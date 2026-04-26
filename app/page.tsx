@@ -18,7 +18,7 @@ export default function HomePage() {
           </h1>
 
           <p className="heroText muted">
-            ArcMail gives you structured outreach systems so you know what to
+            Thalovo gives you structured outreach systems so you know what to
             send, when to send it, and how to keep conversations moving without
             guessing.
           </p>
@@ -55,14 +55,14 @@ export default function HomePage() {
         </div>
 
         <div className="heroCard sidePanel">
-          <div className="badge">Why ArcMail</div>
+          <div className="badge">Why Thalovo</div>
 
           <h3 className="sectionTitle" style={{ marginTop: 18 }}>
             Most outreach breaks because there is no system behind it
           </h3>
 
           <p className="muted" style={{ lineHeight: 1.7 }}>
-            One email is rarely enough. ArcMail helps you start strong, follow
+            One email is rarely enough. Thalovo helps you start strong, follow
             up properly, handle objections, and reuse what works.
           </p>
 
@@ -84,7 +84,7 @@ export default function HomePage() {
           </h2>
 
           <p className="muted sectionLeadCopy" style={{ maxWidth: 760, lineHeight: 1.75 }}>
-            ArcMail is designed around the full conversation. You do not just
+            Thalovo is designed around the full conversation. You do not just
             get copy. You get timing, progression, decision points, and reusable
             messaging systems built to move a lead forward.
           </p>
@@ -140,7 +140,7 @@ export default function HomePage() {
             </h2>
 
             <p className="muted" style={{ marginTop: 10, lineHeight: 1.75 }}>
-              ArcMail is not trying to be your CRM or your sending tool. It is
+              Thalovo is not trying to be your CRM or your sending tool. It is
               the structured messaging system you use alongside those tools.
             </p>
           </div>
@@ -197,7 +197,7 @@ export default function HomePage() {
 
       <section className="container section">
         <div className="glassCard ctaBand" style={{ padding: 30, textAlign: "center" }}>
-          <div className="badge">ArcMail Pro+</div>
+          <div className="badge">Thalovo Pro+</div>
 
           <h2 className="pageTitle" style={{ marginTop: 14 }}>
             Want a system shaped around your business?

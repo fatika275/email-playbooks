@@ -11,9 +11,9 @@ import type { ReactNode } from "react";
 import SiteHeader from "@/components/site-header";
 
 export const metadata: Metadata = {
-  title: "ArcMail",
+  title: "Thalovo",
   description:
-    "ArcMail helps agencies and founders turn cold leads into replies with structured outreach systems.",
+    "Thalovo helps agencies and founders turn cold leads into replies with structured outreach systems.",
 };
 
 export default function RootLayout({

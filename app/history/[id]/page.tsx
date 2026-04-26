@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { getEmails, type SavedEmail } from "@/lib/storage";
 
-const REUSE_EMAIL_KEY = "arcmail_reuse_email";
+const REUSE_EMAIL_KEY = "thalovo_reuse_email";
 
 export default function SavedEmailViewPage() {
   const params = useParams();
@@ -39,6 +39,7 @@ export default function SavedEmailViewPage() {
 
     if (typeof window !== "undefined") {
       localStorage.setItem(REUSE_EMAIL_KEY, JSON.stringify(email));
+      localStorage.removeItem("arcmail_reuse_email");
     }
 
     router.push(`/editor/${email.playbookId}/${email.templateId}`);

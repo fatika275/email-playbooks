@@ -18,22 +18,42 @@ export type CustomTemplate = {
   createdAt: string;
 };
 
-const EMAILS_KEY = "arcmail_emails";
-const TEMPLATES_KEY = "arcmail_templates";
+const EMAILS_KEY = "thalovo_emails";
+const LEGACY_EMAILS_KEY = "arcmail_emails";
+const TEMPLATES_KEY = "thalovo_templates";
+const LEGACY_TEMPLATES_KEY = "arcmail_templates";
+
+function getStoredCollection<T>(key: string, legacyKey?: string): T[] {
+  if (typeof window === "undefined") return [];
+
+  const raw = localStorage.getItem(key);
+
+  if (raw) {
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return [];
+    }
+  }
+
+  if (!legacyKey) return [];
+
+  const legacyRaw = localStorage.getItem(legacyKey);
+  if (!legacyRaw) return [];
+
+  try {
+    const parsed = JSON.parse(legacyRaw) as T[];
+    localStorage.setItem(key, JSON.stringify(parsed));
+    return parsed;
+  } catch {
+    return [];
+  }
+}
 
 /* ---------------- EMAILS ---------------- */
 
 export function getEmails(): SavedEmail[] {
-  if (typeof window === "undefined") return [];
-
-  const raw = localStorage.getItem(EMAILS_KEY);
-  if (!raw) return [];
-
-  try {
-    return JSON.parse(raw);
-  } catch {
-    return [];
-  }
+  return getStoredCollection<SavedEmail>(EMAILS_KEY, LEGACY_EMAILS_KEY);
 }
 
 export function saveEmail(email: SavedEmail) {
@@ -45,16 +65,10 @@ export function saveEmail(email: SavedEmail) {
 /* ---------------- CUSTOM PLAYBOOKS ---------------- */
 
 export function getCustomTemplates(): CustomTemplate[] {
-  if (typeof window === "undefined") return [];
-
-  const raw = localStorage.getItem(TEMPLATES_KEY);
-  if (!raw) return [];
-
-  try {
-    return JSON.parse(raw);
-  } catch {
-    return [];
-  }
+  return getStoredCollection<CustomTemplate>(
+    TEMPLATES_KEY,
+    LEGACY_TEMPLATES_KEY
+  );
 }
 
 export function saveCustomTemplate(template: CustomTemplate) {

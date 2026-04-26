@@ -7,7 +7,8 @@ import { renderTemplate } from "@/lib/renderTemplate";
 import { saveCustomTemplate, saveEmail, type SavedEmail } from "@/lib/storage";
 import { downloadHtmlFile } from "@/lib/exportHtml";
 
-const REUSE_EMAIL_KEY = "arcmail_reuse_email";
+const REUSE_EMAIL_KEY = "thalovo_reuse_email";
+const LEGACY_REUSE_EMAIL_KEY = "arcmail_reuse_email";
 
 function makeId() {
   return typeof crypto !== "undefined" && "randomUUID" in crypto
@@ -160,7 +161,9 @@ export default function EditorPage() {
   > | null>(() => {
     if (typeof window === "undefined") return null;
 
-    const raw = localStorage.getItem(REUSE_EMAIL_KEY);
+    const raw =
+      localStorage.getItem(REUSE_EMAIL_KEY) ||
+      localStorage.getItem(LEGACY_REUSE_EMAIL_KEY);
     if (!raw) return null;
 
     try {
@@ -170,6 +173,8 @@ export default function EditorPage() {
         savedEmail.playbookId === playbookId &&
         savedEmail.templateId === templateId
       ) {
+        localStorage.removeItem(REUSE_EMAIL_KEY);
+        localStorage.removeItem(LEGACY_REUSE_EMAIL_KEY);
         return {
           subject: savedEmail.subject,
           body: savedEmail.body,

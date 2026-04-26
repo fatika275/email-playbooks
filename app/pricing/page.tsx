@@ -21,7 +21,7 @@ export default function PricingPage() {
               lineHeight: 1.75,
             }}
           >
-            ArcMail starts with self-serve systems and expands into a more
+            Thalovo starts with self-serve systems and expands into a more
             tailored offer for businesses that want help shaping their outbound
             process.
           </p>

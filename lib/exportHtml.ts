@@ -21,7 +21,7 @@ export function buildEmailHtml(
   const safeBody = escapeHtml(body).replace(/\n/g, "<br />");
   const safeCompanyName = options?.companyName
     ? escapeHtml(options.companyName)
-    : "ArcMail";
+    : "Thalovo";
 
   const safeLogoUrl = options?.logoUrl || "";
 

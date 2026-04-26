@@ -25,7 +25,7 @@ export default function SiteHeader() {
     <header className="topbar">
       <div className="container topbarInner">
         <Link href="/" className="brand">
-          <span className="brandText">ArcMail</span>
+          <span className="brandText">Thalovo</span>
         </Link>
 
         <nav className="nav" aria-label="Main navigation">
