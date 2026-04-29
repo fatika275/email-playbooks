@@ -9,6 +9,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import SiteHeader from "@/components/site-header";
+import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
   title: "Thalovo",
@@ -28,6 +29,7 @@ export default function RootLayout({
           <SiteHeader />
           {children}
         </div>
+        <Analytics />
       </body>
     </html>
   );
