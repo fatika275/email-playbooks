@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useMemo, useState, useEffect } from "react";
 import { getPlaybookById } from "@/lib/data";
+import { useAccount } from "@/components/account-provider";
+import { getPlaybookAccess } from "@/lib/access";
 
 function getDayFromLabel(label: string) {
   const match = label.match(/\((Day\s+\d+)\)/i);
@@ -96,7 +98,7 @@ function TemplateEducation({
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className="button buttonSecondary"
+        className="button buttonUtility"
       >
         {isOpen ? "Hide Expert Breakdown" : "View Expert Breakdown"}
       </button>
@@ -168,6 +170,7 @@ function TemplateEducation({
 export default function PlaybookPage() {
   const params = useParams();
   const [toastMessage, setToastMessage] = useState("");
+  const { hasProAccess } = useAccount();
 
   const id = useMemo(() => {
     const value = params?.id;
@@ -175,6 +178,7 @@ export default function PlaybookPage() {
   }, [params]);
 
   const playbook = id ? getPlaybookById(id) : null;
+  const access = playbook ? getPlaybookAccess(playbook, hasProAccess) : null;
 
   if (!playbook) {
     return (
@@ -188,6 +192,34 @@ export default function PlaybookPage() {
             <div className="toolbar" style={{ justifyContent: "center" }}>
               <Link href="/" className="button buttonPrimary">
                 Back to System Library
+              </Link>
+            </div>
+          </div>
+        </section>
+      </main>
+    );
+  }
+
+  if (access?.isLocked) {
+    return (
+      <main className="main">
+        <section className="container">
+          <div className="glassCard emptyState">
+            <div className="badge">Pro Playbook</div>
+            <h1 className="pageTitle" style={{ marginTop: 14 }}>
+              Unlock {playbook.name}
+            </h1>
+            <p className="muted" style={{ maxWidth: 680, marginInline: "auto" }}>
+              This is part of the Pro library. Free access includes the core
+              playbooks, while Pro unlocks the full system library, reusable
+              workflows, and advanced sequence tools.
+            </p>
+            <div className="toolbar" style={{ justifyContent: "center", marginTop: 20 }}>
+              <Link href="/pricing" className="button buttonPrimary">
+                View Pro
+              </Link>
+              <Link href="/" className="button buttonSecondary">
+                Back to Free Library
               </Link>
             </div>
           </div>
@@ -220,6 +252,12 @@ export default function PlaybookPage() {
               like, and what to do next — plus deeper breakdowns when you want
               them.
             </p>
+
+            <div className="toolbar" style={{ marginTop: 18 }}>
+              <Link href="/sequence-builder" className="button buttonSecondary">
+                Build Custom Sequence
+              </Link>
+            </div>
           </div>
 
           <div className="sequenceMeta">

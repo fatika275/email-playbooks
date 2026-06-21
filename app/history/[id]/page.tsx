@@ -1,25 +1,39 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { getEmails, type SavedEmail } from "@/lib/storage";
+import { type SavedEmail, useEmails } from "@/lib/storage";
+import { saveEmailRecord } from "@/lib/cloud";
 
 const REUSE_EMAIL_KEY = "thalovo_reuse_email";
 
 export default function SavedEmailViewPage() {
   const params = useParams();
   const router = useRouter();
+  const emails = useEmails();
 
   const id = useMemo(() => {
     const value = params?.id;
     return Array.isArray(value) ? value[0] : value;
   }, [params]);
 
-  const email = useMemo<SavedEmail | null>(() => {
+  const storedEmail = useMemo<SavedEmail | null>(() => {
     if (!id) return null;
-    return getEmails().find((item) => item.id === id) ?? null;
-  }, [id]);
+    return emails.find((item) => item.id === id) ?? null;
+  }, [emails, id]);
+  const [optimisticEmail, setOptimisticEmail] = useState<SavedEmail | null>(
+    null
+  );
+  const email =
+    optimisticEmail?.id === storedEmail?.id ? optimisticEmail : storedEmail;
+  const [tagsInput, setTagsInput] = useState(
+    () => storedEmail?.tags.join(", ") ?? ""
+  );
+  const [folderInput, setFolderInput] = useState(
+    () => storedEmail?.folder ?? ""
+  );
+  const [savedNotice, setSavedNotice] = useState("");
 
   async function handleCopy() {
     if (!email) return;
@@ -43,6 +57,38 @@ export default function SavedEmailViewPage() {
     }
 
     router.push(`/editor/${email.playbookId}/${email.templateId}`);
+  }
+
+  async function handleSaveMetadata() {
+    if (!email) return;
+
+    const tags = tagsInput
+      .split(",")
+      .map((tag) => tag.trim())
+      .filter(Boolean);
+
+    const updatedEmail = {
+      ...email,
+      tags,
+      folder: folderInput.trim() || null,
+    };
+
+    setOptimisticEmail(updatedEmail);
+    await saveEmailRecord(updatedEmail);
+    setSavedNotice("Details updated.");
+  }
+
+  async function handleToggleFavorite() {
+    if (!email) return;
+
+    const updatedEmail = {
+      ...email,
+      isFavorite: !email.isFavorite,
+    };
+
+    setOptimisticEmail(updatedEmail);
+    await saveEmailRecord(updatedEmail);
+    setSavedNotice(email.isFavorite ? "Removed from favorites." : "Added to favorites.");
   }
 
   if (!email) {
@@ -133,6 +179,91 @@ export default function SavedEmailViewPage() {
                     {new Date(email.createdAt).toLocaleString()}
                   </p>
                 </div>
+
+                <div>
+                  <p
+                    className="muted"
+                    style={{
+                      margin: 0,
+                      fontSize: 12,
+                      textTransform: "uppercase",
+                      letterSpacing: "0.05em",
+                    }}
+                  >
+                    Tags
+                  </p>
+                  <div className="tagRow" style={{ marginTop: 8 }}>
+                    {email.tags.length > 0 ? (
+                      email.tags.map((tag) => (
+                        <span key={tag} className="tagChip">
+                          {tag}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="small">No tags yet</span>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <p
+                    className="muted"
+                    style={{
+                      margin: 0,
+                      fontSize: 12,
+                      textTransform: "uppercase",
+                      letterSpacing: "0.05em",
+                    }}
+                  >
+                    Folder
+                  </p>
+                  <p style={{ margin: "6px 0 0" }}>
+                    {email.folder ?? "No folder yet"}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="glassCard" style={{ padding: 18, marginBottom: 18 }}>
+              <h4 style={{ margin: 0 }}>Organize this saved email</h4>
+              <div style={{ display: "grid", gap: 14, marginTop: 14 }}>
+                <div className="formGroup" style={{ marginBottom: 0 }}>
+                  <label className="label">Folder</label>
+                  <input
+                    className="input"
+                    defaultValue={email.folder ?? ""}
+                    onChange={(event) => setFolderInput(event.target.value)}
+                    placeholder="Example: Agency outreach"
+                  />
+                </div>
+
+                <div className="formGroup" style={{ marginBottom: 0 }}>
+                  <label className="label">Tags</label>
+                  <input
+                    className="input"
+                    defaultValue={email.tags.join(", ")}
+                    onChange={(event) => setTagsInput(event.target.value)}
+                    placeholder="Example: proposal, follow-up, high intent"
+                  />
+                </div>
+
+                <div className="toolbar">
+                  <button
+                    className="button buttonSecondary"
+                    onClick={() => void handleSaveMetadata()}
+                  >
+                    Save Details
+                  </button>
+
+                  <button
+                    className="button buttonSecondary"
+                    onClick={() => void handleToggleFavorite()}
+                  >
+                    {email.isFavorite ? "Remove Favorite" : "Add Favorite"}
+                  </button>
+                </div>
+
+                {savedNotice ? <p className="notice">{savedNotice}</p> : null}
               </div>
             </div>
 

@@ -1,0 +1,21 @@
+<svg width="1800" height="540" viewBox="0 0 1800 540" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1800" height="540" rx="72" fill="#090D15"/>
+  <path d="M116 114H338V166H258V420H196V166H116V114Z" fill="url(#gold)"/>
+  <path d="M373 420L477 114H552L656 420H590L565 343H462L439 420H373ZM475 291H551L513 174L475 291Z" fill="#F6E7C1"/>
+  <path d="M721 420V114H782V368H932V420H721Z" fill="#F6E7C1"/>
+  <path d="M978 267C978 180 1044 110 1136 110C1227 110 1293 180 1293 267C1293 354 1227 424 1136 424C1044 424 978 354 978 267ZM1040 267C1040 324 1078 370 1136 370C1192 370 1231 324 1231 267C1231 210 1192 164 1136 164C1078 164 1040 210 1040 267Z" fill="url(#gold)"/>
+  <path d="M1350 114L1440 340L1528 114H1595L1469 420H1409L1284 114H1350Z" fill="#F6E7C1"/>
+  <path d="M1618 267C1618 180 1684 110 1775 110C1866 110 1932 180 1932 267C1932 354 1866 424 1775 424C1684 424 1618 354 1618 267ZM1680 267C1680 324 1718 370 1775 370C1832 370 1870 324 1870 267C1870 210 1832 164 1775 164C1718 164 1680 210 1680 267Z" fill="url(#gold2)"/>
+  <defs>
+    <linearGradient id="gold" x1="854" y1="114" x2="854" y2="420" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF3D5"/>
+      <stop offset="0.52" stop-color="#F2DAA0"/>
+      <stop offset="1" stop-color="#C9A648"/>
+    </linearGradient>
+    <linearGradient id="gold2" x1="1775" y1="110" x2="1775" y2="424" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF3D5"/>
+      <stop offset="0.5" stop-color="#E7CB88"/>
+      <stop offset="1" stop-color="#B98D35"/>
+    </linearGradient>
+  </defs>
+</svg>

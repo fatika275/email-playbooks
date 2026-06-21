@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { getEmails, type SavedEmail } from "@/lib/storage";
+import { useMemo, useState } from "react";
+import { useEmails } from "@/lib/storage";
 import Link from "next/link";
 
 function getBodyPreview(body: string, maxLength = 180) {
@@ -11,7 +11,67 @@ function getBodyPreview(body: string, maxLength = 180) {
 }
 
 export default function SavedEmailsPage() {
-  const [emails] = useState<SavedEmail[]>(() => getEmails());
+  const emails = useEmails();
+  const [query, setQuery] = useState("");
+  const [favoritesOnly, setFavoritesOnly] = useState(false);
+  const [folderFilter, setFolderFilter] = useState("All");
+  const [sortBy, setSortBy] = useState("newest");
+  const folderOptions = useMemo(
+    () => [
+      "All",
+      ...Array.from(
+        new Set(
+          emails
+            .map((email) => email.folder)
+            .filter((folder): folder is string => Boolean(folder))
+        )
+      ),
+    ],
+    [emails]
+  );
+  const filteredEmails = useMemo(() => {
+    const normalized = query.trim().toLowerCase();
+    const filtered = emails.filter((email) => {
+      const matchesQuery =
+        !normalized ||
+        [
+          email.templateLabel,
+          email.subject,
+          email.body,
+          email.playbookId,
+          email.folder ?? "",
+          email.tags.join(" "),
+        ]
+          .join(" ")
+          .toLowerCase()
+          .includes(normalized);
+
+      const matchesFavorite = !favoritesOnly || email.isFavorite;
+      const matchesFolder =
+        folderFilter === "All" || email.folder === folderFilter;
+
+      return matchesQuery && matchesFavorite && matchesFolder;
+    });
+
+    const sorted = [...filtered];
+    if (sortBy === "oldest") {
+      sorted.sort(
+        (a, b) =>
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+      );
+    } else if (sortBy === "subject") {
+      sorted.sort((a, b) => a.subject.localeCompare(b.subject));
+    } else if (sortBy === "favorites") {
+      sorted.sort((a, b) => Number(b.isFavorite) - Number(a.isFavorite));
+    } else {
+      sorted.sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+    }
+
+    return sorted;
+  }, [emails, query, favoritesOnly, folderFilter, sortBy]);
 
   return (
     <main className="main">
@@ -76,7 +136,60 @@ export default function SavedEmailsPage() {
           </div>
         ) : (
           <div style={{ display: "grid", gap: 16 }}>
-            {emails.map((email) => (
+            <div className="glassCard" style={{ padding: 18 }}>
+              <div className="grid" style={{ gridTemplateColumns: "1.6fr 1fr 1fr" }}>
+                <div className="formGroup" style={{ marginBottom: 0 }}>
+                  <label className="label">Search saved emails</label>
+                  <input
+                    className="input"
+                    placeholder="Search by subject, template, or email copy"
+                    value={query}
+                    onChange={(event) => setQuery(event.target.value)}
+                  />
+                </div>
+
+                <div className="formGroup" style={{ marginBottom: 0 }}>
+                  <label className="label">Folder</label>
+                  <select
+                    className="input"
+                    value={folderFilter}
+                    onChange={(event) => setFolderFilter(event.target.value)}
+                  >
+                    {folderOptions.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="formGroup" style={{ marginBottom: 0 }}>
+                  <label className="label">Sort</label>
+                  <select
+                    className="input"
+                    value={sortBy}
+                    onChange={(event) => setSortBy(event.target.value)}
+                  >
+                    <option value="newest">Newest</option>
+                    <option value="oldest">Oldest</option>
+                    <option value="subject">Subject</option>
+                    <option value="favorites">Favorites First</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="toolbar" style={{ marginTop: 14 }}>
+                <button
+                  type="button"
+                  className={favoritesOnly ? "button buttonPrimary" : "button buttonSecondary"}
+                  onClick={() => setFavoritesOnly((prev) => !prev)}
+                >
+                  {favoritesOnly ? "Showing Favorites" : "Favorites Only"}
+                </button>
+              </div>
+            </div>
+
+            {filteredEmails.map((email) => (
               <Link
                 key={email.id}
                 href={`/history/${email.id}`}
@@ -89,10 +202,31 @@ export default function SavedEmailsPage() {
               >
                 <div className="cardTop">
                   <h3 className="cardTitle">{email.templateLabel}</h3>
-                  <span className="miniBadge">Saved Email</span>
+                  <span className="miniBadge">
+                    {email.isFavorite ? "Favorite" : "Saved Email"}
+                  </span>
                 </div>
 
                 <p className="templateMeta">Subject: {email.subject}</p>
+
+                {email.folder || email.tags.length > 0 ? (
+                  <div style={{ marginTop: 8 }}>
+                    {email.folder ? (
+                      <p className="small" style={{ margin: "0 0 8px" }}>
+                        Folder: {email.folder}
+                      </p>
+                    ) : null}
+                    {email.tags.length > 0 ? (
+                      <div className="tagRow">
+                        {email.tags.map((tag) => (
+                          <span key={tag} className="tagChip">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    ) : null}
+                  </div>
+                ) : null}
 
                 <p
                   className="muted"
@@ -106,6 +240,16 @@ export default function SavedEmailsPage() {
                 </p>
               </Link>
             ))}
+
+            {filteredEmails.length === 0 ? (
+              <div className="glassCard emptyState">
+                <h3 className="cardTitle">No saved emails match that search</h3>
+                <p className="muted" style={{ maxWidth: 620, marginInline: "auto" }}>
+                  Try a broader phrase or search by subject, template name, or
+                  a keyword from the email body.
+                </p>
+              </div>
+            ) : null}
           </div>
         )}
       </section>

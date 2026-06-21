@@ -1,0 +1,8 @@
+<svg width="1400" height="420" viewBox="0 0 1400 420" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="40" y="60" width="300" height="300" rx="70" fill="#050505"/>
+  <rect x="66" y="86" width="248" height="248" rx="52" stroke="#242424" stroke-width="5"/>
+  <path d="M116 144H264V190H214V286H166V190H116V144Z" fill="#FFFFFF"/>
+  <circle cx="265" cy="145" r="18" fill="#D8B85A"/>
+  <text x="390" y="245" fill="#050505" font-family="Manrope, Segoe UI, Arial, sans-serif" font-size="124" font-weight="800" letter-spacing="-4">Thalovo</text>
+  <text x="397" y="300" fill="#71717A" font-family="Manrope, Segoe UI, Arial, sans-serif" font-size="28" font-weight="600">Email playbooks for sharper outbound systems</text>
+</svg>

@@ -1,14 +1,37 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import Image from "next/image";
+import { useMemo, useState, useSyncExternalStore } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { getTemplate } from "@/lib/data";
+import { getPlaybookById, getTemplate } from "@/lib/data";
 import { renderTemplate } from "@/lib/renderTemplate";
-import { saveCustomTemplate, saveEmail, type SavedEmail } from "@/lib/storage";
+import { type SavedEmail } from "@/lib/storage";
+import {
+  saveCustomTemplateRecord,
+  saveEmailRecord,
+} from "@/lib/cloud";
 import { downloadHtmlFile } from "@/lib/exportHtml";
+import { useAccount } from "@/components/account-provider";
+import { getPlaybookAccess } from "@/lib/access";
 
 const REUSE_EMAIL_KEY = "thalovo_reuse_email";
 const LEGACY_REUSE_EMAIL_KEY = "arcmail_reuse_email";
+const EMPTY_REUSE_EMAIL = "";
+
+function subscribeToBrowserStorage(onStoreChange: () => void) {
+  if (typeof window === "undefined") return () => {};
+  window.addEventListener("storage", onStoreChange);
+  return () => window.removeEventListener("storage", onStoreChange);
+}
+
+function getReuseEmailSnapshot() {
+  if (typeof window === "undefined") return EMPTY_REUSE_EMAIL;
+  return (
+    localStorage.getItem(REUSE_EMAIL_KEY) ||
+    localStorage.getItem(LEGACY_REUSE_EMAIL_KEY) ||
+    EMPTY_REUSE_EMAIL
+  );
+}
 
 function makeId() {
   return typeof crypto !== "undefined" && "randomUUID" in crypto
@@ -129,6 +152,7 @@ function Field({
 export default function EditorPage() {
   const params = useParams();
   const router = useRouter();
+  const { hasProAccess } = useAccount();
 
   const rawPlaybookId = useMemo(() => {
     const value = params?.playbookId;
@@ -149,32 +173,28 @@ export default function EditorPage() {
   const [primaryGoal, setPrimaryGoal] = useState("");
   const [showOptionalInputs, setShowOptionalInputs] = useState(false);
   const [showBranding, setShowBranding] = useState(false);
-  const [showPersonalGuide, setShowPersonalGuide] = useState(false);
   const [showMoreActions, setShowMoreActions] = useState(false);
   const playbookId = rawPlaybookId ?? "";
   const templateId = rawTemplateId ?? "";
   const foundTemplate =
     playbookId && templateId ? getTemplate(playbookId, templateId) : null;
-  const [reuseDraft] = useState<Pick<
-    SavedEmail,
-    "subject" | "body"
-  > | null>(() => {
-    if (typeof window === "undefined") return null;
-
-    const raw =
-      localStorage.getItem(REUSE_EMAIL_KEY) ||
-      localStorage.getItem(LEGACY_REUSE_EMAIL_KEY);
-    if (!raw) return null;
+  const playbook = playbookId ? getPlaybookById(playbookId) : null;
+  const access = playbook ? getPlaybookAccess(playbook, hasProAccess) : null;
+  const rawReuseEmail = useSyncExternalStore(
+    subscribeToBrowserStorage,
+    getReuseEmailSnapshot,
+    () => EMPTY_REUSE_EMAIL
+  );
+  const reuseDraft = useMemo<Pick<SavedEmail, "subject" | "body"> | null>(() => {
+    if (!rawReuseEmail) return null;
 
     try {
-      const savedEmail = JSON.parse(raw) as SavedEmail;
+      const savedEmail = JSON.parse(rawReuseEmail) as SavedEmail;
 
       if (
         savedEmail.playbookId === playbookId &&
         savedEmail.templateId === templateId
       ) {
-        localStorage.removeItem(REUSE_EMAIL_KEY);
-        localStorage.removeItem(LEGACY_REUSE_EMAIL_KEY);
         return {
           subject: savedEmail.subject,
           body: savedEmail.body,
@@ -185,7 +205,7 @@ export default function EditorPage() {
     }
 
     return null;
-  });
+  }, [playbookId, rawReuseEmail, templateId]);
   const [reuseMode, setReuseMode] = useState(Boolean(reuseDraft));
   const [editableSubject, setEditableSubject] = useState(
     reuseDraft?.subject ?? ""
@@ -265,14 +285,17 @@ export default function EditorPage() {
     });
   }
 
-  function handleSaveEmail() {
-    saveEmail({
+  async function handleSaveEmail() {
+    await saveEmailRecord({
       id: makeId(),
       playbookId,
       templateId,
       templateLabel: template.label,
       subject: finalSubject,
       body: finalBody,
+      tags: [],
+      folder: null,
+      isFavorite: false,
       createdAt: new Date().toISOString(),
     });
 
@@ -280,14 +303,50 @@ export default function EditorPage() {
     setTimeout(() => setSavedMessage(""), 2200);
   }
 
-  function handleSaveSequenceVersion() {
-    saveCustomTemplate({
+  if (playbook && access?.isLocked) {
+    return (
+      <main className="main">
+        <section className="container">
+          <div className="glassCard emptyState">
+            <div className="badge">Pro Editor</div>
+            <h1 className="pageTitle" style={{ marginTop: 14 }}>
+              Unlock this Pro step
+            </h1>
+            <p className="muted">
+              This editor step belongs to a Pro playbook. Upgrade to use the
+              full playbook library and advanced workflows.
+            </p>
+            <div className="toolbar" style={{ justifyContent: "center" }}>
+              <button
+                className="button buttonPrimary"
+                onClick={() => router.push("/pricing")}
+              >
+                View Pro
+              </button>
+              <button
+                className="button buttonUtility"
+                onClick={() => router.push("/")}
+              >
+                Back to Library
+              </button>
+            </div>
+          </div>
+        </section>
+      </main>
+    );
+  }
+
+  async function handleSaveSequenceVersion() {
+    await saveCustomTemplateRecord({
       id: makeId(),
       title: template.label,
       subject: finalSubject,
       body: finalBody,
       sourcePlaybookId: playbookId,
       sourceTemplateId: templateId,
+      tags: [],
+      folder: null,
+      isFavorite: false,
       createdAt: new Date().toISOString(),
     });
 
@@ -319,8 +378,8 @@ export default function EditorPage() {
           }}
         >
           <p className="muted" style={{ margin: 0, lineHeight: 1.65 }}>
-            You’re using early access. Paid plans will unlock more advanced playbooks
-            and features later.
+            Free playbooks help you start quickly. Pro unlocks the deeper
+            library, builder, folders, and reusable sequence workflow.
           </p>
         </div>
 
@@ -442,7 +501,7 @@ export default function EditorPage() {
 
                   <button
                     type="button"
-                    className="button buttonSecondary"
+                    className="button buttonUtility"
                     onClick={() => setShowOptionalInputs((prev) => !prev)}
                   >
                     {showOptionalInputs ? "Hide optional details" : "Show optional details"}
@@ -475,50 +534,6 @@ export default function EditorPage() {
                 }}
               >
                 <div>
-                  <h4 style={{ margin: 0 }}>Make this feel personal</h4>
-                  <p className="muted" style={{ margin: "6px 0 0" }}>
-                    Small details often make the biggest difference.
-                  </p>
-                </div>
-
-                <button
-                  type="button"
-                  className="button buttonSecondary"
-                  onClick={() => setShowPersonalGuide((prev) => !prev)}
-                >
-                  {showPersonalGuide ? "Hide tips" : "Show tips"}
-                </button>
-              </div>
-
-              {showPersonalGuide ? (
-                <div style={{ display: "grid", gap: 8, marginTop: 14 }}>
-                  <p className="muted" style={{ margin: 0 }}>
-                    Mention something specific about the person or company whenever you can.
-                  </p>
-                  <p className="muted" style={{ margin: 0 }}>
-                    A useful observation beats a generic compliment.
-                  </p>
-                  <p className="muted" style={{ margin: 0 }}>
-                    Avoid empty lines like “hope you’re well” unless the rest is genuinely relevant.
-                  </p>
-                  <p className="muted" style={{ margin: 0 }}>
-                    Keep it natural — personal does not mean long.
-                  </p>
-                </div>
-              ) : null}
-            </div>
-
-            <div className="glassCard" style={{ padding: 18, marginBottom: 18 }}>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  gap: 12,
-                  flexWrap: "wrap",
-                }}
-              >
-                <div>
                   <h4 style={{ margin: 0 }}>Branding for HTML export</h4>
                   <p className="muted" style={{ margin: "6px 0 0" }}>
                     Optional if you want a branded export.
@@ -527,7 +542,7 @@ export default function EditorPage() {
 
                 <button
                   type="button"
-                  className="button buttonSecondary"
+                  className="button buttonUtility"
                   onClick={() => setShowBranding((prev) => !prev)}
                 >
                   {showBranding ? "Hide branding" : "Show branding"}
@@ -572,14 +587,18 @@ export default function EditorPage() {
 
                     {logoData ? (
                       <div style={{ marginTop: 12 }}>
-                        <img
+                        <Image
                           src={logoData}
                           alt="Logo preview"
+                          unoptimized
+                          width={180}
+                          height={56}
                           style={{
                             maxHeight: 56,
                             maxWidth: 180,
                             display: "block",
                             borderRadius: 8,
+                            width: "auto",
                           }}
                         />
                       </div>
@@ -650,7 +669,7 @@ export default function EditorPage() {
 
                 <div className="toolbar" style={{ marginTop: 14 }}>
                   <button
-                    className="button buttonSecondary"
+                    className="button buttonUtility"
                     onClick={() => {
                       setReuseMode(false);
                       setEditableSubject("");
@@ -663,8 +682,21 @@ export default function EditorPage() {
               </div>
             ) : (
               <div className="toolbar" style={{ marginBottom: 18 }}>
+                {reuseDraft ? (
+                  <button
+                    className="button buttonPrimary"
+                    onClick={() => {
+                      setReuseMode(true);
+                      setEditableSubject(reuseDraft.subject);
+                      setEditableBody(reuseDraft.body);
+                    }}
+                  >
+                    Load saved email
+                  </button>
+                ) : null}
+
                 <button
-                  className="button buttonSecondary"
+                  className="button buttonUtility"
                   onClick={() => {
                     setReuseMode(true);
                     setEditableSubject(generatedSubject);
@@ -695,12 +727,15 @@ export default function EditorPage() {
                   Copy Email
                 </button>
 
-                <button className="button buttonSecondary" onClick={handleSaveEmail}>
+                <button
+                  className="button buttonSecondary"
+                  onClick={() => void handleSaveEmail()}
+                >
                   Save Email
                 </button>
 
                 <button
-                  className="button buttonSecondary"
+                  className="button buttonUtility"
                   onClick={() => setShowMoreActions((prev) => !prev)}
                 >
                   {showMoreActions ? "Hide options" : "More"}
@@ -716,17 +751,17 @@ export default function EditorPage() {
                     gap: 10,
                   }}
                 >
-                  <button className="button buttonSecondary" onClick={handleDownloadText}>
+                  <button className="button buttonUtility" onClick={handleDownloadText}>
                     Download TXT
                   </button>
 
-                  <button className="button buttonSecondary" onClick={handleDownloadHtml}>
+                  <button className="button buttonUtility" onClick={handleDownloadHtml}>
                     Export HTML
                   </button>
 
                   <button
                     className="button buttonSecondary"
-                    onClick={handleSaveSequenceVersion}
+                    onClick={() => void handleSaveSequenceVersion()}
                   >
                     Save Sequence Version
                   </button>

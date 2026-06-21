@@ -2,12 +2,21 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useAccount } from "@/components/account-provider";
 
 const navItems = [
-  { href: "/", label: "System Library" },
-  { href: "/history", label: "Saved Emails" },
-  { href: "/custom-templates", label: "Reusable Sequences" },
+  { href: "/", label: "Home" },
+  { href: "/library", label: "Library" },
+  { href: "/workspace", label: "Workspace" },
   { href: "/pricing", label: "Pricing" },
+];
+
+const workspacePaths = [
+  "/workspace",
+  "/sequence-builder",
+  "/history",
+  "/custom-templates",
+  "/folders",
 ];
 
 function isActive(pathname: string, href: string) {
@@ -15,11 +24,18 @@ function isActive(pathname: string, href: string) {
     return pathname === "/";
   }
 
+  if (href === "/workspace") {
+    return workspacePaths.some(
+      (path) => pathname === path || pathname.startsWith(`${path}/`)
+    );
+  }
+
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
 export default function SiteHeader() {
   const pathname = usePathname();
+  const { user, isAdmin, isConfigured, isSyncing } = useAccount();
 
   return (
     <header className="topbar">
@@ -43,6 +59,30 @@ export default function SiteHeader() {
               </Link>
             );
           })}
+
+          <Link
+            href="/account"
+            className={`navLink ${pathname === "/account" ? "navLinkActive" : ""}`}
+            aria-current={pathname === "/account" ? "page" : undefined}
+          >
+            {user
+              ? isSyncing
+                ? "Syncing"
+                : "Account"
+              : isConfigured
+                ? "Sign In"
+                : "Local Mode"}
+          </Link>
+
+          {isAdmin ? (
+            <Link
+              href="/admin"
+              className={`navLink ${pathname === "/admin" ? "navLinkActive" : ""}`}
+              aria-current={pathname === "/admin" ? "page" : undefined}
+            >
+              Admin
+            </Link>
+          ) : null}
         </nav>
       </div>
     </header>

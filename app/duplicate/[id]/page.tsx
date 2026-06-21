@@ -1,8 +1,10 @@
 "use client";
 
+import Image from "next/image";
 import { useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { getEmails, saveEmail, type SavedEmail } from "@/lib/storage";
+import { type SavedEmail, useEmails } from "@/lib/storage";
+import { saveEmailRecord } from "@/lib/cloud";
 import { downloadHtmlFile } from "@/lib/exportHtml";
 
 function makeId() {
@@ -14,6 +16,7 @@ function makeId() {
 export default function DuplicateEmailPage() {
   const params = useParams();
   const router = useRouter();
+  const emails = useEmails();
 
   const id = useMemo(() => {
     const value = params?.id;
@@ -22,8 +25,8 @@ export default function DuplicateEmailPage() {
 
   const email = useMemo<SavedEmail | null>(() => {
     if (!id) return null;
-    return getEmails().find((item) => item.id === id) ?? null;
-  }, [id]);
+    return emails.find((item) => item.id === id) ?? null;
+  }, [emails, id]);
   const [subjectDraft, setSubjectDraft] = useState<string | null>(null);
   const [bodyDraft, setBodyDraft] = useState<string | null>(null);
   const [companyName, setCompanyName] = useState("");
@@ -63,16 +66,19 @@ export default function DuplicateEmailPage() {
     });
   }
 
-  function handleSaveEmail() {
+  async function handleSaveEmail() {
     if (!email) return;
 
-    saveEmail({
+    await saveEmailRecord({
       id: makeId(),
       playbookId: email.playbookId,
       templateId: email.templateId,
       templateLabel: email.templateLabel,
       subject,
       body,
+      tags: email.tags ?? [],
+      folder: email.folder ?? null,
+      isFavorite: email.isFavorite ?? false,
       createdAt: new Date().toISOString(),
     });
 
@@ -166,10 +172,13 @@ export default function DuplicateEmailPage() {
               />
 
               {logoData ? (
-                <img
+                <Image
                   src={logoData}
                   alt="Logo preview"
-                  style={{ marginTop: 10, maxHeight: 50 }}
+                  unoptimized
+                  width={160}
+                  height={50}
+                  style={{ marginTop: 10, maxHeight: 50, width: "auto" }}
                 />
               ) : null}
             </div>
@@ -195,7 +204,7 @@ export default function DuplicateEmailPage() {
 
               <button
                 className="button buttonSecondary"
-                onClick={handleSaveEmail}
+                onClick={() => void handleSaveEmail()}
               >
                 Save Email
               </button>

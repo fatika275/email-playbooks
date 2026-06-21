@@ -1,219 +1,153 @@
 "use client";
 
 import Link from "next/link";
+import { ScrollReveal } from "@/components/scroll-reveal";
 import { playbooks } from "@/lib/data";
+import { getBillingLinks, getPlanHref } from "@/lib/billing";
+import { trackEvent } from "@/lib/analytics";
+
+const workflow = [
+  {
+    title: "Pick the situation",
+    text: "Choose the outreach moment you are in: first touch, follow-up, objection, proposal, or re-engagement.",
+  },
+  {
+    title: "Shape the message",
+    text: "Add prospect context, your offer, and the outcome you want so the draft feels specific.",
+  },
+  {
+    title: "Save the system",
+    text: "Keep strong emails and reusable sequences in your workspace so outreach becomes repeatable.",
+  },
+];
 
 export default function HomePage() {
+  const billingLinks = getBillingLinks();
+  const proPlusHref = getPlanHref(
+    billingLinks.proPlus || billingLinks.bookCall,
+    "/book-call"
+  );
+
   return (
     <main className="main">
-      <section className="container hero">
-        <div className="heroCard">
+      <ScrollReveal as="section" className="container homeHero homeRevealHero">
+        <div className="homeHeroInner">
           <div className="eyebrow">
             <span className="eyebrowDot" />
-            Reply-focused outbound system
+            Reply-focused outbound systems
           </div>
 
-          <h1 className="heroTitle">
-            Turn cold leads into <span className="goldText">real replies</span>.
+          <h1 className="homeHeroTitle">
+            Write outbound emails with structure, not guesswork.
           </h1>
 
-          <p className="heroText muted">
-            Thalovo gives you structured outreach systems so you know what to
-            send, when to send it, and how to keep conversations moving without
-            guessing.
+          <p className="homeHeroText">
+            Thalovo helps founders, agencies, and small teams build practical
+            email sequences for starting conversations, following up, handling
+            objections, and reusing what works.
           </p>
 
-          <div className="heroActions">
+          <div className="heroActions homeHeroActions">
             <Link
-              href="/playbook/cold-outreach-sequence"
+              href="/library"
               className="button buttonPrimary"
+              onClick={() => trackEvent("homepage_explore_library")}
             >
-              Start the system
+              Explore library
             </Link>
+            <Link
+              href="/account"
+              className="button buttonSecondary"
+              onClick={() => trackEvent("homepage_get_started")}
+            >
+              Get started
+            </Link>
+          </div>
+        </div>
+      </ScrollReveal>
 
+      <ScrollReveal as="section" className="container section" delay={80}>
+        <div className="homeMetrics">
+          <div>
+            <strong>{playbooks.length}+</strong>
+            <span>Playbook systems</span>
+          </div>
+          <div>
+            <strong>Full sequence</strong>
+            <span>Not isolated templates</span>
+          </div>
+          <div>
+            <strong>Reusable</strong>
+            <span>Saved emails, folders, and workspace</span>
+          </div>
+        </div>
+      </ScrollReveal>
+
+      <ScrollReveal as="section" className="container section" delay={100}>
+        <div className="sectionHeader homeSectionHeader">
+          <div>
+            <h2 className="pageTitle">A calmer way to build outbound</h2>
+            <p className="muted">
+              Start with proven structure, then make each message specific to
+              the person you are trying to reach.
+            </p>
+          </div>
+        </div>
+
+        <div className="grid homeWorkflowGrid">
+          {workflow.map((item, index) => (
+            <ScrollReveal
+              key={item.title}
+              className="glassCard homeWorkflowCard"
+              delay={index * 90}
+            >
+              <span className="miniBadge">{String(index + 1).padStart(2, "0")}</span>
+              <h3 className="cardTitle">{item.title}</h3>
+              <p className="muted">{item.text}</p>
+            </ScrollReveal>
+          ))}
+        </div>
+      </ScrollReveal>
+
+      <ScrollReveal as="section" className="container section" delay={120}>
+        <div className="homeProductBand">
+          <div>
+            <div className="badge">Workspace</div>
+            <h2 className="pageTitle" style={{ marginTop: 14 }}>
+              From one email to a repeatable operating system.
+            </h2>
+            <p className="muted" style={{ marginTop: 12, maxWidth: 680 }}>
+              Use the library for the first draft, save the best versions, and
+              build reusable sequences as your outreach gets sharper.
+            </p>
+          </div>
+
+          <div className="homeProductActions">
+            <Link href="/workspace" className="button buttonPrimary">
+              Open workspace
+            </Link>
             <Link href="/pricing" className="button buttonSecondary">
               View pricing
             </Link>
           </div>
-
-          <div className="statGrid">
-            <div className="statCard">
-              <div className="statValue">{playbooks.length}+</div>
-              <div className="statLabel">Playbooks</div>
-            </div>
-
-            <div className="statCard">
-              <div className="statValue">Structured</div>
-              <div className="statLabel">Not random templates</div>
-            </div>
-
-            <div className="statCard">
-              <div className="statValue">Reusable</div>
-              <div className="statLabel">Systems and saved emails</div>
-            </div>
-          </div>
         </div>
+      </ScrollReveal>
 
-        <div className="heroCard sidePanel">
-          <div className="badge">Why Thalovo</div>
-
-          <h3 className="sectionTitle" style={{ marginTop: 18 }}>
-            Most outreach breaks because there is no system behind it
-          </h3>
-
-          <p className="muted" style={{ lineHeight: 1.7 }}>
-            One email is rarely enough. Thalovo helps you start strong, follow
-            up properly, handle objections, and reuse what works.
-          </p>
-
-          <ul className="featureList">
-            <li>Cold outreach steps that start conversations</li>
-            <li>Follow-ups that recover ignored leads</li>
-            <li>Objection replies that protect momentum</li>
-            <li>Reusable sequences and saved email workflow</li>
-          </ul>
-        </div>
-      </section>
-
-      <section className="container section">
-        <div className="glassCard featureBand" style={{ padding: 30 }}>
-          <div className="badge">The system difference</div>
-
-          <h2 className="pageTitle sectionLeadTitle" style={{ marginTop: 14 }}>
-            Better replies come from better structure
-          </h2>
-
-          <p className="muted sectionLeadCopy" style={{ maxWidth: 760, lineHeight: 1.75 }}>
-            Thalovo is designed around the full conversation. You do not just
-            get copy. You get timing, progression, decision points, and reusable
-            messaging systems built to move a lead forward.
-          </p>
-
-          <div className="grid featureGrid" style={{ marginTop: 24 }}>
-            <div className="glassCard featurePanel" style={{ padding: 20 }}>
-              <h3 className="cardTitle">Start with relevance</h3>
-              <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
-                Open with outreach that feels specific to the prospect instead
-                of generic or over-pitched.
-              </p>
-            </div>
-
-            <div className="glassCard featurePanel" style={{ padding: 20 }}>
-              <h3 className="cardTitle">Follow through properly</h3>
-              <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
-                Know when to follow up, what to send next, and how to avoid
-                stopping too early.
-              </p>
-            </div>
-
-            <div className="glassCard featurePanel" style={{ padding: 20 }}>
-              <h3 className="cardTitle">Reuse what works</h3>
-              <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
-                Save strong emails and sequence versions so your best outreach
-                becomes part of your workflow.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="container section">
-        <div className="grid infoGrid">
-          <div className="glassCard infoPanel" style={{ padding: 28 }}>
-            <div className="badge">Built for</div>
-            <h2 className="pageTitle" style={{ marginTop: 14 }}>
-              Teams and founders doing outbound seriously
-            </h2>
-
-            <ul className="featureList" style={{ marginTop: 18 }}>
-              <li>Agencies trying to win more clients</li>
-              <li>Founders doing their own outbound</li>
-              <li>Freelancers building lead flow through email</li>
-              <li>Small teams needing a repeatable system</li>
-            </ul>
-          </div>
-
-          <div className="glassCard infoPanel" style={{ padding: 28 }}>
-            <div className="badge">Positioning</div>
-            <h2 className="pageTitle" style={{ marginTop: 14 }}>
-              Focused on the messaging layer
-            </h2>
-
-            <p className="muted" style={{ marginTop: 10, lineHeight: 1.75 }}>
-              Thalovo is not trying to be your CRM or your sending tool. It is
-              the structured messaging system you use alongside those tools.
-            </p>
-          </div>
-
-          <div className="glassCard infoPanel" style={{ padding: 28 }}>
-            <div className="badge">Why it feels different</div>
-            <h2 className="pageTitle" style={{ marginTop: 14 }}>
-              Practical first, educational when needed
-            </h2>
-
-            <p className="muted" style={{ marginTop: 10, lineHeight: 1.75 }}>
-              Use a step immediately or open the expert breakdown to understand
-              the psychology, sentence logic, and common mistakes behind it.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section className="container section">
-        <div className="sectionHeader">
-          <div>
-            <h2 className="pageTitle">System Library</h2>
-            <p className="muted">
-              Choose the system that fits the conversation you need to move.
-            </p>
-          </div>
-        </div>
-
-        <div className="grid libraryGrid">
-          {playbooks.map((playbook) => (
-            <div key={playbook.id} className="playbookCard glassCard">
-              <div className="cardTop">
-                <h3 className="cardTitle">{playbook.name}</h3>
-                <span className="miniBadge">{playbook.badge}</span>
-              </div>
-
-              <p className="cardDesc">{playbook.description}</p>
-
-              <div className="cardMeta">
-                {playbook.templates.length}{" "}
-                {playbook.templates.length === 1 ? "step" : "steps"}
-              </div>
-
-              <Link
-                href={`/playbook/${playbook.id}`}
-                className="button buttonPrimary"
-              >
-                Open system
-              </Link>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="container section">
-        <div className="glassCard ctaBand" style={{ padding: 30, textAlign: "center" }}>
-          <div className="badge">Thalovo Pro+</div>
-
+      <ScrollReveal as="section" className="container section" delay={120}>
+        <div className="homeCta">
+          <div className="badge">Pro+</div>
           <h2 className="pageTitle" style={{ marginTop: 14 }}>
-            Want a system shaped around your business?
+            Want the system shaped around your offer?
           </h2>
-
-          <p className="muted" style={{ maxWidth: 700, margin: "10px auto", lineHeight: 1.75 }}>
-            Pro+ is for agencies and founders who want help refining their
-            offer, structuring outbound, and building a reply-focused system
-            they can actually use.
+          <p className="muted">
+            Pro+ is for founders and agencies who want help refining their
+            positioning, outbound flow, and reusable messaging system.
           </p>
-
-          <Link href="/pricing" className="button buttonPrimary">
-            Explore Pro+
+          <Link href={proPlusHref} className="button buttonPrimary">
+            Book Pro+
           </Link>
         </div>
-      </section>
+      </ScrollReveal>
     </main>
   );
 }

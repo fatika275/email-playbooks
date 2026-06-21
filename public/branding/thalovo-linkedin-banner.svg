@@ -1,0 +1,76 @@
+<svg width="1584" height="396" viewBox="0 0 1584 396" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1584" height="396" rx="32" fill="#090D15"/>
+  <rect x="12" y="12" width="1560" height="372" rx="22" stroke="url(#frame)" stroke-opacity="0.55" stroke-width="2"/>
+
+  <circle cx="1376" cy="92" r="164" fill="url(#glow)" fill-opacity="0.18"/>
+  <circle cx="1228" cy="328" r="218" fill="url(#glow2)" fill-opacity="0.1"/>
+
+  <g opacity="0.8">
+    <path d="M1142 74H1462" stroke="url(#line1)" stroke-width="1.5"/>
+    <path d="M1098 112H1512" stroke="url(#line2)" stroke-width="1"/>
+    <path d="M1068 150H1480" stroke="url(#line3)" stroke-width="1"/>
+  </g>
+
+  <text x="108" y="148" fill="url(#wordmark)" font-family="'Cormorant Garamond', Georgia, serif" font-size="78" font-weight="700" letter-spacing="-2.5">
+    Thalovo
+  </text>
+
+  <text x="110" y="198" fill="#F2DAA0" font-family="'Manrope', 'Segoe UI', Arial, sans-serif" font-size="17" font-weight="700" letter-spacing="3.6">
+    STRUCTURED OUTBOUND SYSTEMS
+  </text>
+
+  <text x="108" y="252" fill="#E8EBF2" font-family="'Manrope', 'Segoe UI', Arial, sans-serif" font-size="30" font-weight="500">
+    Turn cold leads into real replies.
+  </text>
+
+  <text x="108" y="296" fill="rgba(247,248,251,0.7)" font-family="'Manrope', 'Segoe UI', Arial, sans-serif" font-size="20" font-weight="500">
+    Built for agencies, founders, and service businesses doing outbound seriously.
+  </text>
+
+  <g opacity="0.95">
+    <rect x="1186" y="214" width="250" height="64" rx="32" fill="url(#pill)" stroke="rgba(201,166,72,0.35)" stroke-width="1.5"/>
+    <text x="1237" y="254" fill="#111317" font-family="'Manrope', 'Segoe UI', Arial, sans-serif" font-size="17" font-weight="800" letter-spacing="1.4">
+      EARLY ACCESS
+    </text>
+  </g>
+
+  <defs>
+    <linearGradient id="wordmark" x1="108" y1="102" x2="570" y2="170" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="0.48" stop-color="#F7EFD9"/>
+      <stop offset="1" stop-color="#D6B66A"/>
+    </linearGradient>
+    <linearGradient id="pill" x1="1311" y1="214" x2="1311" y2="278" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F3DC9E"/>
+      <stop offset="1" stop-color="#C9A648"/>
+    </linearGradient>
+    <linearGradient id="frame" x1="80" y1="28" x2="1492" y2="364" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2D2416"/>
+      <stop offset="0.52" stop-color="#C9A648"/>
+      <stop offset="1" stop-color="#17140F"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1376 92) rotate(90) scale(164)">
+      <stop stop-color="#D3B265"/>
+      <stop offset="1" stop-color="#D3B265" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glow2" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1228 328) rotate(90) scale(218)">
+      <stop stop-color="#8B6E2D"/>
+      <stop offset="1" stop-color="#8B6E2D" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="line1" x1="1142" y1="74" x2="1462" y2="74" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#C9A648" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#C9A648" stop-opacity="0.7"/>
+      <stop offset="1" stop-color="#C9A648" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="line2" x1="1098" y1="112" x2="1512" y2="112" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F7EFD9" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#F7EFD9" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#F7EFD9" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="line3" x1="1068" y1="150" x2="1480" y2="150" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#C9A648" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#C9A648" stop-opacity="0.32"/>
+      <stop offset="1" stop-color="#C9A648" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+</svg>

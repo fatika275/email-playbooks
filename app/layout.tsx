@@ -8,6 +8,8 @@ import "@fontsource/cormorant-garamond/700.css";
 import "./globals.css";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { AccountProvider } from "@/components/account-provider";
+import SiteFooter from "@/components/site-footer";
 import SiteHeader from "@/components/site-header";
 
 export const metadata: Metadata = {
@@ -24,10 +26,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased">
-        <div className="siteShell">
-          <SiteHeader />
-          {children}
-        </div>
+        <AccountProvider>
+          <div className="siteShell">
+            <SiteHeader />
+            {children}
+            <SiteFooter />
+          </div>
+        </AccountProvider>
       </body>
     </html>
   );

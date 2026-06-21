@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { getCustomTemplates, type CustomTemplate } from "@/lib/storage";
+import { type CustomTemplate, useCustomTemplates } from "@/lib/storage";
 import { playbooks } from "@/lib/data";
+import { useAccount } from "@/components/account-provider";
 
 type GroupedTemplates = {
   sourcePlaybookId: string;
@@ -20,8 +21,14 @@ function getBodyPreview(body: string, maxLength = 140) {
 }
 
 export default function ReusableSequencesPage() {
-  const [templates] = useState<CustomTemplate[]>(() => getCustomTemplates());
+  const { hasProAccess } = useAccount();
+  const templates = useCustomTemplates();
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
+  const [query, setQuery] = useState("");
+  const [playbookFilter, setPlaybookFilter] = useState("All");
+  const [favoritesOnly, setFavoritesOnly] = useState(false);
+  const [folderFilter, setFolderFilter] = useState("All");
+  const [sortBy, setSortBy] = useState("newest");
 
   const groupedTemplates = useMemo<GroupedTemplates[]>(() => {
     const groups = new Map<
@@ -62,11 +69,114 @@ export default function ReusableSequencesPage() {
     });
   }, [templates]);
 
+  const playbookOptions = useMemo(
+    () => ["All", ...groupedTemplates.map((group) => group.sourcePlaybookName)],
+    [groupedTemplates]
+  );
+
+  const folderOptions = useMemo(
+    () => [
+      "All",
+      ...Array.from(
+        new Set(
+          templates
+            .map((template) => template.folder)
+            .filter((folder): folder is string => Boolean(folder))
+        )
+      ),
+    ],
+    [templates]
+  );
+
+  const filteredGroups = useMemo(() => {
+    const normalized = query.trim().toLowerCase();
+
+    return groupedTemplates
+      .map((group) => ({
+        ...group,
+        items: group.items.filter((template) => {
+          const matchesQuery =
+            normalized.length === 0 ||
+            [
+              template.title,
+              template.subject,
+              template.body,
+              template.sourceTemplateLabel,
+              group.sourcePlaybookName,
+            ]
+              .join(" ")
+              .toLowerCase()
+              .includes(normalized);
+
+          const matchesPlaybook =
+            playbookFilter === "All" ||
+            group.sourcePlaybookName === playbookFilter;
+
+          const matchesFavorite = !favoritesOnly || template.isFavorite;
+          const matchesFolder =
+            folderFilter === "All" || template.folder === folderFilter;
+
+          return matchesQuery && matchesPlaybook && matchesFavorite && matchesFolder;
+        }),
+      }))
+      .map((group) => ({
+        ...group,
+        items: [...group.items].sort((a, b) => {
+          if (sortBy === "oldest") {
+            return (
+              new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+            );
+          }
+
+          if (sortBy === "name") {
+            return a.title.localeCompare(b.title);
+          }
+
+          if (sortBy === "favorites") {
+            return Number(b.isFavorite) - Number(a.isFavorite);
+          }
+
+          return (
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          );
+        }),
+      }))
+      .filter((group) => group.items.length > 0);
+  }, [groupedTemplates, query, playbookFilter, favoritesOnly, folderFilter, sortBy]);
+
   function toggleGroup(groupId: string) {
     setOpenGroups((prev) => ({
       ...prev,
       [groupId]: !prev[groupId],
     }));
+  }
+
+  if (!hasProAccess) {
+    return (
+      <main className="main">
+        <section className="container">
+          <div className="glassCard emptyState">
+            <div className="badge">Pro Library</div>
+            <h1 className="pageTitle" style={{ marginTop: 14 }}>
+              Reusable Sequences are Pro
+            </h1>
+            <p className="muted" style={{ maxWidth: 680, marginInline: "auto" }}>
+              Free access includes the core playbooks. Pro unlocks reusable
+              sequences, folders, the sequence builder, and the full playbook
+              library.
+            </p>
+            <div className="toolbar" style={{ justifyContent: "center", marginTop: 20 }}>
+              <Link href="/pricing" className="button buttonPrimary">
+                View Pro
+              </Link>
+              <Link href="/" className="button buttonSecondary">
+                Use Free Playbooks
+              </Link>
+            </div>
+          </div>
+        </section>
+      </main>
+    );
   }
 
   return (
@@ -131,7 +241,75 @@ export default function ReusableSequencesPage() {
           </div>
         ) : (
           <div style={{ display: "grid", gap: 24 }}>
-            {groupedTemplates.map((group) => {
+            <div className="glassCard" style={{ padding: 18 }}>
+              <div className="grid" style={{ gridTemplateColumns: "1.6fr 1fr 1fr 1fr" }}>
+                <div className="formGroup" style={{ marginBottom: 0 }}>
+                  <label className="label">Search reusable sequences</label>
+                  <input
+                    className="input"
+                    placeholder="Search by title, subject, or sequence content"
+                    value={query}
+                    onChange={(event) => setQuery(event.target.value)}
+                  />
+                </div>
+
+                <div className="formGroup" style={{ marginBottom: 0 }}>
+                  <label className="label">Filter by playbook</label>
+                  <select
+                    className="input"
+                    value={playbookFilter}
+                    onChange={(event) => setPlaybookFilter(event.target.value)}
+                  >
+                    {playbookOptions.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="formGroup" style={{ marginBottom: 0 }}>
+                  <label className="label">Folder</label>
+                  <select
+                    className="input"
+                    value={folderFilter}
+                    onChange={(event) => setFolderFilter(event.target.value)}
+                  >
+                    {folderOptions.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="formGroup" style={{ marginBottom: 0 }}>
+                  <label className="label">Sort</label>
+                  <select
+                    className="input"
+                    value={sortBy}
+                    onChange={(event) => setSortBy(event.target.value)}
+                  >
+                    <option value="newest">Newest</option>
+                    <option value="oldest">Oldest</option>
+                    <option value="name">Name</option>
+                    <option value="favorites">Favorites First</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="toolbar" style={{ marginTop: 14 }}>
+                <button
+                  type="button"
+                  className={favoritesOnly ? "button buttonPrimary" : "button buttonSecondary"}
+                  onClick={() => setFavoritesOnly((prev) => !prev)}
+                >
+                  {favoritesOnly ? "Showing Favorites" : "Favorites Only"}
+                </button>
+              </div>
+            </div>
+
+            {filteredGroups.map((group) => {
               const isOpen =
                 openGroups[group.sourcePlaybookId] === undefined
                   ? true
@@ -164,7 +342,7 @@ export default function ReusableSequencesPage() {
                     </div>
 
                     <button
-                      className="button buttonSecondary"
+                      className="button buttonUtility"
                       onClick={() => toggleGroup(group.sourcePlaybookId)}
                     >
                       {isOpen ? "Hide Sequences" : "Show Sequences"}
@@ -192,15 +370,36 @@ export default function ReusableSequencesPage() {
                         >
                           <div className="cardTop">
                             <h3 className="cardTitle">{template.title}</h3>
-                            <span className="miniBadge">Reusable Sequence</span>
+                            <span className="miniBadge">
+                              {template.isFavorite ? "Favorite" : "Reusable Sequence"}
+                            </span>
                           </div>
 
                           <p className="templateMeta">
                             Subject: {template.subject}
                           </p>
 
+                          {template.folder || template.tags.length > 0 ? (
+                            <div style={{ marginTop: 8 }}>
+                              {template.folder ? (
+                                <p className="small" style={{ margin: "0 0 8px" }}>
+                                  Folder: {template.folder}
+                                </p>
+                              ) : null}
+                              {template.tags.length > 0 ? (
+                                <div className="tagRow">
+                                  {template.tags.map((tag) => (
+                                    <span key={tag} className="tagChip">
+                                      {tag}
+                                    </span>
+                                  ))}
+                                </div>
+                              ) : null}
+                            </div>
+                          ) : null}
+
                           <p className="small">
-                            From: {group.sourcePlaybookName} →{" "}
+                            From: {group.sourcePlaybookName} {"->"}{" "}
                             {template.sourceTemplateLabel}
                           </p>
 
@@ -221,6 +420,16 @@ export default function ReusableSequencesPage() {
                 </section>
               );
             })}
+
+            {filteredGroups.length === 0 ? (
+              <div className="glassCard emptyState">
+                <h3 className="cardTitle">No reusable sequences match that search</h3>
+                <p className="muted" style={{ maxWidth: 620, marginInline: "auto" }}>
+                  Try clearing the filter or use a broader keyword from the
+                  title, subject, or sequence body.
+                </p>
+              </div>
+            ) : null}
           </div>
         )}
       </section>

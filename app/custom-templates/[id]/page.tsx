@@ -1,15 +1,16 @@
 "use client";
 
+import Image from "next/image";
 import { useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
-  getCustomTemplates,
-  saveCustomTemplate,
-  saveEmail,
   type CustomTemplate,
+  useCustomTemplates,
 } from "@/lib/storage";
+import { saveCustomTemplateRecord, saveEmailRecord } from "@/lib/cloud";
 import { downloadHtmlFile } from "@/lib/exportHtml";
 import { playbooks } from "@/lib/data";
+import { useAccount } from "@/components/account-provider";
 
 function makeId() {
   return typeof crypto !== "undefined" && "randomUUID" in crypto
@@ -20,22 +21,37 @@ function makeId() {
 export default function SequenceAssetPage() {
   const params = useParams();
   const router = useRouter();
+  const { hasProAccess } = useAccount();
+  const templates = useCustomTemplates();
 
   const id = useMemo(() => {
     const value = params?.id;
     return Array.isArray(value) ? value[0] : value;
   }, [params]);
 
-  const template = useMemo<CustomTemplate | null>(() => {
+  const storedTemplate = useMemo<CustomTemplate | null>(() => {
     if (!id) return null;
-    return getCustomTemplates().find((item) => item.id === id) ?? null;
-  }, [id]);
+    return templates.find((item) => item.id === id) ?? null;
+  }, [id, templates]);
+
+  const [optimisticTemplate, setOptimisticTemplate] =
+    useState<CustomTemplate | null>(null);
+  const template =
+    optimisticTemplate?.id === storedTemplate?.id
+      ? optimisticTemplate
+      : storedTemplate;
   const [titleDraft, setTitleDraft] = useState<string | null>(null);
   const [subjectDraft, setSubjectDraft] = useState<string | null>(null);
   const [bodyDraft, setBodyDraft] = useState<string | null>(null);
   const [companyName, setCompanyName] = useState("");
   const [logoData, setLogoData] = useState("");
   const [savedMessage, setSavedMessage] = useState("");
+  const [tagsInput, setTagsInput] = useState(
+    () => storedTemplate?.tags.join(", ") ?? ""
+  );
+  const [folderInput, setFolderInput] = useState(
+    () => storedTemplate?.folder ?? ""
+  );
   const title = titleDraft ?? template?.title ?? "";
   const subject = subjectDraft ?? template?.subject ?? "";
   const body = bodyDraft ?? template?.body ?? "";
@@ -49,11 +65,11 @@ export default function SequenceAssetPage() {
     }
 
     const sourcePlaybook = playbooks.find(
-      (p) => p.id === template.sourcePlaybookId
+      (playbook) => playbook.id === template.sourcePlaybookId
     );
 
     const sourceTemplate = sourcePlaybook?.templates.find(
-      (t) => t.id === template.sourceTemplateId
+      (item) => item.id === template.sourceTemplateId
     );
 
     return {
@@ -93,38 +109,112 @@ export default function SequenceAssetPage() {
     });
   }
 
-  function handleSaveVersion() {
+  async function handleSaveVersion() {
     if (!template) return;
 
-    saveCustomTemplate({
+    await saveCustomTemplateRecord({
       id: makeId(),
       title,
       subject,
       body,
       sourcePlaybookId: template.sourcePlaybookId,
       sourceTemplateId: template.sourceTemplateId,
+      tags: template.tags ?? [],
+      folder: template.folder ?? null,
+      isFavorite: template.isFavorite ?? false,
       createdAt: new Date().toISOString(),
     });
 
-    setSavedMessage("Saved as new version");
+    setSavedMessage("Saved as new version.");
     setTimeout(() => setSavedMessage(""), 2000);
   }
 
-  function handleSaveAsEmail() {
+  async function handleSaveAsEmail() {
     if (!template) return;
 
-    saveEmail({
+    await saveEmailRecord({
       id: makeId(),
       playbookId: template.sourcePlaybookId,
       templateId: template.sourceTemplateId,
       templateLabel: title,
       subject,
       body,
+      tags: template.tags ?? [],
+      folder: template.folder ?? null,
+      isFavorite: false,
       createdAt: new Date().toISOString(),
     });
 
-    setSavedMessage("Saved to Saved Emails");
+    setSavedMessage("Saved to Saved Emails.");
     setTimeout(() => setSavedMessage(""), 2000);
+  }
+
+  async function handleSaveMetadata() {
+    if (!template) return;
+
+    const tags = tagsInput
+      .split(",")
+      .map((tag) => tag.trim())
+      .filter(Boolean);
+
+    const updatedTemplate = {
+      ...template,
+      tags,
+      folder: folderInput.trim() || null,
+    };
+
+    setOptimisticTemplate(updatedTemplate);
+    await saveCustomTemplateRecord(updatedTemplate);
+    setSavedMessage("Sequence details updated.");
+    setTimeout(() => setSavedMessage(""), 2000);
+  }
+
+  async function handleToggleFavorite() {
+    if (!template) return;
+
+    const updatedTemplate = {
+      ...template,
+      isFavorite: !template.isFavorite,
+    };
+
+    setOptimisticTemplate(updatedTemplate);
+    await saveCustomTemplateRecord(updatedTemplate);
+    setSavedMessage(
+      template.isFavorite ? "Removed from favorites." : "Added to favorites."
+    );
+    setTimeout(() => setSavedMessage(""), 2000);
+  }
+
+  if (!hasProAccess) {
+    return (
+      <main className="main">
+        <section className="container">
+          <div className="glassCard emptyState">
+            <div className="badge">Pro Library</div>
+            <h1 className="pageTitle" style={{ marginTop: 14 }}>
+              Reusable Sequences are Pro
+            </h1>
+            <p className="muted">
+              Upgrade to manage reusable sequence assets and built sequences.
+            </p>
+            <div className="toolbar" style={{ justifyContent: "center" }}>
+              <button
+                className="button buttonPrimary"
+                onClick={() => router.push("/pricing")}
+              >
+                View Pro
+              </button>
+              <button
+                className="button buttonSecondary"
+                onClick={() => router.push("/")}
+              >
+                Back to Library
+              </button>
+            </div>
+          </div>
+        </section>
+      </main>
+    );
   }
 
   if (!template) {
@@ -161,7 +251,7 @@ export default function SequenceAssetPage() {
           </h1>
 
           <p className="muted">
-            From: {sourceInfo.playbookName} → {sourceInfo.templateLabel}
+            From: {sourceInfo.playbookName} {"->"} {sourceInfo.templateLabel}
           </p>
         </div>
 
@@ -213,8 +303,108 @@ export default function SequenceAssetPage() {
                     Source
                   </p>
                   <p style={{ margin: "6px 0 0" }}>
-                    {sourceInfo.playbookName} → {sourceInfo.templateLabel}
+                    {sourceInfo.playbookName} {"->"} {sourceInfo.templateLabel}
                   </p>
+                </div>
+
+                <div>
+                  <p
+                    className="muted"
+                    style={{
+                      margin: 0,
+                      fontSize: 12,
+                      textTransform: "uppercase",
+                      letterSpacing: "0.05em",
+                    }}
+                  >
+                    Favorite
+                  </p>
+                  <p style={{ margin: "6px 0 0" }}>
+                    {template.isFavorite ? "Yes" : "No"}
+                  </p>
+                </div>
+
+                <div>
+                  <p
+                    className="muted"
+                    style={{
+                      margin: 0,
+                      fontSize: 12,
+                      textTransform: "uppercase",
+                      letterSpacing: "0.05em",
+                    }}
+                  >
+                    Folder
+                  </p>
+                  <p style={{ margin: "6px 0 0" }}>
+                    {template.folder ?? "No folder yet"}
+                  </p>
+                </div>
+
+                <div>
+                  <p
+                    className="muted"
+                    style={{
+                      margin: 0,
+                      fontSize: 12,
+                      textTransform: "uppercase",
+                      letterSpacing: "0.05em",
+                    }}
+                  >
+                    Tags
+                  </p>
+                  <div className="tagRow" style={{ marginTop: 8 }}>
+                    {template.tags.length > 0 ? (
+                      template.tags.map((tag) => (
+                        <span key={tag} className="tagChip">
+                          {tag}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="small">No tags yet</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="glassCard" style={{ padding: 18, marginBottom: 18 }}>
+              <h4 style={{ margin: 0 }}>Organize this sequence</h4>
+              <div style={{ display: "grid", gap: 14, marginTop: 14 }}>
+                <div className="formGroup" style={{ marginBottom: 0 }}>
+                  <label className="label">Folder</label>
+                  <input
+                    className="input"
+                    defaultValue={template.folder ?? ""}
+                    onChange={(event) => setFolderInput(event.target.value)}
+                    placeholder="Example: Client acquisition"
+                  />
+                </div>
+
+                <div className="formGroup" style={{ marginBottom: 0 }}>
+                  <label className="label">Tags</label>
+                  <input
+                    className="input"
+                    defaultValue={template.tags.join(", ")}
+                    onChange={(event) => setTagsInput(event.target.value)}
+                    placeholder="Example: outreach, founder, follow-up"
+                  />
+                </div>
+
+                <div className="toolbar">
+                  <button
+                    className="button buttonSecondary"
+                    onClick={() => void handleSaveMetadata()}
+                  >
+                    Save Details
+                  </button>
+
+                  <button
+                    className="button buttonSecondary"
+                    onClick={() => void handleToggleFavorite()}
+                  >
+                    {template.isFavorite ? "Remove Favorite" : "Add Favorite"}
+                  </button>
                 </div>
               </div>
             </div>
@@ -224,7 +414,7 @@ export default function SequenceAssetPage() {
               <input
                 className="input"
                 value={title}
-                onChange={(e) => setTitleDraft(e.target.value)}
+                onChange={(event) => setTitleDraft(event.target.value)}
                 placeholder="Enter asset name"
               />
             </div>
@@ -234,7 +424,7 @@ export default function SequenceAssetPage() {
               <input
                 className="input"
                 value={subject}
-                onChange={(e) => setSubjectDraft(e.target.value)}
+                onChange={(event) => setSubjectDraft(event.target.value)}
                 placeholder="Enter subject"
               />
             </div>
@@ -245,7 +435,7 @@ export default function SequenceAssetPage() {
                 className="input"
                 rows={14}
                 value={body}
-                onChange={(e) => setBodyDraft(e.target.value)}
+                onChange={(event) => setBodyDraft(event.target.value)}
                 placeholder="Enter email body"
               />
             </div>
@@ -255,7 +445,7 @@ export default function SequenceAssetPage() {
               <input
                 className="input"
                 value={companyName}
-                onChange={(e) => setCompanyName(e.target.value)}
+                onChange={(event) => setCompanyName(event.target.value)}
                 placeholder="Enter company name for export"
               />
             </div>
@@ -266,8 +456,8 @@ export default function SequenceAssetPage() {
                 type="file"
                 accept="image/*"
                 className="input"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
+                onChange={(event) => {
+                  const file = event.target.files?.[0];
                   if (!file) return;
 
                   const reader = new FileReader();
@@ -279,10 +469,13 @@ export default function SequenceAssetPage() {
               />
 
               {logoData ? (
-                <img
+                <Image
                   src={logoData}
                   alt="Logo preview"
-                  style={{ marginTop: 10, maxHeight: 50 }}
+                  unoptimized
+                  width={160}
+                  height={50}
+                  style={{ marginTop: 10, maxHeight: 50, width: "auto" }}
                 />
               ) : null}
             </div>
@@ -308,14 +501,14 @@ export default function SequenceAssetPage() {
 
               <button
                 className="button buttonSecondary"
-                onClick={handleSaveVersion}
+                onClick={() => void handleSaveVersion()}
               >
                 Save New Version
               </button>
 
               <button
                 className="button buttonSecondary"
-                onClick={handleSaveAsEmail}
+                onClick={() => void handleSaveAsEmail()}
               >
                 Save as Email
               </button>

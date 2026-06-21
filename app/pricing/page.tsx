@@ -1,8 +1,20 @@
 "use client";
 
 import Link from "next/link";
+import { useAccount } from "@/components/account-provider";
+import { getBillingLinks, getPlanHref } from "@/lib/billing";
 
 export default function PricingPage() {
+  const { founderEligible, founderPriceGbp } = useAccount();
+  const founderPriceLabel =
+    founderPriceGbp !== null ? `GBP ${founderPriceGbp}` : "GBP 12";
+  const billingLinks = getBillingLinks();
+
+  const proPlusHref = getPlanHref(
+    billingLinks.proPlus || billingLinks.bookCall,
+    "/book-call"
+  );
+
   return (
     <main className="main">
       <section className="container">
@@ -21,9 +33,8 @@ export default function PricingPage() {
               lineHeight: 1.75,
             }}
           >
-            Thalovo starts with self-serve systems and expands into a more
-            tailored offer for businesses that want help shaping their outbound
-            process.
+            Thalovo starts with self-serve systems and can grow into a more
+            tailored outbound offer for teams that want extra support.
           </p>
 
           <p
@@ -35,45 +46,47 @@ export default function PricingPage() {
               marginInline: "auto",
             }}
           >
-            Early access is currently free while we refine the system.
+            {founderEligible
+              ? "Founder checkout is unlocked on this account. Complete payment to activate Founder Pro."
+              : "Start with the essentials, then upgrade when outreach becomes a regular workflow."}
           </p>
         </div>
 
-        <div className="grid" style={{ marginTop: 28 }}>
-          <div
-            className="glassCard"
-            style={{
-              padding: 28,
-              display: "flex",
-              flexDirection: "column",
-              minHeight: "100%",
-            }}
-          >
-            <div className="badge">Starter</div>
-
+        <div className="founderPriceBand glassCard">
+          <div>
+            <div className="badge">Founder Pro</div>
             <h2 className="pageTitle" style={{ marginTop: 14 }}>
-              £9<span className="muted">/month</span>
+              {founderPriceLabel}
+              <span className="muted">/month locked</span>
             </h2>
-
-            <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
-              For people who want a simple way to send better outreach with
-              structure behind it.
+            <p className="muted" style={{ marginTop: 10, lineHeight: 1.75 }}>
+              Founder Pro gives selected early users the full Pro feature set
+              at a lower locked monthly price. It is invite-only, and you can
+              register interest without booking a call.
             </p>
-
-            <ul className="featureList">
-              <li>Core playbooks</li>
-              <li>Cold outreach and follow-up systems</li>
-              <li>Copy and export emails</li>
-              <li>Save emails for reuse</li>
-            </ul>
-
-            <div style={{ marginTop: 24 }}>
-              <Link href="/" className="button buttonSecondary">
-                Start free
-              </Link>
-            </div>
           </div>
 
+          <div className="founderPriceActions">
+            <span
+              className={
+                founderEligible
+                  ? "statusPill statusPillSuccess"
+                  : "statusPill statusPillWarning"
+              }
+            >
+              {founderEligible ? "Unlocked on this account" : "Invite-only"}
+            </span>
+
+            <Link
+              href="/founder"
+              className={founderEligible ? "button buttonPrimary" : "button buttonSecondary"}
+            >
+              {founderEligible ? "Start Founder" : "Register interest"}
+            </Link>
+          </div>
+        </div>
+
+        <div className="grid" style={{ marginTop: 28 }}>
           <div
             className="glassCard"
             style={{
@@ -87,7 +100,7 @@ export default function PricingPage() {
             <div className="badge">Pro</div>
 
             <h2 className="pageTitle" style={{ marginTop: 14 }}>
-              £29<span className="muted">/month</span>
+              GBP 19<span className="muted">/month</span>
             </h2>
 
             <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
@@ -96,16 +109,16 @@ export default function PricingPage() {
             </p>
 
             <ul className="featureList">
-              <li>Everything in Starter</li>
               <li>Full playbook library</li>
-              <li>Expert breakdowns and education</li>
-              <li>Reusable sequence versions</li>
+              <li>Full sequence builder</li>
+              <li>Unlimited saved emails and folders</li>
+              <li>Reusable sequence library</li>
               <li>Branded HTML export</li>
             </ul>
 
             <div style={{ marginTop: 24 }}>
-              <Link href="/" className="button buttonPrimary">
-                Explore Pro
+              <Link href="/pro" className="button buttonPrimary">
+                View Pro
               </Link>
             </div>
           </div>
@@ -122,7 +135,7 @@ export default function PricingPage() {
             <div className="badge">Pro+</div>
 
             <h2 className="pageTitle" style={{ marginTop: 14 }}>
-              £500<span className="muted">+/month</span>
+              Custom<span className="muted"> pricing</span>
             </h2>
 
             <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
@@ -135,11 +148,12 @@ export default function PricingPage() {
               <li>Positioning and messaging refinement</li>
               <li>Custom cold outreach and follow-up structure</li>
               <li>Support refining sequence quality over time</li>
+              <li>Best sold through a call instead of one-click checkout</li>
             </ul>
 
             <div style={{ marginTop: 24 }}>
-              <Link href="/" className="button buttonSecondary">
-                Ask about Pro+
+              <Link href={proPlusHref} className="button buttonSecondary">
+                {billingLinks.proPlus ? "Book Pro+" : "Ask about Pro+"}
               </Link>
             </div>
           </div>
@@ -155,10 +169,10 @@ export default function PricingPage() {
 
             <div className="grid" style={{ marginTop: 20 }}>
               <div className="glassCard" style={{ padding: 20 }}>
-                <h3 className="cardTitle">Starter</h3>
+                <h3 className="cardTitle">Free</h3>
                 <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
-                  Good if you want structured outreach without building from
-                  scratch every time.
+                  Best for previewing the core playbooks and checking whether
+                  the structure feels useful before paying.
                 </p>
               </div>
 
@@ -178,6 +192,7 @@ export default function PricingPage() {
                 </p>
               </div>
             </div>
+
           </div>
         </section>
       </section>
