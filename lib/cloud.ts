@@ -125,7 +125,17 @@ export async function signUpWithPassword(email: string, password: string) {
     throw new Error("Sign-in is temporarily unavailable. Please try again later.");
   }
 
-  const { error } = await client.auth.signUp({
+  if (
+    password.length < 8 ||
+    !/[A-Za-z]/.test(password) ||
+    !/[0-9]/.test(password)
+  ) {
+    throw new Error(
+      "Use at least 8 characters with at least one letter and one number."
+    );
+  }
+
+  const { data, error } = await client.auth.signUp({
     email: email.trim().toLowerCase(),
     password,
     options: {
@@ -137,6 +147,14 @@ export async function signUpWithPassword(email: string, password: string) {
   });
 
   if (error) throw normalizeCloudError(error);
+
+  if (data.user && data.user.identities?.length === 0) {
+    throw new Error(
+      "An account already exists for this email. Use Log in instead."
+    );
+  }
+
+  return { needsVerification: !data.session };
 }
 
 export async function signInWithPassword(email: string, password: string) {

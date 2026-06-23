@@ -1,10 +1,8 @@
 import { normalizePlan, type PlanId } from "@/lib/plans";
 
 type SupabaseUserResponse = {
-  user?: {
-    id: string;
-    email?: string;
-  };
+  id?: string;
+  email?: string;
 };
 
 function getSupabaseServerConfig() {
@@ -35,11 +33,14 @@ export async function getUserFromAccessToken(accessToken: string) {
 
   const payload = (await response.json()) as SupabaseUserResponse;
 
-  if (!payload.user?.id) {
+  if (!payload.id) {
     throw new Error("Signed-in user was not found.");
   }
 
-  return payload.user;
+  return {
+    id: payload.id,
+    email: payload.email,
+  };
 }
 
 export async function updateUserPlan(options: {

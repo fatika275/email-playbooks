@@ -94,6 +94,41 @@ export default function PricingPage() {
               display: "flex",
               flexDirection: "column",
               minHeight: "100%",
+            }}
+          >
+            <div className="badge">Free</div>
+
+            <h2 className="pageTitle" style={{ marginTop: 14 }}>
+              GBP 0<span className="muted">/month</span>
+            </h2>
+
+            <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
+              Test the core Thalovo writing experience before deciding whether
+              the full outbound workspace fits your workflow.
+            </p>
+
+            <ul className="featureList">
+              <li>Three core outreach playbooks</li>
+              <li>Email drafting and variable replacement</li>
+              <li>Copy and TXT download</li>
+              <li>Basic saved-email history</li>
+              <li>No card required</li>
+            </ul>
+
+            <div style={{ marginTop: 24 }}>
+              <Link href="/library" className="button buttonSecondary">
+                Start free
+              </Link>
+            </div>
+          </div>
+
+          <div
+            className="glassCard"
+            style={{
+              padding: 28,
+              display: "flex",
+              flexDirection: "column",
+              minHeight: "100%",
               borderColor: "rgba(201, 166, 72, 0.22)",
             }}
           >

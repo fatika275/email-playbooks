@@ -42,7 +42,10 @@ type AccountContextValue = {
   statusMessage: string;
   syncErrorMessage: string;
   signInWithPassword: (email: string, password: string) => Promise<void>;
-  signUpWithPassword: (email: string, password: string) => Promise<void>;
+  signUpWithPassword: (
+    email: string,
+    password: string
+  ) => Promise<{ needsVerification: boolean }>;
   resendSignupVerification: (email: string) => Promise<void>;
   verifySignupCode: (email: string, code: string) => Promise<void>;
   signOut: () => Promise<void>;
@@ -179,9 +182,14 @@ export function AccountProvider({ children }: { children: ReactNode }) {
         setStatusMessage("You are signed in. Syncing your workspace...");
       },
       async signUpWithPassword(email: string, password: string) {
-        await signUpWithPasswordCloud(email, password);
+        const result = await signUpWithPasswordCloud(email, password);
         setSyncErrorMessage("");
-        setStatusMessage("Account created. Check your email to verify it.");
+        setStatusMessage(
+          result.needsVerification
+            ? "Account created. Check your email to verify it."
+            : "Account created. You are signed in."
+        );
+        return result;
       },
       async resendSignupVerification(email: string) {
         await resendSignupVerificationCloud(email);

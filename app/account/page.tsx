@@ -29,15 +29,25 @@ export default function AccountPage() {
   const [needsVerification, setNeedsVerification] = useState(false);
   const [notice, setNotice] = useState("");
 
+  const showVerification = !user && needsVerification;
+  const visibleNotice =
+    user && /verification|verify your email|check your email/i.test(notice)
+      ? "Account created. You are signed in."
+      : notice;
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     try {
       if (authMode === "signup") {
-        await signUp(email, password);
+        const result = await signUp(email, password);
         trackEvent("account_signup_requested");
-        setNeedsVerification(true);
-        setNotice("Account created. Check your email for the verification code.");
+        setNeedsVerification(result.needsVerification);
+        setNotice(
+          result.needsVerification
+            ? "Account created. Check your email for the verification code."
+            : "Account created. You are signed in."
+        );
         return;
       }
 
@@ -179,7 +189,7 @@ export default function AccountPage() {
               </div>
             ) : null}
 
-            {notice ? <p className="notice">{notice}</p> : null}
+            {visibleNotice ? <p className="notice">{visibleNotice}</p> : null}
             {syncErrorMessage ? (
               <p className="notice">
                 We could not sync your workspace right now. Your local work is
@@ -196,8 +206,8 @@ export default function AccountPage() {
             {!user ? (
               <>
                 <p className="muted" style={{ marginTop: 10, lineHeight: 1.75 }}>
-                  Sign in with your email and password. New accounts verify
-                  their email once before Founder requests can be approved.
+                  Sign in with your email and password. Account sessions are
+                  securely handled by Supabase Auth.
                 </p>
 
                 <div className="authModeTabs" role="tablist" aria-label="Account mode">
@@ -232,6 +242,7 @@ export default function AccountPage() {
                     <input
                       id="email"
                       type="email"
+                      autoComplete="email"
                       className="input"
                       placeholder="you@example.com"
                       value={email}
@@ -247,6 +258,9 @@ export default function AccountPage() {
                     <input
                       id="password"
                       type="password"
+                      autoComplete={
+                        authMode === "signup" ? "new-password" : "current-password"
+                      }
                       className="input"
                       placeholder={
                         authMode === "signup"
@@ -255,9 +269,14 @@ export default function AccountPage() {
                       }
                       value={password}
                       onChange={(event) => setPassword(event.target.value)}
-                      minLength={6}
+                      minLength={authMode === "signup" ? 8 : 6}
                       required
                     />
+                    {authMode === "signup" ? (
+                      <p className="small" style={{ marginTop: 8 }}>
+                        Use at least 8 characters with a letter and a number.
+                      </p>
+                    ) : null}
                   </div>
 
                   <button
@@ -269,7 +288,7 @@ export default function AccountPage() {
                   </button>
                 </form>
 
-                {needsVerification ? (
+                {showVerification ? (
                   <form onSubmit={handleVerifySignup} className="verificationBox">
                     <div className="formGroup">
                       <label htmlFor="signup-code" className="label">
@@ -308,10 +327,12 @@ export default function AccountPage() {
                   </form>
                 ) : null}
 
-                <p className="small" style={{ marginTop: 12 }}>
-                  If verification mail does not arrive, check spam and your
-                  Supabase email provider settings.
-                </p>
+                {showVerification ? (
+                  <p className="small" style={{ marginTop: 12 }}>
+                    If the verification email does not arrive, check spam and
+                    your Supabase email provider settings.
+                  </p>
+                ) : null}
 
                 {!isConfigured ? (
                   <p className="notice">
