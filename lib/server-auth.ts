@@ -7,21 +7,22 @@ type SupabaseUserResponse = {
 
 function getSupabaseServerConfig() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-  if (!url || !serviceRoleKey) {
+  if (!url || !anonKey || !serviceRoleKey) {
     throw new Error("Supabase server environment variables are missing.");
   }
 
-  return { url: url.replace(/\/$/, ""), serviceRoleKey };
+  return { url: url.replace(/\/$/, ""), anonKey, serviceRoleKey };
 }
 
 export async function getUserFromAccessToken(accessToken: string) {
-  const { url, serviceRoleKey } = getSupabaseServerConfig();
+  const { url, anonKey } = getSupabaseServerConfig();
 
   const response = await fetch(`${url}/auth/v1/user`, {
     headers: {
-      apikey: serviceRoleKey,
+      apikey: anonKey,
       authorization: `Bearer ${accessToken}`,
     },
     cache: "no-store",
