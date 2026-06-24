@@ -206,6 +206,45 @@ export async function resendSignupVerification(email: string) {
   if (error) throw normalizeCloudError(error);
 }
 
+export async function requestPasswordReset(email: string) {
+  const client = getSupabaseBrowserClient();
+  if (!client) {
+    throw new Error("Password recovery is temporarily unavailable.");
+  }
+
+  const { error } = await client.auth.resetPasswordForEmail(
+    email.trim().toLowerCase(),
+    {
+      redirectTo:
+        typeof window !== "undefined"
+          ? `${window.location.origin}/reset-password`
+          : undefined,
+    }
+  );
+
+  if (error) throw normalizeCloudError(error);
+}
+
+export async function updatePassword(password: string) {
+  const client = getSupabaseBrowserClient();
+  if (!client) {
+    throw new Error("Password recovery is temporarily unavailable.");
+  }
+
+  if (
+    password.length < 8 ||
+    !/[A-Za-z]/.test(password) ||
+    !/[0-9]/.test(password)
+  ) {
+    throw new Error(
+      "Use at least 8 characters with at least one letter and one number."
+    );
+  }
+
+  const { error } = await client.auth.updateUser({ password });
+  if (error) throw normalizeCloudError(error);
+}
+
 export async function signOutFromCloud() {
   const client = getSupabaseBrowserClient();
   if (!client) return;

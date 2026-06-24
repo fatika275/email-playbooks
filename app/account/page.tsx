@@ -18,6 +18,7 @@ export default function AccountPage() {
     signInWithPassword: signIn,
     signUpWithPassword: signUp,
     resendSignupVerification,
+    requestPasswordReset,
     signOut,
     syncNow,
     verifySignupCode,
@@ -91,6 +92,27 @@ export default function AccountPage() {
         error instanceof Error
           ? error.message
           : "Could not resend the verification email right now."
+      );
+    }
+  }
+
+  async function handlePasswordResetRequest() {
+    if (!email.trim()) {
+      setNotice("Enter your email address first, then request a reset link.");
+      return;
+    }
+
+    try {
+      await requestPasswordReset(email);
+      trackEvent("account_password_reset_requested");
+      setNotice(
+        "If an account exists for that email, a password reset link has been sent."
+      );
+    } catch (error) {
+      setNotice(
+        error instanceof Error
+          ? error.message
+          : "Password reset could not be requested right now."
       );
     }
   }
@@ -286,6 +308,17 @@ export default function AccountPage() {
                   >
                     {authMode === "signup" ? "Create account" : "Log in"}
                   </button>
+
+                  {authMode === "login" ? (
+                    <button
+                      className="button buttonUtility"
+                      type="button"
+                      onClick={() => void handlePasswordResetRequest()}
+                      style={{ marginLeft: 10 }}
+                    >
+                      Forgot password?
+                    </button>
+                  ) : null}
                 </form>
 
                 {showVerification ? (

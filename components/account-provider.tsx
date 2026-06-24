@@ -14,11 +14,13 @@ import {
   getIsCurrentUserAdmin,
   getSignedInUser,
   hydrateLocalDataFromCloud,
+  requestPasswordReset as requestPasswordResetCloud,
   resendSignupVerification as resendSignupVerificationCloud,
   signInWithPassword as signInWithPasswordCloud,
   signUpWithPassword as signUpWithPasswordCloud,
   signOutFromCloud,
   syncLocalDataToCloud,
+  updatePassword as updatePasswordCloud,
   type CloudProfile,
   verifySignupCode as verifySignupCodeWithCloud,
 } from "@/lib/cloud";
@@ -47,6 +49,8 @@ type AccountContextValue = {
     password: string
   ) => Promise<{ needsVerification: boolean }>;
   resendSignupVerification: (email: string) => Promise<void>;
+  requestPasswordReset: (email: string) => Promise<void>;
+  updatePassword: (password: string) => Promise<void>;
   verifySignupCode: (email: string, code: string) => Promise<void>;
   signOut: () => Promise<void>;
   syncNow: () => Promise<void>;
@@ -195,6 +199,16 @@ export function AccountProvider({ children }: { children: ReactNode }) {
         await resendSignupVerificationCloud(email);
         setSyncErrorMessage("");
         setStatusMessage("Verification email sent.");
+      },
+      async requestPasswordReset(email: string) {
+        await requestPasswordResetCloud(email);
+        setSyncErrorMessage("");
+        setStatusMessage("Password reset email requested.");
+      },
+      async updatePassword(password: string) {
+        await updatePasswordCloud(password);
+        setSyncErrorMessage("");
+        setStatusMessage("Your password has been updated.");
       },
       async verifySignupCode(email: string, code: string) {
         await verifySignupCodeWithCloud(email, code);
