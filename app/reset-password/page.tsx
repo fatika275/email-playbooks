@@ -1,8 +1,9 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import { useAccount } from "@/components/account-provider";
+import { getSupabaseBrowserClient } from "@/lib/supabase";
 
 export default function ResetPasswordPage() {
   const { updatePassword } = useAccount();
@@ -10,6 +11,75 @@ export default function ResetPasswordPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [notice, setNotice] = useState("");
   const [isComplete, setIsComplete] = useState(false);
+  const [isChecking, setIsChecking] = useState(true);
+  const [canReset, setCanReset] = useState(false);
+
+  useEffect(() => {
+    const client = getSupabaseBrowserClient();
+
+    if (!client) {
+      setNotice("Password recovery is temporarily unavailable.");
+      setIsChecking(false);
+      return;
+    }
+
+    let isMounted = true;
+
+    async function prepareRecoverySession() {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const code = params.get("code");
+        const tokenHash = params.get("token_hash");
+
+        if (code) {
+          const { error } = await client!.auth.exchangeCodeForSession(code);
+          if (error) throw error;
+        } else if (tokenHash) {
+          const { error } = await client!.auth.verifyOtp({
+            token_hash: tokenHash,
+            type: "recovery",
+          });
+          if (error) throw error;
+        }
+
+        const {
+          data: { session },
+        } = await client!.auth.getSession();
+
+        if (!isMounted) return;
+        setCanReset(Boolean(session));
+        setNotice(
+          session
+            ? ""
+            : "This reset link is invalid or has expired. Request a new one."
+        );
+      } catch {
+        if (!isMounted) return;
+        setCanReset(false);
+        setNotice("This reset link is invalid or has expired. Request a new one.");
+      } finally {
+        if (isMounted) setIsChecking(false);
+      }
+    }
+
+    void prepareRecoverySession();
+
+    const {
+      data: { subscription },
+    } = client.auth.onAuthStateChange((event, session) => {
+      if (!isMounted) return;
+      if (event === "PASSWORD_RECOVERY" || (event === "SIGNED_IN" && session)) {
+        setCanReset(true);
+        setIsChecking(false);
+        setNotice("");
+      }
+    });
+
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -48,7 +118,9 @@ export default function ResetPasswordPage() {
         </div>
 
         <section className="glassCard formCard" style={{ maxWidth: 620 }}>
-          {isComplete ? (
+          {isChecking ? (
+            <p className="muted">Checking your reset link...</p>
+          ) : isComplete ? (
             <div>
               <h2 className="cardTitle">Password updated</h2>
               <p className="muted" style={{ marginTop: 10 }}>
@@ -63,7 +135,7 @@ export default function ResetPasswordPage() {
                 Go to account
               </Link>
             </div>
-          ) : (
+          ) : canReset ? (
             <form onSubmit={handleSubmit}>
               <div className="formGroup">
                 <label className="label" htmlFor="new-password">
@@ -101,6 +173,21 @@ export default function ResetPasswordPage() {
                 Update password
               </button>
             </form>
+          ) : (
+            <div>
+              <h2 className="cardTitle">Request a new reset link</h2>
+              <p className="muted" style={{ marginTop: 10 }}>
+                Return to the account page, enter your email, and choose Forgot
+                password again.
+              </p>
+              <Link
+                href="/account"
+                className="button buttonPrimary"
+                style={{ marginTop: 20 }}
+              >
+                Back to account
+              </Link>
+            </div>
           )}
 
           {notice ? <p className="notice">{notice}</p> : null}

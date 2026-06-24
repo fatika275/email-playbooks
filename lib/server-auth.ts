@@ -1,9 +1,5 @@
+import { createClient } from "@supabase/supabase-js";
 import { normalizePlan, type PlanId } from "@/lib/plans";
-
-type SupabaseUserResponse = {
-  id?: string;
-  email?: string;
-};
 
 function getSupabaseServerConfig() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -19,29 +15,23 @@ function getSupabaseServerConfig() {
 
 export async function getUserFromAccessToken(accessToken: string) {
   const { url, anonKey } = getSupabaseServerConfig();
-
-  const response = await fetch(`${url}/auth/v1/user`, {
-    headers: {
-      apikey: anonKey,
-      authorization: `Bearer ${accessToken}`,
+  const client = createClient(url, anonKey, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+      detectSessionInUrl: false,
     },
-    cache: "no-store",
   });
+  const {
+    data: { user },
+    error,
+  } = await client.auth.getUser(accessToken);
 
-  if (!response.ok) {
-    throw new Error("Could not verify signed-in user.");
+  if (error || !user) {
+    throw new Error("Your sign-in session has expired. Please sign in again.");
   }
 
-  const payload = (await response.json()) as SupabaseUserResponse;
-
-  if (!payload.id) {
-    throw new Error("Signed-in user was not found.");
-  }
-
-  return {
-    id: payload.id,
-    email: payload.email,
-  };
+  return user;
 }
 
 export async function updateUserPlan(options: {

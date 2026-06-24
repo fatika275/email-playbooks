@@ -29,10 +29,10 @@ export function CheckoutButton({
     }
 
     const client = getSupabaseBrowserClient();
-    const session = await client?.auth.getSession();
-    const accessToken = session?.data.session?.access_token;
+    const refreshed = await client?.auth.refreshSession();
+    const accessToken = refreshed?.data.session?.access_token;
 
-    if (!accessToken) {
+    if (refreshed?.error || !accessToken) {
       setMessage("Please sign in again before checkout.");
       return;
     }
