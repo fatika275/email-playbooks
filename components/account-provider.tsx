@@ -128,9 +128,18 @@ export function AccountProvider({ children }: { children: ReactNode }) {
 
     const {
       data: { subscription },
-    } = client.auth.onAuthStateChange((_event, session) => {
+    } = client.auth.onAuthStateChange((event, session) => {
       const nextUser = session?.user ?? null;
       setUser(nextUser);
+
+      if (
+        event === "PASSWORD_RECOVERY" &&
+        typeof window !== "undefined" &&
+        window.location.pathname !== "/reset-password"
+      ) {
+        window.location.replace("/reset-password");
+        return;
+      }
 
       if (nextUser) {
         setSyncErrorMessage("");

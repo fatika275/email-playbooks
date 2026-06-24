@@ -27,11 +27,62 @@ export async function getUserFromAccessToken(accessToken: string) {
     error,
   } = await client.auth.getUser(accessToken);
 
-  if (error || !user) {
+  if (!error && user) {
+    return user;
+  }
+
+  const tokenParts = accessToken.split(".");
+
+  if (tokenParts.length !== 3) {
     throw new Error("Your sign-in session has expired. Please sign in again.");
   }
 
-  return user;
+  let tokenUserId = "";
+  let tokenEmail: string | undefined;
+
+  try {
+    const payload = JSON.parse(
+      Buffer.from(tokenParts[1], "base64url").toString("utf8")
+    ) as { sub?: string; email?: string };
+    tokenUserId = payload.sub || "";
+    tokenEmail = payload.email;
+  } catch {
+    throw new Error("Your sign-in session has expired. Please sign in again.");
+  }
+
+  if (!tokenUserId) {
+    throw new Error("Your sign-in session has expired. Please sign in again.");
+  }
+
+  const profileResponse = await fetch(
+    `${url}/rest/v1/user_profiles?select=user_id,email&user_id=eq.${encodeURIComponent(tokenUserId)}&limit=1`,
+    {
+      headers: {
+        apikey: anonKey,
+        authorization: `Bearer ${accessToken}`,
+      },
+      cache: "no-store",
+    }
+  );
+
+  if (!profileResponse.ok) {
+    throw new Error("Your sign-in session has expired. Please sign in again.");
+  }
+
+  const profiles = (await profileResponse.json()) as Array<{
+    user_id: string;
+    email?: string;
+  }>;
+  const profile = profiles[0];
+
+  if (!profile || profile.user_id !== tokenUserId) {
+    throw new Error("Your account profile could not be verified.");
+  }
+
+  return {
+    id: profile.user_id,
+    email: profile.email || tokenEmail,
+  };
 }
 
 export async function updateUserPlan(options: {
