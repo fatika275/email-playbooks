@@ -32,3 +32,23 @@ export function getSupabaseBrowserClient() {
 
   return browserClient;
 }
+
+export function clearSupabaseBrowserSession() {
+  if (typeof window === "undefined") return;
+
+  const clearStorage = (storage: Storage) => {
+    for (let index = storage.length - 1; index >= 0; index -= 1) {
+      const key = storage.key(index);
+      if (
+        key &&
+        ((key.startsWith("sb-") && key.endsWith("-auth-token")) ||
+          key.startsWith("supabase.auth.token"))
+      ) {
+        storage.removeItem(key);
+      }
+    }
+  };
+
+  clearStorage(window.localStorage);
+  clearStorage(window.sessionStorage);
+}

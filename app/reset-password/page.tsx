@@ -3,10 +3,13 @@
 import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import { useAccount } from "@/components/account-provider";
-import { getSupabaseBrowserClient } from "@/lib/supabase";
+import {
+  clearSupabaseBrowserSession,
+  getSupabaseBrowserClient,
+} from "@/lib/supabase";
 
 export default function ResetPasswordPage() {
-  const { signOut, updatePassword } = useAccount();
+  const { updatePassword } = useAccount();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [notice, setNotice] = useState("");
@@ -91,7 +94,9 @@ export default function ResetPasswordPage() {
 
     try {
       await updatePassword(password);
-      await signOut();
+      const client = getSupabaseBrowserClient();
+      await client?.auth.signOut({ scope: "global" }).catch(() => undefined);
+      clearSupabaseBrowserSession();
       setIsComplete(true);
       setCanReset(false);
       setNotice("Your password has been updated. Sign in with your new password.");
@@ -129,13 +134,13 @@ export default function ResetPasswordPage() {
                 Your recovery session has been closed. Sign in again with your
                 new password to continue.
               </p>
-              <Link
+              <a
                 href="/account"
                 className="button buttonPrimary"
                 style={{ marginTop: 20 }}
               >
                 Sign in
-              </Link>
+              </a>
             </div>
           ) : canReset ? (
             <form onSubmit={handleSubmit}>
