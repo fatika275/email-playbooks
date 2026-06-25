@@ -1,4 +1,3 @@
-import { createClient } from "@supabase/supabase-js";
 import { normalizePlan, type PlanId } from "@/lib/plans";
 
 function getSupabaseServerConfig() {
@@ -10,24 +9,26 @@ function getSupabaseServerConfig() {
     throw new Error("Supabase server environment variables are missing.");
   }
 
-  return { url: url.replace(/\/$/, ""), anonKey, serviceRoleKey };
+  return {
+    url: url.replace(/\/rest\/v1\/?$/, "").replace(/\/$/, ""),
+    anonKey,
+    serviceRoleKey,
+  };
 }
 
 export async function getUserFromAccessToken(accessToken: string) {
   const { url, anonKey } = getSupabaseServerConfig();
-  const client = createClient(url, anonKey, {
-    auth: {
-      persistSession: false,
-      autoRefreshToken: false,
-      detectSessionInUrl: false,
-    },
-  });
-  const {
-    data: { user },
-    error,
-  } = await client.auth.getUser(accessToken);
 
-  if (!error && user) {
+  const userResponse = await fetch(`${url}/auth/v1/user`, {
+    headers: {
+      apikey: anonKey,
+      authorization: `Bearer ${accessToken}`,
+    },
+    cache: "no-store",
+  }).catch(() => null);
+
+  if (userResponse?.ok) {
+    const user = (await userResponse.json()) as { id: string; email?: string };
     return user;
   }
 
