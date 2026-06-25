@@ -6,7 +6,7 @@ import { useAccount } from "@/components/account-provider";
 import { getSupabaseBrowserClient } from "@/lib/supabase";
 
 export default function ResetPasswordPage() {
-  const { updatePassword } = useAccount();
+  const { signOut, updatePassword } = useAccount();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [notice, setNotice] = useState("");
@@ -91,8 +91,10 @@ export default function ResetPasswordPage() {
 
     try {
       await updatePassword(password);
+      await signOut();
       setIsComplete(true);
-      setNotice("Your password has been updated.");
+      setCanReset(false);
+      setNotice("Your password has been updated. Sign in with your new password.");
       setPassword("");
       setConfirmPassword("");
     } catch (error) {
@@ -124,15 +126,15 @@ export default function ResetPasswordPage() {
             <div>
               <h2 className="cardTitle">Password updated</h2>
               <p className="muted" style={{ marginTop: 10 }}>
-                You can now return to your account and sign in with the new
-                password.
+                Your recovery session has been closed. Sign in again with your
+                new password to continue.
               </p>
               <Link
                 href="/account"
                 className="button buttonPrimary"
                 style={{ marginTop: 20 }}
               >
-                Go to account
+                Sign in
               </Link>
             </div>
           ) : canReset ? (
