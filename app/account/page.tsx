@@ -211,7 +211,6 @@ export default function AccountPage() {
               </div>
             ) : null}
 
-            {visibleNotice ? <p className="notice">{visibleNotice}</p> : null}
             {syncErrorMessage ? (
               <p className="notice">
                 We could not sync your workspace right now. Your local work is
@@ -224,6 +223,8 @@ export default function AccountPage() {
             <h2 className="cardTitle">
               {user ? "Quick links" : "Access your account"}
             </h2>
+
+            {visibleNotice ? <p className="notice">{visibleNotice}</p> : null}
 
             {!user ? (
               <>

@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { useAccount } from "@/components/account-provider";
 import {
   listFounderWaitlistForAdmin,
@@ -176,31 +175,6 @@ export default function AdminPage() {
         </div>
 
         {notice ? <p className="notice">{notice}</p> : null}
-
-        <div
-          className="glassCard"
-          style={{ padding: 22, marginBottom: 22, display: "grid", gap: 12 }}
-        >
-          <h2 className="cardTitle">First-time setup</h2>
-          <p className="muted" style={{ lineHeight: 1.75 }}>
-            Your first admin still needs to be granted once in Supabase. After
-            that, you can manage founder visibility from here.
-          </p>
-          <div className="toolbar">
-            <Link href="/account" className="button buttonSecondary">
-              Open account page
-            </Link>
-          </div>
-          <p className="small" style={{ margin: 0 }}>
-            Use the helper file at <code>supabase/admin-setup.sql</code> to add
-            your own user ID into <code>admin_users</code> one time.
-          </p>
-          <p className="small" style={{ margin: 0 }}>
-            When a user is marked as founder-enabled here, the pricing page
-            unlocks Founder checkout. Payment is confirmed by the Stripe
-            webhook before the account plan becomes active.
-          </p>
-        </div>
 
         <div className="glassCard" style={{ padding: 28 }}>
           <div
