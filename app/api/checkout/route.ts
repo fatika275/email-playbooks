@@ -47,7 +47,10 @@ export async function POST(request: NextRequest) {
     form.set("mode", "subscription");
     form.set("line_items[0][price]", priceId);
     form.set("line_items[0][quantity]", "1");
-    form.set("success_url", `${siteUrl}/account?checkout=success`);
+    form.set(
+      "success_url",
+      `${siteUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`
+    );
     form.set("cancel_url", `${siteUrl}/pricing?checkout=cancelled`);
     form.set("client_reference_id", user.id);
     if (user.email) {

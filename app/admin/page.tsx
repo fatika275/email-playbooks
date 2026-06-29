@@ -128,6 +128,24 @@ export default function AdminPage() {
     }
   }
 
+  function getFounderApprovalEmailHref(entry: FounderWaitlistEntry) {
+    const subject = "Your Thalovo Founder access is approved";
+    const body = [
+      "Hi,",
+      "",
+      "Your Thalovo Founder access has been approved.",
+      "",
+      "Sign in with this email address and open the pricing page to complete Founder checkout:",
+      `${window.location.origin}/pricing`,
+      "",
+      "Your Founder price will stay locked while your subscription remains active.",
+      "",
+      "Thalovo",
+    ].join("\n");
+
+    return `mailto:${encodeURIComponent(entry.email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  }
+
   if (!isConfigured) {
     return (
       <main className="main">
@@ -349,6 +367,15 @@ export default function AdminPage() {
                       >
                         Mark reviewed
                       </button>
+
+                      {entry.status === "approved" ? (
+                        <a
+                          className="button buttonUtility"
+                          href={getFounderApprovalEmailHref(entry)}
+                        >
+                          Email approval
+                        </a>
+                      ) : null}
                     </div>
                   </div>
                 );
