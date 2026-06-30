@@ -16,6 +16,14 @@ export type ObjectionCategory =
   | "not-interested"
   | "general";
 
+export type ObjectionTone = "concise" | "consultative" | "low-pressure";
+
+export const objectionToneLabels: Record<ObjectionTone, string> = {
+  concise: "Concise",
+  consultative: "Consultative",
+  "low-pressure": "Low pressure",
+};
+
 export const objectionCategoryLabels: Record<ObjectionCategory, string> = {
   price: "Price or budget",
   timing: "Bad timing",
@@ -51,7 +59,8 @@ export function detectObjectionCategory(objection: string): ObjectionCategory {
 
 export function buildObjectionReply(
   context: ObjectionContext,
-  selectedCategory?: ObjectionCategory
+  selectedCategory?: ObjectionCategory,
+  tone: ObjectionTone = "consultative"
 ) {
   const category = selectedCategory || detectObjectionCategory(context.objection);
   const greeting = context.name ? `Hi ${context.name},` : "Hi,";
@@ -61,20 +70,75 @@ export function buildObjectionReply(
     ? `Best,\n${context.senderName}`
     : "Best,";
 
-  const replies: Record<ObjectionCategory, string> = {
-    price: `That makes sense. Rather than forcing the numbers, it may be more useful to check whether ${offer} could create enough value through ${result} to justify the investment.\n\nWould it help if I sent a short breakdown of the scope and expected outcome so you can judge it properly?`,
-    timing: `Completely understand. I do not want to add pressure if the timing is not right.\n\nWould it be sensible for me to check back at a specific time, or is there something that would need to change before ${offer} becomes relevant?`,
-    authority: `Of course. I can make that conversation easier for you.\n\nWould a short summary covering the problem, the proposed approach, and the expected impact on ${result} help you discuss it internally?`,
-    existing: `That makes sense, and I would not suggest changing something that is already working.\n\nThe useful question may be whether there is any gap in the current setup around ${result}. If there is, I can show you where ${offer} would fit without disrupting what you already have.`,
-    information: `Absolutely. The short version is that ${offer} is designed to help with ${result}.\n\nI can send a concise overview with the approach, scope, and next step. Is there one question you would especially like it to answer?`,
-    trust: `That is a fair question. You should not have to take the claim at face value.\n\nI can share a relevant example and explain exactly how we would approach ${result}, including what success would and would not look like. Would that be useful?`,
-    "not-interested": `Thanks for being direct. I will leave it there and will not keep following up.\n\nIf improving ${result} becomes relevant later, you are welcome to get in touch.`,
-    general: `Thanks for explaining. That makes sense.\n\nIt sounds like the main concern is whether ${offer} is the right fit for ${result}. Would it help to clarify that in one short reply, or would you prefer I leave it here?`,
+  const normalizedObjection = context.objection
+    .trim()
+    .replace(/\s+/g, " ")
+    .replace(/^["']|["']$/g, "");
+  const shortObjection =
+    normalizedObjection.length > 150
+      ? `${normalizedObjection.slice(0, 147).trim()}...`
+      : normalizedObjection;
+  const acknowledgement = shortObjection
+    ? `Thanks for explaining. I understand your concern: “${shortObjection}”`
+    : "Thanks for explaining. I understand the concern.";
+
+  const guidance: Record<
+    ObjectionCategory,
+    { reframe: string; question: string; exit: string }
+  > = {
+    price: {
+      reframe: `The useful question is whether ${offer} can create enough value through ${result} to justify the investment.`,
+      question: "Would a short breakdown of the scope and expected outcome help you judge that properly?",
+      exit: "If the budget is not there, I completely understand and I will leave it with you.",
+    },
+    timing: {
+      reframe: `I do not want to force ${offer} before it is relevant.`,
+      question: "Is there a specific time that would be better for me to check back?",
+      exit: "No pressure from me. I am happy to leave this until the timing is genuinely better.",
+    },
+    authority: {
+      reframe: `I can make the internal conversation easier by summarising the approach and its expected impact on ${result}.`,
+      question: "Would a short decision summary help you discuss it with the right person?",
+      exit: "I am happy to step back until the right people are ready to look at it.",
+    },
+    existing: {
+      reframe: `I would not suggest replacing something that already works. The question is whether there is still a gap around ${result}.`,
+      question: `Would it be useful to see where ${offer} could complement your current setup?`,
+      exit: "If your current setup already covers this well, there is no reason to change it.",
+    },
+    information: {
+      reframe: `${offer} is designed to help with ${result}, and I can keep the explanation concise.`,
+      question: "What is the main question you would like the overview to answer?",
+      exit: "I can send the essentials and leave you to review them in your own time.",
+    },
+    trust: {
+      reframe: `You should not have to take claims about ${result} at face value.`,
+      question: "Would a relevant example and a clear explanation of the approach be useful?",
+      exit: "I am happy to send proof and let you decide without any pressure.",
+    },
+    "not-interested": {
+      reframe: "I appreciate you being direct, and I will not keep pushing the conversation.",
+      question: "Would you prefer that I close this completely?",
+      exit: `I will leave it there. If ${result} becomes relevant later, you are welcome to get in touch.`,
+    },
+    general: {
+      reframe: `It sounds like the key question is whether ${offer} is the right fit for ${result}.`,
+      question: "Would one short clarification help, or would you prefer I leave it here?",
+      exit: "No pressure. I am happy to leave it with you.",
+    },
   };
+
+  const selectedGuidance = guidance[category];
+  const reply =
+    tone === "concise"
+      ? `${acknowledgement}\n\n${selectedGuidance.question}`
+      : tone === "low-pressure"
+        ? `${acknowledgement}\n\n${selectedGuidance.exit}`
+        : `${acknowledgement}\n\n${selectedGuidance.reframe}\n\n${selectedGuidance.question}`;
 
   return {
     category,
     subject: "Re: your message",
-    body: `${greeting}\n\n${replies[category]}\n\n${signoff}`,
+    body: `${greeting}\n\n${reply}\n\n${signoff}`,
   };
 }

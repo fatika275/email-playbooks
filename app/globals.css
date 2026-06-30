@@ -1113,6 +1113,16 @@ select.input option {
   box-shadow: none;
 }
 
+.editorModeTabs {
+  margin-top: 0;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.editorModeTabs .authModeTab {
+  letter-spacing: 0;
+  text-transform: none;
+}
+
 .verificationBox {
   margin-top: 18px;
   padding: 16px;

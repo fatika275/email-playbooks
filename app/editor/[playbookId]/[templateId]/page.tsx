@@ -20,7 +20,9 @@ import {
   buildObjectionReply,
   detectObjectionCategory,
   objectionCategoryLabels,
+  objectionToneLabels,
   type ObjectionCategory,
+  type ObjectionTone,
 } from "@/lib/objectionAssistant";
 import { useAccount } from "@/components/account-provider";
 import { getPlaybookAccess } from "@/lib/access";
@@ -185,10 +187,14 @@ export default function EditorPage() {
   const [showOptionalInputs, setShowOptionalInputs] = useState(false);
   const [showBranding, setShowBranding] = useState(false);
   const [showMoreActions, setShowMoreActions] = useState(false);
-  const [showObjectionAssistant, setShowObjectionAssistant] = useState(false);
+  const [editorTab, setEditorTab] = useState<"write" | "objection" | "export">(
+    "write"
+  );
   const [objection, setObjection] = useState("");
   const [objectionCategory, setObjectionCategory] =
     useState<ObjectionCategory>("general");
+  const [objectionTone, setObjectionTone] =
+    useState<ObjectionTone>("consultative");
   const playbookId = rawPlaybookId ?? "";
   const templateId = rawTemplateId ?? "";
   const foundTemplate =
@@ -332,12 +338,14 @@ export default function EditorPage() {
         result: values.result || primaryGoal,
         senderName: values.yourName,
       },
-      objectionCategory
+      objectionCategory,
+      objectionTone
     );
 
     setReuseMode(true);
     setEditableSubject(reply.subject);
     setEditableBody(reply.body);
+    setEditorTab("write");
     setSavedMessage(
       `Drafted a ${objectionCategoryLabels[reply.category].toLowerCase()} reply. Review it before sending.`
     );
@@ -432,8 +440,39 @@ export default function EditorPage() {
         >
           <div className="formCard">
             <div
+              className="authModeTabs editorModeTabs"
+              role="tablist"
+              aria-label="Email editor section"
+              style={{ marginBottom: 22 }}
+            >
+              <button
+                type="button"
+                className={editorTab === "write" ? "authModeTab active" : "authModeTab"}
+                onClick={() => setEditorTab("write")}
+              >
+                Write
+              </button>
+              <button
+                type="button"
+                className={
+                  editorTab === "objection" ? "authModeTab active" : "authModeTab"
+                }
+                onClick={() => setEditorTab("objection")}
+              >
+                Objections
+              </button>
+              <button
+                type="button"
+                className={editorTab === "export" ? "authModeTab active" : "authModeTab"}
+                onClick={() => setEditorTab("export")}
+              >
+                Export
+              </button>
+            </div>
+            <div
               className="glassCard"
               style={{
+                display: editorTab === "write" ? "block" : "none",
                 padding: 18,
                 marginBottom: 18,
                 background: "rgba(255,255,255,0.03)",
@@ -447,7 +486,7 @@ export default function EditorPage() {
 
             <div
               style={{
-                display: "grid",
+                display: editorTab === "write" ? "grid" : "none",
                 gap: 14,
                 gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
                 marginBottom: 18,
@@ -487,6 +526,7 @@ export default function EditorPage() {
             <div
               className="glassCard"
               style={{
+                display: editorTab === "write" ? "block" : "none",
                 padding: 18,
                 marginBottom: 18,
                 background: "rgba(255,255,255,0.026)",
@@ -521,7 +561,7 @@ export default function EditorPage() {
               </div>
             </div>
 
-            {optionalVariables.length > 0 ? (
+            {editorTab === "write" && optionalVariables.length > 0 ? (
               <div className="glassCard" style={{ padding: 18, marginBottom: 18 }}>
                 <div
                   style={{
@@ -563,7 +603,14 @@ export default function EditorPage() {
               </div>
             ) : null}
 
-            <div className="glassCard" style={{ padding: 18, marginBottom: 18 }}>
+            <div
+              className="glassCard"
+              style={{
+                display: editorTab === "export" ? "block" : "none",
+                padding: 18,
+                marginBottom: 18,
+              }}
+            >
               <div
                 style={{
                   display: "flex",
@@ -648,7 +695,14 @@ export default function EditorPage() {
               ) : null}
             </div>
 
-            <div className="glassCard" style={{ padding: 18, marginBottom: 18 }}>
+            <div
+              className="glassCard"
+              style={{
+                display: editorTab === "export" ? "block" : "none",
+                padding: 18,
+                marginBottom: 18,
+              }}
+            >
               <h4 style={{ margin: 0 }}>Save options</h4>
 
               <div
@@ -679,7 +733,7 @@ export default function EditorPage() {
               </div>
             </div>
 
-            {reuseMode ? (
+            {editorTab !== "write" ? null : reuseMode ? (
               <div className="glassCard" style={{ padding: 18, marginBottom: 18 }}>
                 <h4 style={{ margin: 0 }}>Reuse this email</h4>
                 <p className="muted" style={{ margin: "8px 0 0" }}>
@@ -750,6 +804,7 @@ export default function EditorPage() {
 
             <div
               style={{
+                display: editorTab === "objection" ? "block" : "none",
                 padding: 18,
                 marginBottom: 18,
                 border: "1px solid var(--border)",
@@ -771,17 +826,12 @@ export default function EditorPage() {
                     Turn a prospect&apos;s concern into a calm, useful reply.
                   </p>
                 </div>
-                <button
-                  type="button"
-                  className="button buttonUtility"
-                  onClick={() => setShowObjectionAssistant((previous) => !previous)}
-                >
-                  {showObjectionAssistant ? "Close assistant" : "Handle an objection"}
-                </button>
+                <span className="miniBadge">
+                  {objectionCategoryLabels[objectionCategory]}
+                </span>
               </div>
 
-              {showObjectionAssistant ? (
-                <div style={{ marginTop: 18 }}>
+              <div style={{ marginTop: 18 }}>
                   <div className="formGroup">
                     <label className="label" htmlFor="prospect-objection">
                       What did the prospect say?
@@ -816,6 +866,26 @@ export default function EditorPage() {
                     </select>
                   </div>
 
+                  <div className="formGroup">
+                    <label className="label" htmlFor="objection-tone">
+                      Reply style
+                    </label>
+                    <select
+                      id="objection-tone"
+                      className="input"
+                      value={objectionTone}
+                      onChange={(event) =>
+                        setObjectionTone(event.target.value as ObjectionTone)
+                      }
+                    >
+                      {Object.entries(objectionToneLabels).map(([value, label]) => (
+                        <option key={value} value={value}>
+                          {label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
                   <button
                     type="button"
                     className="button buttonPrimary"
@@ -824,13 +894,13 @@ export default function EditorPage() {
                   >
                     Draft reply
                   </button>
-                </div>
-              ) : null}
+              </div>
             </div>
 
             <div
               className="glassCard"
               style={{
+                display: editorTab === "export" ? "block" : "none",
                 padding: 18,
                 marginTop: 8,
               }}
@@ -914,7 +984,15 @@ export default function EditorPage() {
 
             {savedMessage ? <p className="notice">{savedMessage}</p> : null}
 
-            <div className="toolbar" style={{ marginTop: 14, rowGap: 12, columnGap: 12 }}>
+            <div
+              className="toolbar"
+              style={{
+                display: editorTab === "export" ? "flex" : "none",
+                marginTop: 14,
+                rowGap: 12,
+                columnGap: 12,
+              }}
+            >
               <button
                 className="button buttonSecondary"
                 onClick={() => router.push("/history")}
