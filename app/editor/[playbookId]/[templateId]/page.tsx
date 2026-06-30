@@ -11,6 +11,17 @@ import {
   saveEmailRecord,
 } from "@/lib/cloud";
 import { downloadHtmlFile } from "@/lib/exportHtml";
+import {
+  downloadEmlFile,
+  openGmailDraft,
+  openOutlookDraft,
+} from "@/lib/exportEmail";
+import {
+  buildObjectionReply,
+  detectObjectionCategory,
+  objectionCategoryLabels,
+  type ObjectionCategory,
+} from "@/lib/objectionAssistant";
 import { useAccount } from "@/components/account-provider";
 import { getPlaybookAccess } from "@/lib/access";
 
@@ -174,6 +185,10 @@ export default function EditorPage() {
   const [showOptionalInputs, setShowOptionalInputs] = useState(false);
   const [showBranding, setShowBranding] = useState(false);
   const [showMoreActions, setShowMoreActions] = useState(false);
+  const [showObjectionAssistant, setShowObjectionAssistant] = useState(false);
+  const [objection, setObjection] = useState("");
+  const [objectionCategory, setObjectionCategory] =
+    useState<ObjectionCategory>("general");
   const playbookId = rawPlaybookId ?? "";
   const templateId = rawTemplateId ?? "";
   const foundTemplate =
@@ -301,6 +316,31 @@ export default function EditorPage() {
 
     setSavedMessage("Saved to Saved Emails");
     setTimeout(() => setSavedMessage(""), 2200);
+  }
+
+  function handleObjectionChange(nextObjection: string) {
+    setObjection(nextObjection);
+    setObjectionCategory(detectObjectionCategory(nextObjection));
+  }
+
+  function handleBuildObjectionReply() {
+    const reply = buildObjectionReply(
+      {
+        objection,
+        name: values.name,
+        offer: values.offer || values.service || offerType,
+        result: values.result || primaryGoal,
+        senderName: values.yourName,
+      },
+      objectionCategory
+    );
+
+    setReuseMode(true);
+    setEditableSubject(reply.subject);
+    setEditableBody(reply.body);
+    setSavedMessage(
+      `Drafted a ${objectionCategoryLabels[reply.category].toLowerCase()} reply. Review it before sending.`
+    );
   }
 
   if (playbook && access?.isLocked) {
@@ -709,6 +749,86 @@ export default function EditorPage() {
             )}
 
             <div
+              style={{
+                padding: 18,
+                marginBottom: 18,
+                border: "1px solid var(--border)",
+                borderRadius: 8,
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  gap: 12,
+                  flexWrap: "wrap",
+                }}
+              >
+                <div>
+                  <h4 style={{ margin: 0 }}>Objection-handling assistant</h4>
+                  <p className="muted" style={{ margin: "6px 0 0" }}>
+                    Turn a prospect&apos;s concern into a calm, useful reply.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  className="button buttonUtility"
+                  onClick={() => setShowObjectionAssistant((previous) => !previous)}
+                >
+                  {showObjectionAssistant ? "Close assistant" : "Handle an objection"}
+                </button>
+              </div>
+
+              {showObjectionAssistant ? (
+                <div style={{ marginTop: 18 }}>
+                  <div className="formGroup">
+                    <label className="label" htmlFor="prospect-objection">
+                      What did the prospect say?
+                    </label>
+                    <textarea
+                      id="prospect-objection"
+                      className="input"
+                      rows={4}
+                      value={objection}
+                      onChange={(event) => handleObjectionChange(event.target.value)}
+                      placeholder="Paste their objection here"
+                    />
+                  </div>
+
+                  <div className="formGroup">
+                    <label className="label" htmlFor="objection-category">
+                      Main concern
+                    </label>
+                    <select
+                      id="objection-category"
+                      className="input"
+                      value={objectionCategory}
+                      onChange={(event) =>
+                        setObjectionCategory(event.target.value as ObjectionCategory)
+                      }
+                    >
+                      {Object.entries(objectionCategoryLabels).map(([value, label]) => (
+                        <option key={value} value={value}>
+                          {label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <button
+                    type="button"
+                    className="button buttonPrimary"
+                    disabled={!objection.trim()}
+                    onClick={handleBuildObjectionReply}
+                  >
+                    Draft reply
+                  </button>
+                </div>
+              ) : null}
+            </div>
+
+            <div
               className="glassCard"
               style={{
                 padding: 18,
@@ -757,6 +877,29 @@ export default function EditorPage() {
 
                   <button className="button buttonUtility" onClick={handleDownloadHtml}>
                     Export HTML
+                  </button>
+
+                  <button
+                    className="button buttonUtility"
+                    onClick={() => openGmailDraft(finalSubject, finalBody)}
+                  >
+                    Open in Gmail
+                  </button>
+
+                  <button
+                    className="button buttonUtility"
+                    onClick={() => openOutlookDraft(finalSubject, finalBody)}
+                  >
+                    Open in Outlook
+                  </button>
+
+                  <button
+                    className="button buttonUtility"
+                    onClick={() =>
+                      downloadEmlFile(finalSubject, finalBody, template.id)
+                    }
+                  >
+                    Download EML
                   </button>
 
                   <button
