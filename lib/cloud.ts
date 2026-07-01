@@ -77,6 +77,26 @@ export type TeamShare = {
   created_at: string;
 };
 
+export type BusinessWorkspace = {
+  id: string;
+  owner_id: string;
+  name: string;
+  status: "active" | "inactive";
+  seat_limit: number;
+  created_at: string;
+};
+
+export type BusinessMember = {
+  id: string;
+  workspace_id: string;
+  email: string;
+  user_id: string | null;
+  role: "member";
+  status: "invited" | "active";
+  access_active: boolean;
+  created_at: string;
+};
+
 function normalizeCloudError(error: unknown) {
   if (!(error instanceof Error)) {
     if (
@@ -631,5 +651,91 @@ export async function removeTeamShare(id: string) {
   if (!client) throw new Error("Team sharing is temporarily unavailable.");
 
   const { error } = await client.from("team_shares").delete().eq("id", id);
+  if (error) throw normalizeCloudError(error);
+}
+
+function isMissingBusinessSchema(error: { code?: string; message?: string } | null) {
+  return Boolean(
+    error &&
+      (error.code === "42P01" ||
+        error.code === "PGRST205" ||
+        error.code === "PGRST202" ||
+        error.message?.toLowerCase().includes("claim_business_membership") ||
+        error.message?.toLowerCase().includes("business_members"))
+  );
+}
+
+export async function getBusinessMembership() {
+  const client = getSupabaseBrowserClient();
+  const user = await getSignedInUser();
+  if (!client || !user?.email) return null;
+
+  const { data, error } = await client.rpc("claim_business_membership");
+
+  if (isMissingBusinessSchema(error)) return null;
+  if (error) throw normalizeCloudError(error);
+  const membership = Array.isArray(data) ? data[0] : data;
+  return (membership as BusinessMember | undefined) ?? null;
+}
+
+export async function getOwnedBusinessWorkspace() {
+  const client = getSupabaseBrowserClient();
+  const user = await getSignedInUser();
+  if (!client || !user) return null;
+
+  const { data, error } = await client
+    .from("business_workspaces")
+    .select("id, owner_id, name, status, seat_limit, created_at")
+    .eq("owner_id", user.id)
+    .maybeSingle();
+
+  if (isMissingBusinessSchema(error)) return null;
+  if (error) throw normalizeCloudError(error);
+  return data as BusinessWorkspace | null;
+}
+
+export async function listBusinessMembers(workspaceId: string) {
+  const client = getSupabaseBrowserClient();
+  if (!client) return [];
+
+  const { data, error } = await client
+    .from("business_members")
+    .select(
+      "id, workspace_id, email, user_id, role, status, access_active, created_at"
+    )
+    .eq("workspace_id", workspaceId)
+    .order("created_at", { ascending: true });
+
+  if (error) throw normalizeCloudError(error);
+  return (data ?? []) as BusinessMember[];
+}
+
+export async function inviteBusinessMember(workspaceId: string, email: string) {
+  const client = getSupabaseBrowserClient();
+  const user = await getSignedInUser();
+  if (!client || !user?.email) {
+    throw new Error("Sign in as the Business Pro owner first.");
+  }
+
+  const normalizedEmail = email.trim().toLowerCase();
+  if (!normalizedEmail || normalizedEmail === user.email.toLowerCase()) {
+    throw new Error("Enter a teammate's email address, not your own.");
+  }
+
+  const { error } = await client.from("business_members").insert({
+    workspace_id: workspaceId,
+    email: normalizedEmail,
+    status: "invited",
+    access_active: true,
+  });
+
+  if (error) throw normalizeCloudError(error);
+}
+
+export async function removeBusinessMember(id: string) {
+  const client = getSupabaseBrowserClient();
+  if (!client) throw new Error("Business member access is unavailable.");
+
+  const { error } = await client.from("business_members").delete().eq("id", id);
   if (error) throw normalizeCloudError(error);
 }

@@ -23,12 +23,15 @@ export function ShareWithTeam({
   subject,
   body,
 }: ShareWithTeamProps) {
-  const { user, hasProAccess } = useAccount();
+  const { user, plan, businessMembership } = useAccount();
   const [email, setEmail] = useState("");
   const [notice, setNotice] = useState("");
   const [isSharing, setIsSharing] = useState(false);
 
-  if (!hasProAccess) return null;
+  const hasBusinessSharing =
+    plan === "business" || Boolean(businessMembership?.access_active);
+
+  if (!hasBusinessSharing) return null;
 
   async function handleShare() {
     if (!email.trim()) {

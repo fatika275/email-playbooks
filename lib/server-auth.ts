@@ -120,4 +120,101 @@ export async function updateUserPlan(options: {
   if (!response.ok) {
     throw new Error(await response.text());
   }
+
+  if (options.plan === "business") {
+    await setBusinessWorkspaceAccess({
+      ownerId: options.userId,
+      active: true,
+      stripeCustomerId: options.stripeCustomerId ?? null,
+      stripeSubscriptionId: options.stripeSubscriptionId ?? null,
+    });
+  } else {
+    await setBusinessWorkspaceAccess({
+      ownerId: options.userId,
+      active: false,
+      stripeCustomerId: options.stripeCustomerId ?? null,
+      stripeSubscriptionId: options.stripeSubscriptionId ?? null,
+    });
+  }
+}
+
+async function setBusinessWorkspaceAccess(options: {
+  ownerId: string;
+  active: boolean;
+  stripeCustomerId: string | null;
+  stripeSubscriptionId: string | null;
+}) {
+  const { url, serviceRoleKey } = getSupabaseServerConfig();
+  const headers = {
+    apikey: serviceRoleKey,
+    authorization: `Bearer ${serviceRoleKey}`,
+    "content-type": "application/json",
+  };
+
+  if (options.active) {
+    const upsertResponse = await fetch(
+      `${url}/rest/v1/business_workspaces?on_conflict=owner_id`,
+      {
+        method: "POST",
+        headers: {
+          ...headers,
+          prefer: "resolution=merge-duplicates",
+        },
+        body: JSON.stringify({
+          owner_id: options.ownerId,
+          status: "active",
+          seat_limit: 10,
+          stripe_customer_id: options.stripeCustomerId,
+          stripe_subscription_id: options.stripeSubscriptionId,
+          updated_at: new Date().toISOString(),
+        }),
+      }
+    );
+
+    if (!upsertResponse.ok) {
+      throw new Error(await upsertResponse.text());
+    }
+  }
+
+  const workspaceResponse = await fetch(
+    `${url}/rest/v1/business_workspaces?select=id&owner_id=eq.${encodeURIComponent(options.ownerId)}&limit=1`,
+    { headers, cache: "no-store" }
+  );
+
+  if (!workspaceResponse.ok) {
+    if (!options.active && workspaceResponse.status === 404) return;
+    throw new Error(await workspaceResponse.text());
+  }
+
+  const workspaces = (await workspaceResponse.json()) as Array<{ id: string }>;
+  const workspace = workspaces[0];
+  if (!workspace) return;
+
+  if (!options.active) {
+    const workspaceUpdate = await fetch(
+      `${url}/rest/v1/business_workspaces?id=eq.${encodeURIComponent(workspace.id)}`,
+      {
+        method: "PATCH",
+        headers,
+        body: JSON.stringify({
+          status: "inactive",
+          updated_at: new Date().toISOString(),
+        }),
+      }
+    );
+    if (!workspaceUpdate.ok) throw new Error(await workspaceUpdate.text());
+  }
+
+  const memberUpdate = await fetch(
+    `${url}/rest/v1/business_members?workspace_id=eq.${encodeURIComponent(workspace.id)}`,
+    {
+      method: "PATCH",
+      headers,
+      body: JSON.stringify({
+        access_active: options.active,
+        updated_at: new Date().toISOString(),
+      }),
+    }
+  );
+  if (!memberUpdate.ok) throw new Error(await memberUpdate.text());
 }

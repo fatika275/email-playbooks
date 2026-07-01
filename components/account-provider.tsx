@@ -11,6 +11,7 @@ import {
 import type { User } from "@supabase/supabase-js";
 import {
   getCloudProfile,
+  getBusinessMembership,
   getIsCurrentUserAdmin,
   getSignedInUser,
   hydrateLocalDataFromCloud,
@@ -22,6 +23,7 @@ import {
   syncLocalDataToCloud,
   updatePassword as updatePasswordCloud,
   type CloudProfile,
+  type BusinessMember,
   verifySignupCode as verifySignupCodeWithCloud,
 } from "@/lib/cloud";
 import { getSupabaseBrowserClient, hasSupabaseConfig } from "@/lib/supabase";
@@ -36,6 +38,8 @@ type AccountContextValue = {
   plan: PlanId;
   planLabel: string;
   hasProAccess: boolean;
+  businessMembership: BusinessMember | null;
+  hasBusinessAccess: boolean;
   isAdmin: boolean;
   isConfigured: boolean;
   isLoading: boolean;
@@ -62,6 +66,8 @@ export function AccountProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<CloudProfile | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [businessMembership, setBusinessMembership] =
+    useState<BusinessMember | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncVersion, setSyncVersion] = useState(0);
@@ -83,14 +89,16 @@ export function AccountProvider({ children }: { children: ReactNode }) {
 
     async function refreshAccountState(currentUser: User) {
       await hydrateLocalDataFromCloud(currentUser);
-      const [currentProfile, adminStatus] = await Promise.all([
+      const [currentProfile, adminStatus, currentBusinessMembership] = await Promise.all([
         getCloudProfile(currentUser.id),
         getIsCurrentUserAdmin(),
+        getBusinessMembership(),
       ]);
 
       if (!isMounted) return;
       setProfile(currentProfile);
       setIsAdmin(adminStatus);
+      setBusinessMembership(currentBusinessMembership);
       setSyncVersion((value) => value + 1);
       setSyncErrorMessage("");
       setStatusMessage("You are signed in and cloud sync is active.");
@@ -119,6 +127,7 @@ export function AccountProvider({ children }: { children: ReactNode }) {
       } else {
         setProfile(null);
         setIsAdmin(false);
+        setBusinessMembership(null);
         setSyncErrorMessage("");
         setStatusMessage("You are browsing without an account.");
       }
@@ -157,6 +166,7 @@ export function AccountProvider({ children }: { children: ReactNode }) {
       } else {
         setProfile(null);
         setIsAdmin(false);
+        setBusinessMembership(null);
         setSyncErrorMessage("");
         setStatusMessage("You are browsing without an account.");
       }
@@ -173,7 +183,9 @@ export function AccountProvider({ children }: { children: ReactNode }) {
       user,
       profile,
       plan: normalizePlan(profile?.plan),
-      planLabel: PLAN_LABELS[normalizePlan(profile?.plan)],
+      planLabel: businessMembership?.access_active
+        ? "Business Pro (team member)"
+        : PLAN_LABELS[normalizePlan(profile?.plan)],
       founderEligible: Boolean(profile?.founder_eligible),
       founderPriceGbp: profile?.founder_price_gbp ?? null,
       hasProAccess: canUseProFeatures({
@@ -181,7 +193,10 @@ export function AccountProvider({ children }: { children: ReactNode }) {
         founderEligible: Boolean(profile?.founder_eligible),
         isAdmin,
         plan: normalizePlan(profile?.plan),
+        hasBusinessAccess: Boolean(businessMembership?.access_active),
       }),
+      businessMembership,
+      hasBusinessAccess: Boolean(businessMembership?.access_active),
       isAdmin,
       isConfigured: hasSupabaseConfig(),
       isLoading,
@@ -228,6 +243,7 @@ export function AccountProvider({ children }: { children: ReactNode }) {
         await signOutFromCloud();
         setProfile(null);
         setIsAdmin(false);
+        setBusinessMembership(null);
         setSyncVersion((value) => value + 1);
         setSyncErrorMessage("");
         setStatusMessage("You are signed out. Local work stays on this device.");
@@ -237,12 +253,14 @@ export function AccountProvider({ children }: { children: ReactNode }) {
         setIsSyncing(true);
         try {
           await syncLocalDataToCloud(user);
-          const [refreshedProfile, adminStatus] = await Promise.all([
+          const [refreshedProfile, adminStatus, refreshedBusinessMembership] = await Promise.all([
             getCloudProfile(user.id),
             getIsCurrentUserAdmin(),
+            getBusinessMembership(),
           ]);
           setProfile(refreshedProfile);
           setIsAdmin(adminStatus);
+          setBusinessMembership(refreshedBusinessMembership);
           setSyncVersion((value) => value + 1);
           setSyncErrorMessage("");
           setStatusMessage("Your account is up to date.");
@@ -262,6 +280,7 @@ export function AccountProvider({ children }: { children: ReactNode }) {
     [
       user,
       profile,
+      businessMembership,
       isAdmin,
       isLoading,
       isSyncing,

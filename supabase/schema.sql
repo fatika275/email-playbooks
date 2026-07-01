@@ -223,3 +223,7 @@ create policy "Senders can remove team shares"
   on public.team_shares
   for delete
   using (auth.uid() = owner_id);
+
+-- Business Pro workspaces and inherited teammate access are installed through
+-- supabase/business-workspaces.sql. Keep that migration separate so it can be
+-- safely rerun as the seat model evolves.

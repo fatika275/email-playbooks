@@ -1,13 +1,19 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useAccount } from "@/components/account-provider";
 import {
+  getOwnedBusinessWorkspace,
+  inviteBusinessMember,
+  listBusinessMembers,
   listTeamShares,
+  removeBusinessMember,
   removeTeamShare,
   saveCustomTemplateRecord,
   saveEmailRecord,
+  type BusinessMember,
+  type BusinessWorkspace,
   type TeamShare,
 } from "@/lib/cloud";
 
@@ -18,8 +24,11 @@ function makeSharedId(prefix: string) {
 }
 
 export default function TeamLibraryPage() {
-  const { user, hasProAccess, isLoading } = useAccount();
+  const { user, hasProAccess, isLoading, plan, businessMembership } = useAccount();
   const [shares, setShares] = useState<TeamShare[]>([]);
+  const [workspace, setWorkspace] = useState<BusinessWorkspace | null>(null);
+  const [members, setMembers] = useState<BusinessMember[]>([]);
+  const [inviteEmail, setInviteEmail] = useState("");
   const [isLoadingShares, setIsLoadingShares] = useState(false);
   const [notice, setNotice] = useState("");
 
@@ -36,10 +45,24 @@ export default function TeamLibraryPage() {
     }
   }
 
+  const refreshBusinessTeam = useCallback(async () => {
+    if (plan !== "business") return;
+    const ownedWorkspace = await getOwnedBusinessWorkspace();
+    setWorkspace(ownedWorkspace);
+    setMembers(
+      ownedWorkspace ? await listBusinessMembers(ownedWorkspace.id) : []
+    );
+  }, [plan]);
+
   useEffect(() => {
     if (!user || !hasProAccess) return;
     void refreshShares();
-  }, [hasProAccess, user]);
+    void refreshBusinessTeam().catch((error) => {
+      setNotice(
+        error instanceof Error ? error.message : "Business team could not load."
+      );
+    });
+  }, [hasProAccess, refreshBusinessTeam, user]);
 
   const incoming = useMemo(
     () => shares.filter((share) => share.owner_id !== user?.id),
@@ -96,6 +119,38 @@ export default function TeamLibraryPage() {
     } catch (error) {
       setNotice(
         error instanceof Error ? error.message : "Could not remove this share."
+      );
+    }
+  }
+
+  async function handleInviteMember() {
+    if (!workspace) {
+      setNotice("Your Business Pro workspace is not ready yet. Refresh after payment.");
+      return;
+    }
+
+    try {
+      await inviteBusinessMember(workspace.id, inviteEmail);
+      await refreshBusinessTeam();
+      setNotice(
+        `${inviteEmail.trim().toLowerCase()} can now sign in and use Business Pro.`
+      );
+      setInviteEmail("");
+    } catch (error) {
+      setNotice(
+        error instanceof Error ? error.message : "Could not invite this teammate."
+      );
+    }
+  }
+
+  async function handleRemoveMember(id: string) {
+    try {
+      await removeBusinessMember(id);
+      await refreshBusinessTeam();
+      setNotice("Teammate access removed.");
+    } catch (error) {
+      setNotice(
+        error instanceof Error ? error.message : "Could not remove this teammate."
       );
     }
   }
@@ -159,6 +214,100 @@ export default function TeamLibraryPage() {
         </div>
 
         {notice ? <p className="notice">{notice}</p> : null}
+
+        {plan === "business" ? (
+          <section className="glassCard" style={{ padding: 24, marginBottom: 22 }}>
+            <div className="cardTop">
+              <div>
+                <h2 className="cardTitle">Business Pro teammates</h2>
+                <p className="muted" style={{ margin: "8px 0 0" }}>
+                  One subscription covers you and up to 10 teammates. Invited
+                  people receive full Pro access when they sign in with this email.
+                </p>
+              </div>
+              <span className="statusPill statusPillSuccess">
+                {members.length}/10 teammates
+              </span>
+            </div>
+
+            <div
+              className="businessInviteGrid"
+              style={{ alignItems: "end", marginTop: 18 }}
+            >
+              <div className="formGroup" style={{ marginBottom: 0 }}>
+                <label className="label" htmlFor="business-invite-email">
+                  Teammate email
+                </label>
+                <input
+                  id="business-invite-email"
+                  className="input"
+                  type="email"
+                  value={inviteEmail}
+                  onChange={(event) => setInviteEmail(event.target.value)}
+                  placeholder="teammate@company.com"
+                />
+              </div>
+              <button
+                className="button buttonPrimary"
+                disabled={!inviteEmail.trim() || members.length >= 10}
+                onClick={() => void handleInviteMember()}
+              >
+                Invite teammate
+              </button>
+            </div>
+
+            <div style={{ display: "grid", gap: 10, marginTop: 20 }}>
+              {members.map((member) => (
+                <div
+                  key={member.id}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: 12,
+                    padding: 14,
+                    border: "1px solid var(--border)",
+                    borderRadius: 8,
+                  }}
+                >
+                  <div>
+                    <strong>{member.email}</strong>
+                    <p className="small" style={{ margin: "4px 0 0" }}>
+                      {member.status === "active" ? "Active member" : "Invitation ready"}
+                    </p>
+                  </div>
+                  <button
+                    className="button buttonUtility"
+                    onClick={() => void handleRemoveMember(member.id)}
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+            </div>
+          </section>
+        ) : businessMembership?.access_active ? (
+          <section className="glassCard" style={{ padding: 22, marginBottom: 22 }}>
+            <span className="statusPill statusPillSuccess">Business Pro active</span>
+            <h2 className="cardTitle" style={{ marginTop: 14 }}>
+              Your access is covered by your business
+            </h2>
+            <p className="muted" style={{ margin: "8px 0 0" }}>
+              You receive full Pro access through this team membership. You do
+              not need a separate paid subscription.
+            </p>
+          </section>
+        ) : (
+          <section className="glassCard" style={{ padding: 22, marginBottom: 22 }}>
+            <h2 className="cardTitle">Need access for a whole business?</h2>
+            <p className="muted" style={{ margin: "8px 0 14px" }}>
+              Business Pro gives one payer and up to 10 teammates full Pro access.
+            </p>
+            <Link href="/business" className="button buttonPrimary">
+              View Business Pro
+            </Link>
+          </section>
+        )}
 
         <div className="toolbar" style={{ marginBottom: 22 }}>
           <button

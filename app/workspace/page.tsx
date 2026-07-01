@@ -35,7 +35,7 @@ const workspaceItems = [
   {
     href: "/team",
     label: "Team Library",
-    badge: "Pro",
+    badge: "Business",
     description:
       "Share templates and reusable sequences securely with teammates.",
   },

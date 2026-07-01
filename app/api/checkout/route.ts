@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getStripePriceIdForPlan, type PlanId } from "@/lib/plans";
 import { getUserFromAccessToken } from "@/lib/server-auth";
 
-const checkoutPlans = new Set<PlanId>(["pro", "founder"]);
+const checkoutPlans = new Set<PlanId>(["pro", "founder", "business"]);
 
 export async function POST(request: NextRequest) {
   try {

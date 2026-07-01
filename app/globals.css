@@ -1198,6 +1198,12 @@ select.input option {
   gap: 14px;
 }
 
+.businessInviteGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+}
+
 .folderItemCard {
   display: block;
   padding: 18px;
@@ -1629,6 +1635,10 @@ select.input option {
   }
 
   .folderOrganizerGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .businessInviteGrid {
     grid-template-columns: 1fr;
   }
 

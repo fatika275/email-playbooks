@@ -16,8 +16,12 @@ export function canUseProFeatures(options: {
   founderEligible: boolean;
   isAdmin: boolean;
   plan: PlanId;
+  hasBusinessAccess?: boolean;
 }) {
-  return hasProAccess(options.plan, options.isAdmin);
+  return (
+    hasProAccess(options.plan, options.isAdmin) ||
+    Boolean(options.hasBusinessAccess)
+  );
 }
 
 export function getPlaybookAccess(playbook: Playbook, hasProAccess: boolean) {

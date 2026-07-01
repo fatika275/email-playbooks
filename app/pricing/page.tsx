@@ -148,13 +148,47 @@ export default function PricingPage() {
               <li>Full sequence builder</li>
               <li>Unlimited saved emails and folders</li>
               <li>Reusable sequence library</li>
-              <li>Secure team sharing</li>
               <li>Branded HTML export</li>
             </ul>
 
             <div style={{ marginTop: 24 }}>
               <Link href="/pro" className="button buttonPrimary">
                 View Pro
+              </Link>
+            </div>
+          </div>
+
+          <div
+            className="glassCard"
+            style={{
+              padding: 28,
+              display: "flex",
+              flexDirection: "column",
+              minHeight: "100%",
+            }}
+          >
+            <div className="badge">Business Pro</div>
+
+            <h2 className="pageTitle" style={{ marginTop: 14 }}>
+              GBP 49<span className="muted">/month</span>
+            </h2>
+
+            <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
+              One payment for a business owner and up to 10 teammates with full
+              Pro access.
+            </p>
+
+            <ul className="featureList">
+              <li>Everything in Pro</li>
+              <li>10 teammate seats included</li>
+              <li>Full Pro access for every active member</li>
+              <li>Secure team templates and sequences</li>
+              <li>Owner-managed access</li>
+            </ul>
+
+            <div style={{ marginTop: 24 }}>
+              <Link href="/business" className="button buttonPrimary">
+                View Business Pro
               </Link>
             </div>
           </div>
@@ -217,6 +251,14 @@ export default function PricingPage() {
                 <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
                   Better if outreach is a regular part of your workflow and you
                   want stronger systems plus better reuse.
+                </p>
+              </div>
+
+              <div className="glassCard" style={{ padding: 20 }}>
+                <h3 className="cardTitle">Business Pro</h3>
+                <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
+                  Best for one business paying centrally while up to 10 teammates
+                  receive full Pro access.
                 </p>
               </div>
 
