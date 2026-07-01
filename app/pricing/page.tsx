@@ -148,6 +148,7 @@ export default function PricingPage() {
               <li>Full sequence builder</li>
               <li>Unlimited saved emails and folders</li>
               <li>Reusable sequence library</li>
+              <li>Secure team sharing</li>
               <li>Branded HTML export</li>
             </ul>
 

@@ -32,6 +32,13 @@ const workspaceItems = [
     description:
       "Group saved emails and reusable sequences by client, offer, or campaign.",
   },
+  {
+    href: "/team",
+    label: "Team Library",
+    badge: "Pro",
+    description:
+      "Share templates and reusable sequences securely with teammates.",
+  },
 ];
 
 export default function WorkspacePage() {

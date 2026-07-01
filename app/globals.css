@@ -1192,6 +1192,12 @@ select.input option {
   margin-top: 18px;
 }
 
+.folderOrganizerGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(220px, 1fr) auto;
+  gap: 14px;
+}
+
 .folderItemCard {
   display: block;
   padding: 18px;
@@ -1619,6 +1625,10 @@ select.input option {
   }
 
   .statGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .folderOrganizerGrid {
     grid-template-columns: 1fr;
   }
 

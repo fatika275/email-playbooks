@@ -9,6 +9,7 @@ import {
   useCustomTemplates,
   useEmails,
 } from "@/lib/storage";
+import { saveCustomTemplateRecord, saveEmailRecord } from "@/lib/cloud";
 
 type FolderItem =
   | {
@@ -55,14 +56,15 @@ export default function FoldersPage() {
   const [query, setQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState("All");
   const [sortBy, setSortBy] = useState("newest");
+  const [selectedItemKey, setSelectedItemKey] = useState("");
+  const [folderName, setFolderName] = useState("");
+  const [folderNotice, setFolderNotice] = useState("");
 
   const emails = useEmails();
   const templates = useCustomTemplates();
 
-  const folderGroups = useMemo<FolderGroup[]>(() => {
-    const normalizedQuery = query.trim().toLowerCase();
-
-    const items: FolderItem[] = [
+  const allItems = useMemo<FolderItem[]>(
+    () => [
       ...emails.map((email) => ({
         id: email.id,
         type: "email" as const,
@@ -85,7 +87,26 @@ export default function FoldersPage() {
         createdAt: template.createdAt,
         item: template,
       })),
-    ].filter((item) => {
+    ],
+    [emails, templates]
+  );
+
+  const existingFolders = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          allItems
+            .map((item) => item.item.folder?.trim())
+            .filter((folder): folder is string => Boolean(folder))
+        )
+      ).sort((a, b) => a.localeCompare(b)),
+    [allItems]
+  );
+
+  const folderGroups = useMemo<FolderGroup[]>(() => {
+    const normalizedQuery = query.trim().toLowerCase();
+
+    const items = allItems.filter((item) => {
       const matchesType =
         typeFilter === "All" ||
         (typeFilter === "Saved Emails" && item.type === "email") ||
@@ -143,9 +164,37 @@ export default function FoldersPage() {
         if (b.name === "Unfiled") return -1;
         return a.name.localeCompare(b.name);
       });
-  }, [emails, templates, query, typeFilter, sortBy]);
+  }, [allItems, query, typeFilter, sortBy]);
 
   const totalItems = emails.length + templates.length;
+
+  async function handleAssignFolder() {
+    const item = allItems.find(
+      (candidate) => `${candidate.type}:${candidate.id}` === selectedItemKey
+    );
+    const nextFolder = folderName.trim();
+
+    if (!item || !nextFolder) {
+      setFolderNotice("Choose an item and enter a folder name first.");
+      return;
+    }
+
+    try {
+      if (item.type === "email") {
+        await saveEmailRecord({ ...item.item, folder: nextFolder });
+      } else {
+        await saveCustomTemplateRecord({ ...item.item, folder: nextFolder });
+      }
+
+      setFolderNotice(`Moved “${item.title}” to ${nextFolder}.`);
+      setSelectedItemKey("");
+      setFolderName("");
+    } catch (error) {
+      setFolderNotice(
+        error instanceof Error ? error.message : "Could not update the folder."
+      );
+    }
+  }
 
   if (!hasProAccess) {
     return (
@@ -230,12 +279,82 @@ export default function FoldersPage() {
           </div>
         </div>
 
+        {totalItems > 0 ? (
+          <div className="glassCard" style={{ padding: 22, marginBottom: 22 }}>
+            <div className="cardTop">
+              <div>
+                <h2 className="cardTitle">Add an item to a folder</h2>
+                <p className="muted" style={{ margin: "8px 0 0" }}>
+                  Choose saved work, then use an existing folder name or type a
+                  new one. The first item creates the folder automatically.
+                </p>
+              </div>
+            </div>
+
+            <div
+              className="folderOrganizerGrid"
+              style={{
+                alignItems: "end",
+                marginTop: 18,
+              }}
+            >
+              <div className="formGroup" style={{ marginBottom: 0 }}>
+                <label className="label" htmlFor="folder-item">
+                  Saved email or sequence
+                </label>
+                <select
+                  id="folder-item"
+                  className="input"
+                  value={selectedItemKey}
+                  onChange={(event) => setSelectedItemKey(event.target.value)}
+                >
+                  <option value="">Choose an item</option>
+                  {allItems.map((item) => (
+                    <option key={`${item.type}:${item.id}`} value={`${item.type}:${item.id}`}>
+                      {item.type === "email" ? "Email" : "Sequence"}: {item.title}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="formGroup" style={{ marginBottom: 0 }}>
+                <label className="label" htmlFor="folder-name">
+                  Folder name
+                </label>
+                <input
+                  id="folder-name"
+                  className="input"
+                  list="folder-suggestions"
+                  value={folderName}
+                  onChange={(event) => setFolderName(event.target.value)}
+                  placeholder="Example: Client campaigns"
+                />
+                <datalist id="folder-suggestions">
+                  {existingFolders.map((folder) => (
+                    <option key={folder} value={folder} />
+                  ))}
+                </datalist>
+              </div>
+
+              <button
+                type="button"
+                className="button buttonPrimary"
+                onClick={() => void handleAssignFolder()}
+              >
+                Move to folder
+              </button>
+            </div>
+
+            {folderNotice ? <p className="notice">{folderNotice}</p> : null}
+          </div>
+        ) : null}
+
         {totalItems === 0 ? (
           <div className="glassCard emptyState">
             <h3 className="cardTitle">No saved work yet</h3>
             <p className="muted" style={{ maxWidth: 620, marginInline: "auto" }}>
-              Save emails or reusable sequences first, then assign folders from
-              their detail pages.
+              Save an email or reusable sequence first. Then return here to put
+              it into a folder.
             </p>
             <div className="toolbar" style={{ justifyContent: "center", marginTop: 20 }}>
               <Link href="/sequence-builder" className="button buttonPrimary">

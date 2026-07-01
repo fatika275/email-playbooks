@@ -17,6 +17,7 @@ const workspacePaths = [
   "/history",
   "/custom-templates",
   "/folders",
+  "/team",
 ];
 
 function isActive(pathname: string, href: string) {

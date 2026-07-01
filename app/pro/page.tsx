@@ -6,6 +6,7 @@ const proFeatures = [
   "Full sequence builder",
   "Unlimited saved emails and folders",
   "Reusable sequence library",
+  "Secure team sharing for templates and sequences",
   "HTML export for more polished sending",
 ];
 

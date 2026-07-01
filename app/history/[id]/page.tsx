@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { type SavedEmail, useEmails } from "@/lib/storage";
 import { saveEmailRecord } from "@/lib/cloud";
+import { ShareWithTeam } from "@/components/share-with-team";
 
 const REUSE_EMAIL_KEY = "thalovo_reuse_email";
 
@@ -266,6 +267,14 @@ export default function SavedEmailViewPage() {
                 {savedNotice ? <p className="notice">{savedNotice}</p> : null}
               </div>
             </div>
+
+            <ShareWithTeam
+              assetType="email"
+              sourceId={email.id}
+              title={email.templateLabel}
+              subject={email.subject}
+              body={email.body}
+            />
 
             <div className="toolbar">
               <button className="button buttonPrimary" onClick={handleCopy}>

@@ -62,6 +62,21 @@ export type FounderWaitlistEntry = {
   updated_at: string;
 };
 
+export type TeamShareAssetType = "email" | "sequence";
+
+export type TeamShare = {
+  id: string;
+  owner_id: string;
+  owner_email: string;
+  recipient_email: string;
+  asset_type: TeamShareAssetType;
+  source_id: string;
+  title: string;
+  subject: string;
+  body: string;
+  created_at: string;
+};
+
 function normalizeCloudError(error: unknown) {
   if (!(error instanceof Error)) {
     if (
@@ -561,4 +576,60 @@ export async function saveCustomTemplateRecord(template: CustomTemplate) {
   if (!user) return;
 
   await upsertTemplates(user.id, [template]);
+}
+
+export async function shareAssetWithTeammate(options: {
+  recipientEmail: string;
+  assetType: TeamShareAssetType;
+  sourceId: string;
+  title: string;
+  subject: string;
+  body: string;
+}) {
+  const client = getSupabaseBrowserClient();
+  const user = await getSignedInUser();
+  if (!client || !user?.email) {
+    throw new Error("Sign in before sharing with a teammate.");
+  }
+
+  const recipientEmail = options.recipientEmail.trim().toLowerCase();
+  if (!recipientEmail || recipientEmail === user.email.toLowerCase()) {
+    throw new Error("Enter a teammate's email address, not your own.");
+  }
+
+  const { error } = await client.from("team_shares").insert({
+    owner_id: user.id,
+    owner_email: user.email.toLowerCase(),
+    recipient_email: recipientEmail,
+    asset_type: options.assetType,
+    source_id: options.sourceId,
+    title: options.title,
+    subject: options.subject,
+    body: options.body,
+  });
+
+  if (error) throw normalizeCloudError(error);
+}
+
+export async function listTeamShares() {
+  const client = getSupabaseBrowserClient();
+  if (!client) return [];
+
+  const { data, error } = await client
+    .from("team_shares")
+    .select(
+      "id, owner_id, owner_email, recipient_email, asset_type, source_id, title, subject, body, created_at"
+    )
+    .order("created_at", { ascending: false });
+
+  if (error) throw normalizeCloudError(error);
+  return (data ?? []) as TeamShare[];
+}
+
+export async function removeTeamShare(id: string) {
+  const client = getSupabaseBrowserClient();
+  if (!client) throw new Error("Team sharing is temporarily unavailable.");
+
+  const { error } = await client.from("team_shares").delete().eq("id", id);
+  if (error) throw normalizeCloudError(error);
 }

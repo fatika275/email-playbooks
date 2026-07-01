@@ -8,6 +8,7 @@ import {
   useCustomTemplates,
 } from "@/lib/storage";
 import { saveCustomTemplateRecord, saveEmailRecord } from "@/lib/cloud";
+import { ShareWithTeam } from "@/components/share-with-team";
 import { downloadHtmlFile } from "@/lib/exportHtml";
 import { playbooks } from "@/lib/data";
 import { useAccount } from "@/components/account-provider";
@@ -408,6 +409,14 @@ export default function SequenceAssetPage() {
                 </div>
               </div>
             </div>
+
+            <ShareWithTeam
+              assetType="sequence"
+              sourceId={template.id}
+              title={title}
+              subject={subject}
+              body={body}
+            />
 
             <div className="formGroup">
               <label className="label">Asset Name</label>
