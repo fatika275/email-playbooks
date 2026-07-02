@@ -170,7 +170,7 @@ export default function PricingPage() {
             <div className="badge">Business Pro</div>
 
             <h2 className="pageTitle" style={{ marginTop: 14 }}>
-              GBP 49<span className="muted">/month</span>
+              GBP 29<span className="muted">/month</span>
             </h2>
 
             <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>

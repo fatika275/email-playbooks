@@ -36,7 +36,7 @@ export default function BusinessPage() {
           <aside className="glassCard planCheckoutCard">
             <span className="statusPill statusPillSuccess">10 seats included</span>
             <h2 className="pageTitle" style={{ marginTop: 16 }}>
-              GBP 49<span className="muted">/month</span>
+              GBP 29<span className="muted">/month</span>
             </h2>
             <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
               Only the workspace owner is billed. Invite teammates after payment
