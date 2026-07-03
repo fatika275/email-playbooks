@@ -5,6 +5,13 @@ import { useAccount } from "@/components/account-provider";
 
 const workspaceItems = [
   {
+    href: "/prospects",
+    label: "Prospect Pipeline",
+    badge: "Pro",
+    description:
+      "Track leads, deal stages, values, notes, and the next follow-up needed to win a client.",
+  },
+  {
     href: "/sequence-builder",
     label: "Sequence Builder",
     badge: "Pro",
@@ -50,11 +57,11 @@ export default function WorkspacePage() {
         <div className="pageHeader">
           <div className="badge">Workspace</div>
           <h1 className="pageTitle" style={{ marginTop: 14 }}>
-            Your Outreach Workspace
+            Your Client Acquisition Workspace
           </h1>
           <p className="muted" style={{ maxWidth: 760, lineHeight: 1.75 }}>
-            Build, save, organise, and return to the outreach assets that are
-            already working for you.
+            Manage prospects, build outreach, run follow-ups, and keep the work
+            needed to win clients in one operating system.
           </p>
         </div>
 
@@ -64,11 +71,11 @@ export default function WorkspacePage() {
               {hasProAccess ? "Pro workspace active" : "Free workspace preview"}
             </span>
             <h2 className="sectionTitle" style={{ marginTop: 16 }}>
-              Fewer links up top, more useful structure in here.
+              Know who to contact and what happens next.
             </h2>
             <p className="muted" style={{ marginTop: 10, lineHeight: 1.75 }}>
-              The main navigation now stays focused. This page holds the tools
-              that support saved work and campaign building.
+              Start in the prospect pipeline, move into the right message, then
+              return to log contact and schedule the next follow-up.
             </p>
           </div>
 
@@ -77,8 +84,8 @@ export default function WorkspacePage() {
               Unlock Pro Workspace
             </Link>
           ) : (
-            <Link href="/sequence-builder" className="button buttonPrimary">
-              Build Sequence
+            <Link href="/prospects" className="button buttonPrimary">
+              Open Pipeline
             </Link>
           )}
         </div>

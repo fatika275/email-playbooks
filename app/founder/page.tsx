@@ -61,7 +61,9 @@ export default function FounderPage() {
           </h1>
           <p className="muted" style={{ maxWidth: 760, lineHeight: 1.75 }}>
             Founder Pro is for selected early users who want the full Pro system
-            at a lower monthly price while Thalovo continues to improve.
+            at a lower monthly price while Thalovo continues to improve. It is
+            an individual plan for one person; businesses that need teammate
+            access should use Business Pro.
           </p>
         </div>
 
@@ -89,10 +91,13 @@ export default function FounderPage() {
 
             <ul className="featureList">
               <li>Everything in Pro</li>
+              <li>Prospect pipeline and follow-up tracking</li>
+              <li>Access for one individual account</li>
               <li>Locked Founder Pro monthly price</li>
               <li>Full playbook library</li>
               <li>Full sequence builder</li>
               <li>Reusable sequences, folders, and saved emails</li>
+              <li>Team seats are not included</li>
             </ul>
 
             {founderEligible ? (

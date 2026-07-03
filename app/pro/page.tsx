@@ -2,6 +2,7 @@ import Link from "next/link";
 import { CheckoutButton } from "@/components/checkout-button";
 
 const proFeatures = [
+  "Prospect pipeline and follow-up tracking",
   "Full playbook library",
   "Full sequence builder",
   "Unlimited saved emails and folders",

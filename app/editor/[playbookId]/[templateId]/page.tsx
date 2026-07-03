@@ -30,6 +30,7 @@ import { getPlaybookAccess } from "@/lib/access";
 const REUSE_EMAIL_KEY = "thalovo_reuse_email";
 const LEGACY_REUSE_EMAIL_KEY = "arcmail_reuse_email";
 const EMPTY_REUSE_EMAIL = "";
+const PROSPECT_CONTEXT_KEY = "thalovo_prospect_context";
 
 function subscribeToBrowserStorage(onStoreChange: () => void) {
   if (typeof window === "undefined") return () => {};
@@ -44,6 +45,11 @@ function getReuseEmailSnapshot() {
     localStorage.getItem(LEGACY_REUSE_EMAIL_KEY) ||
     EMPTY_REUSE_EMAIL
   );
+}
+
+function getProspectContextSnapshot() {
+  if (typeof window === "undefined") return "";
+  return localStorage.getItem(PROSPECT_CONTEXT_KEY) || "";
 }
 
 function makeId() {
@@ -206,6 +212,26 @@ export default function EditorPage() {
     getReuseEmailSnapshot,
     () => EMPTY_REUSE_EMAIL
   );
+  const rawProspectContext = useSyncExternalStore(
+    subscribeToBrowserStorage,
+    getProspectContextSnapshot,
+    () => ""
+  );
+  const prospectValues = useMemo<Record<string, string>>(() => {
+    if (!rawProspectContext) return {} as Record<string, string>;
+    try {
+      const context = JSON.parse(rawProspectContext) as {
+        name?: string;
+        company?: string;
+      };
+      return {
+        name: context.name || "",
+        company: context.company || "",
+      };
+    } catch {
+      return {} as Record<string, string>;
+    }
+  }, [rawProspectContext]);
   const reuseDraft = useMemo<Pick<SavedEmail, "subject" | "body"> | null>(() => {
     if (!rawReuseEmail) return null;
 
@@ -253,13 +279,14 @@ export default function EditorPage() {
 
   const template = foundTemplate;
 
+  const inputValues = { ...prospectValues, ...values };
   const mergedValues = {
-    ...values,
-    service: values.service || offerType,
-    offer: values.offer || offerType,
-    company: values.company || targetAudience,
-    result: values.result || primaryGoal,
-    product: values.product || offerType,
+    ...inputValues,
+    service: inputValues.service || offerType,
+    offer: inputValues.offer || offerType,
+    company: inputValues.company || targetAudience,
+    result: inputValues.result || primaryGoal,
+    product: inputValues.product || offerType,
   };
 
   const generatedSubject = renderTemplate(template.subject, mergedValues);
@@ -554,7 +581,7 @@ export default function EditorPage() {
                   <Field
                     key={variable}
                     variable={variable}
-                    values={values}
+                    values={inputValues}
                     handleChange={handleChange}
                   />
                 ))}
@@ -594,7 +621,7 @@ export default function EditorPage() {
                       <Field
                         key={variable}
                         variable={variable}
-                        values={values}
+                        values={inputValues}
                         handleChange={handleChange}
                       />
                     ))}

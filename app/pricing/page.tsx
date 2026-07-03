@@ -62,7 +62,8 @@ export default function PricingPage() {
             <p className="muted" style={{ marginTop: 10, lineHeight: 1.75 }}>
               Founder Pro gives selected early users the full Pro feature set
               at a lower locked monthly price. It is invite-only, and you can
-              register interest without booking a call.
+              register interest without booking a call. Founder Pro covers one
+              individual account and does not include Business Pro team seats.
             </p>
           </div>
 
@@ -144,6 +145,7 @@ export default function PricingPage() {
             </p>
 
             <ul className="featureList">
+              <li>Prospect pipeline and follow-up tracking</li>
               <li>Full playbook library</li>
               <li>Full sequence builder</li>
               <li>Unlimited saved emails and folders</li>
@@ -180,6 +182,7 @@ export default function PricingPage() {
 
             <ul className="featureList">
               <li>Everything in Pro</li>
+              <li>One shared prospect pipeline</li>
               <li>10 teammate seats included</li>
               <li>Full Pro access for every active member</li>
               <li>Secure team templates and sequences</li>

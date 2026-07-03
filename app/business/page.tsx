@@ -3,6 +3,7 @@ import { CheckoutButton } from "@/components/checkout-button";
 
 const businessFeatures = [
   "Everything in Pro",
+  "One shared prospect pipeline",
   "One payment for the business",
   "Full Pro access for up to 10 teammates",
   "Secure shared templates and sequences",

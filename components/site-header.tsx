@@ -18,6 +18,7 @@ const workspacePaths = [
   "/custom-templates",
   "/folders",
   "/team",
+  "/prospects",
 ];
 
 function isActive(pathname: string, href: string) {
