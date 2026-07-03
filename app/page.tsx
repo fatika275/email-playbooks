@@ -8,16 +8,16 @@ import { trackEvent } from "@/lib/analytics";
 
 const workflow = [
   {
-    title: "Pick the situation",
-    text: "Choose the outreach moment you are in: first touch, follow-up, objection, proposal, or re-engagement.",
+    title: "Manage the opportunity",
+    text: "Keep every prospect, deal stage, task, note, value, and next follow-up in one working pipeline.",
   },
   {
-    title: "Shape the message",
-    text: "Add prospect context, your offer, and the outcome you want so the draft feels specific.",
+    title: "Run the outreach",
+    text: "Move directly from prospect context into structured emails, sequences, objections, and follow-ups.",
   },
   {
-    title: "Save the system",
-    text: "Keep strong emails and reusable sequences in your workspace so outreach becomes repeatable.",
+    title: "Operate until won",
+    text: "Use the Today queue, activity history, tasks, and reporting to keep momentum until the client closes.",
   },
 ];
 
@@ -34,26 +34,26 @@ export default function HomePage() {
         <div className="homeHeroInner">
           <div className="eyebrow">
             <span className="eyebrowDot" />
-            Reply-focused outbound systems
+            Client acquisition operating system
           </div>
 
           <h1 className="homeHeroTitle">
-            Write outbound emails with structure, not guesswork.
+            Thalovo, your client acquisition operating system.
           </h1>
 
           <p className="homeHeroText">
-            Thalovo helps founders, agencies, and small teams build practical
-            email sequences for starting conversations, following up, handling
-            objections, and reusing what works.
+            Manage prospects, run outreach, handle follow-ups, track pipeline
+            value, and move opportunities toward signed clients without stitching
+            together a pile of disconnected tools.
           </p>
 
           <div className="heroActions homeHeroActions">
             <Link
-              href="/library"
+              href="/prospects"
               className="button buttonPrimary"
               onClick={() => trackEvent("homepage_explore_library")}
             >
-              Explore library
+              Open prospect pipeline
             </Link>
             <Link
               href="/account"
@@ -69,16 +69,16 @@ export default function HomePage() {
       <ScrollReveal as="section" className="container section" delay={80}>
         <div className="homeMetrics">
           <div>
-            <strong>{playbooks.length}+</strong>
-            <span>Playbook systems</span>
+            <strong>One pipeline</strong>
+            <span>Prospects, stages, tasks, and follow-ups</span>
           </div>
           <div>
-            <strong>Full sequence</strong>
-            <span>Not isolated templates</span>
+            <strong>{playbooks.length}+ playbooks</strong>
+            <span>Messaging for each sales situation</span>
           </div>
           <div>
-            <strong>Reusable</strong>
-            <span>Saved emails, folders, and workspace</span>
+            <strong>Operational</strong>
+            <span>Today queue, reporting, and team access</span>
           </div>
         </div>
       </ScrollReveal>
@@ -86,10 +86,10 @@ export default function HomePage() {
       <ScrollReveal as="section" className="container section" delay={100}>
         <div className="sectionHeader homeSectionHeader">
           <div>
-            <h2 className="pageTitle">A calmer way to build outbound</h2>
+            <h2 className="pageTitle">One workflow from lead to client</h2>
             <p className="muted">
-              Start with proven structure, then make each message specific to
-              the person you are trying to reach.
+              Keep account context, communication, and next actions together so
+              opportunities do not disappear between tools.
             </p>
           </div>
         </div>
@@ -114,11 +114,11 @@ export default function HomePage() {
           <div>
             <div className="badge">Workspace</div>
             <h2 className="pageTitle" style={{ marginTop: 14 }}>
-              From one email to a repeatable operating system.
+              Messaging belongs inside the acquisition operation.
             </h2>
             <p className="muted" style={{ marginTop: 12, maxWidth: 680 }}>
-              Use the library for the first draft, save the best versions, and
-              build reusable sequences as your outreach gets sharper.
+              Start from the prospect record, draft with their context already
+              attached, then return to log activity and schedule what happens next.
             </p>
           </div>
 

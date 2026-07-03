@@ -2,16 +2,21 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import Papa from "papaparse";
 import { useAccount } from "@/components/account-provider";
 import { getOwnedBusinessWorkspace } from "@/lib/cloud";
 import {
+  createProspectsBatch,
   createProspect,
+  listProspectTasks,
   listProspects,
   PROSPECT_STAGES,
   PROSPECT_STAGE_LABELS,
+  setProspectTaskCompleted,
   updateProspectStage,
   type Prospect,
   type ProspectStage,
+  type ProspectTask,
 } from "@/lib/prospects";
 
 const ACTIVE_STAGES: ProspectStage[] = [
@@ -44,7 +49,7 @@ export default function ProspectsPage() {
   const [workspaceId, setWorkspaceId] = useState<string | null>(
     businessMembership?.workspace_id ?? null
   );
-  const [view, setView] = useState<"pipeline" | "list">("pipeline");
+  const [view, setView] = useState<"pipeline" | "list" | "today" | "reports">("pipeline");
   const [query, setQuery] = useState("");
   const [stageFilter, setStageFilter] = useState<ProspectStage | "all">("all");
   const [showAdd, setShowAdd] = useState(false);
@@ -57,6 +62,9 @@ export default function ProspectsPage() {
   const [nextFollowUp, setNextFollowUp] = useState("");
   const [notice, setNotice] = useState("");
   const [isWorking, setIsWorking] = useState(false);
+  const [tasks, setTasks] = useState<ProspectTask[]>([]);
+  const [draggedProspectId, setDraggedProspectId] = useState<string | null>(null);
+  const [dragStage, setDragStage] = useState<ProspectStage | null>(null);
 
   const refresh = useCallback(async () => {
     if (!user || !hasProAccess) return;
@@ -65,9 +73,12 @@ export default function ProspectsPage() {
       activeWorkspaceId = (await getOwnedBusinessWorkspace())?.id ?? null;
     }
     setWorkspaceId(activeWorkspaceId);
-    setProspects(
-      await listProspects({ userId: user.id, workspaceId: activeWorkspaceId })
-    );
+    const nextProspects = await listProspects({
+      userId: user.id,
+      workspaceId: activeWorkspaceId,
+    });
+    setProspects(nextProspects);
+    setTasks(await listProspectTasks(nextProspects.map((prospect) => prospect.id)));
   }, [businessMembership?.workspace_id, hasProAccess, plan, user]);
 
   useEffect(() => {
@@ -98,6 +109,53 @@ export default function ProspectsPage() {
       due: active.filter((prospect) => isDue(prospect.next_follow_up)).length,
       value: active.reduce((sum, prospect) => sum + prospect.estimated_value_gbp, 0),
       won: prospects.filter((prospect) => prospect.stage === "won").length,
+    };
+  }, [prospects]);
+
+  const todayItems = useMemo(() => {
+    const openTasks = tasks
+      .filter((task) => !task.completed_at && isDue(task.due_date))
+      .map((task) => ({
+        id: `task-${task.id}`,
+        task,
+        prospect: prospects.find((prospect) => prospect.id === task.prospect_id),
+      }));
+    const followUps = prospects
+      .filter(
+        (prospect) =>
+          ACTIVE_STAGES.includes(prospect.stage) && isDue(prospect.next_follow_up)
+      )
+      .map((prospect) => ({ id: `followup-${prospect.id}`, prospect }));
+    return { openTasks, followUps };
+  }, [prospects, tasks]);
+
+  const report = useMemo(() => {
+    const probabilities: Record<ProspectStage, number> = {
+      new: 0.05,
+      researching: 0.1,
+      contacted: 0.2,
+      replied: 0.35,
+      qualified: 0.55,
+      meeting: 0.75,
+      won: 1,
+      lost: 0,
+    };
+    const closed = prospects.filter((prospect) => ["won", "lost"].includes(prospect.stage));
+    const won = closed.filter((prospect) => prospect.stage === "won").length;
+    return {
+      weighted: prospects.reduce(
+        (sum, prospect) => sum + prospect.estimated_value_gbp * probabilities[prospect.stage],
+        0
+      ),
+      winRate: closed.length ? Math.round((won / closed.length) * 100) : 0,
+      stages: PROSPECT_STAGES.map((stage) => {
+        const rows = prospects.filter((prospect) => prospect.stage === stage);
+        return {
+          stage,
+          count: rows.length,
+          value: rows.reduce((sum, prospect) => sum + prospect.estimated_value_gbp, 0),
+        };
+      }),
     };
   }, [prospects]);
 
@@ -150,6 +208,76 @@ export default function ProspectsPage() {
     }
   }
 
+  async function handleDrop(stage: ProspectStage) {
+    if (!draggedProspectId) return;
+    const id = draggedProspectId;
+    setDraggedProspectId(null);
+    setDragStage(null);
+    await handleStageChange(id, stage);
+  }
+
+  async function handleCsvImport(file: File) {
+    if (!user) return;
+    setIsWorking(true);
+    Papa.parse<Record<string, string>>(file, {
+      header: true,
+      skipEmptyLines: true,
+      transformHeader: (header) =>
+        header.trim().toLowerCase().replace(/[^a-z0-9]+/g, "_"),
+      complete: (result) => {
+        void (async () => {
+          try {
+            const inputs = result.data
+              .map((row) => {
+                const rawStage = (row.stage || "new").trim().toLowerCase();
+                const stage = PROSPECT_STAGES.includes(rawStage as ProspectStage)
+                  ? (rawStage as ProspectStage)
+                  : "new";
+                return {
+                  full_name: row.full_name || row.name || row.contact_name || "",
+                  company: row.company || row.company_name || row.account || "",
+                  email: row.email || row.work_email || "",
+                  role: row.role || row.job_title || row.title || "",
+                  linkedin_url: row.linkedin_url || row.linkedin || "",
+                  source: row.source || "CSV import",
+                  stage,
+                  estimated_value_gbp: Number(
+                    row.estimated_value_gbp || row.value || row.deal_value || 0
+                  ),
+                  notes: row.notes || "",
+                  next_follow_up: row.next_follow_up || row.follow_up || "",
+                };
+              })
+              .filter((row) => row.full_name.trim() && row.company.trim());
+            if (!inputs.length) {
+              throw new Error("No valid rows found. CSV needs name and company columns.");
+            }
+            await createProspectsBatch({ userId: user.id, workspaceId, inputs });
+            await refresh();
+            setNotice(`Imported ${inputs.length} prospects.`);
+          } catch (error) {
+            setNotice(error instanceof Error ? error.message : "CSV import failed.");
+          } finally {
+            setIsWorking(false);
+          }
+        })();
+      },
+      error: (error) => {
+        setNotice(error.message || "CSV import failed.");
+        setIsWorking(false);
+      },
+    });
+  }
+
+  async function handleTaskComplete(task: ProspectTask) {
+    try {
+      await setProspectTaskCompleted(task.id, true);
+      await refresh();
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Task could not be completed.");
+    }
+  }
+
   if (isLoading) {
     return <main className="main"><section className="container"><div className="glassCard emptyState">Loading pipeline...</div></section></main>;
   }
@@ -188,9 +316,25 @@ export default function ProspectsPage() {
                 : "Your private prospect pipeline"}
             </p>
           </div>
-          <button className="button buttonPrimary" onClick={() => setShowAdd((open) => !open)}>
-            {showAdd ? "Close" : "Add prospect"}
-          </button>
+          <div className="toolbar">
+            <label className="button buttonSecondary prospectImportButton">
+              Import CSV
+              <input
+                className="prospectImportInput"
+                type="file"
+                accept=".csv,text/csv"
+                disabled={isWorking}
+                onChange={(event) => {
+                  const file = event.target.files?.[0];
+                  if (file) void handleCsvImport(file);
+                  event.target.value = "";
+                }}
+              />
+            </label>
+            <button className="button buttonPrimary" onClick={() => setShowAdd((open) => !open)}>
+              {showAdd ? "Close" : "Add prospect"}
+            </button>
+          </div>
         </div>
 
         <div className="prospectMetrics">
@@ -221,6 +365,8 @@ export default function ProspectsPage() {
           <div className="authModeTabs prospectViewTabs" role="tablist" aria-label="Prospect view">
             <button className={view === "pipeline" ? "authModeTab active" : "authModeTab"} onClick={() => setView("pipeline")}>Pipeline</button>
             <button className={view === "list" ? "authModeTab active" : "authModeTab"} onClick={() => setView("list")}>List</button>
+            <button className={view === "today" ? "authModeTab active" : "authModeTab"} onClick={() => setView("today")}>Today</button>
+            <button className={view === "reports" ? "authModeTab active" : "authModeTab"} onClick={() => setView("reports")}>Reports</button>
           </div>
           <input className="input prospectSearch" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search name, company, email..." />
           <select className="input prospectStageFilter" value={stageFilter} onChange={(event) => setStageFilter(event.target.value as ProspectStage | "all")}>
@@ -234,14 +380,29 @@ export default function ProspectsPage() {
             {PROSPECT_STAGES.map((stage) => {
               const stageProspects = filtered.filter((prospect) => prospect.stage === stage);
               return (
-                <section key={stage} className="prospectColumn">
+                <section
+                  key={stage}
+                  className={dragStage === stage ? "prospectColumn isDragTarget" : "prospectColumn"}
+                  onDragEnter={() => setDragStage(stage)}
+                  onDragOver={(event) => event.preventDefault()}
+                  onDrop={() => void handleDrop(stage)}
+                >
                   <div className="prospectColumnHeader"><strong>{PROSPECT_STAGE_LABELS[stage]}</strong><span>{stageProspects.length}</span></div>
                   <div className="prospectColumnBody">
                     {stageProspects.map((prospect) => (
-                      <article key={prospect.id} className="prospectCard">
+                      <article
+                        key={prospect.id}
+                        className="prospectCard"
+                        draggable
+                        onDragStart={() => setDraggedProspectId(prospect.id)}
+                        onDragEnd={() => {
+                          setDraggedProspectId(null);
+                          setDragStage(null);
+                        }}
+                      >
                         <Link href={`/prospects/${prospect.id}`} className="prospectCardLink">
                           <strong>{prospect.full_name}</strong>
-                          <span>{prospect.company}{prospect.role ? ` · ${prospect.role}` : ""}</span>
+                          <span>{prospect.company}{prospect.role ? ` - ${prospect.role}` : ""}</span>
                           <span>{formatMoney(prospect.estimated_value_gbp)}</span>
                           {prospect.next_follow_up ? <span className={isDue(prospect.next_follow_up) ? "prospectDue" : ""}>Follow up {prospect.next_follow_up}</span> : null}
                         </Link>
@@ -256,14 +417,14 @@ export default function ProspectsPage() {
               );
             })}
           </div>
-        ) : (
+        ) : view === "list" ? (
           <div className="prospectTableWrap">
             <table className="prospectTable">
               <thead><tr><th>Prospect</th><th>Stage</th><th>Value</th><th>Follow-up</th><th>Source</th></tr></thead>
               <tbody>
                 {filtered.map((prospect) => (
                   <tr key={prospect.id}>
-                    <td><Link href={`/prospects/${prospect.id}`}><strong>{prospect.full_name}</strong><span>{prospect.company}{prospect.role ? ` · ${prospect.role}` : ""}</span></Link></td>
+                    <td><Link href={`/prospects/${prospect.id}`}><strong>{prospect.full_name}</strong><span>{prospect.company}{prospect.role ? ` - ${prospect.role}` : ""}</span></Link></td>
                     <td><select className="input prospectTableStage" value={prospect.stage} onChange={(event) => void handleStageChange(prospect.id, event.target.value as ProspectStage)}>{PROSPECT_STAGES.map((stage) => <option key={stage} value={stage}>{PROSPECT_STAGE_LABELS[stage]}</option>)}</select></td>
                     <td>{formatMoney(prospect.estimated_value_gbp)}</td>
                     <td className={isDue(prospect.next_follow_up) ? "prospectDue" : ""}>{prospect.next_follow_up || "Not set"}</td>
@@ -273,6 +434,63 @@ export default function ProspectsPage() {
               </tbody>
             </table>
             {filtered.length === 0 ? <div className="emptyState"><p className="muted">No prospects match this view.</p></div> : null}
+          </div>
+        ) : view === "today" ? (
+          <div className="prospectTodayGrid">
+            <section className="prospectTodayPanel">
+              <div className="prospectSectionHeader"><h2 className="cardTitle">Tasks due</h2></div>
+              <div className="prospectTodayList">
+                {todayItems.openTasks.map(({ id, task, prospect }) => (
+                  <div key={id} className="prospectTodayItem">
+                    <div>
+                      <strong>{task.title}</strong>
+                      <span>{prospect ? `${prospect.full_name} - ${prospect.company}` : "Prospect"}{task.due_date ? ` - Due ${task.due_date}` : ""}</span>
+                    </div>
+                    <div className="toolbar">
+                      {prospect ? <Link href={`/prospects/${prospect.id}`} className="button buttonSecondary">Open</Link> : null}
+                      <button className="button buttonPrimary" onClick={() => void handleTaskComplete(task)}>Complete</button>
+                    </div>
+                  </div>
+                ))}
+                {todayItems.openTasks.length === 0 ? <p className="muted">No overdue tasks. Nicely handled.</p> : null}
+              </div>
+            </section>
+
+            <section className="prospectTodayPanel">
+              <div className="prospectSectionHeader"><h2 className="cardTitle">Prospects to follow up</h2></div>
+              <div className="prospectTodayList">
+                {todayItems.followUps.map(({ id, prospect }) => (
+                  <div key={id} className="prospectTodayItem">
+                    <div><strong>{prospect.full_name}</strong><span>{prospect.company} - {PROSPECT_STAGE_LABELS[prospect.stage]} - Due {prospect.next_follow_up}</span></div>
+                    <Link href={`/prospects/${prospect.id}`} className="button buttonPrimary">Follow up</Link>
+                  </div>
+                ))}
+                {todayItems.followUps.length === 0 ? <p className="muted">No prospect follow-ups are due.</p> : null}
+              </div>
+            </section>
+          </div>
+        ) : (
+          <div className="prospectReports">
+            <section className="prospectReportSummary">
+              <div><span>Weighted forecast</span><strong>{formatMoney(report.weighted)}</strong></div>
+              <div><span>Closed win rate</span><strong>{report.winRate}%</strong></div>
+              <div><span>Total records</span><strong>{prospects.length}</strong></div>
+            </section>
+            <section className="prospectReportTableWrap">
+              <table className="prospectTable">
+                <thead><tr><th>Stage</th><th>Prospects</th><th>Total value</th><th>Share of pipeline</th></tr></thead>
+                <tbody>
+                  {report.stages.map((row) => (
+                    <tr key={row.stage}>
+                      <td><strong>{PROSPECT_STAGE_LABELS[row.stage]}</strong></td>
+                      <td>{row.count}</td>
+                      <td>{formatMoney(row.value)}</td>
+                      <td><div className="prospectReportBar"><span style={{ width: `${prospects.length ? (row.count / prospects.length) * 100 : 0}%` }} /></div></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </section>
           </div>
         )}
       </section>

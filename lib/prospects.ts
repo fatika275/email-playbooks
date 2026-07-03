@@ -57,6 +57,29 @@ export type ProspectInput = {
   last_contacted_at?: string | null;
 };
 
+export type ProspectActivityType = "note" | "email" | "call" | "meeting" | "status";
+
+export type ProspectActivity = {
+  id: string;
+  prospect_id: string;
+  created_by: string;
+  activity_type: ProspectActivityType;
+  summary: string;
+  created_at: string;
+};
+
+export type ProspectTask = {
+  id: string;
+  prospect_id: string;
+  created_by: string;
+  title: string;
+  due_date: string | null;
+  assigned_email: string | null;
+  completed_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
 function prospectError(error: { code?: string; message?: string } | null) {
   if (
     error?.code === "42P01" ||
@@ -134,6 +157,32 @@ export async function createProspect(options: {
   return data as Prospect;
 }
 
+export async function createProspectsBatch(options: {
+  userId: string;
+  workspaceId?: string | null;
+  inputs: ProspectInput[];
+}) {
+  const client = getSupabaseBrowserClient();
+  if (!client) throw new Error("Sign in before importing prospects.");
+  const rows = options.inputs.map((input) => ({
+    owner_id: options.userId,
+    workspace_id: options.workspaceId ?? null,
+    full_name: input.full_name.trim(),
+    company: input.company.trim(),
+    email: optional(input.email),
+    role: optional(input.role),
+    linkedin_url: optional(input.linkedin_url),
+    source: optional(input.source),
+    stage: input.stage ?? "new",
+    estimated_value_gbp: Math.max(0, input.estimated_value_gbp ?? 0),
+    notes: optional(input.notes),
+    next_follow_up: optional(input.next_follow_up),
+  }));
+  const { data, error } = await client.from("prospects").insert(rows).select("*");
+  if (error) throw prospectError(error);
+  return (data ?? []) as Prospect[];
+}
+
 export async function updateProspect(id: string, input: ProspectInput) {
   const client = getSupabaseBrowserClient();
   if (!client) throw new Error("Sign in before updating a prospect.");
@@ -176,5 +225,96 @@ export async function deleteProspect(id: string) {
   const client = getSupabaseBrowserClient();
   if (!client) throw new Error("Sign in before deleting a prospect.");
   const { error } = await client.from("prospects").delete().eq("id", id);
+  if (error) throw prospectError(error);
+}
+
+export async function listProspectActivities(prospectId: string) {
+  const client = getSupabaseBrowserClient();
+  if (!client) return [];
+  const { data, error } = await client
+    .from("prospect_activities")
+    .select("*")
+    .eq("prospect_id", prospectId)
+    .order("created_at", { ascending: false });
+  if (error) throw prospectError(error);
+  return (data ?? []) as ProspectActivity[];
+}
+
+export async function createProspectActivity(options: {
+  prospectId: string;
+  userId: string;
+  activityType: ProspectActivityType;
+  summary: string;
+}) {
+  const client = getSupabaseBrowserClient();
+  if (!client) throw new Error("Sign in before logging activity.");
+  const { data, error } = await client
+    .from("prospect_activities")
+    .insert({
+      prospect_id: options.prospectId,
+      created_by: options.userId,
+      activity_type: options.activityType,
+      summary: options.summary.trim(),
+    })
+    .select("*")
+    .single();
+  if (error) throw prospectError(error);
+  return data as ProspectActivity;
+}
+
+export async function listProspectTasks(prospectIds: string[]) {
+  const client = getSupabaseBrowserClient();
+  if (!client || prospectIds.length === 0) return [];
+  const { data, error } = await client
+    .from("prospect_tasks")
+    .select("*")
+    .in("prospect_id", prospectIds)
+    .order("completed_at", { ascending: true, nullsFirst: true })
+    .order("due_date", { ascending: true, nullsFirst: false });
+  if (error) throw prospectError(error);
+  return (data ?? []) as ProspectTask[];
+}
+
+export async function createProspectTask(options: {
+  prospectId: string;
+  userId: string;
+  title: string;
+  dueDate?: string;
+  assignedEmail?: string;
+}) {
+  const client = getSupabaseBrowserClient();
+  if (!client) throw new Error("Sign in before adding a task.");
+  const { data, error } = await client
+    .from("prospect_tasks")
+    .insert({
+      prospect_id: options.prospectId,
+      created_by: options.userId,
+      title: options.title.trim(),
+      due_date: optional(options.dueDate),
+      assigned_email: optional(options.assignedEmail),
+    })
+    .select("*")
+    .single();
+  if (error) throw prospectError(error);
+  return data as ProspectTask;
+}
+
+export async function setProspectTaskCompleted(id: string, completed: boolean) {
+  const client = getSupabaseBrowserClient();
+  if (!client) throw new Error("Sign in before updating a task.");
+  const { error } = await client
+    .from("prospect_tasks")
+    .update({
+      completed_at: completed ? new Date().toISOString() : null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", id);
+  if (error) throw prospectError(error);
+}
+
+export async function deleteProspectTask(id: string) {
+  const client = getSupabaseBrowserClient();
+  if (!client) throw new Error("Sign in before deleting a task.");
+  const { error } = await client.from("prospect_tasks").delete().eq("id", id);
   if (error) throw prospectError(error);
 }
