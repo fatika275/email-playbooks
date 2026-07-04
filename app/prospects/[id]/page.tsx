@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useAccount } from "@/components/account-provider";
+import { listBusinessMembers, type BusinessMember } from "@/lib/cloud";
 import {
   createProspectActivity,
   createProspectTask,
@@ -16,6 +17,7 @@ import {
   PROSPECT_STAGE_LABELS,
   setProspectTaskCompleted,
   updateProspect,
+  updateProspectAssignment,
   type ProspectActivity,
   type ProspectActivityType,
   type ProspectTask,
@@ -53,6 +55,7 @@ export default function ProspectDetailPage() {
   const [taskTitle, setTaskTitle] = useState("");
   const [taskDueDate, setTaskDueDate] = useState("");
   const [taskAssignee, setTaskAssignee] = useState(user?.email ?? "");
+  const [teamMembers, setTeamMembers] = useState<BusinessMember[]>([]);
 
   useEffect(() => {
     if (!id || !user || !hasProAccess) return;
@@ -88,6 +91,16 @@ export default function ProspectDetailPage() {
         setNotice(error instanceof Error ? error.message : "Prospect could not load.");
       });
   }, [hasProAccess, id, user]);
+
+  useEffect(() => {
+    if (!prospect?.workspace_id) {
+      setTeamMembers([]);
+      return;
+    }
+    void listBusinessMembers(prospect.workspace_id)
+      .then((rows) => setTeamMembers(rows.filter((member) => member.access_active)))
+      .catch(() => setTeamMembers([]));
+  }, [prospect?.workspace_id]);
 
   async function save(options?: { markContacted?: boolean }) {
     if (!id || !fullName.trim() || !company.trim()) {
@@ -171,6 +184,9 @@ export default function ProspectDetailPage() {
         title: taskTitle,
         dueDate: taskDueDate,
         assignedEmail: taskAssignee,
+        assignedUserId:
+          teamMembers.find((member) => member.email === taskAssignee)?.user_id ??
+          (taskAssignee === user.email ? user.id : null),
       });
       setTaskTitle("");
       setTaskDueDate("");
@@ -178,6 +194,24 @@ export default function ProspectDetailPage() {
       setNotice("Task added.");
     } catch (error) {
       setNotice(error instanceof Error ? error.message : "Task could not be added.");
+    }
+  }
+
+  async function handleProspectAssignment(value: string) {
+    if (!id) return;
+    const member = teamMembers.find((item) => item.id === value);
+    const assigningSelf = value === "self";
+    try {
+      const updated = await updateProspectAssignment({
+        id,
+        userId: member?.user_id ?? (assigningSelf ? user?.id : null),
+        email: member?.email ?? (assigningSelf ? user?.email : null),
+      });
+      setProspect(updated);
+      await refreshOperations();
+      setNotice(member || assigningSelf ? "Prospect assigned." : "Prospect unassigned.");
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Assignment could not be updated.");
     }
   }
 
@@ -260,6 +294,7 @@ export default function ProspectDetailPage() {
               <div className="formGroup"><label className="label">Stored contract value (GBP)</label><input className="input" type="number" min="0" value={value} onChange={(event) => setValue(event.target.value)} /><p className="small" style={{ margin: "6px 0 0" }}>Use the full fixed, calculated monthly, or annual value defined by your forecast model.</p></div>
               <div className="formGroup"><label className="label">Next follow-up</label><input className="input" type="date" value={nextFollowUp} onChange={(event) => setNextFollowUp(event.target.value)} /></div>
               <div className="formGroup"><label className="label">Last contacted</label><input className="input" value={lastContactedAt ? new Date(lastContactedAt).toLocaleString() : "Not contacted yet"} disabled /></div>
+              {prospect?.workspace_id ? <div className="formGroup"><label className="label">Prospect owner</label><select className="input" value={teamMembers.find((member) => member.user_id === prospect.assigned_user_id || member.email === prospect.assigned_email)?.id ?? (prospect.assigned_user_id === user.id ? "self" : "")} onChange={(event) => void handleProspectAssignment(event.target.value)}><option value="">Unassigned</option><option value="self">Me ({user.email})</option>{teamMembers.filter((member) => member.user_id !== user.id && member.email !== user.email).map((member) => <option key={member.id} value={member.id}>{member.email} · {member.role}</option>)}</select></div> : null}
             </div>
 
             <div className="formGroup"><label className="label">Notes</label><textarea className="input" rows={9} value={notes} onChange={(event) => setNotes(event.target.value)} placeholder="Decision criteria, pain points, context, objections, and next steps..." /></div>
@@ -270,7 +305,7 @@ export default function ProspectDetailPage() {
                 <div className="formGroup"><label className="label">Next task</label><input className="input" value={taskTitle} onChange={(event) => setTaskTitle(event.target.value)} placeholder="Send case study, call decision-maker..." /></div>
                 <div className="prospectTaskForm">
                   <input className="input" type="date" value={taskDueDate} onChange={(event) => setTaskDueDate(event.target.value)} aria-label="Task due date" />
-                  <input className="input" type="email" value={taskAssignee} onChange={(event) => setTaskAssignee(event.target.value)} placeholder="Assignee email" aria-label="Task assignee" />
+                  {prospect?.workspace_id ? <select className="input" value={taskAssignee} onChange={(event) => setTaskAssignee(event.target.value)} aria-label="Task assignee"><option value="">Unassigned</option><option value={user.email ?? ""}>Me ({user.email})</option>{teamMembers.filter((member) => member.email !== user.email).map((member) => <option key={member.id} value={member.email}>{member.email}</option>)}</select> : <input className="input" type="email" value={taskAssignee} onChange={(event) => setTaskAssignee(event.target.value)} placeholder="Assignee email" aria-label="Task assignee" />}
                   <button className="button buttonPrimary" disabled={!taskTitle.trim()} onClick={() => void handleAddTask()}>Add task</button>
                 </div>
                 <div className="prospectTaskList">
@@ -298,7 +333,7 @@ export default function ProspectDetailPage() {
                   {activities.map((activity) => (
                     <div key={activity.id} className="prospectTimelineItem">
                       <span className="miniBadge">{activity.activity_type}</span>
-                      <div><strong>{activity.summary}</strong><p className="small">{new Date(activity.created_at).toLocaleString()}</p></div>
+                      <div><strong>{activity.summary}</strong><p className="small">{activity.actor_email || "Teammate"} · {new Date(activity.created_at).toLocaleString()}</p></div>
                     </div>
                   ))}
                   {activities.length === 0 ? <p className="small">No activity logged yet.</p> : null}
@@ -329,7 +364,7 @@ export default function ProspectDetailPage() {
             <div className="prospectContextBlock">
               <span>Current stage</span><strong>{PROSPECT_STAGE_LABELS[stage]}</strong>
               <span>Next follow-up</span><strong>{nextFollowUp || "Not scheduled"}</strong>
-              <span>Record owner</span><strong>{prospect?.owner_id === user.id ? "You" : "Teammate"}</strong>
+              <span>Assigned to</span><strong>{prospect?.assigned_email || "Unassigned"}</strong>
             </div>
           </aside>
         </div>

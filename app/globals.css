@@ -1200,8 +1200,24 @@ select.input option {
 
 .businessInviteGrid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) minmax(140px, 0.35fr) auto;
   gap: 14px;
+}
+
+.teamRoleSelect {
+  width: auto;
+  min-width: 112px;
+}
+
+.teamActivitySection {
+  margin-top: 24px;
+  padding-top: 22px;
+  border-top: 1px solid var(--border);
+}
+
+.prospectWorkspaceSelect {
+  width: auto;
+  min-width: 220px;
 }
 
 .folderItemCard {
@@ -2171,6 +2187,12 @@ select.input option {
 
   .businessInviteGrid {
     grid-template-columns: 1fr;
+  }
+
+  .teamRoleSelect,
+  .prospectWorkspaceSelect {
+    width: 100%;
+    min-width: 0;
   }
 
   .planHero {

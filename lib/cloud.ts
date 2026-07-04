@@ -91,10 +91,14 @@ export type BusinessMember = {
   workspace_id: string;
   email: string;
   user_id: string | null;
-  role: "member";
+  role: "admin" | "member";
   status: "invited" | "active";
   access_active: boolean;
   created_at: string;
+};
+
+export type BusinessWorkspaceAccess = BusinessWorkspace & {
+  access_role: "owner" | "admin" | "member";
 };
 
 function normalizeCloudError(error: unknown) {
@@ -694,6 +698,42 @@ export async function getOwnedBusinessWorkspace() {
   return data as BusinessWorkspace | null;
 }
 
+export async function listAccessibleBusinessWorkspaces() {
+  const client = getSupabaseBrowserClient();
+  const user = await getSignedInUser();
+  if (!client || !user) return [];
+
+  const [{ data: workspaces, error: workspaceError }, { data: memberships, error: memberError }] =
+    await Promise.all([
+      client
+        .from("business_workspaces")
+        .select("id, owner_id, name, status, seat_limit, created_at")
+        .eq("status", "active")
+        .order("created_at", { ascending: true }),
+      client
+        .from("business_members")
+        .select("workspace_id, role")
+        .eq("user_id", user.id)
+        .eq("status", "active")
+        .eq("access_active", true),
+    ]);
+
+  if (isMissingBusinessSchema(workspaceError) || isMissingBusinessSchema(memberError)) return [];
+  if (workspaceError) throw normalizeCloudError(workspaceError);
+  if (memberError) throw normalizeCloudError(memberError);
+
+  const roleByWorkspace = new Map(
+    (memberships ?? []).map((membership) => [membership.workspace_id, membership.role])
+  );
+  return (workspaces ?? []).map((workspace) => ({
+    ...(workspace as BusinessWorkspace),
+    access_role:
+      workspace.owner_id === user.id
+        ? "owner"
+        : (roleByWorkspace.get(workspace.id) as "admin" | "member") ?? "member",
+  })) as BusinessWorkspaceAccess[];
+}
+
 export async function listBusinessMembers(workspaceId: string) {
   const client = getSupabaseBrowserClient();
   if (!client) return [];
@@ -729,6 +769,19 @@ export async function inviteBusinessMember(workspaceId: string, email: string) {
     access_active: true,
   });
 
+  if (error) throw normalizeCloudError(error);
+}
+
+export async function updateBusinessMember(
+  id: string,
+  updates: Partial<Pick<BusinessMember, "role" | "access_active" | "status">>
+) {
+  const client = getSupabaseBrowserClient();
+  if (!client) throw new Error("Business member access is unavailable.");
+  const { error } = await client
+    .from("business_members")
+    .update({ ...updates, updated_at: new Date().toISOString() })
+    .eq("id", id);
   if (error) throw normalizeCloudError(error);
 }
 

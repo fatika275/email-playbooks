@@ -4,18 +4,24 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useAccount } from "@/components/account-provider";
 import {
-  getOwnedBusinessWorkspace,
   inviteBusinessMember,
+  listAccessibleBusinessWorkspaces,
   listBusinessMembers,
   listTeamShares,
   removeBusinessMember,
   removeTeamShare,
   saveCustomTemplateRecord,
   saveEmailRecord,
+  updateBusinessMember,
   type BusinessMember,
   type BusinessWorkspace,
+  type BusinessWorkspaceAccess,
   type TeamShare,
 } from "@/lib/cloud";
+import {
+  listWorkspaceProspectActivities,
+  type WorkspaceProspectActivity,
+} from "@/lib/prospects";
 
 function makeSharedId(prefix: string) {
   return typeof crypto !== "undefined" && "randomUUID" in crypto
@@ -24,11 +30,14 @@ function makeSharedId(prefix: string) {
 }
 
 export default function TeamLibraryPage() {
-  const { user, hasProAccess, isLoading, plan, businessMembership } = useAccount();
+  const { user, hasProAccess, isLoading, businessMembership } = useAccount();
   const [shares, setShares] = useState<TeamShare[]>([]);
   const [workspace, setWorkspace] = useState<BusinessWorkspace | null>(null);
+  const [workspaces, setWorkspaces] = useState<BusinessWorkspaceAccess[]>([]);
   const [members, setMembers] = useState<BusinessMember[]>([]);
+  const [activity, setActivity] = useState<WorkspaceProspectActivity[]>([]);
   const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteRole, setInviteRole] = useState<"admin" | "member">("member");
   const [isLoadingShares, setIsLoadingShares] = useState(false);
   const [notice, setNotice] = useState("");
 
@@ -46,13 +55,24 @@ export default function TeamLibraryPage() {
   }
 
   const refreshBusinessTeam = useCallback(async () => {
-    if (plan !== "business") return;
-    const ownedWorkspace = await getOwnedBusinessWorkspace();
-    setWorkspace(ownedWorkspace);
-    setMembers(
-      ownedWorkspace ? await listBusinessMembers(ownedWorkspace.id) : []
-    );
-  }, [plan]);
+    const accessible = await listAccessibleBusinessWorkspaces();
+    setWorkspaces(accessible);
+    const storedId = window.localStorage.getItem("thalovo_active_workspace_id");
+    const selected = accessible.find((item) => item.id === storedId) ?? accessible[0] ?? null;
+    setWorkspace(selected);
+    if (!selected) {
+      setMembers([]);
+      setActivity([]);
+      return;
+    }
+    window.localStorage.setItem("thalovo_active_workspace_id", selected.id);
+    const [nextMembers, nextActivity] = await Promise.all([
+      listBusinessMembers(selected.id),
+      listWorkspaceProspectActivities(selected.id),
+    ]);
+    setMembers(nextMembers);
+    setActivity(nextActivity);
+  }, []);
 
   useEffect(() => {
     if (!user || !hasProAccess) return;
@@ -131,9 +151,16 @@ export default function TeamLibraryPage() {
 
     try {
       await inviteBusinessMember(workspace.id, inviteEmail);
+      const refreshed = await listBusinessMembers(workspace.id);
+      const invited = refreshed.find(
+        (member) => member.email === inviteEmail.trim().toLowerCase()
+      );
+      if (invited && inviteRole !== "member") {
+        await updateBusinessMember(invited.id, { role: inviteRole });
+      }
       await refreshBusinessTeam();
       setNotice(
-        `${inviteEmail.trim().toLowerCase()} can now sign in and use Business Pro.`
+        `Invitation created for ${inviteEmail.trim().toLowerCase()}. Send them the sign-in instructions.`
       );
       setInviteEmail("");
     } catch (error) {
@@ -141,6 +168,40 @@ export default function TeamLibraryPage() {
         error instanceof Error ? error.message : "Could not invite this teammate."
       );
     }
+  }
+
+  async function handleMemberUpdate(
+    member: BusinessMember,
+    updates: Partial<Pick<BusinessMember, "role" | "access_active">>
+  ) {
+    try {
+      await updateBusinessMember(member.id, updates);
+      await refreshBusinessTeam();
+      setNotice("Teammate access updated.");
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Could not update this teammate.");
+    }
+  }
+
+  function handleResendInvite(member: BusinessMember) {
+    const subject = encodeURIComponent(`You have been invited to ${workspace?.name ?? "Thalovo"}`);
+    const body = encodeURIComponent(
+      `You have been invited to our Thalovo workspace. Sign up or sign in using ${member.email}, then open the Team page to access the workspace.\n\nhttps://thalovo.com/account`
+    );
+    window.location.href = `mailto:${encodeURIComponent(member.email)}?subject=${subject}&body=${body}`;
+  }
+
+  async function handleWorkspaceChange(workspaceId: string) {
+    window.localStorage.setItem("thalovo_active_workspace_id", workspaceId);
+    const selected = workspaces.find((item) => item.id === workspaceId) ?? null;
+    setWorkspace(selected);
+    if (!selected) return;
+    const [nextMembers, nextActivity] = await Promise.all([
+      listBusinessMembers(selected.id),
+      listWorkspaceProspectActivities(selected.id),
+    ]);
+    setMembers(nextMembers);
+    setActivity(nextActivity);
   }
 
   async function handleRemoveMember(id: string) {
@@ -215,22 +276,31 @@ export default function TeamLibraryPage() {
 
         {notice ? <p className="notice">{notice}</p> : null}
 
-        {plan === "business" ? (
+        {workspace ? (
           <section className="glassCard" style={{ padding: 24, marginBottom: 22 }}>
             <div className="cardTop">
               <div>
-                <h2 className="cardTitle">Business Pro teammates</h2>
+                <h2 className="cardTitle">{workspace.name}</h2>
                 <p className="muted" style={{ margin: "8px 0 0" }}>
-                  One subscription covers you and up to 10 teammates. Invited
-                  people receive full Pro access when they sign in with this email.
+                  One subscription covers the owner and invited teammates. Manage
+                  roles, access, assignments, and shared pipeline work here.
                 </p>
               </div>
               <span className="statusPill statusPillSuccess">
-                {members.length}/10 teammates
+                {members.length}/{workspace.seat_limit} teammate seats
               </span>
             </div>
 
-            <div
+            {workspaces.length > 1 ? (
+              <div className="formGroup" style={{ marginTop: 18, maxWidth: 420 }}>
+                <label className="label" htmlFor="active-team-workspace">Active workspace</label>
+                <select id="active-team-workspace" className="input" value={workspace.id} onChange={(event) => void handleWorkspaceChange(event.target.value)}>
+                  {workspaces.map((item) => <option key={item.id} value={item.id}>{item.name} · {item.access_role}</option>)}
+                </select>
+              </div>
+            ) : null}
+
+            {workspaces.find((item) => item.id === workspace.id)?.access_role !== "member" ? <><div
               className="businessInviteGrid"
               style={{ alignItems: "end", marginTop: 18 }}
             >
@@ -247,14 +317,21 @@ export default function TeamLibraryPage() {
                   placeholder="teammate@company.com"
                 />
               </div>
+              <div className="formGroup" style={{ marginBottom: 0 }}>
+                <label className="label" htmlFor="business-invite-role">Role</label>
+                <select id="business-invite-role" className="input" value={inviteRole} onChange={(event) => setInviteRole(event.target.value as "admin" | "member")}>
+                  <option value="member">Member</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
               <button
                 className="button buttonPrimary"
-                disabled={!inviteEmail.trim() || members.length >= 10}
+                disabled={!inviteEmail.trim() || members.length >= workspace.seat_limit}
                 onClick={() => void handleInviteMember()}
               >
                 Invite teammate
               </button>
-            </div>
+            </div></> : null}
 
             <div style={{ display: "grid", gap: 10, marginTop: 20 }}>
               {members.map((member) => (
@@ -273,17 +350,32 @@ export default function TeamLibraryPage() {
                   <div>
                     <strong>{member.email}</strong>
                     <p className="small" style={{ margin: "4px 0 0" }}>
-                      {member.status === "active" ? "Active member" : "Invitation ready"}
+                      {member.access_active ? (member.status === "active" ? "Active" : "Pending invitation") : "Access paused"} · {member.role}
                     </p>
                   </div>
-                  <button
-                    className="button buttonUtility"
-                    onClick={() => void handleRemoveMember(member.id)}
-                  >
-                    Remove
-                  </button>
+                  {workspaces.find((item) => item.id === workspace.id)?.access_role !== "member" ? <div className="toolbar">
+                    <select className="input teamRoleSelect" value={member.role} aria-label={`Role for ${member.email}`} onChange={(event) => void handleMemberUpdate(member, { role: event.target.value as "admin" | "member" })}>
+                      <option value="member">Member</option><option value="admin">Admin</option>
+                    </select>
+                    {member.status === "invited" ? <button className="button buttonSecondary" onClick={() => handleResendInvite(member)}>Resend invite</button> : null}
+                    <button className="button buttonSecondary" onClick={() => void handleMemberUpdate(member, { access_active: !member.access_active })}>{member.access_active ? "Pause" : "Restore"}</button>
+                    <button className="button buttonUtility" onClick={() => void handleRemoveMember(member.id)}>Remove</button>
+                  </div> : null}
                 </div>
               ))}
+            </div>
+
+            <div className="teamActivitySection">
+              <div className="cardTop"><h3 className="cardTitle">Workspace activity</h3><span className="miniBadge">Latest {activity.length}</span></div>
+              <div className="prospectTimeline">
+                {activity.map((item) => (
+                  <div key={item.id} className="prospectTimelineItem">
+                    <span className="miniBadge">{item.activity_type}</span>
+                    <div><Link href={`/prospects/${item.prospects.id}`}><strong>{item.prospects.full_name} · {item.prospects.company}</strong></Link><p className="small">{item.summary} · {item.actor_email || "Teammate"} · {new Date(item.created_at).toLocaleString()}</p></div>
+                  </div>
+                ))}
+                {activity.length === 0 ? <p className="muted">No shared pipeline activity yet.</p> : null}
+              </div>
             </div>
           </section>
         ) : businessMembership?.access_active ? (

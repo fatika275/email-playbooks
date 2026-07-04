@@ -4,7 +4,10 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import Papa from "papaparse";
 import { useAccount } from "@/components/account-provider";
-import { getOwnedBusinessWorkspace } from "@/lib/cloud";
+import {
+  listAccessibleBusinessWorkspaces,
+  type BusinessWorkspaceAccess,
+} from "@/lib/cloud";
 import {
   createProspectsBatch,
   createProspect,
@@ -49,11 +52,12 @@ function isDue(date: string | null) {
 }
 
 export default function ProspectsPage() {
-  const { user, hasProAccess, isLoading, plan, businessMembership } = useAccount();
+  const { user, hasProAccess, isLoading, businessMembership } = useAccount();
   const [prospects, setProspects] = useState<Prospect[]>([]);
   const [workspaceId, setWorkspaceId] = useState<string | null>(
     businessMembership?.workspace_id ?? null
   );
+  const [workspaces, setWorkspaces] = useState<BusinessWorkspaceAccess[]>([]);
   const [view, setView] = useState<"pipeline" | "list" | "today" | "reports">("pipeline");
   const [query, setQuery] = useState("");
   const [stageFilter, setStageFilter] = useState<ProspectStage | "all">("all");
@@ -79,9 +83,14 @@ export default function ProspectsPage() {
 
   const refresh = useCallback(async () => {
     if (!user || !hasProAccess) return;
-    let activeWorkspaceId = businessMembership?.workspace_id ?? null;
-    if (!activeWorkspaceId && plan === "business") {
-      activeWorkspaceId = (await getOwnedBusinessWorkspace())?.id ?? null;
+    const accessible = await listAccessibleBusinessWorkspaces();
+    setWorkspaces(accessible);
+    const storedId = window.localStorage.getItem("thalovo_active_workspace_id");
+    const activeWorkspace =
+      accessible.find((item) => item.id === storedId) ?? accessible[0] ?? null;
+    const activeWorkspaceId = activeWorkspace?.id ?? null;
+    if (activeWorkspaceId) {
+      window.localStorage.setItem("thalovo_active_workspace_id", activeWorkspaceId);
     }
     setWorkspaceId(activeWorkspaceId);
     const nextProspects = await listProspects({
@@ -99,7 +108,7 @@ export default function ProspectsPage() {
       setValueMonths(settings.default_months);
       setProbabilities(settings.stage_probabilities);
     }
-  }, [businessMembership?.workspace_id, hasProAccess, plan, user]);
+  }, [hasProAccess, user]);
 
   useEffect(() => {
     void refresh().catch((error) => {
@@ -131,7 +140,8 @@ export default function ProspectsPage() {
       won: prospects.filter((prospect) => prospect.stage === "won").length,
     };
   }, [prospects]);
-  const canEditForecast = !workspaceId || plan === "business";
+  const activeWorkspace = workspaces.find((item) => item.id === workspaceId);
+  const canEditForecast = !workspaceId || activeWorkspace?.access_role !== "member";
   const calculatedInputValue =
     valueBasis === "monthly"
       ? (Number(value) || 0) * Math.max(1, valueMonths)
@@ -209,6 +219,22 @@ export default function ProspectsPage() {
       await refresh();
     } catch (error) {
       setNotice(error instanceof Error ? error.message : "Prospect could not be added.");
+    } finally {
+      setIsWorking(false);
+    }
+  }
+
+  async function handleWorkspaceChange(nextWorkspaceId: string) {
+    window.localStorage.setItem("thalovo_active_workspace_id", nextWorkspaceId);
+    setWorkspaceId(nextWorkspaceId);
+    setIsWorking(true);
+    try {
+      const nextProspects = await listProspects({ userId: user!.id, workspaceId: nextWorkspaceId });
+      setProspects(nextProspects);
+      setTasks(await listProspectTasks(nextProspects.map((prospect) => prospect.id)));
+      setNotice("Workspace switched.");
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Workspace could not be opened.");
     } finally {
       setIsWorking(false);
     }
@@ -357,6 +383,7 @@ export default function ProspectsPage() {
             </p>
           </div>
           <div className="toolbar">
+            {workspaces.length > 1 ? <select className="input prospectWorkspaceSelect" value={workspaceId ?? ""} aria-label="Active workspace" onChange={(event) => void handleWorkspaceChange(event.target.value)}>{workspaces.map((item) => <option key={item.id} value={item.id}>{item.name} · {item.access_role}</option>)}</select> : null}
             <label className="button buttonSecondary prospectImportButton">
               Import CSV
               <input

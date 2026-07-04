@@ -51,6 +51,8 @@ export type Prospect = {
   id: string;
   owner_id: string;
   workspace_id: string | null;
+  assigned_user_id: string | null;
+  assigned_email: string | null;
   full_name: string;
   company: string;
   email: string | null;
@@ -80,7 +82,7 @@ export type ProspectInput = {
   last_contacted_at?: string | null;
 };
 
-export type ProspectActivityType = "note" | "email" | "call" | "meeting" | "status";
+export type ProspectActivityType = "note" | "email" | "call" | "meeting" | "status" | "update";
 
 export type ProspectActivity = {
   id: string;
@@ -88,7 +90,16 @@ export type ProspectActivity = {
   created_by: string;
   activity_type: ProspectActivityType;
   summary: string;
+  actor_email: string | null;
   created_at: string;
+};
+
+export type WorkspaceProspectActivity = ProspectActivity & {
+  prospects: {
+    id: string;
+    full_name: string;
+    company: string;
+  };
 };
 
 export type ProspectTask = {
@@ -97,6 +108,7 @@ export type ProspectTask = {
   created_by: string;
   title: string;
   due_date: string | null;
+  assigned_user_id: string | null;
   assigned_email: string | null;
   completed_at: string | null;
   created_at: string;
@@ -316,6 +328,27 @@ export async function updateProspectStage(id: string, stage: ProspectStage) {
   if (error) throw prospectError(error);
 }
 
+export async function updateProspectAssignment(options: {
+  id: string;
+  userId?: string | null;
+  email?: string | null;
+}) {
+  const client = getSupabaseBrowserClient();
+  if (!client) throw new Error("Sign in before assigning a prospect.");
+  const { data, error } = await client
+    .from("prospects")
+    .update({
+      assigned_user_id: options.userId ?? null,
+      assigned_email: options.email?.trim().toLowerCase() || null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", options.id)
+    .select("*")
+    .single();
+  if (error) throw prospectError(error);
+  return data as Prospect;
+}
+
 export async function deleteProspect(id: string) {
   const client = getSupabaseBrowserClient();
   if (!client) throw new Error("Sign in before deleting a prospect.");
@@ -333,6 +366,19 @@ export async function listProspectActivities(prospectId: string) {
     .order("created_at", { ascending: false });
   if (error) throw prospectError(error);
   return (data ?? []) as ProspectActivity[];
+}
+
+export async function listWorkspaceProspectActivities(workspaceId: string, limit = 25) {
+  const client = getSupabaseBrowserClient();
+  if (!client) return [];
+  const { data, error } = await client
+    .from("prospect_activities")
+    .select("*, prospects!inner(id, full_name, company, workspace_id)")
+    .eq("prospects.workspace_id", workspaceId)
+    .order("created_at", { ascending: false })
+    .limit(limit);
+  if (error) throw prospectError(error);
+  return (data ?? []) as WorkspaceProspectActivity[];
 }
 
 export async function createProspectActivity(options: {
@@ -376,6 +422,7 @@ export async function createProspectTask(options: {
   title: string;
   dueDate?: string;
   assignedEmail?: string;
+  assignedUserId?: string | null;
 }) {
   const client = getSupabaseBrowserClient();
   if (!client) throw new Error("Sign in before adding a task.");
@@ -386,6 +433,7 @@ export async function createProspectTask(options: {
       created_by: options.userId,
       title: options.title.trim(),
       due_date: optional(options.dueDate),
+      assigned_user_id: options.assignedUserId ?? null,
       assigned_email: optional(options.assignedEmail),
     })
     .select("*")
