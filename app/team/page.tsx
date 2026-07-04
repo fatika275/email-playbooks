@@ -336,13 +336,13 @@ export default function TeamLibraryPage() {
     <main className="main">
       <section className="container">
         <div className="pageHeader">
-          <div className="badge">Team Library</div>
+          <div className="badge">Team workspace</div>
           <h1 className="pageTitle" style={{ marginTop: 14 }}>
-            Shared templates and sequences
+            Your team, shared work, and access
           </h1>
           <p className="muted" style={{ maxWidth: 760, lineHeight: 1.75 }}>
-            Share from any saved email or reusable sequence. Teammates must sign
-            in using the exact email address you shared with.
+            Invite teammates and manage everyday access here. Advanced controls
+            stay out of the way until you need them.
           </p>
         </div>
 
@@ -395,11 +395,12 @@ export default function TeamLibraryPage() {
                 />
               </div>
               <div className="formGroup" style={{ marginBottom: 0 }}>
-                <label className="label" htmlFor="business-invite-role">Role</label>
+                <label className="label" htmlFor="business-invite-role">Access level</label>
                 <select id="business-invite-role" className="input" value={inviteRole} onChange={(event) => setInviteRole(event.target.value as "admin" | "member")}>
-                  <option value="member">Member</option>
-                  <option value="admin">Admin</option>
+                  <option value="member">Member - works in the workspace</option>
+                  <option value="admin">Admin - also manages teammates</option>
                 </select>
+                <p className="small" style={{ margin: "6px 0 0" }}>Choose Member for most people. Admins can invite, pause, and remove teammates.</p>
               </div>
               <button
                 className="button buttonPrimary"
@@ -460,17 +461,25 @@ export default function TeamLibraryPage() {
               <div className="prospectReportSummary">{Array.from(new Set(activity.map((item) => item.actor_email || "Teammate"))).map((email) => <div key={email}><span>{email}</span><strong>{activity.filter((item) => (item.actor_email || "Teammate") === email).length} actions</strong></div>)}</div>
             </div>
 
-            {workspaces.find((item) => item.id === workspace.id)?.access_role !== "member" ? <div className="teamActivitySection">
-              <h3 className="cardTitle">Custom roles</h3>
-              <div className="businessInviteGrid" style={{ marginTop: 14 }}><input className="input" value={roleName} onChange={(event) => setRoleName(event.target.value)} placeholder="Role name, e.g. Sales lead" /><label className="teamCheck"><input type="checkbox" checked={roleMembers} onChange={(event) => setRoleMembers(event.target.checked)} /> Manage members</label><button className="button buttonPrimary" disabled={!roleName.trim()} onClick={() => void handleCreateRole()}>Create role</button></div>
-              <label className="teamCheck"><input type="checkbox" checked={roleExport} onChange={(event) => setRoleExport(event.target.checked)} /> Allow workspace export</label>
+            {workspaces.find((item) => item.id === workspace.id)?.access_role !== "member" ? <details className="teamAdvancedPanel">
+              <summary><strong>Optional: custom permissions</strong><span>Only open this when Admin and Member are not specific enough.</span></summary>
+              <div className="teamAdvancedContent">
+              <p className="muted teamSectionDescription">Most teams only need Admin and Member. A custom role gives someone selected extra permissions without making them a full Admin.</p>
+              <div className="teamRoleBuilder">
+                <div className="formGroup"><label className="label">Custom role name</label><input className="input" value={roleName} onChange={(event) => setRoleName(event.target.value)} placeholder="For example, Sales lead" /></div>
+                <label className="teamPermissionOption"><input type="checkbox" checked={roleMembers} onChange={(event) => setRoleMembers(event.target.checked)} /><span><strong>Can manage teammates</strong><small>Can invite people, pause access, change roles, and remove teammates.</small></span></label>
+                <label className="teamPermissionOption"><input type="checkbox" checked={roleExport} onChange={(event) => setRoleExport(event.target.checked)} /><span><strong>Can download workspace data</strong><small>Can export prospects, tasks, comments, and activity as a backup file.</small></span></label>
+                <p className="small">Leave a box unticked when that permission should not be included. Shared pipeline access is included automatically.</p>
+                <button className="button buttonPrimary" disabled={!roleName.trim()} onClick={() => void handleCreateRole()}>Create custom role</button>
+              </div>
               {roles.length ? <div className="prospectTaskList">{roles.map((role) => <div className="prospectTask" key={role.id}><span className="miniBadge">Role</span><div><strong>{role.name}</strong><span>{role.can_manage_members ? "Manages members" : "Pipeline access"}{role.can_export_data ? " · Can export" : ""}</span></div></div>)}</div> : null}
               <div style={{ display: "grid", gap: 10, marginTop: 16 }}>{members.map((member) => <div key={member.id} className="teamRoleAssignment"><span>{member.email}</span><select className="input" value={member.custom_role_id || ""} onChange={(event) => void assignWorkspaceCustomRole(member.id, event.target.value || null).then(refreshBusinessTeam)}><option value="">Standard {member.role}</option>{roles.map((role) => <option key={role.id} value={role.id}>{role.name}</option>)}</select></div>)}</div>
-            </div> : null}
+              </div>
+            </details> : null}
 
             <div className="teamActivitySection">
               <div className="cardTop"><div><h3 className="cardTitle">Workspace data</h3><p className="small">Export a complete JSON backup of members, prospects, tasks, comments, and activity.</p></div>{canExportWorkspace ? <button className="button buttonSecondary" onClick={() => void handleExportWorkspace()}>Export workspace</button> : <span className="miniBadge">Export permission required</span>}</div>
-              {workspaces.find((item) => item.id === workspace.id)?.access_role === "owner" ? <div className="teamDangerZone"><h3 className="cardTitle">Owner controls</h3><select className="input" defaultValue="" onChange={(event) => void handleTransferOwnership(event.target.value)}><option value="" disabled>Transfer ownership to...</option>{members.filter((member) => member.user_id && member.status === "active").map((member) => <option key={member.id} value={member.user_id!}>{member.email}</option>)}</select><button className="button buttonUtility" onClick={() => void handleDeleteWorkspace()}>Delete workspace</button></div> : null}
+              {workspaces.find((item) => item.id === workspace.id)?.access_role === "owner" ? <details className="teamOwnerControls"><summary>Ownership and deletion</summary><p className="small">These controls are rarely needed. Transfer ownership changes who controls the workspace. Deleting removes all shared workspace data permanently.</p><div className="teamDangerZone"><select className="input" defaultValue="" onChange={(event) => void handleTransferOwnership(event.target.value)}><option value="" disabled>Transfer ownership to...</option>{members.filter((member) => member.user_id && member.status === "active").map((member) => <option key={member.id} value={member.user_id!}>{member.email}</option>)}</select><button className="button buttonUtility" onClick={() => void handleDeleteWorkspace()}>Delete workspace</button></div></details> : null}
             </div>
           </section>
         ) : businessMembership?.access_active ? (

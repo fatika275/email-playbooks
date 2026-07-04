@@ -1228,6 +1228,77 @@ select.input option {
   font-size: 12px;
 }
 
+.teamAdvancedPanel,
+.teamOwnerControls {
+  margin-top: 24px;
+  border-top: 1px solid var(--border);
+}
+
+.teamAdvancedPanel > summary,
+.teamOwnerControls > summary {
+  display: grid;
+  gap: 4px;
+  padding: 18px 0;
+  color: var(--text);
+  cursor: pointer;
+  list-style-position: inside;
+}
+
+.teamAdvancedPanel > summary span,
+.teamOwnerControls > .small {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.teamAdvancedContent {
+  max-width: 760px;
+  padding: 2px 0 8px;
+}
+
+.teamSectionDescription {
+  margin: 0 0 16px;
+  line-height: 1.65;
+}
+
+.teamRoleBuilder {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--border-soft);
+  background: #0d0d0d;
+}
+
+.teamPermissionOption {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--border-soft);
+  background: #090909;
+  cursor: pointer;
+}
+
+.teamPermissionOption input {
+  margin-top: 3px;
+}
+
+.teamPermissionOption span {
+  display: grid;
+  gap: 4px;
+}
+
+.teamPermissionOption small {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.teamOwnerControls {
+  margin-top: 20px;
+}
+
 .teamRoleAssignment {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(180px, 0.45fr);
