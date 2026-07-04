@@ -8,6 +8,7 @@ const navItems = [
   { href: "/", label: "Home" },
   { href: "/library", label: "Library" },
   { href: "/workspace", label: "Workspace" },
+  { href: "/team", label: "Team Library" },
   { href: "/pricing", label: "Pricing" },
 ];
 
@@ -17,7 +18,6 @@ const workspacePaths = [
   "/history",
   "/custom-templates",
   "/folders",
-  "/team",
   "/prospects",
 ];
 
