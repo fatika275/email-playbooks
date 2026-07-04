@@ -7,11 +7,13 @@ import { useAccount } from "@/components/account-provider";
 import { listBusinessMembers, type BusinessMember } from "@/lib/cloud";
 import {
   createProspectActivity,
+  createProspectComment,
   createProspectTask,
   deleteProspect,
   deleteProspectTask,
   getProspect,
   listProspectActivities,
+  listProspectComments,
   listProspectTasks,
   PROSPECT_STAGES,
   PROSPECT_STAGE_LABELS,
@@ -21,6 +23,7 @@ import {
   type ProspectActivity,
   type ProspectActivityType,
   type ProspectTask,
+  type ProspectComment,
   type Prospect,
   type ProspectStage,
 } from "@/lib/prospects";
@@ -50,6 +53,8 @@ export default function ProspectDetailPage() {
   const [isWorking, setIsWorking] = useState(false);
   const [activities, setActivities] = useState<ProspectActivity[]>([]);
   const [tasks, setTasks] = useState<ProspectTask[]>([]);
+  const [comments, setComments] = useState<ProspectComment[]>([]);
+  const [commentBody, setCommentBody] = useState("");
   const [activityType, setActivityType] = useState<ProspectActivityType>("note");
   const [activitySummary, setActivitySummary] = useState("");
   const [taskTitle, setTaskTitle] = useState("");
@@ -80,12 +85,14 @@ export default function ProspectDetailPage() {
         return Promise.all([
           listProspectActivities(record.id),
           listProspectTasks([record.id]),
+          listProspectComments(record.id),
         ]);
       })
       .then((operations) => {
         if (!operations) return;
         setActivities(operations[0]);
         setTasks(operations[1]);
+        setComments(operations[2]);
       })
       .catch((error) => {
         setNotice(error instanceof Error ? error.message : "Prospect could not load.");
@@ -150,12 +157,26 @@ export default function ProspectDetailPage() {
 
   async function refreshOperations() {
     if (!id) return;
-    const [nextActivities, nextTasks] = await Promise.all([
+    const [nextActivities, nextTasks, nextComments] = await Promise.all([
       listProspectActivities(id),
       listProspectTasks([id]),
+      listProspectComments(id),
     ]);
     setActivities(nextActivities);
     setTasks(nextTasks);
+    setComments(nextComments);
+  }
+
+  async function handleAddComment() {
+    if (!id || !user || !prospect?.workspace_id || !commentBody.trim()) return;
+    try {
+      await createProspectComment({ prospectId: id, workspaceId: prospect.workspace_id, userId: user.id, userEmail: user.email, body: commentBody, members: teamMembers });
+      setCommentBody("");
+      await refreshOperations();
+      setNotice("Comment added.");
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Comment could not be added.");
+    }
   }
 
   async function handleAddActivity() {
@@ -187,6 +208,7 @@ export default function ProspectDetailPage() {
         assignedUserId:
           teamMembers.find((member) => member.email === taskAssignee)?.user_id ??
           (taskAssignee === user.email ? user.id : null),
+        workspaceId: prospect?.workspace_id,
       });
       setTaskTitle("");
       setTaskDueDate("");
@@ -206,6 +228,7 @@ export default function ProspectDetailPage() {
         id,
         userId: member?.user_id ?? (assigningSelf ? user?.id : null),
         email: member?.email ?? (assigningSelf ? user?.email : null),
+        actorId: user?.id,
       });
       setProspect(updated);
       await refreshOperations();
@@ -340,6 +363,17 @@ export default function ProspectDetailPage() {
                 </div>
               </section>
             </div>
+
+            {prospect?.workspace_id ? <section className="prospectOpsPanel prospectCommentsPanel">
+              <div className="prospectSectionHeader"><h2 className="cardTitle">Team comments</h2></div>
+              <p className="small">Mention a teammate using their full email, for example @{teamMembers[0]?.email || "teammate@company.com"}.</p>
+              <textarea className="input" rows={3} value={commentBody} onChange={(event) => setCommentBody(event.target.value)} placeholder="Add context, ask a question, or mention a teammate..." />
+              <button className="button buttonPrimary" disabled={!commentBody.trim()} onClick={() => void handleAddComment()}>Add comment</button>
+              <div className="prospectTimeline">
+                {comments.map((comment) => <div key={comment.id} className="prospectTimelineItem"><span className="miniBadge">Comment</span><div><strong>{comment.author_email || "Teammate"}</strong><p className="muted" style={{ whiteSpace: "pre-wrap", margin: "4px 0" }}>{comment.body}</p><p className="small">{new Date(comment.created_at).toLocaleString()}</p></div></div>)}
+                {comments.length === 0 ? <p className="small">No comments yet.</p> : null}
+              </div>
+            </section> : null}
 
             <div className="toolbar">
               <button className="button buttonPrimary" disabled={isWorking} onClick={() => void save()} title="Save changes to this prospect without recording a new contact">{isWorking ? "Saving..." : "Save prospect"}</button>

@@ -92,8 +92,32 @@ export type BusinessMember = {
   email: string;
   user_id: string | null;
   role: "admin" | "member";
+  custom_role_id?: string | null;
   status: "invited" | "active";
   access_active: boolean;
+  created_at: string;
+};
+
+export type WorkspaceRole = {
+  id: string;
+  workspace_id: string;
+  name: string;
+  can_manage_members: boolean;
+  can_manage_pipeline: boolean;
+  can_export_data: boolean;
+  created_at: string;
+};
+
+export type WorkspaceNotification = {
+  id: string;
+  workspace_id: string;
+  recipient_user_id: string;
+  actor_id: string | null;
+  kind: "mention" | "assignment" | "task" | "overdue";
+  title: string;
+  body: string | null;
+  href: string | null;
+  read_at: string | null;
   created_at: string;
 };
 
@@ -758,13 +782,64 @@ export async function listBusinessMembers(workspaceId: string) {
   const { data, error } = await client
     .from("business_members")
     .select(
-      "id, workspace_id, email, user_id, role, status, access_active, created_at"
+      "id, workspace_id, email, user_id, role, custom_role_id, status, access_active, created_at"
     )
     .eq("workspace_id", workspaceId)
     .order("created_at", { ascending: true });
 
   if (error) throw normalizeCloudError(error);
   return (data ?? []) as BusinessMember[];
+}
+
+export async function listWorkspaceRoles(workspaceId: string) {
+  const client = getSupabaseBrowserClient();
+  if (!client) return [];
+  const { data, error } = await client.from("workspace_roles").select("*").eq("workspace_id", workspaceId).order("name");
+  if (error) throw normalizeCloudError(error);
+  return (data ?? []) as WorkspaceRole[];
+}
+
+export async function createWorkspaceRole(options: Omit<WorkspaceRole, "id" | "created_at">) {
+  const client = getSupabaseBrowserClient();
+  if (!client) throw new Error("Workspace roles are unavailable.");
+  const { error } = await client.from("workspace_roles").insert(options);
+  if (error) throw normalizeCloudError(error);
+}
+
+export async function assignWorkspaceCustomRole(memberId: string, customRoleId: string | null) {
+  const client = getSupabaseBrowserClient();
+  if (!client) throw new Error("Workspace roles are unavailable.");
+  const { error } = await client.from("business_members").update({ custom_role_id: customRoleId, updated_at: new Date().toISOString() }).eq("id", memberId);
+  if (error) throw normalizeCloudError(error);
+}
+
+export async function listWorkspaceNotifications() {
+  const client = getSupabaseBrowserClient();
+  if (!client) return [];
+  const { data, error } = await client.from("workspace_notifications").select("*").order("created_at", { ascending: false }).limit(50);
+  if (error) throw normalizeCloudError(error);
+  return (data ?? []) as WorkspaceNotification[];
+}
+
+export async function markWorkspaceNotificationRead(id: string) {
+  const client = getSupabaseBrowserClient();
+  if (!client) return;
+  const { error } = await client.from("workspace_notifications").update({ read_at: new Date().toISOString() }).eq("id", id);
+  if (error) throw normalizeCloudError(error);
+}
+
+export async function transferBusinessWorkspace(workspaceId: string, newOwnerId: string) {
+  const client = getSupabaseBrowserClient();
+  if (!client) throw new Error("Workspace transfer is unavailable.");
+  const { error } = await client.rpc("transfer_business_workspace", { target_workspace_id: workspaceId, new_owner_id: newOwnerId });
+  if (error) throw normalizeCloudError(error);
+}
+
+export async function deleteBusinessWorkspace(workspaceId: string) {
+  const client = getSupabaseBrowserClient();
+  if (!client) throw new Error("Workspace deletion is unavailable.");
+  const { error } = await client.rpc("delete_business_workspace", { target_workspace_id: workspaceId });
+  if (error) throw normalizeCloudError(error);
 }
 
 export async function inviteBusinessMember(workspaceId: string, email: string) {

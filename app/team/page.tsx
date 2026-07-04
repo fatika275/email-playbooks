@@ -4,23 +4,37 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useAccount } from "@/components/account-provider";
 import {
+  assignWorkspaceCustomRole,
+  createWorkspaceRole,
+  deleteBusinessWorkspace,
   inviteBusinessMember,
   listAccessibleBusinessWorkspaces,
   listBusinessMembers,
+  listWorkspaceNotifications,
+  listWorkspaceRoles,
+  markWorkspaceNotificationRead,
   listTeamShares,
   removeBusinessMember,
   removeTeamShare,
   saveCustomTemplateRecord,
   saveEmailRecord,
   updateBusinessMember,
+  transferBusinessWorkspace,
   type BusinessMember,
   type BusinessWorkspace,
   type BusinessWorkspaceAccess,
+  type WorkspaceNotification,
+  type WorkspaceRole,
   type TeamShare,
 } from "@/lib/cloud";
 import {
+  listProspectComments,
+  listMyOverdueWorkspaceTasks,
+  listProspectTasks,
+  listProspects,
   listWorkspaceProspectActivities,
   type WorkspaceProspectActivity,
+  type OverdueWorkspaceTask,
 } from "@/lib/prospects";
 
 function makeSharedId(prefix: string) {
@@ -36,6 +50,12 @@ export default function TeamLibraryPage() {
   const [workspaces, setWorkspaces] = useState<BusinessWorkspaceAccess[]>([]);
   const [members, setMembers] = useState<BusinessMember[]>([]);
   const [activity, setActivity] = useState<WorkspaceProspectActivity[]>([]);
+  const [notifications, setNotifications] = useState<WorkspaceNotification[]>([]);
+  const [overdueTasks, setOverdueTasks] = useState<OverdueWorkspaceTask[]>([]);
+  const [roles, setRoles] = useState<WorkspaceRole[]>([]);
+  const [roleName, setRoleName] = useState("");
+  const [roleMembers, setRoleMembers] = useState(false);
+  const [roleExport, setRoleExport] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState<"admin" | "member">("member");
   const [isLoadingShares, setIsLoadingShares] = useState(false);
@@ -66,13 +86,19 @@ export default function TeamLibraryPage() {
       return;
     }
     window.localStorage.setItem("thalovo_active_workspace_id", selected.id);
-    const [nextMembers, nextActivity] = await Promise.all([
+    const [nextMembers, nextActivity, nextRoles, nextNotifications, nextOverdueTasks] = await Promise.all([
       listBusinessMembers(selected.id),
       listWorkspaceProspectActivities(selected.id),
+      listWorkspaceRoles(selected.id),
+      listWorkspaceNotifications(),
+      user ? listMyOverdueWorkspaceTasks(selected.id, user.id) : Promise.resolve([]),
     ]);
     setMembers(nextMembers);
     setActivity(nextActivity);
-  }, []);
+    setRoles(nextRoles);
+    setNotifications(nextNotifications);
+    setOverdueTasks(nextOverdueTasks);
+  }, [user]);
 
   useEffect(() => {
     if (!user || !hasProAccess) return;
@@ -92,6 +118,13 @@ export default function TeamLibraryPage() {
     () => shares.filter((share) => share.owner_id === user?.id),
     [shares, user?.id]
   );
+  const activeWorkspaceAccess = workspaces.find((item) => item.id === workspace?.id);
+  const currentMembership = members.find((member) => member.user_id === user?.id);
+  const currentCustomRole = roles.find((role) => role.id === currentMembership?.custom_role_id);
+  const canExportWorkspace =
+    activeWorkspaceAccess?.access_role === "owner" ||
+    activeWorkspaceAccess?.access_role === "admin" ||
+    currentCustomRole?.can_export_data;
 
   async function handleSaveToWorkspace(share: TeamShare) {
     try {
@@ -196,12 +229,51 @@ export default function TeamLibraryPage() {
     const selected = workspaces.find((item) => item.id === workspaceId) ?? null;
     setWorkspace(selected);
     if (!selected) return;
-    const [nextMembers, nextActivity] = await Promise.all([
+    const [nextMembers, nextActivity, nextRoles] = await Promise.all([
       listBusinessMembers(selected.id),
       listWorkspaceProspectActivities(selected.id),
+      listWorkspaceRoles(selected.id),
     ]);
     setMembers(nextMembers);
     setActivity(nextActivity);
+    setRoles(nextRoles);
+  }
+
+  async function handleCreateRole() {
+    if (!workspace || !roleName.trim()) return;
+    try {
+      await createWorkspaceRole({ workspace_id: workspace.id, name: roleName.trim(), can_manage_members: roleMembers, can_manage_pipeline: true, can_export_data: roleExport });
+      setRoleName(""); setRoleMembers(false); setRoleExport(false);
+      await refreshBusinessTeam();
+      setNotice("Custom role created.");
+    } catch (error) { setNotice(error instanceof Error ? error.message : "Role could not be created."); }
+  }
+
+  async function handleExportWorkspace() {
+    if (!workspace || !user) return;
+    try {
+      const prospects = await listProspects({ userId: user.id, workspaceId: workspace.id });
+      const [tasks, comments] = await Promise.all([
+        listProspectTasks(prospects.map((item) => item.id)),
+        Promise.all(prospects.map((item) => listProspectComments(item.id))).then((rows) => rows.flat()),
+      ]);
+      const payload = { exported_at: new Date().toISOString(), workspace, members, prospects, tasks, activities: activity, comments };
+      const url = URL.createObjectURL(new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" }));
+      const anchor = document.createElement("a"); anchor.href = url; anchor.download = `${workspace.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-export.json`; anchor.click(); URL.revokeObjectURL(url);
+      setNotice("Workspace export downloaded.");
+    } catch (error) { setNotice(error instanceof Error ? error.message : "Workspace export failed."); }
+  }
+
+  async function handleTransferOwnership(userId: string) {
+    if (!workspace || !userId || !window.confirm("Transfer ownership permanently to this teammate?")) return;
+    try { await transferBusinessWorkspace(workspace.id, userId); await refreshBusinessTeam(); setNotice("Workspace ownership transferred."); }
+    catch (error) { setNotice(error instanceof Error ? error.message : "Ownership could not be transferred."); }
+  }
+
+  async function handleDeleteWorkspace() {
+    if (!workspace || !window.confirm(`Permanently delete ${workspace.name} and all shared CRM data?`)) return;
+    try { await deleteBusinessWorkspace(workspace.id); window.localStorage.removeItem("thalovo_active_workspace_id"); await refreshBusinessTeam(); setNotice("Workspace deleted."); }
+    catch (error) { setNotice(error instanceof Error ? error.message : "Workspace could not be deleted."); }
   }
 
   async function handleRemoveMember(id: string) {
@@ -275,6 +347,11 @@ export default function TeamLibraryPage() {
         </div>
 
         {notice ? <p className="notice">{notice}</p> : null}
+
+        {notifications.length || overdueTasks.length ? <section className="glassCard teamNotificationPanel">
+          <div className="cardTop"><h2 className="cardTitle">Notifications</h2><span className="statusPill">{notifications.filter((item) => !item.read_at).length + overdueTasks.length} needs attention</span></div>
+          <div className="prospectTimeline">{overdueTasks.map((task) => <div key={`overdue-${task.id}`} className="prospectTimelineItem"><span className="miniBadge">Overdue</span><div><Link href={`/prospects/${task.prospects.id}`}><strong>{task.title}</strong></Link><p className="small">{task.prospects.full_name} · Due {task.due_date}</p></div></div>)}{notifications.slice(0, 8).map((item) => <div key={item.id} className="prospectTimelineItem"><span className="miniBadge">{item.kind}</span><div><Link href={item.href || "/team"} onClick={() => void markWorkspaceNotificationRead(item.id)}><strong>{item.title}</strong></Link><p className="small">{item.body || "Workspace update"} · {new Date(item.created_at).toLocaleString()}</p></div></div>)}</div>
+        </section> : null}
 
         {workspace ? (
           <section className="glassCard" style={{ padding: 24, marginBottom: 22 }}>
@@ -376,6 +453,24 @@ export default function TeamLibraryPage() {
                 ))}
                 {activity.length === 0 ? <p className="muted">No shared pipeline activity yet.</p> : null}
               </div>
+            </div>
+
+            <div className="teamActivitySection">
+              <div className="cardTop"><h3 className="cardTitle">Team performance</h3><span className="miniBadge">Last {activity.length} actions</span></div>
+              <div className="prospectReportSummary">{Array.from(new Set(activity.map((item) => item.actor_email || "Teammate"))).map((email) => <div key={email}><span>{email}</span><strong>{activity.filter((item) => (item.actor_email || "Teammate") === email).length} actions</strong></div>)}</div>
+            </div>
+
+            {workspaces.find((item) => item.id === workspace.id)?.access_role !== "member" ? <div className="teamActivitySection">
+              <h3 className="cardTitle">Custom roles</h3>
+              <div className="businessInviteGrid" style={{ marginTop: 14 }}><input className="input" value={roleName} onChange={(event) => setRoleName(event.target.value)} placeholder="Role name, e.g. Sales lead" /><label className="teamCheck"><input type="checkbox" checked={roleMembers} onChange={(event) => setRoleMembers(event.target.checked)} /> Manage members</label><button className="button buttonPrimary" disabled={!roleName.trim()} onClick={() => void handleCreateRole()}>Create role</button></div>
+              <label className="teamCheck"><input type="checkbox" checked={roleExport} onChange={(event) => setRoleExport(event.target.checked)} /> Allow workspace export</label>
+              {roles.length ? <div className="prospectTaskList">{roles.map((role) => <div className="prospectTask" key={role.id}><span className="miniBadge">Role</span><div><strong>{role.name}</strong><span>{role.can_manage_members ? "Manages members" : "Pipeline access"}{role.can_export_data ? " · Can export" : ""}</span></div></div>)}</div> : null}
+              <div style={{ display: "grid", gap: 10, marginTop: 16 }}>{members.map((member) => <div key={member.id} className="teamRoleAssignment"><span>{member.email}</span><select className="input" value={member.custom_role_id || ""} onChange={(event) => void assignWorkspaceCustomRole(member.id, event.target.value || null).then(refreshBusinessTeam)}><option value="">Standard {member.role}</option>{roles.map((role) => <option key={role.id} value={role.id}>{role.name}</option>)}</select></div>)}</div>
+            </div> : null}
+
+            <div className="teamActivitySection">
+              <div className="cardTop"><div><h3 className="cardTitle">Workspace data</h3><p className="small">Export a complete JSON backup of members, prospects, tasks, comments, and activity.</p></div>{canExportWorkspace ? <button className="button buttonSecondary" onClick={() => void handleExportWorkspace()}>Export workspace</button> : <span className="miniBadge">Export permission required</span>}</div>
+              {workspaces.find((item) => item.id === workspace.id)?.access_role === "owner" ? <div className="teamDangerZone"><h3 className="cardTitle">Owner controls</h3><select className="input" defaultValue="" onChange={(event) => void handleTransferOwnership(event.target.value)}><option value="" disabled>Transfer ownership to...</option>{members.filter((member) => member.user_id && member.status === "active").map((member) => <option key={member.id} value={member.user_id!}>{member.email}</option>)}</select><button className="button buttonUtility" onClick={() => void handleDeleteWorkspace()}>Delete workspace</button></div> : null}
             </div>
           </section>
         ) : businessMembership?.access_active ? (

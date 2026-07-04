@@ -102,6 +102,15 @@ export type WorkspaceProspectActivity = ProspectActivity & {
   };
 };
 
+export type ProspectComment = {
+  id: string;
+  prospect_id: string;
+  author_id: string;
+  author_email: string | null;
+  body: string;
+  created_at: string;
+};
+
 export type ProspectTask = {
   id: string;
   prospect_id: string;
@@ -113,6 +122,10 @@ export type ProspectTask = {
   completed_at: string | null;
   created_at: string;
   updated_at: string;
+};
+
+export type OverdueWorkspaceTask = ProspectTask & {
+  prospects: { id: string; full_name: string; company: string };
 };
 
 function prospectError(error: { code?: string; message?: string } | null) {
@@ -332,6 +345,7 @@ export async function updateProspectAssignment(options: {
   id: string;
   userId?: string | null;
   email?: string | null;
+  actorId?: string;
 }) {
   const client = getSupabaseBrowserClient();
   if (!client) throw new Error("Sign in before assigning a prospect.");
@@ -346,6 +360,10 @@ export async function updateProspectAssignment(options: {
     .select("*")
     .single();
   if (error) throw prospectError(error);
+  if (data.workspace_id && options.userId && options.actorId && options.userId !== options.actorId) {
+    const { error: notificationError } = await client.from("workspace_notifications").insert({ workspace_id: data.workspace_id, recipient_user_id: options.userId, actor_id: options.actorId, kind: "assignment", title: `Prospect assigned: ${data.full_name}`, body: data.company, href: `/prospects/${data.id}` });
+    if (notificationError) throw prospectError(notificationError);
+  }
   return data as Prospect;
 }
 
@@ -366,6 +384,34 @@ export async function listProspectActivities(prospectId: string) {
     .order("created_at", { ascending: false });
   if (error) throw prospectError(error);
   return (data ?? []) as ProspectActivity[];
+}
+
+export async function listProspectComments(prospectId: string) {
+  const client = getSupabaseBrowserClient();
+  if (!client) return [];
+  const { data, error } = await client.from("prospect_comments").select("*").eq("prospect_id", prospectId).order("created_at", { ascending: false });
+  if (error) throw prospectError(error);
+  return (data ?? []) as ProspectComment[];
+}
+
+export async function createProspectComment(options: {
+  prospectId: string;
+  workspaceId: string;
+  userId: string;
+  userEmail?: string | null;
+  body: string;
+  members: Array<{ user_id: string | null; email: string }>;
+}) {
+  const client = getSupabaseBrowserClient();
+  if (!client) throw new Error("Sign in before commenting.");
+  const { error } = await client.from("prospect_comments").insert({ prospect_id: options.prospectId, author_id: options.userId, author_email: options.userEmail ?? null, body: options.body.trim() });
+  if (error) throw prospectError(error);
+  const normalized = options.body.toLowerCase();
+  const mentioned = options.members.filter((member) => member.user_id && normalized.includes(`@${member.email.toLowerCase()}`));
+  if (mentioned.length) {
+    const { error: notificationError } = await client.from("workspace_notifications").insert(mentioned.map((member) => ({ workspace_id: options.workspaceId, recipient_user_id: member.user_id, actor_id: options.userId, kind: "mention", title: "You were mentioned on a prospect", body: options.body.trim().slice(0, 240), href: `/prospects/${options.prospectId}` })));
+    if (notificationError) throw prospectError(notificationError);
+  }
 }
 
 export async function listWorkspaceProspectActivities(workspaceId: string, limit = 25) {
@@ -416,6 +462,15 @@ export async function listProspectTasks(prospectIds: string[]) {
   return (data ?? []) as ProspectTask[];
 }
 
+export async function listMyOverdueWorkspaceTasks(workspaceId: string, userId: string) {
+  const client = getSupabaseBrowserClient();
+  if (!client) return [];
+  const today = new Date().toISOString().slice(0, 10);
+  const { data, error } = await client.from("prospect_tasks").select("*, prospects!inner(id, full_name, company, workspace_id)").eq("prospects.workspace_id", workspaceId).eq("assigned_user_id", userId).is("completed_at", null).lte("due_date", today).order("due_date");
+  if (error) throw prospectError(error);
+  return (data ?? []) as OverdueWorkspaceTask[];
+}
+
 export async function createProspectTask(options: {
   prospectId: string;
   userId: string;
@@ -423,6 +478,7 @@ export async function createProspectTask(options: {
   dueDate?: string;
   assignedEmail?: string;
   assignedUserId?: string | null;
+  workspaceId?: string | null;
 }) {
   const client = getSupabaseBrowserClient();
   if (!client) throw new Error("Sign in before adding a task.");
@@ -439,6 +495,10 @@ export async function createProspectTask(options: {
     .select("*")
     .single();
   if (error) throw prospectError(error);
+  if (options.workspaceId && options.assignedUserId && options.assignedUserId !== options.userId) {
+    const { error: notificationError } = await client.from("workspace_notifications").insert({ workspace_id: options.workspaceId, recipient_user_id: options.assignedUserId, actor_id: options.userId, kind: "task", title: `Task assigned: ${options.title.trim()}`, body: options.dueDate ? `Due ${options.dueDate}` : "No due date", href: `/prospects/${options.prospectId}` });
+    if (notificationError) throw prospectError(notificationError);
+  }
   return data as ProspectTask;
 }
 
