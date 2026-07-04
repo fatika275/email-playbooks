@@ -307,10 +307,13 @@ export default function ProspectDetailPage() {
             </div>
 
             <div className="toolbar">
-              <button className="button buttonPrimary" disabled={isWorking} onClick={() => void save()}>{isWorking ? "Saving..." : "Save prospect"}</button>
-              <button className="button buttonSecondary" disabled={isWorking} onClick={() => void save({ markContacted: true })}>Log contact now</button>
+              <button className="button buttonPrimary" disabled={isWorking} onClick={() => void save()} title="Save changes to this prospect without recording a new contact">{isWorking ? "Saving..." : "Save prospect"}</button>
+              <button className="button buttonSecondary" disabled={isWorking} onClick={() => void save({ markContacted: true })} title="Save changes and record that you contacted this prospect now">Log contact now</button>
               <button className="button buttonUtility" disabled={isWorking} onClick={() => void handleDelete()}>Delete prospect</button>
             </div>
+            <p className="prospectActionHelp">
+              <strong>Save prospect</strong> stores your edits. <strong>Log contact now</strong> also records the current time as your latest contact and adds it to the activity timeline; it does not send a message.
+            </p>
           </section>
 
           <aside className="prospectActionPanel">
