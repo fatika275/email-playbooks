@@ -45,11 +45,13 @@ create policy "Workspace members can read their business workspace"
   using (public.can_access_business_workspace(id));
 
 drop policy if exists "Owners and members can read business members" on public.business_members;
+drop policy if exists "Workspace members can read business members" on public.business_members;
 create policy "Workspace members can read business members"
   on public.business_members for select
   using (public.can_access_business_workspace(workspace_id));
 
 drop policy if exists "Business owners can invite members" on public.business_members;
+drop policy if exists "Workspace managers can invite members" on public.business_members;
 create policy "Workspace managers can invite members"
   on public.business_members for insert
   with check (public.can_manage_business_workspace(workspace_id));
@@ -61,6 +63,7 @@ create policy "Workspace managers can update members"
   with check (public.can_manage_business_workspace(workspace_id));
 
 drop policy if exists "Business owners can remove members" on public.business_members;
+drop policy if exists "Workspace managers can remove members" on public.business_members;
 create policy "Workspace managers can remove members"
   on public.business_members for delete
   using (public.can_manage_business_workspace(workspace_id));
