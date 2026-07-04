@@ -24,6 +24,29 @@ export const PROSPECT_STAGE_LABELS: Record<ProspectStage, string> = {
   lost: "Lost",
 };
 
+export type ForecastValueBasis = "fixed" | "monthly" | "annual";
+export type StageProbabilities = Record<ProspectStage, number>;
+
+export const DEFAULT_STAGE_PROBABILITIES: StageProbabilities = {
+  new: 5,
+  researching: 10,
+  contacted: 20,
+  replied: 35,
+  qualified: 55,
+  meeting: 75,
+  won: 100,
+  lost: 0,
+};
+
+export type ForecastSettings = {
+  id?: string;
+  owner_id: string;
+  workspace_id: string | null;
+  value_basis: ForecastValueBasis;
+  default_months: number;
+  stage_probabilities: StageProbabilities;
+};
+
 export type Prospect = {
   id: string;
   owner_id: string;
@@ -95,6 +118,78 @@ function prospectError(error: { code?: string; message?: string } | null) {
 
 function optional(value?: string) {
   return value?.trim() || null;
+}
+
+function normalizeProbabilities(value: unknown): StageProbabilities {
+  const record =
+    typeof value === "object" && value !== null
+      ? (value as Partial<Record<ProspectStage, unknown>>)
+      : {};
+  return Object.fromEntries(
+    PROSPECT_STAGES.map((stage) => {
+      const probability = Number(record[stage]);
+      return [
+        stage,
+        Number.isFinite(probability)
+          ? Math.min(100, Math.max(0, probability))
+          : DEFAULT_STAGE_PROBABILITIES[stage],
+      ];
+    })
+  ) as StageProbabilities;
+}
+
+export async function getForecastSettings(options: {
+  userId: string;
+  workspaceId?: string | null;
+}) {
+  const client = getSupabaseBrowserClient();
+  if (!client) return null;
+  let query = client.from("forecast_settings").select("*");
+  query = options.workspaceId
+    ? query.eq("workspace_id", options.workspaceId)
+    : query.eq("owner_id", options.userId).is("workspace_id", null);
+  const { data, error } = await query.maybeSingle();
+  if (error) {
+    if (
+      error.code === "42P01" ||
+      error.code === "PGRST205" ||
+      error.message?.toLowerCase().includes("forecast_settings")
+    ) {
+      return null;
+    }
+    throw prospectError(error);
+  }
+  if (!data) return null;
+  return {
+    ...data,
+    stage_probabilities: normalizeProbabilities(data.stage_probabilities),
+  } as ForecastSettings;
+}
+
+export async function saveForecastSettings(settings: ForecastSettings) {
+  const client = getSupabaseBrowserClient();
+  if (!client) throw new Error("Sign in before changing forecast settings.");
+  const payload = {
+    owner_id: settings.owner_id,
+    workspace_id: settings.workspace_id,
+    value_basis: settings.value_basis,
+    default_months: Math.min(60, Math.max(1, settings.default_months)),
+    stage_probabilities: normalizeProbabilities(settings.stage_probabilities),
+    updated_at: new Date().toISOString(),
+  };
+  const existing = await getForecastSettings({
+    userId: settings.owner_id,
+    workspaceId: settings.workspace_id,
+  });
+  const request = existing?.id
+    ? client.from("forecast_settings").update(payload).eq("id", existing.id)
+    : client.from("forecast_settings").insert(payload);
+  const { data, error } = await request.select("*").single();
+  if (error) throw prospectError(error);
+  return {
+    ...data,
+    stage_probabilities: normalizeProbabilities(data.stage_probabilities),
+  } as ForecastSettings;
 }
 
 export async function listProspects(options: {

@@ -257,7 +257,7 @@ export default function ProspectDetailPage() {
             <div className="prospectSectionHeader"><h2 className="cardTitle">Qualification and follow-up</h2></div>
             <div className="prospectFormGrid">
               <div className="formGroup"><label className="label">Pipeline stage</label><select className="input" value={stage} onChange={(event) => setStage(event.target.value as ProspectStage)}>{PROSPECT_STAGES.map((option) => <option key={option} value={option}>{PROSPECT_STAGE_LABELS[option]}</option>)}</select></div>
-              <div className="formGroup"><label className="label">Estimated value (GBP)</label><input className="input" type="number" min="0" value={value} onChange={(event) => setValue(event.target.value)} /></div>
+              <div className="formGroup"><label className="label">Stored contract value (GBP)</label><input className="input" type="number" min="0" value={value} onChange={(event) => setValue(event.target.value)} /><p className="small" style={{ margin: "6px 0 0" }}>Use the full fixed, calculated monthly, or annual value defined by your forecast model.</p></div>
               <div className="formGroup"><label className="label">Next follow-up</label><input className="input" type="date" value={nextFollowUp} onChange={(event) => setNextFollowUp(event.target.value)} /></div>
               <div className="formGroup"><label className="label">Last contacted</label><input className="input" value={lastContactedAt ? new Date(lastContactedAt).toLocaleString() : "Not contacted yet"} disabled /></div>
             </div>
