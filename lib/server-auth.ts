@@ -86,6 +86,23 @@ export async function getUserFromAccessToken(accessToken: string) {
   };
 }
 
+export async function getIsUserAdminServer(userId: string) {
+  const { url, serviceRoleKey } = getSupabaseServerConfig();
+  const response = await fetch(
+    `${url}/rest/v1/admin_users?select=user_id&user_id=eq.${encodeURIComponent(userId)}&limit=1`,
+    {
+      headers: {
+        apikey: serviceRoleKey,
+        authorization: `Bearer ${serviceRoleKey}`,
+      },
+      cache: "no-store",
+    }
+  );
+  if (!response.ok) throw new Error("Admin status could not be verified.");
+  const rows = (await response.json()) as Array<{ user_id: string }>;
+  return rows.some((row) => row.user_id === userId);
+}
+
 export async function updateUserPlan(options: {
   userId: string;
   email?: string | null;

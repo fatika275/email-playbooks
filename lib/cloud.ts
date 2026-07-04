@@ -698,6 +698,23 @@ export async function getOwnedBusinessWorkspace() {
   return data as BusinessWorkspace | null;
 }
 
+export async function createAdminBusinessWorkspace() {
+  const client = getSupabaseBrowserClient();
+  if (!client) throw new Error("Supabase is not configured.");
+  const { data } = await client.auth.getSession();
+  const accessToken = data.session?.access_token;
+  if (!accessToken) throw new Error("Sign in again before granting access.");
+
+  const response = await fetch("/api/admin/business-workspace", {
+    method: "POST",
+    headers: { authorization: `Bearer ${accessToken}` },
+  });
+  const result = (await response.json()) as { ready?: boolean; error?: string };
+  if (!response.ok || !result.ready) {
+    throw new Error(result.error || "Business Pro access could not be granted.");
+  }
+}
+
 export async function listAccessibleBusinessWorkspaces() {
   const client = getSupabaseBrowserClient();
   const user = await getSignedInUser();

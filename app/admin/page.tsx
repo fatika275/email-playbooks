@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useAccount } from "@/components/account-provider";
 import {
+  createAdminBusinessWorkspace,
   listFounderWaitlistForAdmin,
   listUserProfilesForAdmin,
   updateFounderWaitlistStatusForAdmin,
@@ -12,11 +13,25 @@ import {
 } from "@/lib/cloud";
 
 export default function AdminPage() {
-  const { isAdmin, isConfigured, user } = useAccount();
+  const { isAdmin, isConfigured, user, plan, syncNow } = useAccount();
   const [profiles, setProfiles] = useState<CloudAdminProfile[]>([]);
   const [waitlist, setWaitlist] = useState<FounderWaitlistEntry[]>([]);
   const [isLoadingProfiles, setIsLoadingProfiles] = useState(false);
   const [notice, setNotice] = useState("");
+  const [isGrantingBusiness, setIsGrantingBusiness] = useState(false);
+
+  async function handleGrantBusinessWorkspace() {
+    setIsGrantingBusiness(true);
+    try {
+      await createAdminBusinessWorkspace();
+      await syncNow();
+      setNotice("Your admin Business Pro test workspace is active.");
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Business Pro access could not be granted.");
+    } finally {
+      setIsGrantingBusiness(false);
+    }
+  }
 
   async function refreshAdminData() {
     setIsLoadingProfiles(true);
@@ -193,6 +208,25 @@ export default function AdminPage() {
         </div>
 
         {notice ? <p className="notice">{notice}</p> : null}
+
+        <div className="glassCard" style={{ padding: 24, marginBottom: 22 }}>
+          <div className="cardTop">
+            <div>
+              <h2 className="cardTitle">Admin test workspace</h2>
+              <p className="muted" style={{ margin: "8px 0 0", maxWidth: 680 }}>
+                Activate Business Pro for your admin account so you can test team roles, shared pipelines, assignments, and workspace activity without a Stripe payment.
+              </p>
+            </div>
+            <span className={`statusPill ${plan === "business" ? "statusPillSuccess" : ""}`}>
+              {plan === "business" ? "Business Pro active" : "Not active"}
+            </span>
+          </div>
+          <div className="toolbar" style={{ marginTop: 18 }}>
+            <button className="button buttonPrimary" disabled={isGrantingBusiness || plan === "business"} onClick={() => void handleGrantBusinessWorkspace()}>
+              {isGrantingBusiness ? "Activating..." : plan === "business" ? "Workspace active" : "Activate test workspace"}
+            </button>
+          </div>
+        </div>
 
         <div className="glassCard" style={{ padding: 28 }}>
           <div
