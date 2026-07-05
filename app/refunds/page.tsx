@@ -46,17 +46,7 @@ export default function RefundsPage() {
           </div>
 
           <div className="legalBlock">
-            <h2 className="cardTitle">4. Pro+ and tailored work</h2>
-            <p className="muted">
-              Tailored strategy, consulting, or implementation work may have
-              different billing and refund terms. Once custom work has begun,
-              refunds may be partial or unavailable unless stated otherwise in
-              writing.
-            </p>
-          </div>
-
-          <div className="legalBlock">
-            <h2 className="cardTitle">5. How refunds are issued</h2>
+            <h2 className="cardTitle">4. How refunds are issued</h2>
             <p className="muted">
               Refunds are issued back to the original payment method through
               Stripe. Processing time depends on the payment method and bank.
@@ -64,7 +54,7 @@ export default function RefundsPage() {
           </div>
 
           <div className="legalBlock">
-            <h2 className="cardTitle">6. Billing support</h2>
+            <h2 className="cardTitle">5. Billing support</h2>
             <p className="muted">
               Billing questions, cancellation requests, and refund requests can
               be sent to {siteConfig.supportEmail}.

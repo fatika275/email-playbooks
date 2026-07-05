@@ -384,7 +384,7 @@ export default function AccountPage() {
 
                 <Link href="/pricing" className="glassCard clickable accountQuickLink">
                   <strong>View plan options</strong>
-                  <span className="muted">Pro, Founder, and Pro+</span>
+                  <span className="muted">Free, Pro, Founder, and Business</span>
                 </Link>
 
                 <Link href="/" className="glassCard clickable accountQuickLink">

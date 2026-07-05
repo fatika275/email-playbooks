@@ -57,11 +57,11 @@ export default function WorkspacePage() {
         <div className="pageHeader">
           <div className="badge">Workspace</div>
           <h1 className="pageTitle" style={{ marginTop: 14 }}>
-            Your Client Acquisition Workspace
+            Your Agency Outreach Workspace
           </h1>
           <p className="muted" style={{ maxWidth: 760, lineHeight: 1.75 }}>
-            Manage prospects, build outreach, run follow-ups, and keep the work
-            needed to win clients in one operating system.
+            Keep leads, outreach, and follow-ups together so your agency can book
+            more work without adding a complicated CRM.
           </p>
         </div>
 

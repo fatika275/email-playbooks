@@ -4,14 +4,11 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useAccount } from "@/components/account-provider";
 import {
-  assignWorkspaceCustomRole,
-  createWorkspaceRole,
   deleteBusinessWorkspace,
   inviteBusinessMember,
   listAccessibleBusinessWorkspaces,
   listBusinessMembers,
   listWorkspaceNotifications,
-  listWorkspaceRoles,
   markWorkspaceNotificationRead,
   listTeamShares,
   removeBusinessMember,
@@ -24,7 +21,6 @@ import {
   type BusinessWorkspace,
   type BusinessWorkspaceAccess,
   type WorkspaceNotification,
-  type WorkspaceRole,
   type TeamShare,
 } from "@/lib/cloud";
 import {
@@ -52,10 +48,6 @@ export default function TeamLibraryPage() {
   const [activity, setActivity] = useState<WorkspaceProspectActivity[]>([]);
   const [notifications, setNotifications] = useState<WorkspaceNotification[]>([]);
   const [overdueTasks, setOverdueTasks] = useState<OverdueWorkspaceTask[]>([]);
-  const [roles, setRoles] = useState<WorkspaceRole[]>([]);
-  const [roleName, setRoleName] = useState("");
-  const [roleMembers, setRoleMembers] = useState(false);
-  const [roleExport, setRoleExport] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState<"admin" | "member">("member");
   const [isLoadingShares, setIsLoadingShares] = useState(false);
@@ -86,16 +78,14 @@ export default function TeamLibraryPage() {
       return;
     }
     window.localStorage.setItem("thalovo_active_workspace_id", selected.id);
-    const [nextMembers, nextActivity, nextRoles, nextNotifications, nextOverdueTasks] = await Promise.all([
+    const [nextMembers, nextActivity, nextNotifications, nextOverdueTasks] = await Promise.all([
       listBusinessMembers(selected.id),
       listWorkspaceProspectActivities(selected.id),
-      listWorkspaceRoles(selected.id),
       listWorkspaceNotifications(),
       user ? listMyOverdueWorkspaceTasks(selected.id, user.id) : Promise.resolve([]),
     ]);
     setMembers(nextMembers);
     setActivity(nextActivity);
-    setRoles(nextRoles);
     setNotifications(nextNotifications);
     setOverdueTasks(nextOverdueTasks);
   }, [user]);
@@ -119,12 +109,9 @@ export default function TeamLibraryPage() {
     [shares, user?.id]
   );
   const activeWorkspaceAccess = workspaces.find((item) => item.id === workspace?.id);
-  const currentMembership = members.find((member) => member.user_id === user?.id);
-  const currentCustomRole = roles.find((role) => role.id === currentMembership?.custom_role_id);
   const canExportWorkspace =
     activeWorkspaceAccess?.access_role === "owner" ||
-    activeWorkspaceAccess?.access_role === "admin" ||
-    currentCustomRole?.can_export_data;
+    activeWorkspaceAccess?.access_role === "admin";
 
   async function handleSaveToWorkspace(share: TeamShare) {
     try {
@@ -222,31 +209,6 @@ export default function TeamLibraryPage() {
       `You have been invited to our Thalovo workspace. Sign up or sign in using ${member.email}, then open the Team page to access the workspace.\n\nhttps://thalovo.com/account`
     );
     window.location.href = `mailto:${encodeURIComponent(member.email)}?subject=${subject}&body=${body}`;
-  }
-
-  async function handleWorkspaceChange(workspaceId: string) {
-    window.localStorage.setItem("thalovo_active_workspace_id", workspaceId);
-    const selected = workspaces.find((item) => item.id === workspaceId) ?? null;
-    setWorkspace(selected);
-    if (!selected) return;
-    const [nextMembers, nextActivity, nextRoles] = await Promise.all([
-      listBusinessMembers(selected.id),
-      listWorkspaceProspectActivities(selected.id),
-      listWorkspaceRoles(selected.id),
-    ]);
-    setMembers(nextMembers);
-    setActivity(nextActivity);
-    setRoles(nextRoles);
-  }
-
-  async function handleCreateRole() {
-    if (!workspace || !roleName.trim()) return;
-    try {
-      await createWorkspaceRole({ workspace_id: workspace.id, name: roleName.trim(), can_manage_members: roleMembers, can_manage_pipeline: true, can_export_data: roleExport });
-      setRoleName(""); setRoleMembers(false); setRoleExport(false);
-      await refreshBusinessTeam();
-      setNotice("Custom role created.");
-    } catch (error) { setNotice(error instanceof Error ? error.message : "Role could not be created."); }
   }
 
   async function handleExportWorkspace() {
@@ -368,15 +330,6 @@ export default function TeamLibraryPage() {
               </span>
             </div>
 
-            {workspaces.length > 1 ? (
-              <div className="formGroup" style={{ marginTop: 18, maxWidth: 420 }}>
-                <label className="label" htmlFor="active-team-workspace">Active workspace</label>
-                <select id="active-team-workspace" className="input" value={workspace.id} onChange={(event) => void handleWorkspaceChange(event.target.value)}>
-                  {workspaces.map((item) => <option key={item.id} value={item.id}>{item.name} · {item.access_role}</option>)}
-                </select>
-              </div>
-            ) : null}
-
             {workspaces.find((item) => item.id === workspace.id)?.access_role !== "member" ? <><div
               className="businessInviteGrid"
               style={{ alignItems: "end", marginTop: 18 }}
@@ -455,27 +408,6 @@ export default function TeamLibraryPage() {
                 {activity.length === 0 ? <p className="muted">No shared pipeline activity yet.</p> : null}
               </div>
             </div>
-
-            <div className="teamActivitySection">
-              <div className="cardTop"><h3 className="cardTitle">Team performance</h3><span className="miniBadge">Last {activity.length} actions</span></div>
-              <div className="prospectReportSummary">{Array.from(new Set(activity.map((item) => item.actor_email || "Teammate"))).map((email) => <div key={email}><span>{email}</span><strong>{activity.filter((item) => (item.actor_email || "Teammate") === email).length} actions</strong></div>)}</div>
-            </div>
-
-            {workspaces.find((item) => item.id === workspace.id)?.access_role !== "member" ? <details className="teamAdvancedPanel">
-              <summary><strong>Optional: custom permissions</strong><span>Only open this when Admin and Member are not specific enough.</span></summary>
-              <div className="teamAdvancedContent">
-              <p className="muted teamSectionDescription">Most teams only need Admin and Member. A custom role gives someone selected extra permissions without making them a full Admin.</p>
-              <div className="teamRoleBuilder">
-                <div className="formGroup"><label className="label">Custom role name</label><input className="input" value={roleName} onChange={(event) => setRoleName(event.target.value)} placeholder="For example, Sales lead" /></div>
-                <label className="teamPermissionOption"><input type="checkbox" checked={roleMembers} onChange={(event) => setRoleMembers(event.target.checked)} /><span><strong>Can manage teammates</strong><small>Can invite people, pause access, change roles, and remove teammates.</small></span></label>
-                <label className="teamPermissionOption"><input type="checkbox" checked={roleExport} onChange={(event) => setRoleExport(event.target.checked)} /><span><strong>Can download workspace data</strong><small>Can export prospects, tasks, comments, and activity as a backup file.</small></span></label>
-                <p className="small">Leave a box unticked when that permission should not be included. Shared pipeline access is included automatically.</p>
-                <button className="button buttonPrimary" disabled={!roleName.trim()} onClick={() => void handleCreateRole()}>Create custom role</button>
-              </div>
-              {roles.length ? <div className="prospectTaskList">{roles.map((role) => <div className="prospectTask" key={role.id}><span className="miniBadge">Role</span><div><strong>{role.name}</strong><span>{role.can_manage_members ? "Manages members" : "Pipeline access"}{role.can_export_data ? " · Can export" : ""}</span></div></div>)}</div> : null}
-              <div style={{ display: "grid", gap: 10, marginTop: 16 }}>{members.map((member) => <div key={member.id} className="teamRoleAssignment"><span>{member.email}</span><select className="input" value={member.custom_role_id || ""} onChange={(event) => void assignWorkspaceCustomRole(member.id, event.target.value || null).then(refreshBusinessTeam)}><option value="">Standard {member.role}</option>{roles.map((role) => <option key={role.id} value={role.id}>{role.name}</option>)}</select></div>)}</div>
-              </div>
-            </details> : null}
 
             <div className="teamActivitySection">
               <div className="cardTop"><div><h3 className="cardTitle">Workspace data</h3><p className="small">Export a complete JSON backup of members, prospects, tasks, comments, and activity.</p></div>{canExportWorkspace ? <button className="button buttonSecondary" onClick={() => void handleExportWorkspace()}>Export workspace</button> : <span className="miniBadge">Export permission required</span>}</div>

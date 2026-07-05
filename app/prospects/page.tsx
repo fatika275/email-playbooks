@@ -353,7 +353,7 @@ export default function ProspectsPage() {
       <main className="main">
         <section className="container">
           <div className="glassCard emptyState">
-            <div className="badge">Client Acquisition</div>
+            <div className="badge">Agency pipeline</div>
             <h1 className="pageTitle" style={{ marginTop: 14 }}>Prospect Pipeline</h1>
             <p className="muted">
               {user
@@ -374,7 +374,7 @@ export default function ProspectsPage() {
       <section className="container">
         <div className="prospectHeader">
           <div>
-            <div className="badge">Client Acquisition</div>
+            <div className="badge">Agency pipeline</div>
             <h1 className="pageTitle" style={{ marginTop: 14 }}>Prospect Pipeline</h1>
             <p className="muted" style={{ margin: "8px 0 0" }}>
               {workspaceId

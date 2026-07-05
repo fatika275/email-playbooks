@@ -33,9 +33,6 @@ export default function SiteFooter() {
             <Link href="/account" className="footerLink">
               Account
             </Link>
-            <Link href="/book-call" className="footerLink">
-              Book a call
-            </Link>
           </div>
 
           <div className="footerColumn">

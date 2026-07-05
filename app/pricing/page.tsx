@@ -2,18 +2,11 @@
 
 import Link from "next/link";
 import { useAccount } from "@/components/account-provider";
-import { getBillingLinks, getPlanHref } from "@/lib/billing";
 
 export default function PricingPage() {
   const { founderEligible, founderPriceGbp } = useAccount();
   const founderPriceLabel =
     founderPriceGbp !== null ? `GBP ${founderPriceGbp}` : "GBP 12";
-  const billingLinks = getBillingLinks();
-
-  const proPlusHref = getPlanHref(
-    billingLinks.proPlus || billingLinks.bookCall,
-    "/book-call"
-  );
 
   return (
     <main className="main">
@@ -33,8 +26,8 @@ export default function PricingPage() {
               lineHeight: 1.75,
             }}
           >
-            Thalovo starts with self-serve systems and can grow into a more
-            tailored outbound offer for teams that want extra support.
+            Start free, choose Pro for one agency owner, or Business Pro when
+            your small team needs one shared pipeline.
           </p>
 
           <p
@@ -196,40 +189,6 @@ export default function PricingPage() {
             </div>
           </div>
 
-          <div
-            className="glassCard"
-            style={{
-              padding: 28,
-              display: "flex",
-              flexDirection: "column",
-              minHeight: "100%",
-            }}
-          >
-            <div className="badge">Pro+</div>
-
-            <h2 className="pageTitle" style={{ marginTop: 14 }}>
-              Custom<span className="muted"> pricing</span>
-            </h2>
-
-            <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
-              For businesses that want a more tailored outbound system built
-              around their offer, audience, and messaging.
-            </p>
-
-            <ul className="featureList">
-              <li>Tailored outreach system for your business</li>
-              <li>Positioning and messaging refinement</li>
-              <li>Custom cold outreach and follow-up structure</li>
-              <li>Support refining sequence quality over time</li>
-              <li>Best sold through a call instead of one-click checkout</li>
-            </ul>
-
-            <div style={{ marginTop: 24 }}>
-              <Link href={proPlusHref} className="button buttonSecondary">
-                {billingLinks.proPlus ? "Book Pro+" : "Ask about Pro+"}
-              </Link>
-            </div>
-          </div>
         </div>
 
         <section className="section">
@@ -265,13 +224,6 @@ export default function PricingPage() {
                 </p>
               </div>
 
-              <div className="glassCard" style={{ padding: 20 }}>
-                <h3 className="cardTitle">Pro+</h3>
-                <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
-                  Best if you want help shaping the system around your business
-                  instead of relying only on self-serve templates and sequences.
-                </p>
-              </div>
             </div>
 
           </div>

@@ -3,48 +3,40 @@
 import Link from "next/link";
 import { ScrollReveal } from "@/components/scroll-reveal";
 import { playbooks } from "@/lib/data";
-import { getBillingLinks, getPlanHref } from "@/lib/billing";
 import { trackEvent } from "@/lib/analytics";
 
 const workflow = [
   {
-    title: "Manage the opportunity",
-    text: "Keep every prospect, deal stage, task, note, value, and next follow-up in one working pipeline.",
+    title: "Add every lead",
+    text: "Keep each prospect, conversation, and next follow-up in one simple agency pipeline.",
   },
   {
-    title: "Run the outreach",
-    text: "Move directly from prospect context into structured emails, sequences, objections, and follow-ups.",
+    title: "Send better outreach",
+    text: "Use practical emails and follow-up sequences without starting from a blank page.",
   },
   {
-    title: "Operate until won",
-    text: "Use the Today queue, activity history, tasks, and reporting to keep momentum until the client closes.",
+    title: "Never lose the follow-up",
+    text: "See what is due today and keep each opportunity moving until the work is booked.",
   },
 ];
 
 export default function HomePage() {
-  const billingLinks = getBillingLinks();
-  const proPlusHref = getPlanHref(
-    billingLinks.proPlus || billingLinks.bookCall,
-    "/book-call"
-  );
-
   return (
     <main className="main">
       <ScrollReveal as="section" className="container homeHero homeRevealHero">
         <div className="homeHeroInner">
           <div className="eyebrow">
             <span className="eyebrowDot" />
-            Client acquisition operating system
+            Outreach and pipeline for small agencies
           </div>
 
           <h1 className="homeHeroTitle">
-            Thalovo, your client acquisition operating system.
+            Book more agency work. Stop losing good leads.
           </h1>
 
           <p className="homeHeroText">
-            Manage prospects, run outreach, handle follow-ups, track pipeline
-            value, and move opportunities toward signed clients without stitching
-            together a pile of disconnected tools.
+            Thalovo gives small agencies one simple place to write outreach,
+            remember every follow-up, and move leads toward booked work.
           </p>
 
           <div className="heroActions homeHeroActions">
@@ -73,12 +65,12 @@ export default function HomePage() {
             <span>Prospects, stages, tasks, and follow-ups</span>
           </div>
           <div>
-            <strong>{playbooks.length}+ playbooks</strong>
-            <span>Messaging for each sales situation</span>
+            <strong>{playbooks.length}+ outreach templates</strong>
+            <span>Practical messages for real sales conversations</span>
           </div>
           <div>
-            <strong>Operational</strong>
-            <span>Today queue, reporting, and team access</span>
+            <strong>Nothing forgotten</strong>
+            <span>Tasks, reminders, and a clear Today list</span>
           </div>
         </div>
       </ScrollReveal>
@@ -86,10 +78,10 @@ export default function HomePage() {
       <ScrollReveal as="section" className="container section" delay={100}>
         <div className="sectionHeader homeSectionHeader">
           <div>
-            <h2 className="pageTitle">One workflow from lead to client</h2>
+            <h2 className="pageTitle">A simple path from lead to booked work</h2>
             <p className="muted">
-              Keep account context, communication, and next actions together so
-              opportunities do not disappear between tools.
+              Keep outreach and follow-ups beside the lead so opportunities do
+              not disappear in inboxes and spreadsheets.
             </p>
           </div>
         </div>
@@ -114,11 +106,11 @@ export default function HomePage() {
           <div>
             <div className="badge">Workspace</div>
             <h2 className="pageTitle" style={{ marginTop: 14 }}>
-              Messaging belongs inside the acquisition operation.
+              Outreach belongs beside the lead.
             </h2>
             <p className="muted" style={{ marginTop: 12, maxWidth: 680 }}>
-              Start from the prospect record, draft with their context already
-              attached, then return to log activity and schedule what happens next.
+              Start from a prospect, prepare the right message, then record the
+              contact and schedule the next follow-up.
             </p>
           </div>
 
@@ -133,21 +125,6 @@ export default function HomePage() {
         </div>
       </ScrollReveal>
 
-      <ScrollReveal as="section" className="container section" delay={120}>
-        <div className="homeCta">
-          <div className="badge">Pro+</div>
-          <h2 className="pageTitle" style={{ marginTop: 14 }}>
-            Want the system shaped around your offer?
-          </h2>
-          <p className="muted">
-            Pro+ is for founders and agencies who want help refining their
-            positioning, outbound flow, and reusable messaging system.
-          </p>
-          <Link href={proPlusHref} className="button buttonPrimary">
-            Book Pro+
-          </Link>
-        </div>
-      </ScrollReveal>
     </main>
   );
 }
