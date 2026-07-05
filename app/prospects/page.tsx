@@ -195,12 +195,25 @@ export default function ProspectsPage() {
       }),
     };
   }, [probabilities, prospects]);
-  const outreachMetrics = useMemo(() => ({
-    contacted: activities.filter((item) => ["email", "call", "meeting"].includes(item.activity_type)).length,
-    replied: prospects.filter((item) => ["replied", "qualified", "meeting", "won"].includes(item.stage)).length,
-    meetings: activities.filter((item) => item.activity_type === "meeting").length,
-    won: prospects.filter((item) => item.stage === "won").length,
-  }), [activities, prospects]);
+  const outreachMetrics = useMemo(() => {
+    const outreachActivities = activities.filter((item) => ["email", "call", "meeting"].includes(item.activity_type));
+    const contactedIds = new Set(outreachActivities.map((item) => item.prospect_id));
+    prospects.filter((item) => item.last_contacted_at).forEach((item) => contactedIds.add(item.id));
+    const meetingIds = new Set(activities.filter((item) => item.activity_type === "meeting").map((item) => item.prospect_id));
+    prospects.filter((item) => ["meeting", "won"].includes(item.stage)).forEach((item) => meetingIds.add(item.id));
+    return {
+      actions: outreachActivities.length,
+      contacted: contactedIds.size,
+      replied: prospects.filter((item) => ["replied", "qualified", "meeting", "won"].includes(item.stage)).length,
+      meetings: meetingIds.size,
+      won: prospects.filter((item) => item.stage === "won").length,
+    };
+  }, [activities, prospects]);
+  const acquisitionRates = useMemo(() => ({
+    reply: outreachMetrics.contacted ? Math.min(100, Math.round((outreachMetrics.replied / outreachMetrics.contacted) * 100)) : 0,
+    meeting: outreachMetrics.contacted ? Math.min(100, Math.round((outreachMetrics.meetings / outreachMetrics.contacted) * 100)) : 0,
+    win: outreachMetrics.contacted ? Math.min(100, Math.round((outreachMetrics.won / outreachMetrics.contacted) * 100)) : 0,
+  }), [outreachMetrics]);
 
   async function handleCreate() {
     if (!user || !fullName.trim() || !company.trim()) {
@@ -455,7 +468,7 @@ export default function ProspectsPage() {
             <button className={view === "pipeline" ? "authModeTab active" : "authModeTab"} onClick={() => setView("pipeline")}>Pipeline</button>
             <button className={view === "list" ? "authModeTab active" : "authModeTab"} onClick={() => setView("list")}>List</button>
             <button className={view === "today" ? "authModeTab active" : "authModeTab"} onClick={() => setView("today")}>Today</button>
-            <button className={view === "reports" ? "authModeTab active" : "authModeTab"} onClick={() => setView("reports")}>Reports</button>
+            <button className={view === "reports" ? "authModeTab active" : "authModeTab"} onClick={() => setView("reports")}>Dashboard</button>
           </div>
           <input className="input prospectSearch" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search name, company, email..." />
           <select className="input prospectStageFilter" value={stageFilter} onChange={(event) => setStageFilter(event.target.value as ProspectStage | "all")}>
@@ -561,11 +574,21 @@ export default function ProspectsPage() {
           </div>
         ) : (
           <div className="prospectReports">
+            <div className="prospectDashboardHeader">
+              <div><span className="miniBadge">Acquisition dashboard</span><h2 className="sectionTitle">Is outreach turning into booked work?</h2></div>
+              <p className="muted">Based on activity and stage changes logged in Thalovo.</p>
+            </div>
             <section className="prospectReportSummary">
-              <div><span>Outreach logged</span><strong>{outreachMetrics.contacted}</strong></div>
+              <div><span>Outreach actions</span><strong>{outreachMetrics.actions}</strong></div>
               <div><span>Leads that replied</span><strong>{outreachMetrics.replied}</strong></div>
-              <div><span>Meetings logged</span><strong>{outreachMetrics.meetings}</strong></div>
+              <div><span>Leads with meetings</span><strong>{outreachMetrics.meetings}</strong></div>
               <div><span>Work won</span><strong>{outreachMetrics.won}</strong></div>
+            </section>
+            <section className="prospectDashboardHealth">
+              <div><span>Reply rate</span><strong>{acquisitionRates.reply}%</strong><small>Replied leads ÷ contacted leads</small></div>
+              <div><span>Meeting rate</span><strong>{acquisitionRates.meeting}%</strong><small>Meeting leads ÷ contacted leads</small></div>
+              <div><span>Win rate</span><strong>{acquisitionRates.win}%</strong><small>Won work ÷ contacted leads</small></div>
+              <div><span>Follow-ups due</span><strong>{metrics.due}</strong><small>Active leads needing attention</small></div>
             </section>
             <details className="prospectForecastSettings prospectAdvancedReport">
               <summary><strong>Advanced forecast settings</strong><span>Optional deal values, probabilities, and weighted forecasting</span></summary>

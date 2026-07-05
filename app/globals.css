@@ -966,6 +966,16 @@ select.input option {
   background: #111111;
 }
 
+select:not(.input) {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m7 10 5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+}
+
 summary::marker {
   color: #ffffff;
   font-size: 11px;
@@ -1937,6 +1947,52 @@ summary::marker {
   gap: 16px;
 }
 
+.prospectDashboardHeader {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 4px 0 8px;
+}
+
+.prospectDashboardHeader .sectionTitle {
+  margin-top: 12px;
+}
+
+.prospectDashboardHeader .muted {
+  max-width: 360px;
+  margin: 0;
+  text-align: right;
+}
+
+.prospectDashboardHealth {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border: 1px solid var(--border);
+  background: #080808;
+}
+
+.prospectDashboardHealth > div {
+  display: grid;
+  gap: 5px;
+  padding: 18px 20px;
+  border-right: 1px solid var(--border);
+}
+
+.prospectDashboardHealth > div:last-child {
+  border-right: 0;
+}
+
+.prospectDashboardHealth span,
+.prospectDashboardHealth small {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.prospectDashboardHealth strong {
+  font-size: 20px;
+}
+
 .prospectAdvancedReport {
   padding: 20px;
 }
@@ -2552,6 +2608,27 @@ summary::marker {
 
   .prospectReportSummary div:last-child {
     border-bottom: 0;
+  }
+
+  .prospectDashboardHeader {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .prospectDashboardHeader .muted {
+    text-align: left;
+  }
+
+  .prospectDashboardHealth {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .prospectDashboardHealth > div:nth-child(2) {
+    border-right: 0;
+  }
+
+  .prospectDashboardHealth > div:nth-child(-n + 2) {
+    border-bottom: 1px solid var(--border);
   }
 
   .prospectTodayItem {
