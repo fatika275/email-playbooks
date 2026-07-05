@@ -490,12 +490,13 @@ export default function ProspectsPage() {
                         }}
                       >
                         <Link href={`/prospects/${prospect.id}`} className="prospectCardLink">
-                          <strong>{prospect.full_name}</strong>
-                          <span>{prospect.company}{prospect.role ? ` - ${prospect.role}` : ""}</span>
-                          <span>{formatMoney(prospect.estimated_value_gbp)}</span>
-                          {prospect.next_follow_up ? <span className={isDue(prospect.next_follow_up) ? "prospectDue" : ""}>Follow up {prospect.next_follow_up}</span> : null}
+                          <div className="prospectCardTop">
+                            <div><strong>{prospect.full_name}</strong><span>{prospect.company}</span></div>
+                            {prospect.estimated_value_gbp > 0 ? <span className="prospectCardValue">{formatMoney(prospect.estimated_value_gbp)}</span> : null}
+                          </div>
+                          {prospect.next_follow_up ? <span className={isDue(prospect.next_follow_up) ? "prospectCardFollowUp prospectDue" : "prospectCardFollowUp"}>{isDue(prospect.next_follow_up) ? "Due" : "Follow up"} {prospect.next_follow_up}</span> : null}
                         </Link>
-                        <select className="input prospectCardStage" value={prospect.stage} onChange={(event) => void handleStageChange(prospect.id, event.target.value as ProspectStage)} aria-label={`Move ${prospect.full_name} to stage`}>
+                        <select className="input prospectCardStage" value={prospect.stage} onChange={(event) => void handleStageChange(prospect.id, event.target.value as ProspectStage)} aria-label={`Move ${prospect.full_name} to stage`} title="Move to another stage">
                           {PROSPECT_STAGES.map((option) => <option key={option} value={option}>{PROSPECT_STAGE_LABELS[option]}</option>)}
                         </select>
                       </article>
