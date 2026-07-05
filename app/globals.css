@@ -1215,6 +1215,39 @@ select.input option {
   border-top: 1px solid var(--border);
 }
 
+.teamActivityDisclosure > summary,
+.prospectAdvancedReport > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  cursor: pointer;
+  list-style-position: inside;
+}
+
+.teamActivityDisclosure > summary span,
+.prospectAdvancedReport > summary span {
+  color: var(--muted);
+  font-size: 12px;
+  text-align: right;
+}
+
+.teamLibraryActions {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin: 40px 0 26px;
+  padding-top: 30px;
+  border-top: 1px solid var(--border);
+}
+
+.teamLibraryActions .muted {
+  max-width: 620px;
+  margin: 7px 0 0;
+  line-height: 1.6;
+}
+
 .teamNotificationPanel {
   padding: 22px;
   margin-bottom: 22px;
@@ -1862,6 +1895,16 @@ select.input option {
   gap: 16px;
 }
 
+.prospectAdvancedReport {
+  padding: 20px;
+}
+
+.prospectAdvancedReportContent {
+  margin-top: 22px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-soft);
+}
+
 .prospectReportSummary {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -2307,6 +2350,18 @@ select.input option {
   .teamRoleAssignment,
   .teamDangerZone {
     grid-template-columns: 1fr;
+  }
+
+  .teamLibraryActions,
+  .teamActivityDisclosure > summary,
+  .prospectAdvancedReport > summary {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .teamActivityDisclosure > summary span,
+  .prospectAdvancedReport > summary span {
+    text-align: left;
   }
 
   .planHero {

@@ -396,8 +396,8 @@ export default function TeamLibraryPage() {
               ))}
             </div>
 
-            <div className="teamActivitySection">
-              <div className="cardTop"><h3 className="cardTitle">Workspace activity</h3><span className="miniBadge">Latest {activity.length}</span></div>
+            <details className="teamActivitySection teamActivityDisclosure">
+              <summary><strong>Workspace activity</strong><span>{activity.length} recent updates</span></summary>
               <div className="prospectTimeline">
                 {activity.map((item) => (
                   <div key={item.id} className="prospectTimelineItem">
@@ -407,7 +407,7 @@ export default function TeamLibraryPage() {
                 ))}
                 {activity.length === 0 ? <p className="muted">No shared pipeline activity yet.</p> : null}
               </div>
-            </div>
+            </details>
 
             <div className="teamActivitySection">
               <div className="cardTop"><div><h3 className="cardTitle">Workspace data</h3><p className="small">Export a complete JSON backup of members, prospects, tasks, comments, and activity.</p></div>{canExportWorkspace ? <button className="button buttonSecondary" onClick={() => void handleExportWorkspace()}>Export workspace</button> : <span className="miniBadge">Export permission required</span>}</div>
@@ -437,7 +437,9 @@ export default function TeamLibraryPage() {
           </section>
         )}
 
-        <div className="toolbar" style={{ marginBottom: 22 }}>
+        <div className="teamLibraryActions">
+          <div><h2 className="sectionTitle">Shared outreach library</h2><p className="muted">Send useful templates and sequences to teammates, or save items they shared with you.</p></div>
+          <div className="toolbar">
           <button
             className="button buttonSecondary"
             disabled={isLoadingShares}
@@ -451,6 +453,7 @@ export default function TeamLibraryPage() {
           <Link href="/custom-templates" className="button buttonSecondary">
             Choose a sequence
           </Link>
+          </div>
         </div>
 
         <section className="section">

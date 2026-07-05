@@ -386,6 +386,18 @@ export async function listProspectActivities(prospectId: string) {
   return (data ?? []) as ProspectActivity[];
 }
 
+export async function listProspectActivitiesForProspects(prospectIds: string[]) {
+  const client = getSupabaseBrowserClient();
+  if (!client || prospectIds.length === 0) return [];
+  const { data, error } = await client
+    .from("prospect_activities")
+    .select("*")
+    .in("prospect_id", prospectIds)
+    .order("created_at", { ascending: false });
+  if (error) throw prospectError(error);
+  return (data ?? []) as ProspectActivity[];
+}
+
 export async function listProspectComments(prospectId: string) {
   const client = getSupabaseBrowserClient();
   if (!client) return [];

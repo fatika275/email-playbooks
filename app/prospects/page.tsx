@@ -14,6 +14,7 @@ import {
   DEFAULT_STAGE_PROBABILITIES,
   getForecastSettings,
   listProspectTasks,
+  listProspectActivitiesForProspects,
   listProspects,
   PROSPECT_STAGES,
   PROSPECT_STAGE_LABELS,
@@ -23,6 +24,7 @@ import {
   type Prospect,
   type ProspectStage,
   type ProspectTask,
+  type ProspectActivity,
   type ForecastValueBasis,
   type StageProbabilities,
 } from "@/lib/prospects";
@@ -73,6 +75,7 @@ export default function ProspectsPage() {
   const [notice, setNotice] = useState("");
   const [isWorking, setIsWorking] = useState(false);
   const [tasks, setTasks] = useState<ProspectTask[]>([]);
+  const [activities, setActivities] = useState<ProspectActivity[]>([]);
   const [draggedProspectId, setDraggedProspectId] = useState<string | null>(null);
   const [dragStage, setDragStage] = useState<ProspectStage | null>(null);
   const [valueBasis, setValueBasis] = useState<ForecastValueBasis>("fixed");
@@ -98,7 +101,13 @@ export default function ProspectsPage() {
       workspaceId: activeWorkspaceId,
     });
     setProspects(nextProspects);
-    setTasks(await listProspectTasks(nextProspects.map((prospect) => prospect.id)));
+    const prospectIds = nextProspects.map((prospect) => prospect.id);
+    const [nextTasks, nextActivities] = await Promise.all([
+      listProspectTasks(prospectIds),
+      listProspectActivitiesForProspects(prospectIds),
+    ]);
+    setTasks(nextTasks);
+    setActivities(nextActivities);
     const settings = await getForecastSettings({
       userId: user.id,
       workspaceId: activeWorkspaceId,
@@ -186,6 +195,12 @@ export default function ProspectsPage() {
       }),
     };
   }, [probabilities, prospects]);
+  const outreachMetrics = useMemo(() => ({
+    contacted: activities.filter((item) => ["email", "call", "meeting"].includes(item.activity_type)).length,
+    replied: prospects.filter((item) => ["replied", "qualified", "meeting", "won"].includes(item.stage)).length,
+    meetings: activities.filter((item) => item.activity_type === "meeting").length,
+    won: prospects.filter((item) => item.stage === "won").length,
+  }), [activities, prospects]);
 
   async function handleCreate() {
     if (!user || !fullName.trim() || !company.trim()) {
@@ -231,7 +246,13 @@ export default function ProspectsPage() {
     try {
       const nextProspects = await listProspects({ userId: user!.id, workspaceId: nextWorkspaceId });
       setProspects(nextProspects);
-      setTasks(await listProspectTasks(nextProspects.map((prospect) => prospect.id)));
+      const prospectIds = nextProspects.map((prospect) => prospect.id);
+      const [nextTasks, nextActivities] = await Promise.all([
+        listProspectTasks(prospectIds),
+        listProspectActivitiesForProspects(prospectIds),
+      ]);
+      setTasks(nextTasks);
+      setActivities(nextActivities);
       setNotice("Workspace switched.");
     } catch (error) {
       setNotice(error instanceof Error ? error.message : "Workspace could not be opened.");
@@ -540,12 +561,14 @@ export default function ProspectsPage() {
         ) : (
           <div className="prospectReports">
             <section className="prospectReportSummary">
-              <div><span>Weighted forecast</span><strong>{formatMoney(report.weighted)}</strong></div>
-              <div><span>Closed win rate</span><strong>{report.winRate}%</strong></div>
-              <div><span>Total records</span><strong>{prospects.length}</strong></div>
-              <div><span>Forecast confidence</span><strong>{report.confidence}</strong></div>
+              <div><span>Outreach logged</span><strong>{outreachMetrics.contacted}</strong></div>
+              <div><span>Leads that replied</span><strong>{outreachMetrics.replied}</strong></div>
+              <div><span>Meetings logged</span><strong>{outreachMetrics.meetings}</strong></div>
+              <div><span>Work won</span><strong>{outreachMetrics.won}</strong></div>
             </section>
-            <section className="prospectForecastSettings">
+            <details className="prospectForecastSettings prospectAdvancedReport">
+              <summary><strong>Advanced forecast settings</strong><span>Optional deal values, probabilities, and weighted forecasting</span></summary>
+              <div className="prospectAdvancedReportContent">
               <div className="cardTop">
                 <div>
                   <h2 className="cardTitle">Forecast settings</h2>
@@ -598,7 +621,8 @@ export default function ProspectsPage() {
                   <p className="small">Your Business Pro owner controls the shared forecast model.</p>
                 )}
               </div>
-            </section>
+              </div>
+            </details>
             <section className="prospectReportTableWrap">
               <table className="prospectTable">
                 <thead><tr><th>Stage</th><th>Prospects</th><th>Total value</th><th>Share of pipeline</th></tr></thead>
