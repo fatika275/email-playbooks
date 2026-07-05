@@ -60,7 +60,7 @@ export default function ProspectsPage() {
     businessMembership?.workspace_id ?? null
   );
   const [workspaces, setWorkspaces] = useState<BusinessWorkspaceAccess[]>([]);
-  const [view, setView] = useState<"pipeline" | "list" | "today" | "reports">("pipeline");
+  const [view, setView] = useState<"pipeline" | "list" | "today" | "reports">("reports");
   const [query, setQuery] = useState("");
   const [stageFilter, setStageFilter] = useState<ProspectStage | "all">("all");
   const [showAdd, setShowAdd] = useState(false);
@@ -465,10 +465,10 @@ export default function ProspectsPage() {
 
         <div className="prospectToolbar">
           <div className="authModeTabs prospectViewTabs" role="tablist" aria-label="Prospect view">
-            <button className={view === "pipeline" ? "authModeTab active" : "authModeTab"} onClick={() => setView("pipeline")}>Pipeline</button>
-            <button className={view === "list" ? "authModeTab active" : "authModeTab"} onClick={() => setView("list")}>List</button>
-            <button className={view === "today" ? "authModeTab active" : "authModeTab"} onClick={() => setView("today")}>Today</button>
             <button className={view === "reports" ? "authModeTab active" : "authModeTab"} onClick={() => setView("reports")}>Dashboard</button>
+            <button className={view === "pipeline" ? "authModeTab active" : "authModeTab"} onClick={() => setView("pipeline")}>Pipeline</button>
+            <button className={view === "today" ? "authModeTab active" : "authModeTab"} onClick={() => setView("today")}>Today</button>
+            <button className={view === "list" ? "authModeTab active" : "authModeTab"} onClick={() => setView("list")}>List</button>
           </div>
           <input className="input prospectSearch" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search name, company, email..." />
           <select className="input prospectStageFilter" value={stageFilter} onChange={(event) => setStageFilter(event.target.value as ProspectStage | "all")}>
@@ -478,6 +478,8 @@ export default function ProspectsPage() {
         </div>
 
         {view === "pipeline" ? (
+          <div className="prospectViewSection">
+          <div className="prospectViewHeading"><h2 className="sectionTitle">Pipeline stages</h2><p className="muted">Move leads forward as conversations progress. Use the stage dropdown on a lead or drag it into another lane.</p></div>
           <div className="prospectBoard">
             {PROSPECT_STAGES.map((stage) => {
               const stageProspects = filtered.filter((prospect) => prospect.stage === stage);
@@ -520,7 +522,10 @@ export default function ProspectsPage() {
               );
             })}
           </div>
+          </div>
         ) : view === "list" ? (
+          <div className="prospectViewSection">
+          <div className="prospectViewHeading"><h2 className="sectionTitle">All prospects</h2><p className="muted">Scan every lead in one place, then filter by stage or search by name and company.</p></div>
           <div className="prospectTableWrap">
             <table className="prospectTable">
               <thead><tr><th>Prospect</th><th>Stage</th><th>Value</th><th>Follow-up</th><th>Source</th></tr></thead>
@@ -538,7 +543,10 @@ export default function ProspectsPage() {
             </table>
             {filtered.length === 0 ? <div className="emptyState"><p className="muted">No prospects match this view.</p></div> : null}
           </div>
+          </div>
         ) : view === "today" ? (
+          <div className="prospectViewSection">
+          <div className="prospectViewHeading"><h2 className="sectionTitle">Today</h2><p className="muted">Start here each day to complete overdue tasks and follow up with leads before they go cold.</p></div>
           <div className="prospectTodayGrid">
             <section className="prospectTodayPanel">
               <div className="prospectSectionHeader"><h2 className="cardTitle">Tasks due</h2></div>
@@ -572,24 +580,57 @@ export default function ProspectsPage() {
               </div>
             </section>
           </div>
+          </div>
         ) : (
           <div className="prospectReports">
-            <div className="prospectDashboardHeader">
-              <div><span className="miniBadge">Acquisition dashboard</span><h2 className="sectionTitle">Is outreach turning into booked work?</h2></div>
-              <p className="muted">Based on activity and stage changes logged in Thalovo.</p>
+            <section className="prospectDashboardHero">
+              <div>
+                <span className="miniBadge">Agency overview</span>
+                <h2 className="pageTitle">{metrics.due ? `${metrics.due} follow-up${metrics.due === 1 ? "" : "s"} need attention.` : "Your follow-ups are clear."}</h2>
+                <p className="muted">Keep the next action obvious, then check whether outreach is turning into conversations and booked work.</p>
+              </div>
+              <div className="toolbar">
+                <button className="button buttonPrimary" onClick={() => setView("today")}>{metrics.due ? "Handle follow-ups" : "Open Today"}</button>
+                <button className="button buttonSecondary" onClick={() => setView("pipeline")}>View pipeline</button>
+              </div>
+            </section>
+
+            <section className="prospectDashboardOutcomes" aria-label="Acquisition outcomes">
+              <div><strong>{outreachMetrics.actions}</strong><span>Outreach logged</span></div>
+              <div><strong>{outreachMetrics.replied}</strong><span>Replies</span></div>
+              <div><strong>{outreachMetrics.meetings}</strong><span>Meetings</span></div>
+              <div><strong>{outreachMetrics.won}</strong><span>Clients won</span></div>
+            </section>
+
+            <div className="prospectDashboardSplit">
+              <section className="prospectDashboardSection">
+                <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">Conversion snapshot</h3><p className="muted">All-time outcomes from leads contacted in Thalovo.</p></div>
+                <div className="prospectConversionList">
+                  <div><span>Reply rate</span><strong>{acquisitionRates.reply}%</strong><i><b style={{ width: `${acquisitionRates.reply}%` }} /></i></div>
+                  <div><span>Meeting rate</span><strong>{acquisitionRates.meeting}%</strong><i><b style={{ width: `${acquisitionRates.meeting}%` }} /></i></div>
+                  <div><span>Win rate</span><strong>{acquisitionRates.win}%</strong><i><b style={{ width: `${acquisitionRates.win}%` }} /></i></div>
+                </div>
+              </section>
+
+              <section className="prospectDashboardSection">
+                <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">Pipeline now</h3><p className="muted">A quick read on current opportunity volume.</p></div>
+                <div className="prospectPipelineNow">
+                  <div><span>Active leads</span><strong>{metrics.active}</strong></div>
+                  <div><span>Open value</span><strong>{formatMoney(metrics.value)}</strong></div>
+                  <div><span>Closed win rate</span><strong>{report.winRate}%</strong></div>
+                </div>
+              </section>
             </div>
-            <section className="prospectReportSummary">
-              <div><span>Outreach actions</span><strong>{outreachMetrics.actions}</strong></div>
-              <div><span>Leads that replied</span><strong>{outreachMetrics.replied}</strong></div>
-              <div><span>Leads with meetings</span><strong>{outreachMetrics.meetings}</strong></div>
-              <div><span>Work won</span><strong>{outreachMetrics.won}</strong></div>
+
+            <section className="prospectDashboardSection prospectStageSnapshot">
+              <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">Where leads sit</h3><p className="muted">Stage distribution across the whole pipeline.</p></div>
+              <div className="prospectStageRows">
+                {report.stages.map((row) => (
+                  <div key={row.stage}><span>{PROSPECT_STAGE_LABELS[row.stage]}</span><i><b style={{ width: `${prospects.length ? (row.count / prospects.length) * 100 : 0}%` }} /></i><strong>{row.count}</strong></div>
+                ))}
+              </div>
             </section>
-            <section className="prospectDashboardHealth">
-              <div><span>Reply rate</span><strong>{acquisitionRates.reply}%</strong><small>Replied leads ÷ contacted leads</small></div>
-              <div><span>Meeting rate</span><strong>{acquisitionRates.meeting}%</strong><small>Meeting leads ÷ contacted leads</small></div>
-              <div><span>Win rate</span><strong>{acquisitionRates.win}%</strong><small>Won work ÷ contacted leads</small></div>
-              <div><span>Follow-ups due</span><strong>{metrics.due}</strong><small>Active leads needing attention</small></div>
-            </section>
+
             <details className="prospectForecastSettings prospectAdvancedReport">
               <summary><strong>Advanced forecast settings</strong><span>Optional deal values, probabilities, and weighted forecasting</span></summary>
               <div className="prospectAdvancedReportContent">
@@ -647,21 +688,6 @@ export default function ProspectsPage() {
               </div>
               </div>
             </details>
-            <section className="prospectReportTableWrap">
-              <table className="prospectTable">
-                <thead><tr><th>Stage</th><th>Prospects</th><th>Total value</th><th>Share of pipeline</th></tr></thead>
-                <tbody>
-                  {report.stages.map((row) => (
-                    <tr key={row.stage}>
-                      <td><strong>{PROSPECT_STAGE_LABELS[row.stage]}</strong></td>
-                      <td>{row.count}</td>
-                      <td>{formatMoney(row.value)}</td>
-                      <td><div className="prospectReportBar"><span style={{ width: `${prospects.length ? (row.count / prospects.length) * 100 : 0}%` }} /></div></td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </section>
           </div>
         )}
       </section>
