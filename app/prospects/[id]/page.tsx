@@ -28,6 +28,24 @@ import {
   type ProspectStage,
 } from "@/lib/prospects";
 
+const PROPOSAL_CADENCES = {
+  fast: { label: "Fast - days 1, 3 and 7", days: [1, 3, 7] },
+  standard: { label: "Standard - days 2, 5 and 10", days: [2, 5, 10] },
+  gentle: { label: "Gentle - days 3, 7 and 14", days: [3, 7, 14] },
+} as const;
+
+const PROPOSAL_FOLLOW_UP_TITLES = [
+  "Proposal follow-up 1: Confirm it arrived and invite questions",
+  "Proposal follow-up 2: Recap the value and agree the next step",
+  "Proposal follow-up 3: Send a final check-in and close the loop",
+];
+
+function addDays(date: string, days: number) {
+  const result = new Date(`${date}T12:00:00`);
+  result.setDate(result.getDate() + days);
+  return result.toISOString().slice(0, 10);
+}
+
 export default function ProspectDetailPage() {
   const params = useParams();
   const router = useRouter();
@@ -61,6 +79,15 @@ export default function ProspectDetailPage() {
   const [taskDueDate, setTaskDueDate] = useState("");
   const [taskAssignee, setTaskAssignee] = useState(user?.email ?? "");
   const [teamMembers, setTeamMembers] = useState<BusinessMember[]>([]);
+  const [proposalSentDate, setProposalSentDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [proposalCadence, setProposalCadence] = useState<keyof typeof PROPOSAL_CADENCES>("standard");
+  const [isStartingProposalWorkflow, setIsStartingProposalWorkflow] = useState(false);
+
+  const proposalWorkflowTasks = useMemo(
+    () => tasks.filter((task) => task.title.startsWith("Proposal follow-up")),
+    [tasks]
+  );
+  const activeProposalTasks = proposalWorkflowTasks.filter((task) => !task.completed_at);
 
   useEffect(() => {
     if (!id || !user || !hasProAccess) return;
@@ -256,6 +283,93 @@ export default function ProspectDetailPage() {
     }
   }
 
+  async function handleStartProposalWorkflow() {
+    if (!id || !user || !proposalSentDate) return;
+    if (activeProposalTasks.length && !window.confirm("Replace the current proposal follow-up workflow with a new schedule?")) return;
+    setIsStartingProposalWorkflow(true);
+    try {
+      await Promise.all(activeProposalTasks.map((task) => setProspectTaskCompleted(task.id, true)));
+      const cadence = PROPOSAL_CADENCES[proposalCadence];
+      const assignedUserId =
+        teamMembers.find((member) => member.email === taskAssignee)?.user_id ??
+        (taskAssignee === user.email ? user.id : null);
+      await Promise.all(cadence.days.map((days, index) => createProspectTask({
+        prospectId: id,
+        userId: user.id,
+        title: PROPOSAL_FOLLOW_UP_TITLES[index],
+        dueDate: addDays(proposalSentDate, days),
+        assignedEmail: taskAssignee,
+        assignedUserId,
+        workspaceId: prospect?.workspace_id,
+      })));
+      await createProspectActivity({
+        prospectId: id,
+        userId: user.id,
+        activityType: "email",
+        summary: `Proposal sent. ${cadence.label} follow-up workflow started.`,
+      });
+      const firstFollowUp = addDays(proposalSentDate, cadence.days[0]);
+      const updated = await updateProspect(id, {
+        full_name: fullName,
+        company,
+        email,
+        role,
+        linkedin_url: linkedinUrl,
+        source,
+        stage,
+        estimated_value_gbp: Number(value) || 0,
+        next_follow_up: firstFollowUp,
+        last_contacted_at: new Date(`${proposalSentDate}T12:00:00`).toISOString(),
+        notes,
+      });
+      setProspect(updated);
+      setNextFollowUp(firstFollowUp);
+      setLastContactedAt(updated.last_contacted_at);
+      await refreshOperations();
+      setNotice("Proposal follow-up workflow started. Your three reminders are ready.");
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Proposal workflow could not be started.");
+    } finally {
+      setIsStartingProposalWorkflow(false);
+    }
+  }
+
+  async function handleProposalOutcome(outcome: "replied" | "won" | "lost") {
+    if (!id || !user) return;
+    setIsStartingProposalWorkflow(true);
+    try {
+      await Promise.all(activeProposalTasks.map((task) => setProspectTaskCompleted(task.id, true)));
+      const updated = await updateProspect(id, {
+        full_name: fullName,
+        company,
+        email,
+        role,
+        linkedin_url: linkedinUrl,
+        source,
+        stage: outcome,
+        estimated_value_gbp: Number(value) || 0,
+        next_follow_up: "",
+        last_contacted_at: lastContactedAt,
+        notes,
+      });
+      await createProspectActivity({
+        prospectId: id,
+        userId: user.id,
+        activityType: "status",
+        summary: `Proposal workflow closed: ${PROSPECT_STAGE_LABELS[outcome]}.`,
+      });
+      setProspect(updated);
+      setStage(outcome);
+      setNextFollowUp("");
+      await refreshOperations();
+      setNotice(`Proposal workflow closed as ${PROSPECT_STAGE_LABELS[outcome].toLowerCase()}.`);
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Proposal workflow could not be closed.");
+    } finally {
+      setIsStartingProposalWorkflow(false);
+    }
+  }
+
   function handleDraftOutreach() {
     localStorage.setItem(
       "thalovo_prospect_context",
@@ -321,6 +435,23 @@ export default function ProspectDetailPage() {
             </div>
 
             <div className="formGroup"><label className="label">Notes</label><textarea className="input" rows={9} value={notes} onChange={(event) => setNotes(event.target.value)} placeholder="Decision criteria, pain points, context, objections, and next steps..." /></div>
+
+            <section className="prospectOpsPanel proposalWorkflowPanel">
+              <div className="proposalWorkflowHeader">
+                <div><span className="miniBadge">Proposal follow-up</span><h2 className="cardTitle">Keep the deal moving after you send a proposal</h2><p className="small">Create three timed reminders. The workflow stops when you record a reply, win, or loss.</p></div>
+                {activeProposalTasks.length ? <span className="statusPill statusPillSuccess">{activeProposalTasks.length} follow-up{activeProposalTasks.length === 1 ? "" : "s"} active</span> : <span className="statusPill">Not running</span>}
+              </div>
+              <div className="proposalWorkflowForm">
+                <div className="formGroup"><label className="label">Proposal sent</label><input className="input" type="date" value={proposalSentDate} onChange={(event) => setProposalSentDate(event.target.value)} /></div>
+                <div className="formGroup"><label className="label">Follow-up pace</label><select className="input" value={proposalCadence} onChange={(event) => setProposalCadence(event.target.value as keyof typeof PROPOSAL_CADENCES)}>{Object.entries(PROPOSAL_CADENCES).map(([key, cadence]) => <option key={key} value={key}>{cadence.label}</option>)}</select></div>
+                <div className="formGroup"><label className="label">Assigned to</label>{prospect?.workspace_id ? <select className="input" value={taskAssignee} onChange={(event) => setTaskAssignee(event.target.value)}><option value="">Unassigned</option><option value={user.email ?? ""}>Me ({user.email})</option>{teamMembers.filter((member) => member.email !== user.email).map((member) => <option key={member.id} value={member.email}>{member.email}</option>)}</select> : <input className="input" type="email" value={taskAssignee} onChange={(event) => setTaskAssignee(event.target.value)} placeholder="Assignee email" />}</div>
+              </div>
+              <div className="proposalWorkflowActions">
+                <button className="button buttonPrimary" disabled={isStartingProposalWorkflow || !proposalSentDate} onClick={() => void handleStartProposalWorkflow()}>{isStartingProposalWorkflow ? "Updating..." : activeProposalTasks.length ? "Restart schedule" : "Start follow-up workflow"}</button>
+                {activeProposalTasks.length ? <><button className="button buttonSecondary" disabled={isStartingProposalWorkflow} onClick={() => void handleProposalOutcome("replied")}>They replied</button><button className="button buttonSecondary" disabled={isStartingProposalWorkflow} onClick={() => void handleProposalOutcome("won")}>Mark won</button><button className="button buttonUtility" disabled={isStartingProposalWorkflow} onClick={() => void handleProposalOutcome("lost")}>Mark lost</button></> : null}
+              </div>
+              {proposalWorkflowTasks.length ? <div className="proposalWorkflowSchedule">{proposalWorkflowTasks.map((task) => <div key={task.id} className={task.completed_at ? "isComplete" : ""}><span>{task.completed_at ? "Done" : task.due_date ? `Due ${task.due_date}` : "Scheduled"}</span><strong>{task.title.replace(/^Proposal follow-up \d+: /, "")}</strong></div>)}</div> : null}
+            </section>
 
             <div className="prospectOpsGrid">
               <section className="prospectOpsPanel">

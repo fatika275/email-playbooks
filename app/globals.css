@@ -2192,6 +2192,86 @@ details[open] > summary::after {
   min-width: 0;
 }
 
+.proposalWorkflowPanel {
+  margin-top: 22px;
+}
+
+.proposalWorkflowHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.proposalWorkflowHeader .cardTitle {
+  margin-top: 12px;
+}
+
+.proposalWorkflowHeader .small {
+  max-width: 650px;
+  margin: 6px 0 0;
+}
+
+.proposalWorkflowForm {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.proposalWorkflowForm .formGroup {
+  margin-bottom: 0;
+}
+
+.proposalWorkflowActions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
+.proposalWorkflowSchedule {
+  display: grid;
+  margin-top: 20px;
+  border-top: 1px solid var(--border-soft);
+}
+
+.proposalWorkflowSchedule > div {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr);
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.proposalWorkflowSchedule span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.proposalWorkflowSchedule .isComplete {
+  opacity: 0.55;
+}
+
+.proposalWorkflowSchedule .isComplete strong {
+  text-decoration: line-through;
+}
+
+@media (max-width: 720px) {
+  .proposalWorkflowHeader {
+    flex-direction: column;
+  }
+
+  .proposalWorkflowForm {
+    grid-template-columns: 1fr;
+  }
+
+  .proposalWorkflowSchedule > div {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+}
+
 .prospectTaskForm,
 .prospectActivityForm {
   display: grid;
