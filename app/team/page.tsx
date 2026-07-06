@@ -53,6 +53,7 @@ export default function TeamLibraryPage() {
   const [showInvite, setShowInvite] = useState(false);
   const [activityFilter, setActivityFilter] = useState<"key" | "outreach" | "tasks" | "all">("key");
   const [showAllActivity, setShowAllActivity] = useState(false);
+  const [teamView, setTeamView] = useState<"workspace" | "library">("workspace");
   const [isLoadingShares, setIsLoadingShares] = useState(false);
   const [notice, setNotice] = useState("");
 
@@ -331,12 +332,33 @@ export default function TeamLibraryPage() {
 
         {notice ? <p className="notice">{notice}</p> : null}
 
-        {notifications.length || overdueTasks.length ? <section className="teamAttentionPanel">
+        <div className="teamViewTabs" role="tablist" aria-label="Team page view">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={teamView === "workspace"}
+            className={teamView === "workspace" ? "teamViewTab active" : "teamViewTab"}
+            onClick={() => setTeamView("workspace")}
+          >
+            Team workspace
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={teamView === "library"}
+            className={teamView === "library" ? "teamViewTab active" : "teamViewTab"}
+            onClick={() => setTeamView("library")}
+          >
+            Shared outreach{incoming.length ? ` (${incoming.length})` : ""}
+          </button>
+        </div>
+
+        {teamView === "workspace" && (notifications.length || overdueTasks.length) ? <section className="teamAttentionPanel">
           <div className="cardTop"><div><h2 className="sectionTitle">Needs attention</h2><p className="muted">Overdue work and unread team updates.</p></div><span className="statusPill">{notifications.filter((item) => !item.read_at).length + overdueTasks.length}</span></div>
           <div className="prospectTimeline">{overdueTasks.map((task) => <div key={`overdue-${task.id}`} className="prospectTimelineItem"><span className="miniBadge">Overdue</span><div><Link href={`/prospects/${task.prospects.id}`}><strong>{task.title}</strong></Link><p className="small">{task.prospects.full_name} · Due {task.due_date}</p></div></div>)}{notifications.slice(0, 8).map((item) => <div key={item.id} className="prospectTimelineItem"><span className="miniBadge">{item.kind}</span><div><Link href={item.href || "/team"} onClick={() => void markWorkspaceNotificationRead(item.id)}><strong>{item.title}</strong></Link><p className="small">{item.body || "Workspace update"} · {new Date(item.created_at).toLocaleString()}</p></div></div>)}</div>
         </section> : null}
 
-        {workspace ? (
+        {teamView === "workspace" ? (workspace ? (
           <section className="teamWorkspaceOverview">
             <div className="teamWorkspaceHero">
               <div>
@@ -462,9 +484,10 @@ export default function TeamLibraryPage() {
               View Business Pro
             </Link>
           </section>
-        )}
+        )) : null}
 
-        <div className="teamLibraryActions glassCard">
+        {teamView === "library" ? <>
+        <div className="teamLibraryActions">
           <div><h2 className="sectionTitle">Shared outreach library</h2><p className="muted">Send useful templates and sequences to teammates, or save items they shared with you.</p></div>
           <div className="toolbar">
           <button
@@ -539,6 +562,7 @@ export default function TeamLibraryPage() {
             <p className="muted">You have not shared anything yet.</p>
           ) : null}
         </section>
+        </> : null}
       </section>
     </main>
   );
