@@ -1246,6 +1246,20 @@ details[open] > summary::after {
   gap: 14px;
 }
 
+.inviteRoleLabel {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.inviteRoleLabel span:last-child {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 400;
+  text-align: right;
+}
+
 .teamViewTabs {
   display: flex;
   width: fit-content;
@@ -1475,6 +1489,109 @@ details[open] > summary::after {
   padding: 28px 0;
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
+}
+
+.sharedLibraryControls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+.sharedLibraryTabs {
+  display: flex;
+  gap: 22px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sharedLibraryTab {
+  position: relative;
+  padding: 0 0 12px;
+  color: var(--muted);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 650;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.sharedLibraryTab span {
+  margin-left: 6px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.sharedLibraryTab.active {
+  color: var(--text);
+}
+
+.sharedLibraryTab.active::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+  height: 2px;
+  background: #ffffff;
+}
+
+.sharedLibraryFilters {
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) 150px;
+  gap: 10px;
+  width: min(100%, 520px);
+}
+
+.sharedLibrarySection {
+  padding-top: 0;
+}
+
+.sharedLibraryPagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 26px;
+}
+
+.sharedLibraryPagination span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+@media (max-width: 860px) {
+  .sharedLibraryControls {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .sharedLibraryFilters {
+    grid-template-columns: minmax(0, 1fr) 140px;
+    width: 100%;
+  }
+}
+
+@media (max-width: 560px) {
+  .inviteRoleLabel {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .inviteRoleLabel span:last-child {
+    text-align: left;
+  }
+
+  .sharedLibraryTabs {
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .sharedLibraryFilters {
+    grid-template-columns: 1fr;
+  }
 }
 
 .teamWorkspaceSettings {

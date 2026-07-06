@@ -54,6 +54,10 @@ export default function TeamLibraryPage() {
   const [activityFilter, setActivityFilter] = useState<"key" | "outreach" | "tasks" | "all">("key");
   const [showAllActivity, setShowAllActivity] = useState(false);
   const [teamView, setTeamView] = useState<"workspace" | "library">("workspace");
+  const [libraryView, setLibraryView] = useState<"incoming" | "outgoing">("incoming");
+  const [shareSearch, setShareSearch] = useState("");
+  const [shareType, setShareType] = useState<"all" | "email" | "sequence">("all");
+  const [sharePage, setSharePage] = useState(1);
   const [isLoadingShares, setIsLoadingShares] = useState(false);
   const [notice, setNotice] = useState("");
 
@@ -112,6 +116,18 @@ export default function TeamLibraryPage() {
     () => shares.filter((share) => share.owner_id === user?.id),
     [shares, user?.id]
   );
+  const filteredShares = useMemo(() => {
+    const source = libraryView === "incoming" ? incoming : outgoing;
+    const query = shareSearch.trim().toLowerCase();
+    return source.filter((share) => {
+      const matchesType = shareType === "all" || share.asset_type === shareType;
+      const searchable = `${share.title} ${share.subject} ${share.owner_email} ${share.recipient_email}`.toLowerCase();
+      return matchesType && (!query || searchable.includes(query));
+    });
+  }, [incoming, libraryView, outgoing, shareSearch, shareType]);
+  const sharePageSize = 12;
+  const sharePageCount = Math.max(1, Math.ceil(filteredShares.length / sharePageSize));
+  const visibleShares = filteredShares.slice((sharePage - 1) * sharePageSize, sharePage * sharePageSize);
   const filteredActivity = useMemo(() => activity.filter((item) => {
     const summary = item.summary.toLowerCase();
     if (activityFilter === "all") return true;
@@ -379,7 +395,7 @@ export default function TeamLibraryPage() {
             </div>
 
             <section className="teamPeopleSection">
-              <div className="teamPeopleHeading"><div className="teamSectionHeading"><h3 className="sectionTitle">People</h3><p className="muted">Member for everyday work. Admin for managing team access.</p></div>{workspaces.find((item) => item.id === workspace.id)?.access_role !== "member" ? <button className="button buttonPrimary" onClick={() => setShowInvite((current) => !current)}>{showInvite ? "Close invite" : "Invite teammate"}</button> : null}</div>
+              <div className="teamPeopleHeading"><div className="teamSectionHeading"><h3 className="sectionTitle">People</h3><p className="muted">Member for everyday work. Admin for managing team access.</p></div>{workspaces.find((item) => item.id === workspace.id)?.access_role !== "member" ? <button className={`button ${showInvite ? "buttonSecondary" : "buttonPrimary"}`} onClick={() => setShowInvite((current) => !current)}>{showInvite ? "Close invite" : "Invite teammate"}</button> : null}</div>
 
             {showInvite && workspaces.find((item) => item.id === workspace.id)?.access_role !== "member" ? <><div
               className="businessInviteGrid"
@@ -399,12 +415,11 @@ export default function TeamLibraryPage() {
                 />
               </div>
               <div className="formGroup" style={{ marginBottom: 0 }}>
-                <label className="label" htmlFor="business-invite-role">Access level</label>
+                <label className="label inviteRoleLabel" htmlFor="business-invite-role"><span>Access level</span><span>Member for most people; Admin can manage teammates.</span></label>
                 <select id="business-invite-role" className="input" value={inviteRole} onChange={(event) => setInviteRole(event.target.value as "admin" | "member")}>
                   <option value="member">Member - works in the workspace</option>
                   <option value="admin">Admin - also manages teammates</option>
                 </select>
-                <p className="small" style={{ margin: "6px 0 0" }}>Choose Member for most people. Admins can invite, pause, and remove teammates.</p>
               </div>
               <button
                 className="button buttonPrimary"
@@ -506,10 +521,21 @@ export default function TeamLibraryPage() {
           </div>
         </div>
 
-        <section className="section">
-          <div className="teamSectionHeading"><h2 className="sectionTitle">Shared with me</h2><p className="muted">Templates and sequences teammates have sent to your account.</p></div>
+        <div className="sharedLibraryControls">
+          <div className="sharedLibraryTabs" role="tablist" aria-label="Shared outreach direction">
+            <button type="button" role="tab" aria-selected={libraryView === "incoming"} className={libraryView === "incoming" ? "sharedLibraryTab active" : "sharedLibraryTab"} onClick={() => { setLibraryView("incoming"); setSharePage(1); }}>Shared with me <span>{incoming.length}</span></button>
+            <button type="button" role="tab" aria-selected={libraryView === "outgoing"} className={libraryView === "outgoing" ? "sharedLibraryTab active" : "sharedLibraryTab"} onClick={() => { setLibraryView("outgoing"); setSharePage(1); }}>Shared by me <span>{outgoing.length}</span></button>
+          </div>
+          <div className="sharedLibraryFilters">
+            <input className="input" type="search" value={shareSearch} onChange={(event) => { setShareSearch(event.target.value); setSharePage(1); }} placeholder="Search title, subject, or teammate" aria-label="Search shared outreach" />
+            <select className="input" value={shareType} onChange={(event) => { setShareType(event.target.value as "all" | "email" | "sequence"); setSharePage(1); }} aria-label="Filter shared outreach by type"><option value="all">All types</option><option value="email">Templates</option><option value="sequence">Sequences</option></select>
+          </div>
+        </div>
+
+        <section className="section sharedLibrarySection">
+          <div className="teamSectionHeading"><h2 className="sectionTitle">{libraryView === "incoming" ? "Shared with me" : "Shared by me"}</h2><p className="muted">{libraryView === "incoming" ? "Templates and sequences teammates have sent to your account." : "Items you have made available to other teammates."}</p></div>
           <div className="workspaceGrid" style={{ marginTop: 16 }}>
-            {incoming.map((share) => (
+            {visibleShares.map((share) => (
               <article key={share.id} className="glassCard workspaceCard">
                 <div className="cardTop">
                   <h3 className="cardTitle">{share.title}</h3>
@@ -517,50 +543,26 @@ export default function TeamLibraryPage() {
                     {share.asset_type === "email" ? "Template" : "Sequence"}
                   </span>
                 </div>
-                <p className="small">From {share.owner_email}</p>
+                <p className="small">{libraryView === "incoming" ? `From ${share.owner_email}` : `Sent to ${share.recipient_email}`}</p>
                 <p className="templateMeta">Subject: {share.subject}</p>
-                <p className="muted" style={{ whiteSpace: "pre-wrap" }}>
+                {libraryView === "incoming" ? <p className="muted" style={{ whiteSpace: "pre-wrap" }}>
                   {share.body.length > 220
                     ? `${share.body.slice(0, 220).trim()}...`
                     : share.body}
-                </p>
-                <button
+                </p> : null}
+                {libraryView === "incoming" ? <button
                   className="button buttonPrimary"
                   onClick={() => void handleSaveToWorkspace(share)}
                 >
                   Save to my workspace
-                </button>
+                </button> : <button className="button buttonUtility" onClick={() => void handleRemoveShare(share.id)}>Remove access</button>}
               </article>
             ))}
           </div>
-          {!isLoadingShares && incoming.length === 0 ? (
-            <p className="muted">Nothing has been shared with this email yet.</p>
+          {!isLoadingShares && filteredShares.length === 0 ? (
+            <p className="muted">{shareSearch || shareType !== "all" ? "No shared items match these filters." : libraryView === "incoming" ? "Nothing has been shared with this email yet." : "You have not shared anything yet."}</p>
           ) : null}
-        </section>
-
-        <section className="section">
-          <div className="teamSectionHeading"><h2 className="sectionTitle">Shared by me</h2><p className="muted">Items you have made available to other teammates.</p></div>
-          <div className="workspaceGrid" style={{ marginTop: 16 }}>
-            {outgoing.map((share) => (
-              <article key={share.id} className="glassCard workspaceCard">
-                <div className="cardTop">
-                  <h3 className="cardTitle">{share.title}</h3>
-                  <span className="miniBadge">{share.asset_type}</span>
-                </div>
-                <p className="small">Sent to {share.recipient_email}</p>
-                <p className="templateMeta">Subject: {share.subject}</p>
-                <button
-                  className="button buttonUtility"
-                  onClick={() => void handleRemoveShare(share.id)}
-                >
-                  Remove access
-                </button>
-              </article>
-            ))}
-          </div>
-          {!isLoadingShares && outgoing.length === 0 ? (
-            <p className="muted">You have not shared anything yet.</p>
-          ) : null}
+          {filteredShares.length > sharePageSize ? <div className="sharedLibraryPagination"><button className="button buttonSecondary" disabled={sharePage === 1} onClick={() => setSharePage((page) => Math.max(1, page - 1))}>Previous</button><span>Page {sharePage} of {sharePageCount}</span><button className="button buttonSecondary" disabled={sharePage === sharePageCount} onClick={() => setSharePage((page) => Math.min(sharePageCount, page + 1))}>Next</button></div> : null}
         </section>
         </> : null}
       </section>
