@@ -1246,15 +1246,114 @@ details[open] > summary::after {
   gap: 14px;
 }
 
+.teamAttentionPanel {
+  padding: 22px 0;
+  margin-bottom: 22px;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.teamAttentionPanel .muted {
+  margin: 6px 0 0;
+}
+
+.teamWorkspaceOverview {
+  margin-bottom: 34px;
+}
+
+.teamWorkspaceHero {
+  min-height: 210px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 30px;
+  padding: 34px 0 30px;
+  border-bottom: 1px solid var(--border);
+}
+
+.teamWorkspaceHero .pageTitle {
+  margin-top: 14px;
+}
+
+.teamWorkspaceHero .muted {
+  max-width: 620px;
+  line-height: 1.65;
+}
+
+.teamWorkspaceStats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border-bottom: 1px solid var(--border);
+}
+
+.teamWorkspaceStats > div {
+  display: grid;
+  gap: 5px;
+  padding: 22px 20px;
+  border-right: 1px solid var(--border);
+}
+
+.teamWorkspaceStats > div:first-child {
+  padding-left: 0;
+}
+
+.teamWorkspaceStats > div:last-child {
+  border-right: 0;
+}
+
+.teamWorkspaceStats strong {
+  font-size: 26px;
+}
+
+.teamWorkspaceStats span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.teamPeopleSection {
+  padding: 34px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.teamSectionHeading {
+  display: grid;
+  gap: 7px;
+}
+
+.teamSectionHeading .muted {
+  max-width: 700px;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.teamMemberList {
+  display: grid;
+  margin-top: 22px;
+  border-top: 1px solid var(--border-soft);
+}
+
+.teamMemberRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.teamMemberRow:last-child {
+  border-bottom: 0;
+}
+
 .teamRoleSelect {
   width: auto;
   min-width: 112px;
 }
 
 .teamActivitySection {
-  margin-top: 24px;
-  padding-top: 22px;
-  border-top: 1px solid var(--border);
+  margin: 0;
+  padding: 22px 0;
+  border-bottom: 1px solid var(--border);
 }
 
 .teamActivityDisclosure > summary,
@@ -1282,6 +1381,29 @@ details[open] > summary::after {
   margin: 40px 0 26px;
   padding-top: 30px;
   border-top: 1px solid var(--border);
+}
+
+.teamWorkspaceSettings {
+  padding: 22px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.teamWorkspaceSettings > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.teamWorkspaceSettings > summary span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.teamWorkspaceSettingsContent {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-soft);
 }
 
 .teamLibraryActions .muted {
@@ -2666,6 +2788,38 @@ details[open] > summary::after {
 
   .businessInviteGrid {
     grid-template-columns: 1fr;
+  }
+
+  .teamWorkspaceHero,
+  .teamMemberRow,
+  .teamWorkspaceSettings > summary {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .teamWorkspaceStats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .teamWorkspaceStats > div {
+    padding: 18px 14px;
+  }
+
+  .teamWorkspaceStats > div:first-child {
+    padding-left: 14px;
+  }
+
+  .teamWorkspaceStats > div:nth-child(2) {
+    border-right: 0;
+  }
+
+  .teamWorkspaceStats > div:nth-child(-n + 2) {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .teamMemberRow .toolbar,
+  .teamMemberRow .teamRoleSelect {
+    width: 100%;
   }
 
   .teamRoleSelect,

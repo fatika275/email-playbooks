@@ -300,35 +300,43 @@ export default function TeamLibraryPage() {
         <div className="pageHeader">
           <div className="badge">Team workspace</div>
           <h1 className="pageTitle" style={{ marginTop: 14 }}>
-            Your team, shared work, and access
+            Keep your agency aligned.
           </h1>
           <p className="muted" style={{ maxWidth: 760, lineHeight: 1.75 }}>
-            Invite teammates and manage everyday access here. Advanced controls
-            stay out of the way until you need them.
+            Manage who can work with leads, see what needs attention, and keep
+            useful outreach shared across the team.
           </p>
         </div>
 
         {notice ? <p className="notice">{notice}</p> : null}
 
-        {notifications.length || overdueTasks.length ? <section className="glassCard teamNotificationPanel">
-          <div className="cardTop"><h2 className="cardTitle">Notifications</h2><span className="statusPill">{notifications.filter((item) => !item.read_at).length + overdueTasks.length} needs attention</span></div>
+        {notifications.length || overdueTasks.length ? <section className="teamAttentionPanel">
+          <div className="cardTop"><div><h2 className="sectionTitle">Needs attention</h2><p className="muted">Overdue work and unread team updates.</p></div><span className="statusPill">{notifications.filter((item) => !item.read_at).length + overdueTasks.length}</span></div>
           <div className="prospectTimeline">{overdueTasks.map((task) => <div key={`overdue-${task.id}`} className="prospectTimelineItem"><span className="miniBadge">Overdue</span><div><Link href={`/prospects/${task.prospects.id}`}><strong>{task.title}</strong></Link><p className="small">{task.prospects.full_name} · Due {task.due_date}</p></div></div>)}{notifications.slice(0, 8).map((item) => <div key={item.id} className="prospectTimelineItem"><span className="miniBadge">{item.kind}</span><div><Link href={item.href || "/team"} onClick={() => void markWorkspaceNotificationRead(item.id)}><strong>{item.title}</strong></Link><p className="small">{item.body || "Workspace update"} · {new Date(item.created_at).toLocaleString()}</p></div></div>)}</div>
         </section> : null}
 
         {workspace ? (
-          <section className="glassCard" style={{ padding: 24, marginBottom: 22 }}>
-            <div className="cardTop">
+          <section className="teamWorkspaceOverview">
+            <div className="teamWorkspaceHero">
               <div>
-                <h2 className="cardTitle">{workspace.name}</h2>
+                <span className="miniBadge">Active workspace</span>
+                <h2 className="pageTitle">{workspace.name}</h2>
                 <p className="muted" style={{ margin: "8px 0 0" }}>
-                  One subscription covers the owner and invited teammates. Manage
-                  roles, access, assignments, and shared pipeline work here.
+                  One shared place for agency leads, follow-ups, and outreach.
                 </p>
               </div>
-              <span className="statusPill statusPillSuccess">
-                {members.length}/{workspace.seat_limit} teammate seats
-              </span>
+              <Link href="/prospects" className="button buttonPrimary">Open shared pipeline</Link>
             </div>
+
+            <div className="teamWorkspaceStats">
+              <div><strong>{members.filter((member) => member.status === "active" && member.access_active).length}</strong><span>Active teammates</span></div>
+              <div><strong>{members.filter((member) => member.status === "invited" && member.access_active).length}</strong><span>Pending invites</span></div>
+              <div><strong>{workspace.seat_limit - members.length}</strong><span>Seats available</span></div>
+              <div><strong>{incoming.length + outgoing.length}</strong><span>Shared items</span></div>
+            </div>
+
+            <section className="teamPeopleSection">
+              <div className="teamSectionHeading"><h3 className="sectionTitle">People</h3><p className="muted">Invite teammates and keep access simple: Member for everyday work, Admin for managing the team.</p></div>
 
             {workspaces.find((item) => item.id === workspace.id)?.access_role !== "member" ? <><div
               className="businessInviteGrid"
@@ -364,19 +372,11 @@ export default function TeamLibraryPage() {
               </button>
             </div></> : null}
 
-            <div style={{ display: "grid", gap: 10, marginTop: 20 }}>
+            <div className="teamMemberList">
               {members.map((member) => (
                 <div
                   key={member.id}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    gap: 12,
-                    padding: 14,
-                    border: "1px solid var(--border)",
-                    borderRadius: 8,
-                  }}
+                  className="teamMemberRow"
                 >
                   <div>
                     <strong>{member.email}</strong>
@@ -394,7 +394,9 @@ export default function TeamLibraryPage() {
                   </div> : null}
                 </div>
               ))}
+              {members.length === 0 ? <p className="muted">No teammates yet. Invite the first person when you are ready to share the pipeline.</p> : null}
             </div>
+            </section>
 
             <details className="teamActivitySection teamActivityDisclosure">
               <summary><strong>Workspace activity</strong><span>{activity.length} recent updates</span></summary>
@@ -409,10 +411,13 @@ export default function TeamLibraryPage() {
               </div>
             </details>
 
-            <div className="teamActivitySection">
-              <div className="cardTop"><div><h3 className="cardTitle">Workspace data</h3><p className="small">Export a complete JSON backup of members, prospects, tasks, comments, and activity.</p></div>{canExportWorkspace ? <button className="button buttonSecondary" onClick={() => void handleExportWorkspace()}>Export workspace</button> : <span className="miniBadge">Export permission required</span>}</div>
+            <details className="teamWorkspaceSettings">
+              <summary><strong>Workspace settings</strong><span>Export, ownership, and deletion</span></summary>
+              <div className="teamWorkspaceSettingsContent">
+              <div className="cardTop"><div><h3 className="cardTitle">Workspace data</h3><p className="small">Download a backup of members, prospects, tasks, comments, and activity.</p></div>{canExportWorkspace ? <button className="button buttonSecondary" onClick={() => void handleExportWorkspace()}>Export workspace</button> : <span className="miniBadge">Export permission required</span>}</div>
               {workspaces.find((item) => item.id === workspace.id)?.access_role === "owner" ? <details className="teamOwnerControls"><summary>Ownership and deletion</summary><p className="small">These controls are rarely needed. Transfer ownership changes who controls the workspace. Deleting removes all shared workspace data permanently.</p><div className="teamDangerZone"><select className="input" defaultValue="" onChange={(event) => void handleTransferOwnership(event.target.value)}><option value="" disabled>Transfer ownership to...</option>{members.filter((member) => member.user_id && member.status === "active").map((member) => <option key={member.id} value={member.user_id!}>{member.email}</option>)}</select><button className="button buttonUtility" onClick={() => void handleDeleteWorkspace()}>Delete workspace</button></div></details> : null}
-            </div>
+              </div>
+            </details>
           </section>
         ) : businessMembership?.access_active ? (
           <section className="glassCard" style={{ padding: 22, marginBottom: 22 }}>
@@ -457,7 +462,7 @@ export default function TeamLibraryPage() {
         </div>
 
         <section className="section">
-          <h2 className="sectionTitle">Shared with me</h2>
+          <div className="teamSectionHeading"><h2 className="sectionTitle">Shared with me</h2><p className="muted">Templates and sequences teammates have sent to your account.</p></div>
           <div className="workspaceGrid" style={{ marginTop: 16 }}>
             {incoming.map((share) => (
               <article key={share.id} className="glassCard workspaceCard">
@@ -489,7 +494,7 @@ export default function TeamLibraryPage() {
         </section>
 
         <section className="section">
-          <h2 className="sectionTitle">Shared by me</h2>
+          <div className="teamSectionHeading"><h2 className="sectionTitle">Shared by me</h2><p className="muted">Items you have made available to other teammates.</p></div>
           <div className="workspaceGrid" style={{ marginTop: 16 }}>
             {outgoing.map((share) => (
               <article key={share.id} className="glassCard workspaceCard">
