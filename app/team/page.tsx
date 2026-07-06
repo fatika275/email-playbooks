@@ -50,6 +50,9 @@ export default function TeamLibraryPage() {
   const [overdueTasks, setOverdueTasks] = useState<OverdueWorkspaceTask[]>([]);
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState<"admin" | "member">("member");
+  const [showInvite, setShowInvite] = useState(false);
+  const [activityFilter, setActivityFilter] = useState<"key" | "outreach" | "tasks" | "all">("key");
+  const [showAllActivity, setShowAllActivity] = useState(false);
   const [isLoadingShares, setIsLoadingShares] = useState(false);
   const [notice, setNotice] = useState("");
 
@@ -108,6 +111,23 @@ export default function TeamLibraryPage() {
     () => shares.filter((share) => share.owner_id === user?.id),
     [shares, user?.id]
   );
+  const filteredActivity = useMemo(() => activity.filter((item) => {
+    const summary = item.summary.toLowerCase();
+    if (activityFilter === "all") return true;
+    if (activityFilter === "outreach") {
+      return ["email", "call", "meeting"].includes(item.activity_type) || summary.includes("contact logged");
+    }
+    if (activityFilter === "tasks") {
+      return summary.includes("task") || summary.includes("follow-up");
+    }
+    return (
+      ["email", "call", "meeting", "status"].includes(item.activity_type) ||
+      summary.includes("contact logged") ||
+      summary.includes("assigned") ||
+      summary.includes("task completed")
+    );
+  }), [activity, activityFilter]);
+  const visibleActivity = showAllActivity ? filteredActivity : filteredActivity.slice(0, 8);
   const activeWorkspaceAccess = workspaces.find((item) => item.id === workspace?.id);
   const canExportWorkspace =
     activeWorkspaceAccess?.access_role === "owner" ||
@@ -183,6 +203,7 @@ export default function TeamLibraryPage() {
         `Invitation created for ${inviteEmail.trim().toLowerCase()}. Send them the sign-in instructions.`
       );
       setInviteEmail("");
+      setShowInvite(false);
     } catch (error) {
       setNotice(
         error instanceof Error ? error.message : "Could not invite this teammate."
@@ -336,9 +357,9 @@ export default function TeamLibraryPage() {
             </div>
 
             <section className="teamPeopleSection">
-              <div className="teamSectionHeading"><h3 className="sectionTitle">People</h3><p className="muted">Invite teammates and keep access simple: Member for everyday work, Admin for managing the team.</p></div>
+              <div className="teamPeopleHeading"><div className="teamSectionHeading"><h3 className="sectionTitle">People</h3><p className="muted">Member for everyday work. Admin for managing team access.</p></div>{workspaces.find((item) => item.id === workspace.id)?.access_role !== "member" ? <button className="button buttonPrimary" onClick={() => setShowInvite((current) => !current)}>{showInvite ? "Close invite" : "Invite teammate"}</button> : null}</div>
 
-            {workspaces.find((item) => item.id === workspace.id)?.access_role !== "member" ? <><div
+            {showInvite && workspaces.find((item) => item.id === workspace.id)?.access_role !== "member" ? <><div
               className="businessInviteGrid"
               style={{ alignItems: "end", marginTop: 18 }}
             >
@@ -368,7 +389,7 @@ export default function TeamLibraryPage() {
                 disabled={!inviteEmail.trim() || members.length >= workspace.seat_limit}
                 onClick={() => void handleInviteMember()}
               >
-                Invite teammate
+                Send invite
               </button>
             </div></> : null}
 
@@ -384,14 +405,13 @@ export default function TeamLibraryPage() {
                       {member.access_active ? (member.status === "active" ? "Active" : "Pending invitation") : "Access paused"} · {member.role}
                     </p>
                   </div>
-                  {workspaces.find((item) => item.id === workspace.id)?.access_role !== "member" ? <div className="toolbar">
-                    <select className="input teamRoleSelect" value={member.role} aria-label={`Role for ${member.email}`} onChange={(event) => void handleMemberUpdate(member, { role: event.target.value as "admin" | "member" })}>
-                      <option value="member">Member</option><option value="admin">Admin</option>
-                    </select>
-                    {member.status === "invited" ? <button className="button buttonSecondary" onClick={() => handleResendInvite(member)}>Resend invite</button> : null}
-                    <button className="button buttonSecondary" onClick={() => void handleMemberUpdate(member, { access_active: !member.access_active })}>{member.access_active ? "Pause" : "Restore"}</button>
-                    <button className="button buttonUtility" onClick={() => void handleRemoveMember(member.id)}>Remove</button>
-                  </div> : null}
+                  {workspaces.find((item) => item.id === workspace.id)?.access_role !== "member" ? <details className="teamMemberManage">
+                    <summary>Manage</summary>
+                    <div className="teamMemberMenu">
+                      <label className="label">Access level<select className="input" value={member.role} aria-label={`Role for ${member.email}`} onChange={(event) => void handleMemberUpdate(member, { role: event.target.value as "admin" | "member" })}><option value="member">Member</option><option value="admin">Admin</option></select></label>
+                      <div className="toolbar">{member.status === "invited" ? <button className="button buttonSecondary" onClick={() => handleResendInvite(member)}>Resend invite</button> : null}<button className="button buttonSecondary" onClick={() => void handleMemberUpdate(member, { access_active: !member.access_active })}>{member.access_active ? "Pause access" : "Restore access"}</button><button className="button buttonUtility" onClick={() => void handleRemoveMember(member.id)}>Remove</button></div>
+                    </div>
+                  </details> : null}
                 </div>
               ))}
               {members.length === 0 ? <p className="muted">No teammates yet. Invite the first person when you are ready to share the pipeline.</p> : null}
@@ -399,16 +419,18 @@ export default function TeamLibraryPage() {
             </section>
 
             <details className="teamActivitySection teamActivityDisclosure">
-              <summary><strong>Workspace activity</strong><span>{activity.length} recent updates</span></summary>
+              <summary><strong>Workspace activity</strong><span>{filteredActivity.length} useful updates</span></summary>
+              <div className="teamActivityControls"><div><h3 className="cardTitle">Recent activity</h3><p className="small">Key updates hide routine edits so important outreach and task changes stay visible.</p></div><select className="input" value={activityFilter} onChange={(event) => { setActivityFilter(event.target.value as "key" | "outreach" | "tasks" | "all"); setShowAllActivity(false); }} aria-label="Filter workspace activity"><option value="key">Key updates</option><option value="outreach">Outreach only</option><option value="tasks">Tasks only</option><option value="all">All changes</option></select></div>
               <div className="prospectTimeline">
-                {activity.map((item) => (
+                {visibleActivity.map((item) => (
                   <div key={item.id} className="prospectTimelineItem">
                     <span className="miniBadge">{item.activity_type}</span>
                     <div><Link href={`/prospects/${item.prospects.id}`}><strong>{item.prospects.full_name} · {item.prospects.company}</strong></Link><p className="small">{item.summary} · {item.actor_email || "Teammate"} · {new Date(item.created_at).toLocaleString()}</p></div>
                   </div>
                 ))}
-                {activity.length === 0 ? <p className="muted">No shared pipeline activity yet.</p> : null}
+                {filteredActivity.length === 0 ? <p className="muted">No activity matches this filter yet.</p> : null}
               </div>
+              {filteredActivity.length > 8 ? <button className="button buttonSecondary teamActivityMore" onClick={() => setShowAllActivity((current) => !current)}>{showAllActivity ? "Show less" : `Show ${filteredActivity.length - 8} more`}</button> : null}
             </details>
 
             <details className="teamWorkspaceSettings">
@@ -442,7 +464,7 @@ export default function TeamLibraryPage() {
           </section>
         )}
 
-        <div className="teamLibraryActions">
+        <div className="teamLibraryActions glassCard">
           <div><h2 className="sectionTitle">Shared outreach library</h2><p className="muted">Send useful templates and sequences to teammates, or save items they shared with you.</p></div>
           <div className="toolbar">
           <button
