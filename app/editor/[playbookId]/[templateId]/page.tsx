@@ -222,6 +222,7 @@ export default function EditorPage() {
     company?: string;
     prospectId?: string;
     workflowStep?: number;
+    workflowLabel?: string;
   }>(() => {
     if (!rawProspectContext) return {};
     try {
@@ -230,6 +231,7 @@ export default function EditorPage() {
         company?: string;
         prospectId?: string;
         workflowStep?: number;
+        workflowLabel?: string;
       };
     } catch {
       return {};
@@ -445,7 +447,7 @@ export default function EditorPage() {
             {template.label}
           </h1>
           <p className="muted" style={{ maxWidth: 760 }}>
-            {prospectContext.workflowStep ? `Proposal follow-up ${prospectContext.workflowStep} for ${prospectContext.name || "this prospect"}. Personalise the draft, send it, then return to mark the reminder done.` : "Start with the essentials, then refine only if you need to."}
+            {prospectContext.workflowStep ? `Follow-up ${prospectContext.workflowStep} for ${prospectContext.name || "this prospect"}${prospectContext.workflowLabel ? `: ${prospectContext.workflowLabel}` : ""}. Personalise the draft, send it, then return to mark the reminder done.` : "Start with the essentials, then refine only if you need to."}
           </p>
           {prospectContext.prospectId ? <button className="button buttonSecondary" style={{ marginTop: 14 }} onClick={() => router.push(`/prospects/${prospectContext.prospectId}`)}>Back to prospect</button> : null}
         </div>

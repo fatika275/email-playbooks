@@ -40,6 +40,22 @@ const PROPOSAL_FOLLOW_UP_TITLES = [
   "Proposal follow-up 3: Send a final check-in and close the loop",
 ];
 
+const FOLLOW_UP_PURPOSES = {
+  proposal: "Proposal",
+  quote: "Quote or estimate",
+  meeting: "Meeting next step",
+  introduction: "Introduction",
+  custom: "Something else",
+} as const;
+
+function isScheduledFollowUpTask(task: ProspectTask) {
+  return task.title.startsWith("Proposal follow-up") || task.title.startsWith("Scheduled follow-up");
+}
+
+function cleanFollowUpTaskTitle(title: string) {
+  return title.replace(/^(?:Proposal|Scheduled) follow-up \d+: /, "");
+}
+
 function addDays(date: string, days: number) {
   const result = new Date(`${date}T12:00:00`);
   result.setDate(result.getDate() + days);
@@ -81,13 +97,15 @@ export default function ProspectDetailPage() {
   const [teamMembers, setTeamMembers] = useState<BusinessMember[]>([]);
   const [proposalSentDate, setProposalSentDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [proposalCadence, setProposalCadence] = useState<keyof typeof PROPOSAL_CADENCES>("standard");
+  const [followUpPurpose, setFollowUpPurpose] = useState<keyof typeof FOLLOW_UP_PURPOSES>("proposal");
+  const [customFollowUpPurpose, setCustomFollowUpPurpose] = useState("");
   const [isStartingProposalWorkflow, setIsStartingProposalWorkflow] = useState(false);
   const [detailView, setDetailView] = useState<"overview" | "followup" | "activity">("overview");
   const [activityFilter, setActivityFilter] = useState<"useful" | "outreach" | "notes" | "all">("useful");
   const [showAllActivity, setShowAllActivity] = useState(false);
 
   const proposalWorkflowTasks = useMemo(
-    () => tasks.filter((task) => task.title.startsWith("Proposal follow-up")),
+    () => tasks.filter(isScheduledFollowUpTask),
     [tasks]
   );
   const activeProposalTasks = proposalWorkflowTasks.filter((task) => !task.completed_at);
@@ -95,7 +113,7 @@ export default function ProspectDetailPage() {
     (a.due_date || "").localeCompare(b.due_date || "")
   )[0];
   const openManualTasks = tasks.filter(
-    (task) => !task.completed_at && !task.title.startsWith("Proposal follow-up")
+    (task) => !task.completed_at && !isScheduledFollowUpTask(task)
   );
   const filteredActivities = useMemo(() => activities.filter((activity) => {
     if (activityFilter === "all") return true;
@@ -300,9 +318,11 @@ export default function ProspectDetailPage() {
   }
 
   function handleDraftProposalFollowUp(task: ProspectTask) {
-    const stepMatch = task.title.match(/^Proposal follow-up (\d):/);
+    const stepMatch = task.title.match(/follow-up (\d):/);
     const step = Math.min(3, Math.max(1, Number(stepMatch?.[1]) || 1));
     const templateIds = ["proposal-check-in", "proposal-next-steps", "proposal-close-loop"];
+    const isProposal = task.title.toLowerCase().includes("proposal");
+    const workflowLabel = cleanFollowUpTaskTitle(task.title);
     localStorage.setItem(
       "thalovo_prospect_context",
       JSON.stringify({
@@ -313,9 +333,10 @@ export default function ProspectDetailPage() {
         prospectId: id,
         workflowTaskId: task.id,
         workflowStep: step,
+        workflowLabel,
       })
     );
-    router.push(`/editor/proposal-follow-up/${templateIds[step - 1]}`);
+    router.push(isProposal ? `/editor/proposal-follow-up/${templateIds[step - 1]}` : "/library");
   }
 
   async function handleCompleteProposalTask(task: ProspectTask) {
@@ -351,7 +372,12 @@ export default function ProspectDetailPage() {
 
   async function handleStartProposalWorkflow() {
     if (!id || !user || !proposalSentDate) return;
-    if (activeProposalTasks.length && !window.confirm("Replace the current proposal follow-up workflow with a new schedule?")) return;
+    const purposeLabel = followUpPurpose === "custom" ? customFollowUpPurpose.trim() : FOLLOW_UP_PURPOSES[followUpPurpose];
+    if (!purposeLabel) {
+      setNotice("Describe what you are following up on first.");
+      return;
+    }
+    if (activeProposalTasks.length && !window.confirm("Replace the current follow-up schedule with a new one?")) return;
     setIsStartingProposalWorkflow(true);
     try {
       await Promise.all(activeProposalTasks.map((task) => setProspectTaskCompleted(task.id, true)));
@@ -359,10 +385,17 @@ export default function ProspectDetailPage() {
       const assignedUserId =
         teamMembers.find((member) => member.email === taskAssignee)?.user_id ??
         (taskAssignee === user.email ? user.id : null);
+      const taskTitles = followUpPurpose === "proposal"
+        ? PROPOSAL_FOLLOW_UP_TITLES
+        : [
+            `Scheduled follow-up 1: Check in about ${purposeLabel.toLowerCase()}`,
+            `Scheduled follow-up 2: Continue the conversation about ${purposeLabel.toLowerCase()}`,
+            `Scheduled follow-up 3: Send a final check-in about ${purposeLabel.toLowerCase()}`,
+          ];
       await Promise.all(cadence.days.map((days, index) => createProspectTask({
         prospectId: id,
         userId: user.id,
-        title: PROPOSAL_FOLLOW_UP_TITLES[index],
+        title: taskTitles[index],
         dueDate: addDays(proposalSentDate, days),
         assignedEmail: taskAssignee,
         assignedUserId,
@@ -372,7 +405,7 @@ export default function ProspectDetailPage() {
         prospectId: id,
         userId: user.id,
         activityType: "email",
-        summary: `Proposal sent. ${cadence.label} follow-up workflow started.`,
+        summary: `${purposeLabel} follow-up scheduled. ${cadence.label}.`,
       });
       const firstFollowUp = addDays(proposalSentDate, cadence.days[0]);
       const updated = await updateProspect(id, {
@@ -392,9 +425,9 @@ export default function ProspectDetailPage() {
       setNextFollowUp(firstFollowUp);
       setLastContactedAt(updated.last_contacted_at);
       await refreshOperations();
-      setNotice("Proposal follow-up workflow started. Your three reminders are ready.");
+      setNotice("Scheduled follow-up started. Your three reminders are ready.");
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : "Proposal workflow could not be started.");
+      setNotice(error instanceof Error ? error.message : "Scheduled follow-up could not be started.");
     } finally {
       setIsStartingProposalWorkflow(false);
     }
@@ -422,15 +455,15 @@ export default function ProspectDetailPage() {
         prospectId: id,
         userId: user.id,
         activityType: "status",
-        summary: `Proposal workflow closed: ${PROSPECT_STAGE_LABELS[outcome]}.`,
+        summary: `Scheduled follow-up closed: ${PROSPECT_STAGE_LABELS[outcome]}.`,
       });
       setProspect(updated);
       setStage(outcome);
       setNextFollowUp("");
       await refreshOperations();
-      setNotice(`Proposal workflow closed as ${PROSPECT_STAGE_LABELS[outcome].toLowerCase()}.`);
+      setNotice(`Scheduled follow-up closed as ${PROSPECT_STAGE_LABELS[outcome].toLowerCase()}.`);
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : "Proposal workflow could not be closed.");
+      setNotice(error instanceof Error ? error.message : "Scheduled follow-up could not be closed.");
     } finally {
       setIsStartingProposalWorkflow(false);
     }
@@ -512,20 +545,22 @@ export default function ProspectDetailPage() {
 
             <section className="prospectOpsPanel proposalWorkflowPanel" hidden={detailView !== "followup"}>
               <div className="proposalWorkflowHeader">
-                <div><span className="miniBadge">Proposal workflow</span><h2 className="cardTitle">Your next proposal follow-up</h2><p className="small">The Message Library provides the wording and guidance. This page only schedules the messages and tracks what happened.</p></div>
+                <div><span className="miniBadge">Scheduled follow-up</span><h2 className="cardTitle">Your next follow-up</h2><p className="small">Schedule reminders for any conversation. Choose the wording from the Message Library when each reminder is due.</p></div>
                 {activeProposalTasks.length ? <span className="statusPill statusPillSuccess">{activeProposalTasks.length} follow-up{activeProposalTasks.length === 1 ? "" : "s"} active</span> : <span className="statusPill">Not running</span>}
               </div>
               {!nextProposalTask ? <><div className="proposalWorkflowForm">
-                <div className="formGroup"><label className="label">Proposal sent</label><input className="input" type="date" value={proposalSentDate} onChange={(event) => setProposalSentDate(event.target.value)} /></div>
+                <div className="formGroup"><label className="label">Following up on</label><select className="input" value={followUpPurpose} onChange={(event) => setFollowUpPurpose(event.target.value as keyof typeof FOLLOW_UP_PURPOSES)}>{Object.entries(FOLLOW_UP_PURPOSES).map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select></div>
+                <div className="formGroup"><label className="label">Starting from</label><input className="input" type="date" value={proposalSentDate} onChange={(event) => setProposalSentDate(event.target.value)} /></div>
                 <div className="formGroup"><label className="label">Follow-up pace</label><select className="input" value={proposalCadence} onChange={(event) => setProposalCadence(event.target.value as keyof typeof PROPOSAL_CADENCES)}>{Object.entries(PROPOSAL_CADENCES).map(([key, cadence]) => <option key={key} value={key}>{cadence.label}</option>)}</select></div>
                 <div className="formGroup"><label className="label">Assigned to</label>{prospect?.workspace_id ? <select className="input" value={taskAssignee} onChange={(event) => setTaskAssignee(event.target.value)}><option value="">Unassigned</option><option value={user.email ?? ""}>Me ({user.email})</option>{teamMembers.filter((member) => member.email !== user.email).map((member) => <option key={member.id} value={member.email}>{member.email}</option>)}</select> : <input className="input" type="email" value={taskAssignee} onChange={(event) => setTaskAssignee(event.target.value)} placeholder="Assignee email" />}</div>
               </div>
+              {followUpPurpose === "custom" ? <div className="formGroup customFollowUpPurpose"><label className="label">What are you following up on?</label><input className="input" value={customFollowUpPurpose} onChange={(event) => setCustomFollowUpPurpose(event.target.value)} placeholder="Example: audit, referral introduction, contract review..." /></div> : null}
               <div className="proposalWorkflowActions">
-                <button className="button buttonPrimary" disabled={isStartingProposalWorkflow || !proposalSentDate} onClick={() => void handleStartProposalWorkflow()}>{isStartingProposalWorkflow ? "Starting..." : "Start proposal schedule"}</button>
+                <button className="button buttonPrimary" disabled={isStartingProposalWorkflow || !proposalSentDate || (followUpPurpose === "custom" && !customFollowUpPurpose.trim())} onClick={() => void handleStartProposalWorkflow()}>{isStartingProposalWorkflow ? "Starting..." : "Start follow-up schedule"}</button>
               </div></> : <>
                 <div className="proposalNextMessage">
-                  <div><span>{nextProposalTask.due_date ? `Due ${nextProposalTask.due_date}` : "Ready when you are"}</span><strong>{nextProposalTask.title.replace(/^Proposal follow-up \d+: /, "")}</strong><p>{activeProposalTasks.length > 1 ? `${activeProposalTasks.length - 1} later message${activeProposalTasks.length - 1 === 1 ? "" : "s"} already scheduled.` : "This is the final scheduled message."}</p></div>
-                  <div className="proposalTaskActions"><button className="button buttonPrimary" onClick={() => handleDraftProposalFollowUp(nextProposalTask)}>Open message</button><button className="button buttonSecondary" onClick={() => void handleCompleteProposalTask(nextProposalTask)}>Mark sent</button></div>
+                  <div><span>{nextProposalTask.due_date ? `Due ${nextProposalTask.due_date}` : "Ready when you are"}</span><strong>{cleanFollowUpTaskTitle(nextProposalTask.title)}</strong><p>{activeProposalTasks.length > 1 ? `${activeProposalTasks.length - 1} later reminder${activeProposalTasks.length - 1 === 1 ? "" : "s"} already scheduled.` : "This is the final scheduled reminder."}</p></div>
+                  <div className="proposalTaskActions"><button className="button buttonPrimary" onClick={() => handleDraftProposalFollowUp(nextProposalTask)}>{nextProposalTask.title.toLowerCase().includes("proposal") ? "Open suggested message" : "Choose message"}</button><button className="button buttonSecondary" onClick={() => void handleCompleteProposalTask(nextProposalTask)}>Mark sent</button></div>
                 </div>
                 <div className="proposalWorkflowActions proposalOutcomeActions"><span>Did the deal move?</span><button className="button buttonSecondary" disabled={isStartingProposalWorkflow} onClick={() => void handleProposalOutcome("replied")}>They replied</button><button className="button buttonSecondary" disabled={isStartingProposalWorkflow} onClick={() => void handleProposalOutcome("won")}>Mark won</button><button className="button buttonUtility" disabled={isStartingProposalWorkflow} onClick={() => void handleProposalOutcome("lost")}>Mark lost</button></div>
               </>}
