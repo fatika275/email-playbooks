@@ -91,6 +91,9 @@ export default function ProspectDetailPage() {
     [tasks]
   );
   const activeProposalTasks = proposalWorkflowTasks.filter((task) => !task.completed_at);
+  const nextProposalTask = [...activeProposalTasks].sort((a, b) =>
+    (a.due_date || "").localeCompare(b.due_date || "")
+  )[0];
   const openManualTasks = tasks.filter(
     (task) => !task.completed_at && !task.title.startsWith("Proposal follow-up")
   );
@@ -509,22 +512,23 @@ export default function ProspectDetailPage() {
 
             <section className="prospectOpsPanel proposalWorkflowPanel" hidden={detailView !== "followup"}>
               <div className="proposalWorkflowHeader">
-                <div><span className="miniBadge">Workflow using Message Library</span><h2 className="cardTitle">Keep the deal moving after you send a proposal</h2><p className="small">This workflow schedules the follow-ups and opens the right reusable message from your Message Library. It stops when you record a reply, win, or loss.</p></div>
+                <div><span className="miniBadge">Proposal workflow</span><h2 className="cardTitle">Your next proposal follow-up</h2><p className="small">The Message Library provides the wording and guidance. This page only schedules the messages and tracks what happened.</p></div>
                 {activeProposalTasks.length ? <span className="statusPill statusPillSuccess">{activeProposalTasks.length} follow-up{activeProposalTasks.length === 1 ? "" : "s"} active</span> : <span className="statusPill">Not running</span>}
               </div>
-              <div className="proposalWorkflowGuide" aria-label="What to do during proposal follow-up">
-                {PROPOSAL_CADENCES[proposalCadence].days.map((days, index) => <div key={days}><span>Day {days}</span><strong>{index === 0 ? "Confirm it arrived" : index === 1 ? "Reconnect the proposal to their goal" : "Close the loop politely"}</strong><p>{index === 0 ? "Ask whether they received it and whether anything needs clarifying." : index === 1 ? "Restate the result they want, answer concerns, and suggest a decision call." : "Ask for a simple yes, no, or later so the deal has a clear next step."}</p></div>)}
-              </div>
-              <div className="proposalWorkflowForm">
+              {!nextProposalTask ? <><div className="proposalWorkflowForm">
                 <div className="formGroup"><label className="label">Proposal sent</label><input className="input" type="date" value={proposalSentDate} onChange={(event) => setProposalSentDate(event.target.value)} /></div>
                 <div className="formGroup"><label className="label">Follow-up pace</label><select className="input" value={proposalCadence} onChange={(event) => setProposalCadence(event.target.value as keyof typeof PROPOSAL_CADENCES)}>{Object.entries(PROPOSAL_CADENCES).map(([key, cadence]) => <option key={key} value={key}>{cadence.label}</option>)}</select></div>
                 <div className="formGroup"><label className="label">Assigned to</label>{prospect?.workspace_id ? <select className="input" value={taskAssignee} onChange={(event) => setTaskAssignee(event.target.value)}><option value="">Unassigned</option><option value={user.email ?? ""}>Me ({user.email})</option>{teamMembers.filter((member) => member.email !== user.email).map((member) => <option key={member.id} value={member.email}>{member.email}</option>)}</select> : <input className="input" type="email" value={taskAssignee} onChange={(event) => setTaskAssignee(event.target.value)} placeholder="Assignee email" />}</div>
               </div>
               <div className="proposalWorkflowActions">
-                <button className="button buttonPrimary" disabled={isStartingProposalWorkflow || !proposalSentDate} onClick={() => void handleStartProposalWorkflow()}>{isStartingProposalWorkflow ? "Updating..." : activeProposalTasks.length ? "Restart schedule" : "Start follow-up workflow"}</button>
-                {activeProposalTasks.length ? <><button className="button buttonSecondary" disabled={isStartingProposalWorkflow} onClick={() => void handleProposalOutcome("replied")}>They replied</button><button className="button buttonSecondary" disabled={isStartingProposalWorkflow} onClick={() => void handleProposalOutcome("won")}>Mark won</button><button className="button buttonUtility" disabled={isStartingProposalWorkflow} onClick={() => void handleProposalOutcome("lost")}>Mark lost</button></> : null}
-              </div>
-              {activeProposalTasks.length ? <div className="proposalWorkflowSchedule">{activeProposalTasks.map((task) => <div key={task.id}><span>{task.due_date ? `Due ${task.due_date}` : "Scheduled"}</span><strong>{task.title.replace(/^Proposal follow-up \d+: /, "")}</strong><div className="proposalTaskActions"><button className="button buttonPrimary" onClick={() => handleDraftProposalFollowUp(task)}>Draft follow-up</button><button className="button buttonSecondary" onClick={() => void handleCompleteProposalTask(task)}>Mark done</button></div></div>)}</div> : null}
+                <button className="button buttonPrimary" disabled={isStartingProposalWorkflow || !proposalSentDate} onClick={() => void handleStartProposalWorkflow()}>{isStartingProposalWorkflow ? "Starting..." : "Start proposal schedule"}</button>
+              </div></> : <>
+                <div className="proposalNextMessage">
+                  <div><span>{nextProposalTask.due_date ? `Due ${nextProposalTask.due_date}` : "Ready when you are"}</span><strong>{nextProposalTask.title.replace(/^Proposal follow-up \d+: /, "")}</strong><p>{activeProposalTasks.length > 1 ? `${activeProposalTasks.length - 1} later message${activeProposalTasks.length - 1 === 1 ? "" : "s"} already scheduled.` : "This is the final scheduled message."}</p></div>
+                  <div className="proposalTaskActions"><button className="button buttonPrimary" onClick={() => handleDraftProposalFollowUp(nextProposalTask)}>Open message</button><button className="button buttonSecondary" onClick={() => void handleCompleteProposalTask(nextProposalTask)}>Mark sent</button></div>
+                </div>
+                <div className="proposalWorkflowActions proposalOutcomeActions"><span>Did the deal move?</span><button className="button buttonSecondary" disabled={isStartingProposalWorkflow} onClick={() => void handleProposalOutcome("replied")}>They replied</button><button className="button buttonSecondary" disabled={isStartingProposalWorkflow} onClick={() => void handleProposalOutcome("won")}>Mark won</button><button className="button buttonUtility" disabled={isStartingProposalWorkflow} onClick={() => void handleProposalOutcome("lost")}>Mark lost</button></div>
+              </>}
             </section>
 
             <div className={detailView === "overview" ? "prospectOpsGrid isHidden" : "prospectOpsGrid prospectOpsGridSingle"}>

@@ -2270,44 +2270,6 @@ details[open] > summary::after {
   margin-top: 20px;
 }
 
-.proposalWorkflowGuide {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  margin-top: 20px;
-  border-top: 1px solid var(--border-soft);
-  border-bottom: 1px solid var(--border-soft);
-}
-
-.proposalWorkflowGuide > div {
-  padding: 16px;
-  border-right: 1px solid var(--border-soft);
-}
-
-.proposalWorkflowGuide > div:first-child {
-  padding-left: 0;
-}
-
-.proposalWorkflowGuide > div:last-child {
-  border-right: 0;
-}
-
-.proposalWorkflowGuide span,
-.proposalWorkflowGuide p {
-  color: var(--muted);
-  font-size: 12px;
-}
-
-.proposalWorkflowGuide strong {
-  display: block;
-  margin-top: 5px;
-  font-size: 13px;
-}
-
-.proposalWorkflowGuide p {
-  margin: 7px 0 0;
-  line-height: 1.55;
-}
-
 .prospectOpsGridSingle {
   grid-template-columns: 1fr;
 }
@@ -2345,6 +2307,37 @@ details[open] > summary::after {
   gap: 8px;
   flex-wrap: wrap;
   margin-top: 16px;
+}
+
+.proposalNextMessage {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-top: 20px;
+  padding: 20px 0;
+  border-top: 1px solid var(--border-soft);
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.proposalNextMessage > div:first-child {
+  display: grid;
+  gap: 6px;
+}
+
+.proposalNextMessage span,
+.proposalNextMessage p,
+.proposalOutcomeActions > span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.proposalNextMessage p {
+  margin: 0;
+}
+
+.proposalOutcomeActions {
+  align-items: center;
 }
 
 .proposalWorkflowSchedule {
@@ -2394,19 +2387,9 @@ details[open] > summary::after {
     grid-template-columns: 1fr;
   }
 
-  .proposalWorkflowGuide {
-    grid-template-columns: 1fr;
-  }
-
-  .proposalWorkflowGuide > div,
-  .proposalWorkflowGuide > div:first-child {
-    padding: 14px 0;
-    border-right: 0;
-    border-bottom: 1px solid var(--border-soft);
-  }
-
-  .proposalWorkflowGuide > div:last-child {
-    border-bottom: 0;
+  .proposalNextMessage {
+    align-items: flex-start;
+    flex-direction: column;
   }
 
   .prospectActivityHeading {
