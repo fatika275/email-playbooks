@@ -5,20 +5,6 @@ import { useAccount } from "@/components/account-provider";
 
 const workspaceItems = [
   {
-    href: "/library",
-    label: "Message Library",
-    badge: "Messages",
-    description:
-      "Browse reusable outreach messages manually, or let prospect workflows choose the right one for you.",
-  },
-  {
-    href: "/prospects",
-    label: "Prospect Pipeline",
-    badge: "Pro",
-    description:
-      "Track leads, deal stages, values, notes, and the next follow-up needed to win a client.",
-  },
-  {
     href: "/sequence-builder",
     label: "Sequence Builder",
     badge: "Pro",
@@ -46,13 +32,6 @@ const workspaceItems = [
     description:
       "Group saved emails and reusable sequences by client, offer, or campaign.",
   },
-  {
-    href: "/team",
-    label: "Team Library",
-    badge: "Business",
-    description:
-      "Share messages and reusable sequences securely with teammates.",
-  },
 ];
 
 export default function WorkspacePage() {
@@ -62,13 +41,13 @@ export default function WorkspacePage() {
     <main className="main">
       <section className="container">
         <div className="pageHeader">
-          <div className="badge">Workspace</div>
+          <div className="badge">Saved Work</div>
           <h1 className="pageTitle" style={{ marginTop: 14 }}>
-            Your Agency Outreach Workspace
+            Keep your best outreach ready to reuse.
           </h1>
           <p className="muted" style={{ maxWidth: 760, lineHeight: 1.75 }}>
-            Keep leads, outreach, and follow-ups together so your agency can book
-            more work without adding a complicated CRM.
+            Find saved emails, reusable sequences, and campaign folders without
+            mixing them into your active prospect pipeline.
           </p>
         </div>
 
@@ -78,11 +57,11 @@ export default function WorkspacePage() {
               {hasProAccess ? "Pro workspace active" : "Free workspace preview"}
             </span>
             <h2 className="sectionTitle" style={{ marginTop: 16 }}>
-              Know who to contact and what happens next.
+              Build it once. Reuse what works.
             </h2>
             <p className="muted" style={{ marginTop: 10, lineHeight: 1.75 }}>
-              Start in the prospect pipeline, move into the right message, then
-              return to log contact and schedule the next follow-up.
+              Save strong drafts and sequences here, then organise them by client,
+              offer, or campaign when your library grows.
             </p>
           </div>
 
@@ -91,8 +70,8 @@ export default function WorkspacePage() {
               Unlock Pro Workspace
             </Link>
           ) : (
-            <Link href="/prospects" className="button buttonPrimary">
-              Open Pipeline
+            <Link href="/history" className="button buttonPrimary">
+              Open Saved Emails
             </Link>
           )}
         </div>

@@ -5,11 +5,10 @@ import { usePathname } from "next/navigation";
 import { useAccount } from "@/components/account-provider";
 
 const navItems = [
-  { href: "/", label: "Home" },
+  { href: "/prospects", label: "Pipeline", primary: true },
   { href: "/library", label: "Message Library" },
-  { href: "/workspace", label: "Workspace" },
-  { href: "/team", label: "Team Library" },
-  { href: "/pricing", label: "Pricing" },
+  { href: "/workspace", label: "Saved Work" },
+  { href: "/team", label: "Team" },
 ];
 
 const workspacePaths = [
@@ -18,12 +17,17 @@ const workspacePaths = [
   "/history",
   "/custom-templates",
   "/folders",
-  "/prospects",
 ];
 
 function isActive(pathname: string, href: string) {
-  if (href === "/") {
-    return pathname === "/";
+  if (href === "/prospects") {
+    return pathname === href || pathname.startsWith(`${href}/`);
+  }
+
+  if (href === "/library") {
+    return ["/library", "/playbook", "/editor"].some(
+      (path) => pathname === path || pathname.startsWith(`${path}/`)
+    );
   }
 
   if (href === "/workspace") {
@@ -54,13 +58,23 @@ export default function SiteHeader() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`navLink ${active ? "navLinkActive" : ""}`}
+                className={`navLink ${item.primary ? "navLinkPrimary" : ""} ${active ? "navLinkActive" : ""}`}
                 aria-current={active ? "page" : undefined}
               >
                 {item.label}
               </Link>
             );
           })}
+
+          {!user ? (
+            <Link
+              href="/pricing"
+              className={`navLink ${pathname === "/pricing" ? "navLinkActive" : ""}`}
+              aria-current={pathname === "/pricing" ? "page" : undefined}
+            >
+              Pricing
+            </Link>
+          ) : null}
 
           <Link
             href="/account"

@@ -177,6 +177,19 @@ textarea {
   box-shadow: none;
 }
 
+.navLinkPrimary,
+.navLinkPrimary.navLinkActive {
+  color: #080808;
+  background: #f4f4f5;
+  border-color: #f4f4f5;
+}
+
+.navLinkPrimary:hover {
+  color: #080808;
+  background: #ffffff;
+  border-color: #ffffff;
+}
+
 .hero {
   display: grid;
   grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
