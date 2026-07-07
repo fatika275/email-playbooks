@@ -27,6 +27,7 @@ import {
   listProspectComments,
   listMyOverdueWorkspaceTasks,
   listProspectTasks,
+  getProspectTaskDisplayTitle,
   listProspects,
   listWorkspaceProspectActivities,
   type WorkspaceProspectActivity,
@@ -371,7 +372,7 @@ export default function TeamLibraryPage() {
 
         {teamView === "workspace" && (notifications.length || overdueTasks.length) ? <section className="teamAttentionPanel">
           <div className="cardTop"><div><h2 className="sectionTitle">Needs attention</h2><p className="muted">Overdue work and unread team updates.</p></div><span className="statusPill">{notifications.filter((item) => !item.read_at).length + overdueTasks.length}</span></div>
-          <div className="prospectTimeline">{overdueTasks.map((task) => <div key={`overdue-${task.id}`} className="prospectTimelineItem"><span className="miniBadge">Overdue</span><div><Link href={`/prospects/${task.prospects.id}`}><strong>{task.title}</strong></Link><p className="small">{task.prospects.full_name} · Due {task.due_date}</p></div></div>)}{notifications.slice(0, 8).map((item) => <div key={item.id} className="prospectTimelineItem"><span className="miniBadge">{item.kind}</span><div><Link href={item.href || "/team"} onClick={() => void markWorkspaceNotificationRead(item.id)}><strong>{item.title}</strong></Link><p className="small">{item.body || "Workspace update"} · {new Date(item.created_at).toLocaleString()}</p></div></div>)}</div>
+          <div className="prospectTimeline">{overdueTasks.map((task) => <div key={`overdue-${task.id}`} className="prospectTimelineItem"><span className="miniBadge">Overdue</span><div><Link href={`/prospects/${task.prospects.id}`}><strong>{getProspectTaskDisplayTitle(task.title)}</strong></Link><p className="small">{task.prospects.full_name} · Due {task.due_date}</p></div></div>)}{notifications.slice(0, 8).map((item) => <div key={item.id} className="prospectTimelineItem"><span className="miniBadge">{item.kind}</span><div><Link href={item.href || "/team"} onClick={() => void markWorkspaceNotificationRead(item.id)}><strong>{item.title}</strong></Link><p className="small">{item.body || "Workspace update"} · {new Date(item.created_at).toLocaleString()}</p></div></div>)}</div>
         </section> : null}
 
         {teamView === "workspace" ? (workspace ? (

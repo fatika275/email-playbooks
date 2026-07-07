@@ -14,6 +14,7 @@ import {
   DEFAULT_STAGE_PROBABILITIES,
   getForecastSettings,
   listProspectTasks,
+  getProspectTaskDisplayTitle,
   listProspectActivitiesForProspects,
   listProspects,
   PROSPECT_STAGES,
@@ -554,7 +555,7 @@ export default function ProspectsPage() {
                 {todayItems.openTasks.map(({ id, task, prospect }) => (
                   <div key={id} className="prospectTodayItem">
                     <div>
-                      <strong>{task.title}</strong>
+                      <strong>{getProspectTaskDisplayTitle(task.title)}</strong>
                       <span>{prospect ? `${prospect.full_name} - ${prospect.company}` : "Prospect"}{task.due_date ? ` - Due ${task.due_date}` : ""}</span>
                     </div>
                     <div className="toolbar">

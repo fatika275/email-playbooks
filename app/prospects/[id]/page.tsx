@@ -12,6 +12,8 @@ import {
   deleteProspect,
   deleteProspectTask,
   getProspect,
+  getProspectTaskDisplayTitle,
+  getProspectTaskMessageRef,
   listProspectActivities,
   listProspectComments,
   listProspectTasks,
@@ -27,33 +29,28 @@ import {
   type Prospect,
   type ProspectStage,
 } from "@/lib/prospects";
+import { playbooks } from "@/lib/data";
 
-const PROPOSAL_CADENCES = {
-  fast: { label: "Fast - days 1, 3 and 7", days: [1, 3, 7] },
-  standard: { label: "Standard - days 2, 5 and 10", days: [2, 5, 10] },
-  gentle: { label: "Gentle - days 3, 7 and 14", days: [3, 7, 14] },
-} as const;
+const SEQUENCE_TIMING: Record<string, number[]> = {
+  "cold-outreach-sequence": [1, 3, 7, 10],
+  "follow-up-frameworks": [2, 5, 9, 14],
+  "re-engagement-emails": [1, 5, 10],
+  "proposal-follow-up": [2, 5, 10],
+  "meeting-follow-up": [0],
+  "demo-booking-sequence": [0, 2],
+  "inbound-lead-replies": [0, 2],
+  "no-show-recovery": [0, 3],
+  "client-renewal-upsell": [0, 5],
+};
 
-const PROPOSAL_FOLLOW_UP_TITLES = [
-  "Proposal follow-up 1: Confirm it arrived and invite questions",
-  "Proposal follow-up 2: Recap the value and agree the next step",
-  "Proposal follow-up 3: Send a final check-in and close the loop",
-];
-
-const FOLLOW_UP_PURPOSES = {
-  proposal: "Proposal",
-  quote: "Quote or estimate",
-  meeting: "Meeting next step",
-  introduction: "Introduction",
-  custom: "Something else",
-} as const;
+const scheduledSequences = playbooks.filter((playbook) => SEQUENCE_TIMING[playbook.id]);
 
 function isScheduledFollowUpTask(task: ProspectTask) {
   return task.title.startsWith("Proposal follow-up") || task.title.startsWith("Scheduled follow-up");
 }
 
 function cleanFollowUpTaskTitle(title: string) {
-  return title.replace(/^(?:Proposal|Scheduled) follow-up \d+: /, "");
+  return getProspectTaskDisplayTitle(title).replace(/^(?:Proposal|Scheduled) follow-up \d+: /, "");
 }
 
 function addDays(date: string, days: number) {
@@ -96,9 +93,7 @@ export default function ProspectDetailPage() {
   const [taskAssignee, setTaskAssignee] = useState(user?.email ?? "");
   const [teamMembers, setTeamMembers] = useState<BusinessMember[]>([]);
   const [proposalSentDate, setProposalSentDate] = useState(() => new Date().toISOString().slice(0, 10));
-  const [proposalCadence, setProposalCadence] = useState<keyof typeof PROPOSAL_CADENCES>("standard");
-  const [followUpPurpose, setFollowUpPurpose] = useState<keyof typeof FOLLOW_UP_PURPOSES>("proposal");
-  const [customFollowUpPurpose, setCustomFollowUpPurpose] = useState("");
+  const [selectedSequenceId, setSelectedSequenceId] = useState("proposal-follow-up");
   const [isStartingProposalWorkflow, setIsStartingProposalWorkflow] = useState(false);
   const [detailView, setDetailView] = useState<"overview" | "followup" | "activity">("overview");
   const [activityFilter, setActivityFilter] = useState<"useful" | "outreach" | "notes" | "all">("useful");
@@ -320,8 +315,9 @@ export default function ProspectDetailPage() {
   function handleDraftProposalFollowUp(task: ProspectTask) {
     const stepMatch = task.title.match(/follow-up (\d):/);
     const step = Math.min(3, Math.max(1, Number(stepMatch?.[1]) || 1));
+    const messageRef = getProspectTaskMessageRef(task.title);
     const templateIds = ["proposal-check-in", "proposal-next-steps", "proposal-close-loop"];
-    const isProposal = task.title.toLowerCase().includes("proposal");
+    const isLegacyProposal = task.title.startsWith("Proposal follow-up");
     const workflowLabel = cleanFollowUpTaskTitle(task.title);
     localStorage.setItem(
       "thalovo_prospect_context",
@@ -336,7 +332,7 @@ export default function ProspectDetailPage() {
         workflowLabel,
       })
     );
-    router.push(isProposal ? `/editor/proposal-follow-up/${templateIds[step - 1]}` : "/library");
+    router.push(messageRef ? `/editor/${messageRef.playbookId}/${messageRef.templateId}` : isLegacyProposal ? `/editor/proposal-follow-up/${templateIds[step - 1]}` : "/library");
   }
 
   async function handleCompleteProposalTask(task: ProspectTask) {
@@ -372,31 +368,21 @@ export default function ProspectDetailPage() {
 
   async function handleStartProposalWorkflow() {
     if (!id || !user || !proposalSentDate) return;
-    const purposeLabel = followUpPurpose === "custom" ? customFollowUpPurpose.trim() : FOLLOW_UP_PURPOSES[followUpPurpose];
-    if (!purposeLabel) {
-      setNotice("Describe what you are following up on first.");
-      return;
-    }
+    const selectedSequence = scheduledSequences.find((playbook) => playbook.id === selectedSequenceId);
+    if (!selectedSequence) return;
     if (activeProposalTasks.length && !window.confirm("Replace the current follow-up schedule with a new one?")) return;
     setIsStartingProposalWorkflow(true);
     try {
       await Promise.all(activeProposalTasks.map((task) => setProspectTaskCompleted(task.id, true)));
-      const cadence = PROPOSAL_CADENCES[proposalCadence];
+      const timing = SEQUENCE_TIMING[selectedSequence.id];
       const assignedUserId =
         teamMembers.find((member) => member.email === taskAssignee)?.user_id ??
         (taskAssignee === user.email ? user.id : null);
-      const taskTitles = followUpPurpose === "proposal"
-        ? PROPOSAL_FOLLOW_UP_TITLES
-        : [
-            `Scheduled follow-up 1: Check in about ${purposeLabel.toLowerCase()}`,
-            `Scheduled follow-up 2: Continue the conversation about ${purposeLabel.toLowerCase()}`,
-            `Scheduled follow-up 3: Send a final check-in about ${purposeLabel.toLowerCase()}`,
-          ];
-      await Promise.all(cadence.days.map((days, index) => createProspectTask({
+      await Promise.all(selectedSequence.templates.map((template, index) => createProspectTask({
         prospectId: id,
         userId: user.id,
-        title: taskTitles[index],
-        dueDate: addDays(proposalSentDate, days),
+        title: `Scheduled follow-up ${index + 1}: ${template.label.replace(/\s*\(Day\s+\d+\)/i, "")} [[thalovo:${selectedSequence.id}/${template.id}]]`,
+        dueDate: addDays(proposalSentDate, timing[index] ?? index * 3),
         assignedEmail: taskAssignee,
         assignedUserId,
         workspaceId: prospect?.workspace_id,
@@ -405,9 +391,9 @@ export default function ProspectDetailPage() {
         prospectId: id,
         userId: user.id,
         activityType: "email",
-        summary: `${purposeLabel} follow-up scheduled. ${cadence.label}.`,
+        summary: `${selectedSequence.name} scheduled with ${selectedSequence.templates.length} step${selectedSequence.templates.length === 1 ? "" : "s"}.`,
       });
-      const firstFollowUp = addDays(proposalSentDate, cadence.days[0]);
+      const firstFollowUp = addDays(proposalSentDate, timing[0] ?? 0);
       const updated = await updateProspect(id, {
         full_name: fullName,
         company,
@@ -425,7 +411,7 @@ export default function ProspectDetailPage() {
       setNextFollowUp(firstFollowUp);
       setLastContactedAt(updated.last_contacted_at);
       await refreshOperations();
-      setNotice("Scheduled follow-up started. Your three reminders are ready.");
+      setNotice(`${selectedSequence.name} started. Your reminders are ready.`);
     } catch (error) {
       setNotice(error instanceof Error ? error.message : "Scheduled follow-up could not be started.");
     } finally {
@@ -549,18 +535,16 @@ export default function ProspectDetailPage() {
                 {activeProposalTasks.length ? <span className="statusPill statusPillSuccess">{activeProposalTasks.length} follow-up{activeProposalTasks.length === 1 ? "" : "s"} active</span> : <span className="statusPill">Not running</span>}
               </div>
               {!nextProposalTask ? <><div className="proposalWorkflowForm">
-                <div className="formGroup"><label className="label">Following up on</label><select className="input" value={followUpPurpose} onChange={(event) => setFollowUpPurpose(event.target.value as keyof typeof FOLLOW_UP_PURPOSES)}>{Object.entries(FOLLOW_UP_PURPOSES).map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select></div>
+                <div className="formGroup"><label className="label">Sequence</label><select className="input" value={selectedSequenceId} onChange={(event) => setSelectedSequenceId(event.target.value)}>{scheduledSequences.map((sequence) => <option key={sequence.id} value={sequence.id}>{sequence.name} - {sequence.templates.length} step{sequence.templates.length === 1 ? "" : "s"}</option>)}</select></div>
                 <div className="formGroup"><label className="label">Starting from</label><input className="input" type="date" value={proposalSentDate} onChange={(event) => setProposalSentDate(event.target.value)} /></div>
-                <div className="formGroup"><label className="label">Follow-up pace</label><select className="input" value={proposalCadence} onChange={(event) => setProposalCadence(event.target.value as keyof typeof PROPOSAL_CADENCES)}>{Object.entries(PROPOSAL_CADENCES).map(([key, cadence]) => <option key={key} value={key}>{cadence.label}</option>)}</select></div>
                 <div className="formGroup"><label className="label">Assigned to</label>{prospect?.workspace_id ? <select className="input" value={taskAssignee} onChange={(event) => setTaskAssignee(event.target.value)}><option value="">Unassigned</option><option value={user.email ?? ""}>Me ({user.email})</option>{teamMembers.filter((member) => member.email !== user.email).map((member) => <option key={member.id} value={member.email}>{member.email}</option>)}</select> : <input className="input" type="email" value={taskAssignee} onChange={(event) => setTaskAssignee(event.target.value)} placeholder="Assignee email" />}</div>
               </div>
-              {followUpPurpose === "custom" ? <div className="formGroup customFollowUpPurpose"><label className="label">What are you following up on?</label><input className="input" value={customFollowUpPurpose} onChange={(event) => setCustomFollowUpPurpose(event.target.value)} placeholder="Example: audit, referral introduction, contract review..." /></div> : null}
               <div className="proposalWorkflowActions">
-                <button className="button buttonPrimary" disabled={isStartingProposalWorkflow || !proposalSentDate || (followUpPurpose === "custom" && !customFollowUpPurpose.trim())} onClick={() => void handleStartProposalWorkflow()}>{isStartingProposalWorkflow ? "Starting..." : "Start follow-up schedule"}</button>
+                <button className="button buttonPrimary" disabled={isStartingProposalWorkflow || !proposalSentDate || !selectedSequenceId} onClick={() => void handleStartProposalWorkflow()}>{isStartingProposalWorkflow ? "Starting..." : "Start sequence"}</button>
               </div></> : <>
                 <div className="proposalNextMessage">
                   <div><span>{nextProposalTask.due_date ? `Due ${nextProposalTask.due_date}` : "Ready when you are"}</span><strong>{cleanFollowUpTaskTitle(nextProposalTask.title)}</strong><p>{activeProposalTasks.length > 1 ? `${activeProposalTasks.length - 1} later reminder${activeProposalTasks.length - 1 === 1 ? "" : "s"} already scheduled.` : "This is the final scheduled reminder."}</p></div>
-                  <div className="proposalTaskActions"><button className="button buttonPrimary" onClick={() => handleDraftProposalFollowUp(nextProposalTask)}>{nextProposalTask.title.toLowerCase().includes("proposal") ? "Open suggested message" : "Choose message"}</button><button className="button buttonSecondary" onClick={() => void handleCompleteProposalTask(nextProposalTask)}>Mark sent</button></div>
+                  <div className="proposalTaskActions"><button className="button buttonPrimary" onClick={() => handleDraftProposalFollowUp(nextProposalTask)}>Open message</button><button className="button buttonSecondary" onClick={() => void handleCompleteProposalTask(nextProposalTask)}>Mark sent</button></div>
                 </div>
                 <div className="proposalWorkflowActions proposalOutcomeActions"><span>Did the deal move?</span><button className="button buttonSecondary" disabled={isStartingProposalWorkflow} onClick={() => void handleProposalOutcome("replied")}>They replied</button><button className="button buttonSecondary" disabled={isStartingProposalWorkflow} onClick={() => void handleProposalOutcome("won")}>Mark won</button><button className="button buttonUtility" disabled={isStartingProposalWorkflow} onClick={() => void handleProposalOutcome("lost")}>Mark lost</button></div>
               </>}
@@ -579,9 +563,9 @@ export default function ProspectDetailPage() {
                 <div className="prospectTaskList">
                   {openManualTasks.map((task) => (
                     <div key={task.id} className="prospectTask">
-                      <input type="checkbox" checked={false} onChange={() => void handleTaskToggle(task)} aria-label={`Complete ${task.title}`} />
-                      <div><strong>{task.title}</strong><span>{task.due_date ? `Due ${task.due_date}` : "No due date"}{task.assigned_email ? ` · ${task.assigned_email}` : ""}</span></div>
-                      <button className="button buttonUtility" onClick={() => void handleTaskDelete(task.id)} aria-label={`Delete ${task.title}`}>Remove</button>
+                      <input type="checkbox" checked={false} onChange={() => void handleTaskToggle(task)} aria-label={`Complete ${getProspectTaskDisplayTitle(task.title)}`} />
+                      <div><strong>{getProspectTaskDisplayTitle(task.title)}</strong><span>{task.due_date ? `Due ${task.due_date}` : "No due date"}{task.assigned_email ? ` · ${task.assigned_email}` : ""}</span></div>
+                      <button className="button buttonUtility" onClick={() => void handleTaskDelete(task.id)} aria-label={`Delete ${getProspectTaskDisplayTitle(task.title)}`}>Remove</button>
                     </div>
                   ))}
                   {openManualTasks.length === 0 ? <p className="small">No open tasks.</p> : null}

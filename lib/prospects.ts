@@ -84,6 +84,17 @@ export type ProspectInput = {
 
 export type ProspectActivityType = "note" | "email" | "call" | "meeting" | "status" | "update";
 
+const TASK_MESSAGE_REF_PATTERN = /\s*\[\[thalovo:([^/\]]+)\/([^\]]+)\]\]$/;
+
+export function getProspectTaskDisplayTitle(title: string) {
+  return title.replace(TASK_MESSAGE_REF_PATTERN, "");
+}
+
+export function getProspectTaskMessageRef(title: string) {
+  const match = title.match(TASK_MESSAGE_REF_PATTERN);
+  return match ? { playbookId: match[1], templateId: match[2] } : null;
+}
+
 export type ProspectActivity = {
   id: string;
   prospect_id: string;
@@ -508,7 +519,7 @@ export async function createProspectTask(options: {
     .single();
   if (error) throw prospectError(error);
   if (options.workspaceId && options.assignedUserId && options.assignedUserId !== options.userId) {
-    const { error: notificationError } = await client.from("workspace_notifications").insert({ workspace_id: options.workspaceId, recipient_user_id: options.assignedUserId, actor_id: options.userId, kind: "task", title: `Task assigned: ${options.title.trim()}`, body: options.dueDate ? `Due ${options.dueDate}` : "No due date", href: `/prospects/${options.prospectId}` });
+    const { error: notificationError } = await client.from("workspace_notifications").insert({ workspace_id: options.workspaceId, recipient_user_id: options.assignedUserId, actor_id: options.userId, kind: "task", title: `Task assigned: ${getProspectTaskDisplayTitle(options.title.trim())}`, body: options.dueDate ? `Due ${options.dueDate}` : "No due date", href: `/prospects/${options.prospectId}` });
     if (notificationError) throw prospectError(notificationError);
   }
   return data as ProspectTask;
