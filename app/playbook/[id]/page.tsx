@@ -191,7 +191,7 @@ export default function PlaybookPage() {
             </p>
             <div className="toolbar" style={{ justifyContent: "center" }}>
               <Link href="/" className="button buttonPrimary">
-                Back to System Library
+                Back to Message Library
               </Link>
             </div>
           </div>

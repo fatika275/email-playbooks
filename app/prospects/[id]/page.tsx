@@ -509,7 +509,7 @@ export default function ProspectDetailPage() {
 
             <section className="prospectOpsPanel proposalWorkflowPanel" hidden={detailView !== "followup"}>
               <div className="proposalWorkflowHeader">
-                <div><span className="miniBadge">Proposal follow-up</span><h2 className="cardTitle">Keep the deal moving after you send a proposal</h2><p className="small">Create three timed reminders. The workflow stops when you record a reply, win, or loss.</p></div>
+                <div><span className="miniBadge">Workflow using Message Library</span><h2 className="cardTitle">Keep the deal moving after you send a proposal</h2><p className="small">This workflow schedules the follow-ups and opens the right reusable message from your Message Library. It stops when you record a reply, win, or loss.</p></div>
                 {activeProposalTasks.length ? <span className="statusPill statusPillSuccess">{activeProposalTasks.length} follow-up{activeProposalTasks.length === 1 ? "" : "s"} active</span> : <span className="statusPill">Not running</span>}
               </div>
               <div className="proposalWorkflowGuide" aria-label="What to do during proposal follow-up">

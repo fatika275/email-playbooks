@@ -64,20 +64,21 @@ export default function LibraryPage() {
     <main className="main">
       <section className="container">
         <div className="pageHeader libraryHeader">
-          <div className="badge">System Library</div>
+          <div className="badge">Message Library</div>
           <h1 className="pageTitle" style={{ marginTop: 14 }}>
-            Choose the outreach system that fits the conversation.
+            Choose the right message for the conversation.
           </h1>
           <p className="muted">
-            Browse playbooks for cold outreach, follow-ups, objections,
-            proposals, re-engagement, and reusable sequences.
+            Browse reusable messages for cold outreach, follow-ups, objections,
+            proposals, and re-engagement. Prospect workflows use this same library
+            to guide you to the right message at the right time.
           </p>
         </div>
 
         <div className="glassCard libraryFilters">
           <div className="grid libraryFilterGrid">
             <div className="formGroup" style={{ marginBottom: 0 }}>
-              <label className="label">Search systems</label>
+              <label className="label">Search messages</label>
               <input
                 className="input"
                 placeholder="Search by use case, audience, or playbook name"

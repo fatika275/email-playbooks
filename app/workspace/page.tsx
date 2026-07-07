@@ -5,6 +5,13 @@ import { useAccount } from "@/components/account-provider";
 
 const workspaceItems = [
   {
+    href: "/library",
+    label: "Message Library",
+    badge: "Messages",
+    description:
+      "Browse reusable outreach messages manually, or let prospect workflows choose the right one for you.",
+  },
+  {
     href: "/prospects",
     label: "Prospect Pipeline",
     badge: "Pro",
@@ -44,7 +51,7 @@ const workspaceItems = [
     label: "Team Library",
     badge: "Business",
     description:
-      "Share templates and reusable sequences securely with teammates.",
+      "Share messages and reusable sequences securely with teammates.",
   },
 ];
 

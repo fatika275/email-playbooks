@@ -65,8 +65,8 @@ export default function HomePage() {
             <span>Prospects, stages, tasks, and follow-ups</span>
           </div>
           <div>
-            <strong>{playbooks.length}+ outreach templates</strong>
-            <span>Practical messages for real sales conversations</span>
+            <strong>{playbooks.length}+ message playbooks</strong>
+            <span>Reusable wording for real sales conversations</span>
           </div>
           <div>
             <strong>Nothing forgotten</strong>

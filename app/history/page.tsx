@@ -109,7 +109,7 @@ export default function SavedEmailsPage() {
               <div className="glassCard" style={{ padding: 14 }}>
                 <strong>1. Create</strong>
                 <p className="muted" style={{ margin: "6px 0 0" }}>
-                  Start from any playbook in the System Library.
+                  Start from any playbook in the Message Library.
                 </p>
               </div>
 
@@ -130,7 +130,7 @@ export default function SavedEmailsPage() {
 
             <div className="toolbar" style={{ justifyContent: "center", marginTop: 20 }}>
               <Link href="/" className="button buttonPrimary">
-                Browse System Library
+                Browse Message Library
               </Link>
             </div>
           </div>
