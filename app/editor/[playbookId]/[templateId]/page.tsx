@@ -217,21 +217,28 @@ export default function EditorPage() {
     getProspectContextSnapshot,
     () => ""
   );
-  const prospectValues = useMemo<Record<string, string>>(() => {
-    if (!rawProspectContext) return {} as Record<string, string>;
+  const prospectContext = useMemo<{
+    name?: string;
+    company?: string;
+    prospectId?: string;
+    workflowStep?: number;
+  }>(() => {
+    if (!rawProspectContext) return {};
     try {
-      const context = JSON.parse(rawProspectContext) as {
+      return JSON.parse(rawProspectContext) as {
         name?: string;
         company?: string;
-      };
-      return {
-        name: context.name || "",
-        company: context.company || "",
+        prospectId?: string;
+        workflowStep?: number;
       };
     } catch {
-      return {} as Record<string, string>;
+      return {};
     }
   }, [rawProspectContext]);
+  const prospectValues = useMemo<Record<string, string>>(() => ({
+    name: prospectContext.name || "",
+    company: prospectContext.company || "",
+  }), [prospectContext]);
   const reuseDraft = useMemo<Pick<SavedEmail, "subject" | "body"> | null>(() => {
     if (!rawReuseEmail) return null;
 
@@ -438,8 +445,9 @@ export default function EditorPage() {
             {template.label}
           </h1>
           <p className="muted" style={{ maxWidth: 760 }}>
-            Start with the essentials, then refine only if you need to.
+            {prospectContext.workflowStep ? `Proposal follow-up ${prospectContext.workflowStep} for ${prospectContext.name || "this prospect"}. Personalise the draft, send it, then return to mark the reminder done.` : "Start with the essentials, then refine only if you need to."}
           </p>
+          {prospectContext.prospectId ? <button className="button buttonSecondary" style={{ marginTop: 14 }} onClick={() => router.push(`/prospects/${prospectContext.prospectId}`)}>Back to prospect</button> : null}
         </div>
 
         <div

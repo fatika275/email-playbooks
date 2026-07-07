@@ -296,6 +296,56 @@ export default function ProspectDetailPage() {
     }
   }
 
+  function handleDraftProposalFollowUp(task: ProspectTask) {
+    const stepMatch = task.title.match(/^Proposal follow-up (\d):/);
+    const step = Math.min(3, Math.max(1, Number(stepMatch?.[1]) || 1));
+    const templateIds = ["proposal-check-in", "proposal-next-steps", "proposal-close-loop"];
+    localStorage.setItem(
+      "thalovo_prospect_context",
+      JSON.stringify({
+        name: fullName,
+        company,
+        email,
+        role,
+        prospectId: id,
+        workflowTaskId: task.id,
+        workflowStep: step,
+      })
+    );
+    router.push(`/editor/proposal-follow-up/${templateIds[step - 1]}`);
+  }
+
+  async function handleCompleteProposalTask(task: ProspectTask) {
+    if (!id) return;
+    try {
+      await setProspectTaskCompleted(task.id, true);
+      const nextTask = activeProposalTasks
+        .filter((item) => item.id !== task.id)
+        .sort((a, b) => (a.due_date || "").localeCompare(b.due_date || ""))[0];
+      const nextDate = nextTask?.due_date ?? "";
+      const updated = await updateProspect(id, {
+        full_name: fullName,
+        company,
+        email,
+        role,
+        linkedin_url: linkedinUrl,
+        source,
+        stage,
+        estimated_value_gbp: Number(value) || 0,
+        next_follow_up: nextDate,
+        last_contacted_at: new Date().toISOString(),
+        notes,
+      });
+      setProspect(updated);
+      setNextFollowUp(nextDate);
+      setLastContactedAt(updated.last_contacted_at);
+      await refreshOperations();
+      setNotice(nextTask ? "Follow-up completed. The next reminder is scheduled." : "Final follow-up completed. Record the outcome when they respond.");
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Follow-up could not be completed.");
+    }
+  }
+
   async function handleStartProposalWorkflow() {
     if (!id || !user || !proposalSentDate) return;
     if (activeProposalTasks.length && !window.confirm("Replace the current proposal follow-up workflow with a new schedule?")) return;
@@ -474,7 +524,7 @@ export default function ProspectDetailPage() {
                 <button className="button buttonPrimary" disabled={isStartingProposalWorkflow || !proposalSentDate} onClick={() => void handleStartProposalWorkflow()}>{isStartingProposalWorkflow ? "Updating..." : activeProposalTasks.length ? "Restart schedule" : "Start follow-up workflow"}</button>
                 {activeProposalTasks.length ? <><button className="button buttonSecondary" disabled={isStartingProposalWorkflow} onClick={() => void handleProposalOutcome("replied")}>They replied</button><button className="button buttonSecondary" disabled={isStartingProposalWorkflow} onClick={() => void handleProposalOutcome("won")}>Mark won</button><button className="button buttonUtility" disabled={isStartingProposalWorkflow} onClick={() => void handleProposalOutcome("lost")}>Mark lost</button></> : null}
               </div>
-              {activeProposalTasks.length ? <div className="proposalWorkflowSchedule">{activeProposalTasks.map((task) => <div key={task.id}><span>{task.due_date ? `Due ${task.due_date}` : "Scheduled"}</span><strong>{task.title.replace(/^Proposal follow-up \d+: /, "")}</strong></div>)}</div> : null}
+              {activeProposalTasks.length ? <div className="proposalWorkflowSchedule">{activeProposalTasks.map((task) => <div key={task.id}><span>{task.due_date ? `Due ${task.due_date}` : "Scheduled"}</span><strong>{task.title.replace(/^Proposal follow-up \d+: /, "")}</strong><div className="proposalTaskActions"><button className="button buttonPrimary" onClick={() => handleDraftProposalFollowUp(task)}>Draft follow-up</button><button className="button buttonSecondary" onClick={() => void handleCompleteProposalTask(task)}>Mark done</button></div></div>)}</div> : null}
             </section>
 
             <div className={detailView === "overview" ? "prospectOpsGrid isHidden" : "prospectOpsGrid prospectOpsGridSingle"}>

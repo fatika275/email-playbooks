@@ -790,6 +790,46 @@ Best,
           "Not understanding the real blocker.",
         ],
       },
+      {
+        id: "proposal-close-loop",
+        label: "Proposal Close the Loop",
+        subject: "Should I close this out?",
+        variables: ["name", "yourName"],
+        body: `Hi {{name}},
+
+I wanted to close the loop on the proposal.
+
+Would it be most helpful to move forward, revisit this later, or leave it here for now?
+
+Either way is completely fine - a quick reply will help me plan on my side.
+
+Best,
+{{yourName}}`,
+        whenToUse:
+          "Use this as the final proposal follow-up when earlier check-ins have not received a reply.",
+        whyItWorks:
+          "It makes replying easy by offering clear options without applying unnecessary pressure.",
+        goal: "Get a final yes, no, or later decision.",
+        nextStep: "Close the workflow if there is still no response and revisit only when relevant.",
+        expectedOutcome: "A decision, a timing answer, or permission to close the opportunity.",
+        psychology:
+          "A respectful close-the-loop message lowers the effort and awkwardness involved in replying.",
+        subjectLineLogic:
+          "The subject signals finality while remaining calm and practical.",
+        keySentenceBreakdown: [
+          {
+            sentence: "Would it be most helpful to move forward, revisit this later, or leave it here for now?",
+            explanation:
+              "Three clear options make it easier to answer than another open-ended request for thoughts.",
+          },
+        ],
+        commonMistakes: [
+          "Sounding frustrated or passive-aggressive.",
+          "Adding another full sales pitch.",
+          "Creating false urgency.",
+          "Continuing to chase after this final message.",
+        ],
+      },
     ],
   },
 

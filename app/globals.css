@@ -2342,10 +2342,21 @@ details[open] > summary::after {
 
 .proposalWorkflowSchedule > div {
   display: grid;
-  grid-template-columns: 110px minmax(0, 1fr);
+  grid-template-columns: 110px minmax(0, 1fr) auto;
+  align-items: center;
   gap: 14px;
   padding: 12px 0;
   border-bottom: 1px solid var(--border-soft);
+}
+
+.proposalTaskActions {
+  display: flex;
+  gap: 8px;
+}
+
+.proposalTaskActions .button {
+  min-height: 36px;
+  padding: 0 12px;
 }
 
 .proposalWorkflowSchedule span {
@@ -2397,6 +2408,10 @@ details[open] > summary::after {
   .proposalWorkflowSchedule > div {
     grid-template-columns: 1fr;
     gap: 4px;
+  }
+
+  .proposalTaskActions {
+    margin-top: 8px;
   }
 }
 
