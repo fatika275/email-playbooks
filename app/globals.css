@@ -2128,6 +2128,44 @@ details[open] > summary::after {
   padding: 24px;
 }
 
+.prospectDetailTabs {
+  display: flex;
+  gap: 26px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.prospectDetailTabs button {
+  position: relative;
+  padding: 0 0 12px;
+  color: var(--muted);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 650;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.prospectDetailTabs button.active {
+  color: var(--text);
+}
+
+.prospectDetailTabs button.active::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+  height: 2px;
+  background: #ffffff;
+}
+
+.isHidden,
+[hidden] {
+  display: none !important;
+}
+
 .prospectActionPanel {
   position: sticky;
   top: 90px;
@@ -2219,6 +2257,72 @@ details[open] > summary::after {
   margin-top: 20px;
 }
 
+.proposalWorkflowGuide {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 20px;
+  border-top: 1px solid var(--border-soft);
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.proposalWorkflowGuide > div {
+  padding: 16px;
+  border-right: 1px solid var(--border-soft);
+}
+
+.proposalWorkflowGuide > div:first-child {
+  padding-left: 0;
+}
+
+.proposalWorkflowGuide > div:last-child {
+  border-right: 0;
+}
+
+.proposalWorkflowGuide span,
+.proposalWorkflowGuide p {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.proposalWorkflowGuide strong {
+  display: block;
+  margin-top: 5px;
+  font-size: 13px;
+}
+
+.proposalWorkflowGuide p {
+  margin: 7px 0 0;
+  line-height: 1.55;
+}
+
+.prospectOpsGridSingle {
+  grid-template-columns: 1fr;
+}
+
+.prospectActivityHeading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding-bottom: 16px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.prospectActivityHeading .small {
+  max-width: 620px;
+  margin: 6px 0 0;
+}
+
+.prospectActivityHeading select {
+  width: 170px;
+  flex: 0 0 170px;
+}
+
+.prospectActivityMore {
+  margin-top: 14px;
+}
+
 .proposalWorkflowForm .formGroup {
   margin-bottom: 0;
 }
@@ -2264,6 +2368,30 @@ details[open] > summary::after {
 
   .proposalWorkflowForm {
     grid-template-columns: 1fr;
+  }
+
+  .proposalWorkflowGuide {
+    grid-template-columns: 1fr;
+  }
+
+  .proposalWorkflowGuide > div,
+  .proposalWorkflowGuide > div:first-child {
+    padding: 14px 0;
+    border-right: 0;
+    border-bottom: 1px solid var(--border-soft);
+  }
+
+  .proposalWorkflowGuide > div:last-child {
+    border-bottom: 0;
+  }
+
+  .prospectActivityHeading {
+    flex-direction: column;
+  }
+
+  .prospectActivityHeading select {
+    width: 100%;
+    flex-basis: auto;
   }
 
   .proposalWorkflowSchedule > div {
