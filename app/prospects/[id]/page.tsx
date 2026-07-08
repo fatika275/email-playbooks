@@ -30,7 +30,7 @@ import {
   type ProspectStage,
 } from "@/lib/prospects";
 import { playbooks } from "@/lib/data";
-import { useCustomTemplates } from "@/lib/storage";
+import { type CustomTemplate, useCustomTemplates } from "@/lib/storage";
 
 const SEQUENCE_TIMING: Record<string, number[]> = {
   "cold-outreach-sequence": [1, 3, 7, 10],
@@ -64,6 +64,55 @@ function isScheduledFollowUpTask(task: ProspectTask) {
 
 function cleanFollowUpTaskTitle(title: string) {
   return getProspectTaskDisplayTitle(title).replace(/^(?:Proposal|Scheduled) follow-up \d+: /, "");
+}
+
+function cleanTemplateLabel(label: string) {
+  return label.replace(/\s*\(Day\s+\d+\)/i, "").trim();
+}
+
+function getLegacyCustomSequenceSteps(template: CustomTemplate): ScheduledSequence["steps"] {
+  if (template.sequenceSteps?.length) {
+    return template.sequenceSteps.map((step, index) => ({
+      playbookId: step.playbookId,
+      templateId: step.templateId,
+      label: step.templateLabel || `Step ${index + 1}`,
+      dayOffset: step.dayOffset,
+    }));
+  }
+
+  const parsedLabels = Array.from(
+    template.body.matchAll(/^Step\s+\d+:\s*(.+)$/gim)
+  ).map((match) => match[1]?.trim()).filter(Boolean);
+
+  const labels = parsedLabels.length > 0 ? parsedLabels : [template.title];
+
+  return labels
+    .map((label, index) => {
+      const normalizedLabel = label.toLowerCase();
+      const match = playbooks
+        .flatMap((playbook) =>
+          playbook.templates.map((item, templateIndex) => ({
+            playbook,
+            item,
+            templateIndex,
+          }))
+        )
+        .find(({ item }) => cleanTemplateLabel(item.label).toLowerCase() === normalizedLabel);
+
+      if (!match && index > 0) return null;
+
+      const playbookId = match?.playbook.id ?? template.sourcePlaybookId;
+      const templateId = match?.item.id ?? template.sourceTemplateId;
+      const sourceTiming = SEQUENCE_TIMING[playbookId];
+
+      return {
+        playbookId,
+        templateId,
+        label: match ? cleanTemplateLabel(match.item.label) : label,
+        dayOffset: sourceTiming?.[match?.templateIndex ?? index] ?? index * 3,
+      };
+    })
+    .filter((step): step is ScheduledSequence["steps"][number] => Boolean(step));
 }
 
 function addDays(date: string, days: number) {
@@ -121,24 +170,19 @@ export default function ProspectDetailPage() {
       steps: playbook.templates.map((template, index) => ({
         playbookId: playbook.id,
         templateId: template.id,
-        label: template.label.replace(/\s*\(Day\s+\d+\)/i, ""),
+        label: cleanTemplateLabel(template.label),
         dayOffset: SEQUENCE_TIMING[playbook.id][index] ?? index * 3,
       })),
     }));
 
     const saved = customTemplates
-      .filter((template) => (template.sequenceSteps?.length ?? 0) > 0)
       .map((template) => ({
         id: `custom:${template.id}`,
         name: template.title,
-        sourceLabel: "Saved sequence",
-        steps: (template.sequenceSteps ?? []).map((step, index) => ({
-          playbookId: step.playbookId,
-          templateId: step.templateId,
-          label: step.templateLabel || `Step ${index + 1}`,
-          dayOffset: step.dayOffset,
-        })),
-      }));
+        sourceLabel: template.sequenceSteps?.length ? "Saved sequence" : "Saved sequence",
+        steps: getLegacyCustomSequenceSteps(template),
+      }))
+      .filter((sequence) => sequence.steps.length > 0);
 
     return [...saved, ...builtIn];
   }, [customTemplates]);
