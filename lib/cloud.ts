@@ -34,6 +34,7 @@ type CloudCustomTemplateRow = {
   body: string;
   source_playbook_id: string;
   source_template_id: string;
+  sequence_steps?: CustomTemplate["sequenceSteps"] | null;
   tags: string[];
   folder: string | null;
   is_favorite: boolean;
@@ -180,6 +181,14 @@ function normalizeCloudError(error: unknown) {
   }
 
   return error;
+}
+
+function isMissingSequenceStepsColumn(error: { code?: string; message?: string } | null) {
+  return Boolean(
+    error &&
+      (error.code === "PGRST204" ||
+        error.message?.toLowerCase().includes("sequence_steps"))
+  );
 }
 
 export async function signUpWithPassword(email: string, password: string) {
@@ -500,10 +509,23 @@ async function fetchCloudTemplates(userId: string) {
   const { data, error } = await client
     .from("custom_templates")
     .select(
-      "id, title, subject, body, sourcePlaybookId:source_playbook_id, sourceTemplateId:source_template_id, tags, folder, isFavorite:is_favorite, createdAt:created_at"
+      "id, title, subject, body, sourcePlaybookId:source_playbook_id, sourceTemplateId:source_template_id, sequenceSteps:sequence_steps, tags, folder, isFavorite:is_favorite, createdAt:created_at"
     )
     .eq("user_id", userId)
     .order("created_at", { ascending: false });
+
+  if (isMissingSequenceStepsColumn(error)) {
+    const { data: fallbackData, error: fallbackError } = await client
+      .from("custom_templates")
+      .select(
+        "id, title, subject, body, sourcePlaybookId:source_playbook_id, sourceTemplateId:source_template_id, tags, folder, isFavorite:is_favorite, createdAt:created_at"
+      )
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false });
+
+    if (fallbackError) throw normalizeCloudError(fallbackError);
+    return (fallbackData ?? []) as CustomTemplate[];
+  }
 
   if (error) throw normalizeCloudError(error);
   return (data ?? []) as CustomTemplate[];
@@ -543,6 +565,7 @@ async function upsertTemplates(userId: string, templates: CustomTemplate[]) {
     body: template.body,
     source_playbook_id: template.sourcePlaybookId,
     source_template_id: template.sourceTemplateId,
+    sequence_steps: template.sequenceSteps ?? null,
     tags: template.tags ?? [],
     folder: template.folder ?? null,
     is_favorite: template.isFavorite ?? false,
@@ -550,6 +573,28 @@ async function upsertTemplates(userId: string, templates: CustomTemplate[]) {
   }));
 
   const { error } = await client.from("custom_templates").upsert(payload);
+  if (isMissingSequenceStepsColumn(error)) {
+    const fallbackPayload = payload.map((template) => ({
+      id: template.id,
+      user_id: template.user_id,
+      title: template.title,
+      subject: template.subject,
+      body: template.body,
+      source_playbook_id: template.source_playbook_id,
+      source_template_id: template.source_template_id,
+      tags: template.tags,
+      folder: template.folder,
+      is_favorite: template.is_favorite,
+      created_at: template.created_at,
+    }));
+    const { error: fallbackError } = await client
+      .from("custom_templates")
+      .upsert(fallbackPayload);
+
+    if (fallbackError) throw normalizeCloudError(fallbackError);
+    return;
+  }
+
   if (error) throw normalizeCloudError(error);
 }
 

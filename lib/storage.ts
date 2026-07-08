@@ -20,10 +20,19 @@ export type CustomTemplate = {
   body: string;
   sourcePlaybookId: string;
   sourceTemplateId: string;
+  sequenceSteps?: CustomSequenceStep[];
   tags: string[];
   folder: string | null;
   isFavorite: boolean;
   createdAt: string;
+};
+
+export type CustomSequenceStep = {
+  playbookId: string;
+  playbookName: string;
+  templateId: string;
+  templateLabel: string;
+  dayOffset: number;
 };
 
 const EMAILS_KEY = "thalovo_emails";
@@ -94,6 +103,19 @@ function normalizeSavedEmail(email: SavedEmail): SavedEmail {
 function normalizeCustomTemplate(template: CustomTemplate): CustomTemplate {
   return {
     ...template,
+    sequenceSteps: Array.isArray(template.sequenceSteps)
+      ? template.sequenceSteps
+          .map((step, index) => ({
+            playbookId: String(step.playbookId || template.sourcePlaybookId || ""),
+            playbookName: String(step.playbookName || "Message Library"),
+            templateId: String(step.templateId || template.sourceTemplateId || ""),
+            templateLabel: String(step.templateLabel || `Step ${index + 1}`),
+            dayOffset: Number.isFinite(Number(step.dayOffset))
+              ? Number(step.dayOffset)
+              : index * 3,
+          }))
+          .filter((step) => step.playbookId && step.templateId)
+      : undefined,
     tags: Array.isArray(template.tags) ? template.tags : [],
     folder: typeof template.folder === "string" ? template.folder : null,
     isFavorite: Boolean(template.isFavorite),

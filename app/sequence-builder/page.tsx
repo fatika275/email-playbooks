@@ -12,6 +12,7 @@ type BuilderStep = {
   playbookId: string;
   playbookName: string;
   template: Template;
+  dayOffset: number;
 };
 
 function makeId(prefix = "sequence") {
@@ -28,6 +29,11 @@ function getUniqueVariables(steps: BuilderStep[]) {
 
 function getStepLabel(label: string) {
   return label.replace(/\s*\(Day\s+\d+\)/i, "").trim();
+}
+
+function getDefaultDayOffset(label: string, index: number) {
+  const match = label.match(/\(Day\s+(\d+)\)/i);
+  return match ? Math.max(0, Number(match[1]) - 1) : index * 3;
 }
 
 const variableLabels: Record<string, string> = {
@@ -141,6 +147,7 @@ export default function SequenceBuilderPage() {
         playbookId: selectedPlaybook.id,
         playbookName: selectedPlaybook.name,
         template,
+        dayOffset: getDefaultDayOffset(template.label, current.length),
       },
     ]);
   }
@@ -168,6 +175,16 @@ export default function SequenceBuilderPage() {
     setValues((current) => ({ ...current, [variable]: value }));
   }
 
+  function updateStepDayOffset(stepId: string, dayOffset: number) {
+    setSteps((current) =>
+      current.map((step) =>
+        step.id === stepId
+          ? { ...step, dayOffset: Math.max(0, Number.isFinite(dayOffset) ? dayOffset : 0) }
+          : step
+      )
+    );
+  }
+
   async function handleSaveSequence() {
     if (steps.length === 0) {
       setNotice("Add at least one step before saving.");
@@ -187,6 +204,13 @@ export default function SequenceBuilderPage() {
       body: finalBody,
       sourcePlaybookId: firstStep.playbookId,
       sourceTemplateId: firstStep.template.id,
+      sequenceSteps: steps.map((step) => ({
+        playbookId: step.playbookId,
+        playbookName: step.playbookName,
+        templateId: step.template.id,
+        templateLabel: getStepLabel(step.template.label),
+        dayOffset: step.dayOffset,
+      })),
       tags: parsedTags,
       folder: folder.trim() || "Built Sequences",
       isFavorite: false,
@@ -271,6 +295,23 @@ export default function SequenceBuilderPage() {
                       </div>
 
                       <div className="builderStepActions">
+                        <label className="small" style={{ display: "grid", gap: 4 }}>
+                          Day
+                          <input
+                            className="input"
+                            type="number"
+                            min="0"
+                            value={step.dayOffset}
+                            onChange={(event) =>
+                              updateStepDayOffset(
+                                step.id,
+                                Number(event.target.value)
+                              )
+                            }
+                            style={{ width: 84, padding: "8px 10px" }}
+                            aria-label={`Day offset for ${getStepLabel(step.template.label)}`}
+                          />
+                        </label>
                         <button
                           type="button"
                           className="button buttonUtility"

@@ -120,6 +120,7 @@ export default function SequenceAssetPage() {
       body,
       sourcePlaybookId: template.sourcePlaybookId,
       sourceTemplateId: template.sourceTemplateId,
+      sequenceSteps: template.sequenceSteps,
       tags: template.tags ?? [],
       folder: template.folder ?? null,
       isFavorite: template.isFavorite ?? false,

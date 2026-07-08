@@ -151,6 +151,7 @@ create table if not exists public.custom_templates (
   body text not null,
   source_playbook_id text not null,
   source_template_id text not null,
+  sequence_steps jsonb,
   tags text[] not null default '{}',
   folder text,
   is_favorite boolean not null default false,
@@ -160,7 +161,8 @@ create table if not exists public.custom_templates (
 alter table public.custom_templates
   add column if not exists tags text[] not null default '{}',
   add column if not exists folder text,
-  add column if not exists is_favorite boolean not null default false;
+  add column if not exists is_favorite boolean not null default false,
+  add column if not exists sequence_steps jsonb;
 
 create index if not exists custom_templates_user_id_idx
   on public.custom_templates (user_id, created_at desc);

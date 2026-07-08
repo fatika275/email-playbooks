@@ -30,6 +30,7 @@ import {
   type ProspectStage,
 } from "@/lib/prospects";
 import { playbooks } from "@/lib/data";
+import { useCustomTemplates } from "@/lib/storage";
 
 const SEQUENCE_TIMING: Record<string, number[]> = {
   "cold-outreach-sequence": [1, 3, 7, 10],
@@ -43,7 +44,19 @@ const SEQUENCE_TIMING: Record<string, number[]> = {
   "client-renewal-upsell": [0, 5],
 };
 
-const scheduledSequences = playbooks.filter((playbook) => SEQUENCE_TIMING[playbook.id]);
+const builtInScheduledSequences = playbooks.filter((playbook) => SEQUENCE_TIMING[playbook.id]);
+
+type ScheduledSequence = {
+  id: string;
+  name: string;
+  sourceLabel: string;
+  steps: {
+    playbookId: string;
+    templateId: string;
+    label: string;
+    dayOffset: number;
+  }[];
+};
 
 function isScheduledFollowUpTask(task: ProspectTask) {
   return task.title.startsWith("Proposal follow-up") || task.title.startsWith("Scheduled follow-up");
@@ -63,6 +76,7 @@ export default function ProspectDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { user, hasProAccess, isLoading } = useAccount();
+  const customTemplates = useCustomTemplates();
   const id = useMemo(() => {
     const value = params?.id;
     return Array.isArray(value) ? value[0] : value;
@@ -98,6 +112,36 @@ export default function ProspectDetailPage() {
   const [detailView, setDetailView] = useState<"overview" | "followup" | "activity">("overview");
   const [activityFilter, setActivityFilter] = useState<"useful" | "outreach" | "notes" | "all">("useful");
   const [showAllActivity, setShowAllActivity] = useState(false);
+
+  const scheduledSequences = useMemo<ScheduledSequence[]>(() => {
+    const builtIn = builtInScheduledSequences.map((playbook) => ({
+      id: playbook.id,
+      name: playbook.name,
+      sourceLabel: "Message Library",
+      steps: playbook.templates.map((template, index) => ({
+        playbookId: playbook.id,
+        templateId: template.id,
+        label: template.label.replace(/\s*\(Day\s+\d+\)/i, ""),
+        dayOffset: SEQUENCE_TIMING[playbook.id][index] ?? index * 3,
+      })),
+    }));
+
+    const saved = customTemplates
+      .filter((template) => (template.sequenceSteps?.length ?? 0) > 0)
+      .map((template) => ({
+        id: `custom:${template.id}`,
+        name: template.title,
+        sourceLabel: "Saved sequence",
+        steps: (template.sequenceSteps ?? []).map((step, index) => ({
+          playbookId: step.playbookId,
+          templateId: step.templateId,
+          label: step.templateLabel || `Step ${index + 1}`,
+          dayOffset: step.dayOffset,
+        })),
+      }));
+
+    return [...saved, ...builtIn];
+  }, [customTemplates]);
 
   const proposalWorkflowTasks = useMemo(
     () => tasks.filter(isScheduledFollowUpTask),
@@ -369,20 +413,19 @@ export default function ProspectDetailPage() {
   async function handleStartProposalWorkflow() {
     if (!id || !user || !proposalSentDate) return;
     const selectedSequence = scheduledSequences.find((playbook) => playbook.id === selectedSequenceId);
-    if (!selectedSequence) return;
+    if (!selectedSequence || selectedSequence.steps.length === 0) return;
     if (activeProposalTasks.length && !window.confirm("Replace the current follow-up schedule with a new one?")) return;
     setIsStartingProposalWorkflow(true);
     try {
       await Promise.all(activeProposalTasks.map((task) => setProspectTaskCompleted(task.id, true)));
-      const timing = SEQUENCE_TIMING[selectedSequence.id];
       const assignedUserId =
         teamMembers.find((member) => member.email === taskAssignee)?.user_id ??
         (taskAssignee === user.email ? user.id : null);
-      await Promise.all(selectedSequence.templates.map((template, index) => createProspectTask({
+      await Promise.all(selectedSequence.steps.map((step, index) => createProspectTask({
         prospectId: id,
         userId: user.id,
-        title: `Scheduled follow-up ${index + 1}: ${template.label.replace(/\s*\(Day\s+\d+\)/i, "")} [[thalovo:${selectedSequence.id}/${template.id}]]`,
-        dueDate: addDays(proposalSentDate, timing[index] ?? index * 3),
+        title: `Scheduled follow-up ${index + 1}: ${step.label} [[thalovo:${step.playbookId}/${step.templateId}]]`,
+        dueDate: addDays(proposalSentDate, step.dayOffset),
         assignedEmail: taskAssignee,
         assignedUserId,
         workspaceId: prospect?.workspace_id,
@@ -391,9 +434,9 @@ export default function ProspectDetailPage() {
         prospectId: id,
         userId: user.id,
         activityType: "email",
-        summary: `${selectedSequence.name} scheduled with ${selectedSequence.templates.length} step${selectedSequence.templates.length === 1 ? "" : "s"}.`,
+        summary: `${selectedSequence.name} scheduled with ${selectedSequence.steps.length} step${selectedSequence.steps.length === 1 ? "" : "s"}.`,
       });
-      const firstFollowUp = addDays(proposalSentDate, timing[0] ?? 0);
+      const firstFollowUp = addDays(proposalSentDate, selectedSequence.steps[0]?.dayOffset ?? 0);
       const updated = await updateProspect(id, {
         full_name: fullName,
         company,
@@ -535,7 +578,7 @@ export default function ProspectDetailPage() {
                 {activeProposalTasks.length ? <span className="statusPill statusPillSuccess">{activeProposalTasks.length} follow-up{activeProposalTasks.length === 1 ? "" : "s"} active</span> : <span className="statusPill">Not running</span>}
               </div>
               {!nextProposalTask ? <><div className="proposalWorkflowForm">
-                <div className="formGroup"><label className="label">Sequence</label><select className="input" value={selectedSequenceId} onChange={(event) => setSelectedSequenceId(event.target.value)}>{scheduledSequences.map((sequence) => <option key={sequence.id} value={sequence.id}>{sequence.name} - {sequence.templates.length} step{sequence.templates.length === 1 ? "" : "s"}</option>)}</select></div>
+                <div className="formGroup"><label className="label">Sequence</label><select className="input" value={selectedSequenceId} onChange={(event) => setSelectedSequenceId(event.target.value)}>{scheduledSequences.map((sequence) => <option key={sequence.id} value={sequence.id}>{sequence.name} - {sequence.steps.length} step{sequence.steps.length === 1 ? "" : "s"} - {sequence.sourceLabel}</option>)}</select><p className="small" style={{ margin: "6px 0 0" }}>Saved sequences from your library appear here after they are built in Sequence Builder.</p></div>
                 <div className="formGroup"><label className="label">Starting from</label><input className="input" type="date" value={proposalSentDate} onChange={(event) => setProposalSentDate(event.target.value)} /></div>
                 <div className="formGroup"><label className="label">Assigned to</label>{prospect?.workspace_id ? <select className="input" value={taskAssignee} onChange={(event) => setTaskAssignee(event.target.value)}><option value="">Unassigned</option><option value={user.email ?? ""}>Me ({user.email})</option>{teamMembers.filter((member) => member.email !== user.email).map((member) => <option key={member.id} value={member.email}>{member.email}</option>)}</select> : <input className="input" type="email" value={taskAssignee} onChange={(event) => setTaskAssignee(event.target.value)} placeholder="Assignee email" />}</div>
               </div>
