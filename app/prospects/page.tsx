@@ -57,6 +57,13 @@ function isDue(date: string | null) {
   return new Date(`${date}T00:00:00`).getTime() <= today.getTime();
 }
 
+function isFutureDate(date: string | null) {
+  if (!date) return false;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return new Date(`${date}T00:00:00`).getTime() > today.getTime();
+}
+
 function addDays(date: string, days: number) {
   const result = new Date(`${date}T12:00:00`);
   result.setDate(result.getDate() + days);
@@ -475,6 +482,35 @@ export default function ProspectsPage() {
     }
   }
 
+  async function handleUnsnoozeFollowUp(prospect: Prospect) {
+    const today = new Date().toISOString().slice(0, 10);
+    const previous = prospects;
+    setProspects((current) =>
+      current.map((item) =>
+        item.id === prospect.id ? { ...item, next_follow_up: today } : item
+      )
+    );
+    try {
+      await updateProspect(
+        prospect.id,
+        getProspectUpdatePayload(prospect, { next_follow_up: today })
+      );
+      if (user) {
+        await createProspectActivity({
+          prospectId: prospect.id,
+          userId: user.id,
+          activityType: "update",
+          summary: "Follow-up unsnoozed and moved back to today.",
+        });
+      }
+      setNotice(`${prospect.full_name} is back in today's follow-ups.`);
+      await refresh();
+    } catch (error) {
+      setProspects(previous);
+      setNotice(error instanceof Error ? error.message : "Follow-up could not be unsnoozed.");
+    }
+  }
+
   async function handleDrop(stage: ProspectStage) {
     if (!draggedProspectId) return;
     const id = draggedProspectId;
@@ -568,6 +604,7 @@ export default function ProspectsPage() {
   }
 
   function renderProspectQuickActions(prospect: Prospect) {
+    const isSnoozed = isFutureDate(prospect.next_follow_up);
     return (
       <div className="prospectQuickActions" aria-label={`Quick actions for ${prospect.full_name}`}>
         <button
@@ -579,17 +616,19 @@ export default function ProspectsPage() {
         </button>
         <button
           type="button"
-          className="button buttonSecondary"
-          onClick={() => void handleQuickStageChange(prospect, "replied")}
-        >
-          Log reply
-        </button>
-        <button
-          type="button"
           className="button buttonUtility"
-          onClick={() => void handleSnoozeFollowUp(prospect)}
+          title={
+            isSnoozed
+              ? `Snoozed until ${prospect.next_follow_up}. Move back to today.`
+              : "Move follow-up out by 3 days."
+          }
+          onClick={() =>
+            void (isSnoozed
+              ? handleUnsnoozeFollowUp(prospect)
+              : handleSnoozeFollowUp(prospect))
+          }
         >
-          Snooze
+          {isSnoozed ? "Unsnooze" : "Snooze"}
         </button>
         <button
           type="button"
