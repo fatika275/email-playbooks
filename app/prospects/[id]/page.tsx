@@ -156,7 +156,7 @@ export default function ProspectDetailPage() {
   const [taskAssignee, setTaskAssignee] = useState(user?.email ?? "");
   const [teamMembers, setTeamMembers] = useState<BusinessMember[]>([]);
   const [proposalSentDate, setProposalSentDate] = useState(() => new Date().toISOString().slice(0, 10));
-  const [selectedSequenceId, setSelectedSequenceId] = useState("proposal-follow-up");
+  const [selectedSequenceId, setSelectedSequenceId] = useState("");
   const [sequenceSearch, setSequenceSearch] = useState("");
   const [isStartingProposalWorkflow, setIsStartingProposalWorkflow] = useState(false);
   const [detailView, setDetailView] = useState<"overview" | "followup" | "activity">("overview");
@@ -191,7 +191,7 @@ export default function ProspectDetailPage() {
   const selectedScheduledSequence = useMemo(
     () =>
       scheduledSequences.find((sequence) => sequence.id === selectedSequenceId) ??
-      scheduledSequences[0],
+      null,
     [scheduledSequences, selectedSequenceId]
   );
 
@@ -642,16 +642,16 @@ export default function ProspectDetailPage() {
 
             <section className="prospectOpsPanel proposalWorkflowPanel" hidden={detailView !== "followup"}>
               <div className="proposalWorkflowHeader">
-                <div><span className="miniBadge">Scheduled follow-up</span><h2 className="cardTitle">Your next follow-up</h2><p className="small">Schedule reminders for any conversation. Choose the wording from the Message Library when each reminder is due.</p></div>
-                {activeProposalTasks.length ? <span className="statusPill statusPillSuccess">{activeProposalTasks.length} follow-up{activeProposalTasks.length === 1 ? "" : "s"} active</span> : <span className="statusPill">Not running</span>}
+                <div><span className="miniBadge">Sequence schedule</span><h2 className="cardTitle">{nextProposalTask ? "Next scheduled reminder" : "Start a sequence"}</h2><p className="small">{nextProposalTask ? "Work through the active reminders for this prospect. Opening a message loads the right template for the current step." : "Choose a reusable sequence, set the start date, and create the reminders for this prospect."}</p></div>
+                {activeProposalTasks.length ? <span className="statusPill statusPillSuccess">{activeProposalTasks.length} reminder{activeProposalTasks.length === 1 ? "" : "s"} active</span> : <span className="statusPill">No sequence running</span>}
               </div>
               {!nextProposalTask ? <><div className="proposalWorkflowForm">
                 <div className="formGroup proposalSequencePicker"><label className="label">Sequence</label>
                   <div className="proposalSelectedSequence">
                     <div>
-                      <span className="miniBadge">{selectedScheduledSequence?.sourceLabel ?? "Sequence"}</span>
+                      <span className="miniBadge">{selectedScheduledSequence?.sourceLabel ?? "Not selected"}</span>
                       <strong>{selectedScheduledSequence?.name ?? "Choose a sequence"}</strong>
-                      <p>{selectedScheduledSequence ? `${selectedScheduledSequence.steps.length} step${selectedScheduledSequence.steps.length === 1 ? "" : "s"}` : "Search your reusable sequence library."}</p>
+                      <p>{selectedScheduledSequence ? `${selectedScheduledSequence.steps.length} step${selectedScheduledSequence.steps.length === 1 ? "" : "s"}` : "Pick the sequence you want to run for this prospect."}</p>
                     </div>
                   </div>
                   <input className="input" value={sequenceSearch} onChange={(event) => setSequenceSearch(event.target.value)} placeholder="Search saved sequences by name, source, or step" />
@@ -667,9 +667,9 @@ export default function ProspectDetailPage() {
                     ))}
                     {filteredScheduledSequences.length === 0 ? <div className="proposalSequenceEmpty">No matching sequences.</div> : null}
                   </div>
-                  <p className="small" style={{ margin: "6px 0 0" }}>Pro can hold unlimited sequences; search keeps this client picker focused.</p>
+                  <p className="small" style={{ margin: "6px 0 0" }}>Search keeps this picker focused even when your Pro library has lots of saved sequences.</p>
                 </div>
-                <div className="formGroup"><label className="label">Starting from</label><input className="input" type="date" value={proposalSentDate} onChange={(event) => setProposalSentDate(event.target.value)} /></div>
+                <div className="formGroup"><label className="label">Start date</label><input className="input" type="date" value={proposalSentDate} onChange={(event) => setProposalSentDate(event.target.value)} /></div>
                 <div className="formGroup"><label className="label">Assigned to</label>{prospect?.workspace_id ? <select className="input" value={taskAssignee} onChange={(event) => setTaskAssignee(event.target.value)}><option value="">Unassigned</option><option value={user.email ?? ""}>Me ({user.email})</option>{teamMembers.filter((member) => member.email !== user.email).map((member) => <option key={member.id} value={member.email}>{member.email}</option>)}</select> : <input className="input" type="email" value={taskAssignee} onChange={(event) => setTaskAssignee(event.target.value)} placeholder="Assignee email" />}</div>
               </div>
               <div className="proposalWorkflowActions">
@@ -679,7 +679,7 @@ export default function ProspectDetailPage() {
                   <div><span>{nextProposalTask.due_date ? `Due ${nextProposalTask.due_date}` : "Ready when you are"}</span><strong>{cleanFollowUpTaskTitle(nextProposalTask.title)}</strong><p>{activeProposalTasks.length > 1 ? `${activeProposalTasks.length - 1} later reminder${activeProposalTasks.length - 1 === 1 ? "" : "s"} already scheduled.` : "This is the final scheduled reminder."}</p></div>
                   <div className="proposalTaskActions"><button className="button buttonPrimary" onClick={() => handleDraftProposalFollowUp(nextProposalTask)}>Open message</button><button className="button buttonSecondary" onClick={() => void handleCompleteProposalTask(nextProposalTask)}>Mark sent</button></div>
                 </div>
-                <div className="proposalWorkflowActions proposalOutcomeActions"><span>Did the deal move?</span><button className="button buttonSecondary" disabled={isStartingProposalWorkflow} onClick={() => void handleProposalOutcome("replied")}>They replied</button><button className="button buttonSecondary" disabled={isStartingProposalWorkflow} onClick={() => void handleProposalOutcome("won")}>Mark won</button><button className="button buttonUtility" disabled={isStartingProposalWorkflow} onClick={() => void handleProposalOutcome("lost")}>Mark lost</button></div>
+                <div className="proposalWorkflowActions proposalOutcomeActions"><span>Close this schedule</span><button className="button buttonSecondary" disabled={isStartingProposalWorkflow} onClick={() => void handleProposalOutcome("replied")}>They replied</button><button className="button buttonSecondary" disabled={isStartingProposalWorkflow} onClick={() => void handleProposalOutcome("won")}>Mark won</button><button className="button buttonUtility" disabled={isStartingProposalWorkflow} onClick={() => void handleProposalOutcome("lost")}>Mark lost</button></div>
               </>}
             </section>
 
