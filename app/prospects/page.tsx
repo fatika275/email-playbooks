@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Papa from "papaparse";
 import { useAccount } from "@/components/account-provider";
 import {
@@ -11,6 +12,7 @@ import {
 import {
   createProspectsBatch,
   createProspect,
+  createProspectActivity,
   DEFAULT_STAGE_PROBABILITIES,
   getForecastSettings,
   listProspectTasks,
@@ -21,6 +23,7 @@ import {
   PROSPECT_STAGE_LABELS,
   saveForecastSettings,
   setProspectTaskCompleted,
+  updateProspect,
   updateProspectStage,
   type Prospect,
   type ProspectStage,
@@ -54,6 +57,12 @@ function isDue(date: string | null) {
   return new Date(`${date}T00:00:00`).getTime() <= today.getTime();
 }
 
+function addDays(date: string, days: number) {
+  const result = new Date(`${date}T12:00:00`);
+  result.setDate(result.getDate() + days);
+  return result.toISOString().slice(0, 10);
+}
+
 function daysSince(date: string | null) {
   if (!date) return null;
   const today = new Date();
@@ -73,6 +82,7 @@ function isProposalTask(task: ProspectTask) {
 }
 
 export default function ProspectsPage() {
+  const router = useRouter();
   const { user, hasProAccess, isLoading, businessMembership } = useAccount();
   const [prospects, setProspects] = useState<Prospect[]>([]);
   const [workspaceId, setWorkspaceId] = useState<string | null>(
@@ -381,6 +391,90 @@ export default function ProspectsPage() {
     }
   }
 
+  function getProspectUpdatePayload(prospect: Prospect, overrides: Partial<Prospect>) {
+    return {
+      full_name: overrides.full_name ?? prospect.full_name,
+      company: overrides.company ?? prospect.company,
+      email: overrides.email ?? prospect.email ?? "",
+      role: overrides.role ?? prospect.role ?? "",
+      linkedin_url: overrides.linkedin_url ?? prospect.linkedin_url ?? "",
+      source: overrides.source ?? prospect.source ?? "",
+      stage: overrides.stage ?? prospect.stage,
+      estimated_value_gbp:
+        overrides.estimated_value_gbp ?? prospect.estimated_value_gbp,
+      notes: overrides.notes ?? prospect.notes ?? "",
+      next_follow_up: overrides.next_follow_up ?? prospect.next_follow_up ?? "",
+      last_contacted_at:
+        overrides.last_contacted_at ?? prospect.last_contacted_at,
+    };
+  }
+
+  function handleDraftNextMessage(prospect: Prospect) {
+    window.localStorage.setItem(
+      "thalovo_prospect_context",
+      JSON.stringify({
+        name: prospect.full_name,
+        company: prospect.company,
+        email: prospect.email,
+        role: prospect.role,
+        prospectId: prospect.id,
+      })
+    );
+    router.push("/library");
+  }
+
+  async function handleQuickStageChange(prospect: Prospect, stage: ProspectStage) {
+    const previous = prospects;
+    setProspects((current) =>
+      current.map((item) => (item.id === prospect.id ? { ...item, stage } : item))
+    );
+    try {
+      await updateProspectStage(prospect.id, stage);
+      if (user && ["replied", "won", "lost"].includes(stage)) {
+        await createProspectActivity({
+          prospectId: prospect.id,
+          userId: user.id,
+          activityType: "status",
+          summary: `${prospect.full_name} marked ${PROSPECT_STAGE_LABELS[stage].toLowerCase()}.`,
+        });
+      }
+      setNotice(`${prospect.full_name} moved to ${PROSPECT_STAGE_LABELS[stage]}.`);
+      await refresh();
+    } catch (error) {
+      setProspects(previous);
+      setNotice(error instanceof Error ? error.message : "Prospect could not be updated.");
+    }
+  }
+
+  async function handleSnoozeFollowUp(prospect: Prospect, days = 3) {
+    const nextDate = addDays(new Date().toISOString().slice(0, 10), days);
+    const previous = prospects;
+    setProspects((current) =>
+      current.map((item) =>
+        item.id === prospect.id ? { ...item, next_follow_up: nextDate } : item
+      )
+    );
+    try {
+      await updateProspect(
+        prospect.id,
+        getProspectUpdatePayload(prospect, { next_follow_up: nextDate })
+      );
+      if (user) {
+        await createProspectActivity({
+          prospectId: prospect.id,
+          userId: user.id,
+          activityType: "update",
+          summary: `Follow-up snoozed until ${nextDate}.`,
+        });
+      }
+      setNotice(`${prospect.full_name} snoozed until ${nextDate}.`);
+      await refresh();
+    } catch (error) {
+      setProspects(previous);
+      setNotice(error instanceof Error ? error.message : "Follow-up could not be snoozed.");
+    }
+  }
+
   async function handleDrop(stage: ProspectStage) {
     if (!draggedProspectId) return;
     const id = draggedProspectId;
@@ -471,6 +565,48 @@ export default function ProspectsPage() {
     } finally {
       setIsSavingForecast(false);
     }
+  }
+
+  function renderProspectQuickActions(prospect: Prospect) {
+    return (
+      <div className="prospectQuickActions" aria-label={`Quick actions for ${prospect.full_name}`}>
+        <button
+          type="button"
+          className="button buttonPrimary"
+          onClick={() => handleDraftNextMessage(prospect)}
+        >
+          Send next message
+        </button>
+        <button
+          type="button"
+          className="button buttonSecondary"
+          onClick={() => void handleQuickStageChange(prospect, "replied")}
+        >
+          Log reply
+        </button>
+        <button
+          type="button"
+          className="button buttonUtility"
+          onClick={() => void handleSnoozeFollowUp(prospect)}
+        >
+          Snooze
+        </button>
+        <button
+          type="button"
+          className="button buttonSecondary"
+          onClick={() => void handleQuickStageChange(prospect, "won")}
+        >
+          Won
+        </button>
+        <button
+          type="button"
+          className="button buttonUtility"
+          onClick={() => void handleQuickStageChange(prospect, "lost")}
+        >
+          Lost
+        </button>
+      </div>
+    );
   }
 
   if (isLoading) {
@@ -606,6 +742,7 @@ export default function ProspectsPage() {
                           </div>
                           {prospect.next_follow_up ? <span className={isDue(prospect.next_follow_up) ? "prospectCardFollowUp prospectDue" : "prospectCardFollowUp"}>{isDue(prospect.next_follow_up) ? "Due" : "Follow up"} {prospect.next_follow_up}</span> : null}
                         </Link>
+                        {renderProspectQuickActions(prospect)}
                         <select className="input prospectCardStage" value={prospect.stage} onChange={(event) => void handleStageChange(prospect.id, event.target.value as ProspectStage)} aria-label={`Move ${prospect.full_name} to stage`} title="Move to another stage">
                           {PROSPECT_STAGES.map((option) => <option key={option} value={option}>{PROSPECT_STAGE_LABELS[option]}</option>)}
                         </select>
@@ -623,7 +760,7 @@ export default function ProspectsPage() {
           <div className="prospectViewHeading"><h2 className="sectionTitle">All prospects</h2><p className="muted">Scan every lead in one place, then filter by stage or search by name and company.</p></div>
           <div className="prospectTableWrap">
             <table className="prospectTable">
-              <thead><tr><th>Prospect</th><th>Stage</th><th>Value</th><th>Follow-up</th><th>Source</th></tr></thead>
+              <thead><tr><th>Prospect</th><th>Stage</th><th>Value</th><th>Follow-up</th><th>Source</th><th>Actions</th></tr></thead>
               <tbody>
                 {filtered.map((prospect) => (
                   <tr key={prospect.id}>
@@ -632,6 +769,7 @@ export default function ProspectsPage() {
                     <td>{formatMoney(prospect.estimated_value_gbp)}</td>
                     <td className={isDue(prospect.next_follow_up) ? "prospectDue" : ""}>{prospect.next_follow_up || "Not set"}</td>
                     <td>{prospect.source || "-"}</td>
+                    <td>{renderProspectQuickActions(prospect)}</td>
                   </tr>
                 ))}
               </tbody>

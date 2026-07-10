@@ -2273,6 +2273,26 @@ details[open] > summary::after {
   font-size: 11px !important;
 }
 
+.prospectQuickActions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  margin-top: 9px;
+}
+
+.prospectQuickActions .button {
+  min-width: 0;
+  min-height: 30px;
+  padding: 0 8px;
+  white-space: normal;
+  font-size: 11px;
+  line-height: 1.15;
+}
+
+.prospectQuickActions .button:first-child {
+  grid-column: 1 / -1;
+}
+
 .prospectCardStage {
   width: 100%;
   min-height: 30px;
@@ -2304,7 +2324,7 @@ details[open] > summary::after {
 
 .prospectTable {
   width: 100%;
-  min-width: 820px;
+  min-width: 1120px;
   border-collapse: collapse;
 }
 
@@ -2341,6 +2361,16 @@ details[open] > summary::after {
   min-height: 34px;
   padding: 5px 8px;
   font-size: 12px;
+}
+
+.prospectTable .prospectQuickActions {
+  min-width: 260px;
+  margin-top: 0;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.prospectTable .prospectQuickActions .button:first-child {
+  grid-column: auto;
 }
 
 .prospectDetailLayout {
