@@ -15,6 +15,14 @@ type BuilderStep = {
   dayOffset: number;
 };
 
+type TemplateOption = {
+  playbookId: string;
+  playbookName: string;
+  badge: string;
+  audience: string;
+  template: Template;
+};
+
 function makeId(prefix = "sequence") {
   return typeof crypto !== "undefined" && "randomUUID" in crypto
     ? crypto.randomUUID()
@@ -57,11 +65,22 @@ function getVariableLabel(variable: string) {
   return variableLabels[variable] ?? variable;
 }
 
+function getSequenceSpan(steps: BuilderStep[]) {
+  if (steps.length === 0) return 0;
+  return Math.max(...steps.map((step) => step.dayOffset)) + 1;
+}
+
+function getFilledVariableCount(variables: string[], values: Record<string, string>) {
+  return variables.filter((variable) => values[variable]?.trim()).length;
+}
+
 export default function SequenceBuilderPage() {
   const { hasProAccess } = useAccount();
   const [selectedPlaybookId, setSelectedPlaybookId] = useState(
     playbooks[0]?.id ?? ""
   );
+  const [templateQuery, setTemplateQuery] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("All");
   const [steps, setSteps] = useState<BuilderStep[]>([]);
   const [values, setValues] = useState<Record<string, string>>({});
   const [sequenceTitle, setSequenceTitle] = useState("");
@@ -70,12 +89,55 @@ export default function SequenceBuilderPage() {
   const [tags, setTags] = useState("sequence-builder, outbound");
   const [notice, setNotice] = useState("");
 
-  const selectedPlaybook = playbooks.find(
-    (playbook) => playbook.id === selectedPlaybookId
+  const categoryOptions = useMemo(
+    () => ["All", ...Array.from(new Set(playbooks.map((playbook) => playbook.badge)))],
+    []
   );
 
-  const availableTemplates = selectedPlaybook?.templates ?? [];
+  const templateOptions = useMemo<TemplateOption[]>(
+    () =>
+      playbooks.flatMap((playbook) =>
+        playbook.templates.map((template) => ({
+          playbookId: playbook.id,
+          playbookName: playbook.name,
+          badge: playbook.badge,
+          audience: playbook.audience,
+          template,
+        }))
+      ),
+    []
+  );
+
+  const filteredTemplateOptions = useMemo(() => {
+    const normalizedQuery = templateQuery.trim().toLowerCase();
+
+    return templateOptions.filter((option) => {
+      const matchesPlaybook =
+        selectedPlaybookId === "all" || option.playbookId === selectedPlaybookId;
+      const matchesCategory =
+        categoryFilter === "All" || option.badge === categoryFilter;
+      const matchesQuery =
+        normalizedQuery.length === 0 ||
+        [
+          option.template.label,
+          option.template.goal,
+          option.template.whenToUse,
+          option.playbookName,
+          option.badge,
+          option.audience,
+        ]
+          .join(" ")
+          .toLowerCase()
+          .includes(normalizedQuery);
+
+      return matchesPlaybook && matchesCategory && matchesQuery;
+    });
+  }, [categoryFilter, selectedPlaybookId, templateOptions, templateQuery]);
+
   const variables = useMemo(() => getUniqueVariables(steps), [steps]);
+  const sequenceSpan = getSequenceSpan(steps);
+  const filledVariableCount = getFilledVariableCount(variables, values);
+  const isReadyToSave = steps.length > 0;
 
   const renderedSteps = useMemo(
     () =>
@@ -137,17 +199,15 @@ export default function SequenceBuilderPage() {
     );
   }
 
-  function addStep(template: Template) {
-    if (!selectedPlaybook) return;
-
+  function addStep(option: TemplateOption) {
     setSteps((current) => [
       ...current,
       {
         id: makeId("step"),
-        playbookId: selectedPlaybook.id,
-        playbookName: selectedPlaybook.name,
-        template,
-        dayOffset: getDefaultDayOffset(template.label, current.length),
+        playbookId: option.playbookId,
+        playbookName: option.playbookName,
+        template: option.template,
+        dayOffset: getDefaultDayOffset(option.template.label, current.length),
       },
     ]);
   }
@@ -224,32 +284,65 @@ export default function SequenceBuilderPage() {
   return (
     <main className="main">
       <section className="container">
-        <div className="pageHeader">
-          <div className="badge">Sequence Builder</div>
-          <h1 className="pageTitle" style={{ marginTop: 14 }}>
-            Build a Custom Outreach Sequence
-          </h1>
-          <p className="muted" style={{ maxWidth: 760, lineHeight: 1.75 }}>
-            Combine steps from the system library, fill shared variables once,
-            and save the result as a reusable sequence.
-          </p>
+        <div className="builderHero">
+          <div>
+            <div className="badge">Sequence Builder</div>
+            <h1 className="pageTitle" style={{ marginTop: 14 }}>
+              Assemble a reusable outreach sequence.
+            </h1>
+            <p className="muted">
+              Search the message library, arrange the follow-up timeline, fill
+              shared details once, and save the finished system into your workspace.
+            </p>
+          </div>
+
+          <div className="builderHeroStats" aria-label="Sequence summary">
+            <div>
+              <strong>{steps.length}</strong>
+              <span>{steps.length === 1 ? "step" : "steps"}</span>
+            </div>
+            <div>
+              <strong>{sequenceSpan}</strong>
+              <span>{sequenceSpan === 1 ? "day" : "days"}</span>
+            </div>
+            <div>
+              <strong>
+                {filledVariableCount}/{variables.length}
+              </strong>
+              <span>fields</span>
+            </div>
+          </div>
         </div>
 
         <div className="builderLayout">
-          <div className="formCard">
-            <div className="glassCard builderPanel">
-              <h3 className="cardTitle">1. Choose steps</h3>
-              <p className="muted" style={{ marginTop: 8 }}>
-                Pick a playbook, then add the steps you want in order.
-              </p>
+          <div className="builderLibrary glassCard">
+            <div className="builderPanelHeader">
+              <div>
+                <span className="miniBadge">Library</span>
+                <h2 className="cardTitle">Add messages</h2>
+              </div>
+              <span className="small">{filteredTemplateOptions.length} available</span>
+            </div>
 
-              <div className="formGroup" style={{ marginTop: 16 }}>
-                <label className="label">Playbook</label>
+            <div className="builderLibraryControls">
+              <div className="formGroup" style={{ marginBottom: 0 }}>
+                <label className="label">Search</label>
+                <input
+                  className="input"
+                  value={templateQuery}
+                  onChange={(event) => setTemplateQuery(event.target.value)}
+                  placeholder="Search goal, use case, or playbook"
+                />
+              </div>
+
+              <div className="formGroup" style={{ marginBottom: 0 }}>
+                <label className="label">Source</label>
                 <select
                   className="input"
                   value={selectedPlaybookId}
                   onChange={(event) => setSelectedPlaybookId(event.target.value)}
                 >
+                  <option value="all">All playbooks</option>
                   {playbooks.map((playbook) => (
                     <option key={playbook.id} value={playbook.id}>
                       {playbook.name}
@@ -258,73 +351,123 @@ export default function SequenceBuilderPage() {
                 </select>
               </div>
 
-              <div className="builderStepPicker">
-                {availableTemplates.map((template) => (
-                  <button
-                    key={template.id}
-                    type="button"
-                    className="builderStepOption"
-                    onClick={() => addStep(template)}
-                  >
-                    <span>{getStepLabel(template.label)}</span>
-                    <span className="small">{template.goal}</span>
-                  </button>
-                ))}
+              <div className="formGroup" style={{ marginBottom: 0 }}>
+                <label className="label">Category</label>
+                <select
+                  className="input"
+                  value={categoryFilter}
+                  onChange={(event) => setCategoryFilter(event.target.value)}
+                >
+                  {categoryOptions.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
 
-            <div className="glassCard builderPanel">
-              <h3 className="cardTitle">2. Arrange sequence</h3>
+            <div className="builderStepPicker">
+              {filteredTemplateOptions.length === 0 ? (
+                <div className="builderEmptyPanel">
+                  <strong>No matching messages</strong>
+                  <p className="muted">Try a broader search or reset the category.</p>
+                </div>
+              ) : (
+                filteredTemplateOptions.map((option) => (
+                  <button
+                    key={`${option.playbookId}-${option.template.id}`}
+                    type="button"
+                    className="builderStepOption"
+                    onClick={() => addStep(option)}
+                  >
+                    <span className="builderStepOptionTop">
+                      <strong>{getStepLabel(option.template.label)}</strong>
+                      <span className="miniBadge">{option.badge}</span>
+                    </span>
+                    <span className="small">{option.template.goal}</span>
+                    <span className="builderStepOptionMeta">
+                      {option.playbookName}
+                    </span>
+                  </button>
+                ))
+              )}
+            </div>
+          </div>
 
+          <div className="builderCanvas">
+            <div className="glassCard builderPanel">
+              <div className="builderPanelHeader">
+                <div>
+                  <span className="miniBadge">Timeline</span>
+                  <h2 className="cardTitle">Arrange sequence</h2>
+                </div>
+                {steps.length > 0 ? (
+                  <button
+                    type="button"
+                    className="button buttonUtility"
+                    onClick={() => setSteps([])}
+                  >
+                    Clear
+                  </button>
+                ) : null}
+              </div>
               {steps.length === 0 ? (
-                <p className="muted" style={{ marginTop: 10 }}>
-                  No steps selected yet.
-                </p>
+                <div className="builderEmptyPanel">
+                  <strong>Your timeline is empty</strong>
+                  <p className="muted">
+                    Add messages from the library to build the sequence in order.
+                  </p>
+                </div>
               ) : (
                 <div className="builderSelectedSteps">
                   {steps.map((step, index) => (
                     <div key={step.id} className="builderSelectedStep">
-                      <div>
-                        <span className="miniBadge">Step {index + 1}</span>
-                        <h4 style={{ margin: "10px 0 4px" }}>
-                          {getStepLabel(step.template.label)}
-                        </h4>
-                        <p className="small" style={{ margin: 0 }}>
-                          {step.playbookName}
-                        </p>
+                      <div className="builderStepIndex">
+                        <span>{index + 1}</span>
+                      </div>
+                      <div className="builderSelectedStepBody">
+                        <div className="builderSelectedStepTop">
+                          <div>
+                            <h3>{getStepLabel(step.template.label)}</h3>
+                            <p className="small">{step.playbookName}</p>
+                          </div>
+                          <label className="builderDayControl">
+                            <span>Day</span>
+                            <input
+                              className="input"
+                              type="number"
+                              min="0"
+                              value={step.dayOffset}
+                              onChange={(event) =>
+                                updateStepDayOffset(
+                                  step.id,
+                                  Number(event.target.value)
+                                )
+                              }
+                              aria-label={`Day offset for ${getStepLabel(step.template.label)}`}
+                            />
+                          </label>
+                        </div>
+                        <p className="muted">{step.template.goal}</p>
                       </div>
 
                       <div className="builderStepActions">
-                        <label className="small" style={{ display: "grid", gap: 4 }}>
-                          Day
-                          <input
-                            className="input"
-                            type="number"
-                            min="0"
-                            value={step.dayOffset}
-                            onChange={(event) =>
-                              updateStepDayOffset(
-                                step.id,
-                                Number(event.target.value)
-                              )
-                            }
-                            style={{ width: 84, padding: "8px 10px" }}
-                            aria-label={`Day offset for ${getStepLabel(step.template.label)}`}
-                          />
-                        </label>
                         <button
                           type="button"
                           className="button buttonUtility"
                           onClick={() => moveStep(step.id, "up")}
+                          aria-label={`Move ${getStepLabel(step.template.label)} up`}
                         >
-                          Up
+                          ↑
                         </button>
                         <button
                           type="button"
                           className="button buttonUtility"
                           onClick={() => moveStep(step.id, "down")}
+                          aria-label={`Move ${getStepLabel(step.template.label)} down`}
                         >
-                          Down
+                          ↓
                         </button>
                         <button
                           type="button"
@@ -341,12 +484,22 @@ export default function SequenceBuilderPage() {
             </div>
 
             <div className="glassCard builderPanel">
-              <h3 className="cardTitle">3. Fill shared details</h3>
-
+              <div className="builderPanelHeader">
+                <div>
+                  <span className="miniBadge">Variables</span>
+                  <h2 className="cardTitle">Fill shared details</h2>
+                </div>
+                <span className="small">
+                  {filledVariableCount} of {variables.length} complete
+                </span>
+              </div>
               {variables.length === 0 ? (
-                <p className="muted" style={{ marginTop: 10 }}>
-                  Add steps first and the builder will show the fields they need.
-                </p>
+                <div className="builderEmptyPanel">
+                  <strong>No fields yet</strong>
+                  <p className="muted">
+                    Once a message is selected, shared fields will appear here.
+                  </p>
+                </div>
               ) : (
                 <div className="builderFieldGrid">
                   {variables.map((variable) => (
@@ -367,7 +520,12 @@ export default function SequenceBuilderPage() {
             </div>
 
             <div className="glassCard builderPanel">
-              <h3 className="cardTitle">4. Save to your library</h3>
+              <div className="builderPanelHeader">
+                <div>
+                  <span className="miniBadge">Save</span>
+                  <h2 className="cardTitle">Name and file it</h2>
+                </div>
+              </div>
 
               <div className="builderFieldGrid" style={{ marginTop: 16 }}>
                 <div className="formGroup" style={{ marginBottom: 0 }}>
@@ -414,7 +572,7 @@ export default function SequenceBuilderPage() {
               <div className="toolbar" style={{ marginTop: 18 }}>
                 <button
                   type="button"
-                  className="button buttonPrimary"
+                  className={isReadyToSave ? "button buttonPrimary" : "button buttonSecondary"}
                   onClick={() => void handleSaveSequence()}
                 >
                   Save Sequence
@@ -429,32 +587,43 @@ export default function SequenceBuilderPage() {
           </div>
 
           <div className="previewCard builderPreview">
-            <div className="previewLabel">Sequence Preview</div>
-            <div className="previewBox">
-              <strong>{finalTitle}</strong>
-              <br />
-              <span className="muted">Subject: {finalSubject}</span>
+            <div className="builderPreviewHeader">
+              <div>
+                <div className="previewLabel">Live Preview</div>
+                <h2>{finalTitle}</h2>
+              </div>
+              <span className="miniBadge">{steps.length} steps</span>
             </div>
 
-            <div className="previewSpacer" />
+            <div className="builderPreviewMeta">
+              <div>
+                <span>Subject</span>
+                <strong>{finalSubject}</strong>
+              </div>
+              <div>
+                <span>Timeline</span>
+                <strong>
+                  {sequenceSpan} {sequenceSpan === 1 ? "day" : "days"}
+                </strong>
+              </div>
+            </div>
 
-            <div className="previewLabel">Steps</div>
             <div className="builderPreviewSteps">
               {renderedSteps.length === 0 ? (
-                <p className="muted" style={{ margin: 0 }}>
-                  Your selected steps will appear here.
-                </p>
+                <div className="builderEmptyPanel">
+                  <strong>Preview waiting</strong>
+                  <p className="muted">Selected steps will render here in order.</p>
+                </div>
               ) : (
                 renderedSteps.map((step) => (
                   <div key={step.id} className="builderPreviewStep">
-                    <span className="miniBadge">Step {step.number}</span>
-                    <h4 style={{ margin: "10px 0 6px" }}>
-                      {getStepLabel(step.template.label)}
-                    </h4>
-                    <p className="small" style={{ margin: "0 0 10px" }}>
-                      Subject: {step.subject}
-                    </p>
-                    <p className="muted" style={{ margin: 0, whiteSpace: "pre-wrap" }}>
+                    <div className="builderPreviewStepTop">
+                      <span className="miniBadge">Day {step.dayOffset}</span>
+                      <span className="small">Step {step.number}</span>
+                    </div>
+                    <h3>{getStepLabel(step.template.label)}</h3>
+                    <strong>Subject: {step.subject}</strong>
+                    <p className="muted">
                       {step.body}
                     </p>
                   </div>

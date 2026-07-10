@@ -157,6 +157,7 @@ export default function ProspectDetailPage() {
   const [teamMembers, setTeamMembers] = useState<BusinessMember[]>([]);
   const [proposalSentDate, setProposalSentDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [selectedSequenceId, setSelectedSequenceId] = useState("proposal-follow-up");
+  const [sequenceSearch, setSequenceSearch] = useState("");
   const [isStartingProposalWorkflow, setIsStartingProposalWorkflow] = useState(false);
   const [detailView, setDetailView] = useState<"overview" | "followup" | "activity">("overview");
   const [activityFilter, setActivityFilter] = useState<"useful" | "outreach" | "notes" | "all">("useful");
@@ -186,6 +187,29 @@ export default function ProspectDetailPage() {
 
     return [...saved, ...builtIn];
   }, [customTemplates]);
+
+  const selectedScheduledSequence = useMemo(
+    () =>
+      scheduledSequences.find((sequence) => sequence.id === selectedSequenceId) ??
+      scheduledSequences[0],
+    [scheduledSequences, selectedSequenceId]
+  );
+
+  const filteredScheduledSequences = useMemo(() => {
+    const normalized = sequenceSearch.trim().toLowerCase();
+    if (!normalized) return scheduledSequences;
+
+    return scheduledSequences.filter((sequence) =>
+      [
+        sequence.name,
+        sequence.sourceLabel,
+        ...sequence.steps.map((step) => step.label),
+      ]
+        .join(" ")
+        .toLowerCase()
+        .includes(normalized)
+    );
+  }, [scheduledSequences, sequenceSearch]);
 
   const proposalWorkflowTasks = useMemo(
     () => tasks.filter(isScheduledFollowUpTask),
@@ -622,7 +646,29 @@ export default function ProspectDetailPage() {
                 {activeProposalTasks.length ? <span className="statusPill statusPillSuccess">{activeProposalTasks.length} follow-up{activeProposalTasks.length === 1 ? "" : "s"} active</span> : <span className="statusPill">Not running</span>}
               </div>
               {!nextProposalTask ? <><div className="proposalWorkflowForm">
-                <div className="formGroup"><label className="label">Sequence</label><select className="input" value={selectedSequenceId} onChange={(event) => setSelectedSequenceId(event.target.value)}>{scheduledSequences.map((sequence) => <option key={sequence.id} value={sequence.id}>{sequence.name} - {sequence.steps.length} step{sequence.steps.length === 1 ? "" : "s"} - {sequence.sourceLabel}</option>)}</select><p className="small" style={{ margin: "6px 0 0" }}>Saved sequences from your library appear here after they are built in Sequence Builder.</p></div>
+                <div className="formGroup proposalSequencePicker"><label className="label">Sequence</label>
+                  <div className="proposalSelectedSequence">
+                    <div>
+                      <span className="miniBadge">{selectedScheduledSequence?.sourceLabel ?? "Sequence"}</span>
+                      <strong>{selectedScheduledSequence?.name ?? "Choose a sequence"}</strong>
+                      <p>{selectedScheduledSequence ? `${selectedScheduledSequence.steps.length} step${selectedScheduledSequence.steps.length === 1 ? "" : "s"}` : "Search your reusable sequence library."}</p>
+                    </div>
+                  </div>
+                  <input className="input" value={sequenceSearch} onChange={(event) => setSequenceSearch(event.target.value)} placeholder="Search saved sequences by name, source, or step" />
+                  <div className="proposalSequenceResults" aria-label="Sequence results">
+                    {filteredScheduledSequences.map((sequence) => (
+                      <button key={sequence.id} type="button" className={sequence.id === selectedSequenceId ? "proposalSequenceOption isSelected" : "proposalSequenceOption"} onClick={() => { setSelectedSequenceId(sequence.id); setSequenceSearch(""); }} aria-pressed={sequence.id === selectedSequenceId}>
+                        <span>
+                          <strong>{sequence.name}</strong>
+                          <small>{sequence.sourceLabel} - {sequence.steps.length} step{sequence.steps.length === 1 ? "" : "s"}</small>
+                        </span>
+                        <span className="miniBadge">{sequence.id === selectedSequenceId ? "Selected" : "Use"}</span>
+                      </button>
+                    ))}
+                    {filteredScheduledSequences.length === 0 ? <div className="proposalSequenceEmpty">No matching sequences.</div> : null}
+                  </div>
+                  <p className="small" style={{ margin: "6px 0 0" }}>Pro can hold unlimited sequences; search keeps this client picker focused.</p>
+                </div>
                 <div className="formGroup"><label className="label">Starting from</label><input className="input" type="date" value={proposalSentDate} onChange={(event) => setProposalSentDate(event.target.value)} /></div>
                 <div className="formGroup"><label className="label">Assigned to</label>{prospect?.workspace_id ? <select className="input" value={taskAssignee} onChange={(event) => setTaskAssignee(event.target.value)}><option value="">Unassigned</option><option value={user.email ?? ""}>Me ({user.email})</option>{teamMembers.filter((member) => member.email !== user.email).map((member) => <option key={member.id} value={member.email}>{member.email}</option>)}</select> : <input className="input" type="email" value={taskAssignee} onChange={(event) => setTaskAssignee(event.target.value)} placeholder="Assignee email" />}</div>
               </div>
