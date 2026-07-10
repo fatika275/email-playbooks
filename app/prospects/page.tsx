@@ -17,6 +17,7 @@ import {
   getForecastSettings,
   listProspectTasks,
   getProspectTaskDisplayTitle,
+  getProspectTaskMessageRef,
   listProspectActivitiesForProspects,
   listProspects,
   PROSPECT_STAGES,
@@ -86,6 +87,15 @@ function isScheduledTask(task: ProspectTask) {
 
 function isProposalTask(task: ProspectTask) {
   return getProspectTaskDisplayTitle(task.title).toLowerCase().includes("proposal");
+}
+
+function cleanFollowUpTaskTitle(title: string) {
+  return getProspectTaskDisplayTitle(title).replace(/^(?:Proposal|Scheduled) follow-up \d+: /, "");
+}
+
+function getFollowUpStep(task: ProspectTask) {
+  const stepMatch = task.title.match(/follow-up (\d):/);
+  return Math.min(3, Math.max(1, Number(stepMatch?.[1]) || 1));
 }
 
 export default function ProspectsPage() {
@@ -417,6 +427,23 @@ export default function ProspectsPage() {
   }
 
   function handleDraftNextMessage(prospect: Prospect) {
+    const nextTask = tasks
+      .filter((task) => task.prospect_id === prospect.id && !task.completed_at)
+      .filter(
+        (task) =>
+          Boolean(getProspectTaskMessageRef(task.title)) ||
+          task.title.startsWith("Proposal follow-up")
+      )
+      .sort((a, b) => (a.due_date || "9999-12-31").localeCompare(b.due_date || "9999-12-31"))[0];
+    const messageRef = nextTask ? getProspectTaskMessageRef(nextTask.title) : null;
+    const legacyProposalTemplateIds = [
+      "proposal-check-in",
+      "proposal-next-steps",
+      "proposal-close-loop",
+    ];
+    const isLegacyProposalTask = nextTask?.title.startsWith("Proposal follow-up") ?? false;
+    const workflowStep = nextTask ? getFollowUpStep(nextTask) : undefined;
+
     window.localStorage.setItem(
       "thalovo_prospect_context",
       JSON.stringify({
@@ -425,9 +452,20 @@ export default function ProspectsPage() {
         email: prospect.email,
         role: prospect.role,
         prospectId: prospect.id,
+        workflowTaskId: nextTask?.id,
+        workflowStep,
+        workflowLabel: nextTask ? cleanFollowUpTaskTitle(nextTask.title) : undefined,
       })
     );
-    router.push("/library");
+    if (messageRef) {
+      router.push(`/editor/${messageRef.playbookId}/${messageRef.templateId}`);
+      return;
+    }
+    if (isLegacyProposalTask && workflowStep) {
+      router.push(`/editor/proposal-follow-up/${legacyProposalTemplateIds[workflowStep - 1]}`);
+      return;
+    }
+    router.push(`/prospects/${prospect.id}`);
   }
 
   async function handleQuickStageChange(prospect: Prospect, stage: ProspectStage) {
