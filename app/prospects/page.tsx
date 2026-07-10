@@ -223,14 +223,14 @@ export default function ProspectsPage() {
     const priorityItems = [
       ...scheduledFollowUps.slice(0, 4).map(({ task, prospect }) => ({
         id: `followup-task-${task.id}`,
-        label: "Follow-up due",
+        label: "Reminder",
         title: getProspectTaskDisplayTitle(task.title),
         meta: prospect ? `${prospect.full_name} - ${prospect.company}` : "Prospect",
         href: prospect ? `/prospects/${prospect.id}` : "/prospects",
       })),
       ...dueFollowUps.slice(0, 4).map(({ prospect }) => ({
         id: `followup-prospect-${prospect.id}`,
-        label: "Follow-up due",
+        label: "Due today",
         title: prospect.full_name,
         meta: `${prospect.company} - ${PROSPECT_STAGE_LABELS[prospect.stage]}`,
         href: `/prospects/${prospect.id}`,
@@ -535,7 +535,7 @@ export default function ProspectsPage() {
 
         <div className="prospectMetrics">
           <div><span>Active prospects</span><strong>{metrics.active}</strong></div>
-          <div><span>Follow-ups due</span><strong>{metrics.due}</strong></div>
+          <div><span>Replies needed</span><strong>{dailyDashboard.replyNeeded.length}</strong></div>
           <div><span>Open value</span><strong>{formatMoney(metrics.value)}</strong></div>
           <div><span>Clients won</span><strong>{metrics.won}</strong></div>
         </div>
