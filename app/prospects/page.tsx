@@ -54,6 +54,24 @@ function isDue(date: string | null) {
   return new Date(`${date}T00:00:00`).getTime() <= today.getTime();
 }
 
+function daysSince(date: string | null) {
+  if (!date) return null;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const then = new Date(date);
+  then.setHours(0, 0, 0, 0);
+  return Math.floor((today.getTime() - then.getTime()) / 86_400_000);
+}
+
+function isScheduledTask(task: ProspectTask) {
+  const title = getProspectTaskDisplayTitle(task.title).toLowerCase();
+  return title.includes("follow-up") || title.includes("follow up");
+}
+
+function isProposalTask(task: ProspectTask) {
+  return getProspectTaskDisplayTitle(task.title).toLowerCase().includes("proposal");
+}
+
 export default function ProspectsPage() {
   const { user, hasProAccess, isLoading, businessMembership } = useAccount();
   const [prospects, setProspects] = useState<Prospect[]>([]);
@@ -173,6 +191,82 @@ export default function ProspectsPage() {
       .map((prospect) => ({ id: `followup-${prospect.id}`, prospect }));
     return { openTasks, followUps };
   }, [prospects, tasks]);
+
+  const dailyDashboard = useMemo(() => {
+    const openDueTasks = todayItems.openTasks.filter(({ task }) => task.due_date);
+    const scheduledFollowUps = openDueTasks.filter(({ task }) => isScheduledTask(task));
+    const manualDueTasks = openDueTasks.filter(({ task }) => !isScheduledTask(task));
+    const taskProspectIds = new Set(openDueTasks.map(({ task }) => task.prospect_id));
+    const dueFollowUps = todayItems.followUps.filter(
+      ({ prospect }) => !taskProspectIds.has(prospect.id)
+    );
+    const replyNeeded = prospects.filter((prospect) => prospect.stage === "replied");
+    const proposalsToChase = [
+      ...openDueTasks.filter(({ task }) => isProposalTask(task)),
+      ...prospects
+        .filter(
+          (prospect) =>
+            ["qualified", "meeting"].includes(prospect.stage) &&
+            isDue(prospect.next_follow_up)
+        )
+        .map((prospect) => ({ id: `proposal-${prospect.id}`, prospect })),
+    ];
+    const coldProspects = prospects.filter((prospect) => {
+      if (!["contacted", "replied", "qualified", "meeting"].includes(prospect.stage)) {
+        return false;
+      }
+      if (isDue(prospect.next_follow_up)) return false;
+      const days = daysSince(prospect.last_contacted_at ?? prospect.updated_at);
+      return days !== null && days >= 14;
+    });
+
+    const priorityItems = [
+      ...scheduledFollowUps.slice(0, 4).map(({ task, prospect }) => ({
+        id: `followup-task-${task.id}`,
+        label: "Follow-up due",
+        title: getProspectTaskDisplayTitle(task.title),
+        meta: prospect ? `${prospect.full_name} - ${prospect.company}` : "Prospect",
+        href: prospect ? `/prospects/${prospect.id}` : "/prospects",
+      })),
+      ...dueFollowUps.slice(0, 4).map(({ prospect }) => ({
+        id: `followup-prospect-${prospect.id}`,
+        label: "Follow-up due",
+        title: prospect.full_name,
+        meta: `${prospect.company} - ${PROSPECT_STAGE_LABELS[prospect.stage]}`,
+        href: `/prospects/${prospect.id}`,
+      })),
+      ...replyNeeded.slice(0, 3).map((prospect) => ({
+        id: `reply-${prospect.id}`,
+        label: "Needs reply",
+        title: prospect.full_name,
+        meta: prospect.company,
+        href: `/prospects/${prospect.id}`,
+      })),
+      ...coldProspects.slice(0, 3).map((prospect) => ({
+        id: `cold-${prospect.id}`,
+        label: "Going cold",
+        title: prospect.full_name,
+        meta: `${prospect.company} - last touched ${daysSince(prospect.last_contacted_at ?? prospect.updated_at)} days ago`,
+        href: `/prospects/${prospect.id}`,
+      })),
+      ...manualDueTasks.slice(0, 3).map(({ task, prospect }) => ({
+        id: `task-${task.id}`,
+        label: "Task due",
+        title: getProspectTaskDisplayTitle(task.title),
+        meta: prospect ? `${prospect.full_name} - ${prospect.company}` : "Prospect",
+        href: prospect ? `/prospects/${prospect.id}` : "/prospects",
+      })),
+    ].slice(0, 8);
+
+    return {
+      followUpsDue: scheduledFollowUps.length + dueFollowUps.length,
+      replyNeeded,
+      proposalsToChase,
+      coldProspects,
+      manualDueTasks,
+      priorityItems,
+    };
+  }, [prospects, todayItems]);
 
   const report = useMemo(() => {
     const closed = prospects.filter((prospect) => ["won", "lost"].includes(prospect.stage));
@@ -584,40 +678,73 @@ export default function ProspectsPage() {
           </div>
         ) : (
           <div className="prospectReports">
-            <section className="prospectDashboardHero">
+            <section className="prospectDailyHero">
               <div>
-                <span className="miniBadge">Agency overview</span>
-                <h2 className="pageTitle">{metrics.due ? `${metrics.due} follow-up${metrics.due === 1 ? "" : "s"} need attention.` : "Your follow-ups are clear."}</h2>
-                <p className="muted">Keep the next action obvious, then check whether outreach is turning into conversations and booked work.</p>
+                <span className="miniBadge">Daily view</span>
+                <h2 className="pageTitle">
+                  {dailyDashboard.priorityItems.length
+                    ? `${dailyDashboard.priorityItems.length} useful action${dailyDashboard.priorityItems.length === 1 ? "" : "s"} to handle.`
+                    : "You are clear for today."}
+                </h2>
+                <p className="muted">Start with the live work: follow-ups, replies, proposal nudges, and prospects that are starting to cool off.</p>
               </div>
               <div className="toolbar">
-                <button className="button buttonPrimary" onClick={() => setView("today")}>{metrics.due ? "Handle follow-ups" : "Open Today"}</button>
+                <button className="button buttonPrimary" onClick={() => setView("today")}>Open due tasks</button>
                 <button className="button buttonSecondary" onClick={() => setView("pipeline")}>View pipeline</button>
               </div>
             </section>
 
-            <section className="prospectDashboardOutcomes" aria-label="Acquisition outcomes">
-              <div><strong>{outreachMetrics.actions}</strong><span>Outreach logged</span></div>
-              <div><strong>{outreachMetrics.replied}</strong><span>Replies</span></div>
-              <div><strong>{outreachMetrics.meetings}</strong><span>Meetings</span></div>
-              <div><strong>{outreachMetrics.won}</strong><span>Clients won</span></div>
+            <section className="prospectDailyCards" aria-label="Today action summary">
+              <button type="button" onClick={() => setView("today")}>
+                <strong>{dailyDashboard.followUpsDue}</strong>
+                <span>Follow-ups due today</span>
+                <small>Scheduled reminders and overdue follow-up dates.</small>
+              </button>
+              <button type="button" onClick={() => { setStageFilter("replied"); setView("list"); }}>
+                <strong>{dailyDashboard.replyNeeded.length}</strong>
+                <span>Leads need a reply</span>
+                <small>Prospects sitting in Replied.</small>
+              </button>
+              <button type="button" onClick={() => setView("today")}>
+                <strong>{dailyDashboard.proposalsToChase.length}</strong>
+                <span>Proposals need chasing</span>
+                <small>Due proposal tasks or late-stage follow-ups.</small>
+              </button>
+              <button type="button" onClick={() => setView("list")}>
+                <strong>{dailyDashboard.coldProspects.length}</strong>
+                <span>Prospects going cold</span>
+                <small>No recent touch for 14+ days.</small>
+              </button>
             </section>
 
-            <div className="prospectDashboardSplit">
-              <section className="prospectDashboardSection">
-                <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">Conversion snapshot</h3><p className="muted">All-time outcomes from leads contacted in Thalovo.</p></div>
-                <div className="prospectConversionList">
-                  <div><span>Reply rate</span><strong>{acquisitionRates.reply}%</strong><i><b style={{ width: `${acquisitionRates.reply}%` }} /></i></div>
-                  <div><span>Meeting rate</span><strong>{acquisitionRates.meeting}%</strong><i><b style={{ width: `${acquisitionRates.meeting}%` }} /></i></div>
-                  <div><span>Win rate</span><strong>{acquisitionRates.win}%</strong><i><b style={{ width: `${acquisitionRates.win}%` }} /></i></div>
+            <div className="prospectDailyLayout">
+              <section className="prospectDailyPanel">
+                <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">Do these first</h3><p className="muted">The highest-friction items are pulled into one short list.</p></div>
+                <div className="prospectDailyActionList">
+                  {dailyDashboard.priorityItems.map((item) => (
+                    <Link key={item.id} href={item.href} className="prospectDailyAction">
+                      <span className="miniBadge">{item.label}</span>
+                      <div>
+                        <strong>{item.title}</strong>
+                        <small>{item.meta}</small>
+                      </div>
+                    </Link>
+                  ))}
+                  {dailyDashboard.priorityItems.length === 0 ? (
+                    <div className="prospectDailyEmpty">
+                      <strong>No urgent actions</strong>
+                      <p className="muted">Add prospects, schedule follow-ups, or review the pipeline when you want to create the next set of actions.</p>
+                    </div>
+                  ) : null}
                 </div>
               </section>
 
-              <section className="prospectDashboardSection">
-                <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">Pipeline now</h3><p className="muted">A quick read on current opportunity volume.</p></div>
+              <section className="prospectDailyPanel">
+                <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">Pipeline health</h3><p className="muted">Enough context to know whether today&apos;s list is healthy or slipping.</p></div>
                 <div className="prospectPipelineNow">
                   <div><span>Active leads</span><strong>{metrics.active}</strong></div>
                   <div><span>Open value</span><strong>{formatMoney(metrics.value)}</strong></div>
+                  <div><span>Reply rate</span><strong>{acquisitionRates.reply}%</strong></div>
                   <div><span>Closed win rate</span><strong>{report.winRate}%</strong></div>
                 </div>
               </section>

@@ -2855,6 +2855,148 @@ details[open] > summary::after {
   gap: 0;
 }
 
+.prospectDailyHero {
+  min-height: 220px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 32px;
+  padding: 34px 0 30px;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.prospectDailyHero > div:first-child {
+  max-width: 720px;
+}
+
+.prospectDailyHero .pageTitle {
+  max-width: 720px;
+  margin-top: 16px;
+}
+
+.prospectDailyHero .muted {
+  max-width: 640px;
+  margin: 10px 0 0;
+  line-height: 1.7;
+}
+
+.prospectDailyCards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border-bottom: 1px solid var(--border);
+}
+
+.prospectDailyCards button {
+  min-width: 0;
+  min-height: 142px;
+  padding: 22px 20px;
+  display: grid;
+  gap: 6px;
+  text-align: left;
+  color: var(--text);
+  background: transparent;
+  border: 0;
+  border-right: 1px solid var(--border);
+  cursor: pointer;
+}
+
+.prospectDailyCards button:first-child {
+  padding-left: 0;
+}
+
+.prospectDailyCards button:last-child {
+  border-right: 0;
+}
+
+.prospectDailyCards button:hover {
+  background: #0c0c0c;
+}
+
+.prospectDailyCards strong {
+  font-size: 32px;
+  line-height: 1;
+}
+
+.prospectDailyCards span {
+  font-weight: 750;
+}
+
+.prospectDailyCards small {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.prospectDailyLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(300px, 0.9fr);
+  border-bottom: 1px solid var(--border);
+}
+
+.prospectDailyPanel {
+  padding: 30px 0;
+}
+
+.prospectDailyPanel:first-child {
+  padding-right: 34px;
+  border-right: 1px solid var(--border);
+}
+
+.prospectDailyPanel:last-child {
+  padding-left: 34px;
+}
+
+.prospectDailyActionList {
+  display: grid;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.prospectDailyAction {
+  min-height: 68px;
+  padding: 13px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  color: var(--text);
+  text-decoration: none;
+  border: 1px solid var(--border-soft);
+  background: #0d0d0d;
+}
+
+.prospectDailyAction:hover {
+  border-color: #3a3a3a;
+  background: #121212;
+}
+
+.prospectDailyAction div {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.prospectDailyAction strong,
+.prospectDailyAction small {
+  overflow-wrap: anywhere;
+}
+
+.prospectDailyAction small {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.prospectDailyEmpty {
+  padding: 20px;
+  border: 1px dashed #303030;
+  background: #0b0b0b;
+}
+
+.prospectDailyEmpty p {
+  margin: 6px 0 0;
+}
+
 .prospectDashboardHero {
   min-height: 230px;
   display: flex;
@@ -3507,6 +3649,20 @@ details[open] > summary::after {
     grid-template-columns: 1fr;
   }
 
+  .prospectDailyLayout {
+    grid-template-columns: 1fr;
+  }
+
+  .prospectDailyPanel:first-child {
+    padding-right: 0;
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .prospectDailyPanel:last-child {
+    padding-left: 0;
+  }
+
   .prospectDashboardSplit > .prospectDashboardSection:first-child {
     padding-right: 0;
     border-right: 0;
@@ -3749,6 +3905,34 @@ details[open] > summary::after {
     padding: 26px 0;
   }
 
+  .prospectDailyHero {
+    min-height: 0;
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 26px 0;
+  }
+
+  .prospectDailyCards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .prospectDailyCards button {
+    min-height: 124px;
+    padding: 18px 14px;
+  }
+
+  .prospectDailyCards button:first-child {
+    padding-left: 14px;
+  }
+
+  .prospectDailyCards button:nth-child(2) {
+    border-right: 0;
+  }
+
+  .prospectDailyCards button:nth-child(-n + 2) {
+    border-bottom: 1px solid var(--border);
+  }
+
   .prospectDashboardOutcomes {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -3845,6 +4029,11 @@ details[open] > summary::after {
   .prospectTodayItem {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .prospectDailyAction {
+    grid-template-columns: 1fr;
+    align-items: start;
   }
 
   .founderPriceActions {
