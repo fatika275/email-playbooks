@@ -2554,6 +2554,11 @@ details[open] > summary::after {
   background: #060606;
 }
 
+.proposalSequenceBrowse {
+  width: 100%;
+  margin-top: 10px;
+}
+
 .proposalSequenceOption {
   width: 100%;
   min-height: 64px;

@@ -158,6 +158,7 @@ export default function ProspectDetailPage() {
   const [proposalSentDate, setProposalSentDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [selectedSequenceId, setSelectedSequenceId] = useState("");
   const [sequenceSearch, setSequenceSearch] = useState("");
+  const [isSequencePickerOpen, setIsSequencePickerOpen] = useState(false);
   const [isStartingProposalWorkflow, setIsStartingProposalWorkflow] = useState(false);
   const [detailView, setDetailView] = useState<"overview" | "followup" | "activity">("overview");
   const [activityFilter, setActivityFilter] = useState<"useful" | "outreach" | "notes" | "all">("useful");
@@ -210,6 +211,8 @@ export default function ProspectDetailPage() {
         .includes(normalized)
     );
   }, [scheduledSequences, sequenceSearch]);
+  const shouldShowSequenceResults =
+    isSequencePickerOpen || sequenceSearch.trim().length > 0;
 
   const proposalWorkflowTasks = useMemo(
     () => tasks.filter(isScheduledFollowUpTask),
@@ -654,20 +657,26 @@ export default function ProspectDetailPage() {
                       <p>{selectedScheduledSequence ? `${selectedScheduledSequence.steps.length} step${selectedScheduledSequence.steps.length === 1 ? "" : "s"}` : "Pick the sequence you want to run for this prospect."}</p>
                     </div>
                   </div>
-                  <input className="input" value={sequenceSearch} onChange={(event) => setSequenceSearch(event.target.value)} placeholder="Search saved sequences by name, source, or step" />
-                  <div className="proposalSequenceResults" aria-label="Sequence results">
-                    {filteredScheduledSequences.map((sequence) => (
-                      <button key={sequence.id} type="button" className={sequence.id === selectedSequenceId ? "proposalSequenceOption isSelected" : "proposalSequenceOption"} onClick={() => { setSelectedSequenceId(sequence.id); setSequenceSearch(""); }} aria-pressed={sequence.id === selectedSequenceId}>
-                        <span>
-                          <strong>{sequence.name}</strong>
-                          <small>{sequence.sourceLabel} - {sequence.steps.length} step{sequence.steps.length === 1 ? "" : "s"}</small>
-                        </span>
-                        <span className="miniBadge">{sequence.id === selectedSequenceId ? "Selected" : "Use"}</span>
-                      </button>
-                    ))}
-                    {filteredScheduledSequences.length === 0 ? <div className="proposalSequenceEmpty">No matching sequences.</div> : null}
-                  </div>
-                  <p className="small" style={{ margin: "6px 0 0" }}>Search keeps this picker focused even when your Pro library has lots of saved sequences.</p>
+                  <input className="input" value={sequenceSearch} onChange={(event) => setSequenceSearch(event.target.value)} onFocus={() => setIsSequencePickerOpen(true)} placeholder="Search saved sequences by name, source, or step" />
+                  {!shouldShowSequenceResults ? (
+                    <button type="button" className="button buttonSecondary proposalSequenceBrowse" onClick={() => setIsSequencePickerOpen(true)}>
+                      Browse sequences
+                    </button>
+                  ) : (
+                    <div className="proposalSequenceResults" aria-label="Sequence results">
+                      {filteredScheduledSequences.map((sequence) => (
+                        <button key={sequence.id} type="button" className={sequence.id === selectedSequenceId ? "proposalSequenceOption isSelected" : "proposalSequenceOption"} onClick={() => { setSelectedSequenceId(sequence.id); setSequenceSearch(""); setIsSequencePickerOpen(false); }} aria-pressed={sequence.id === selectedSequenceId}>
+                          <span>
+                            <strong>{sequence.name}</strong>
+                            <small>{sequence.sourceLabel} - {sequence.steps.length} step{sequence.steps.length === 1 ? "" : "s"}</small>
+                          </span>
+                          <span className="miniBadge">{sequence.id === selectedSequenceId ? "Selected" : "Use"}</span>
+                        </button>
+                      ))}
+                      {filteredScheduledSequences.length === 0 ? <div className="proposalSequenceEmpty">No matching sequences.</div> : null}
+                    </div>
+                  )}
+                  <p className="small" style={{ margin: "6px 0 0" }}>Search or browse when you need a sequence; nothing is preselected for this prospect.</p>
                 </div>
                 <div className="formGroup"><label className="label">Start date</label><input className="input" type="date" value={proposalSentDate} onChange={(event) => setProposalSentDate(event.target.value)} /></div>
                 <div className="formGroup"><label className="label">Assigned to</label>{prospect?.workspace_id ? <select className="input" value={taskAssignee} onChange={(event) => setTaskAssignee(event.target.value)}><option value="">Unassigned</option><option value={user.email ?? ""}>Me ({user.email})</option>{teamMembers.filter((member) => member.email !== user.email).map((member) => <option key={member.id} value={member.email}>{member.email}</option>)}</select> : <input className="input" type="email" value={taskAssignee} onChange={(event) => setTaskAssignee(event.target.value)} placeholder="Assignee email" />}</div>
