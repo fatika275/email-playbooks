@@ -146,10 +146,10 @@ function prospectError(error: { code?: string; message?: string } | null) {
     error?.message?.toLowerCase().includes("prospects")
   ) {
     return new Error(
-      "Prospect Pipeline needs its one-time Supabase setup before it can save leads."
+      "Client Work Pipeline needs its one-time Supabase setup before it can save leads."
     );
   }
-  return new Error(error?.message || "Prospect management is temporarily unavailable.");
+  return new Error(error?.message || "Client work tracking is temporarily unavailable.");
 }
 
 function optional(value?: string) {

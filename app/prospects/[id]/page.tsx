@@ -575,13 +575,13 @@ export default function ProspectDetailPage() {
   }
 
   if (isLoading) {
-    return <main className="main"><section className="container"><div className="glassCard emptyState">Loading prospect...</div></section></main>;
+    return <main className="main"><section className="container"><div className="glassCard emptyState">Loading lead...</div></section></main>;
   }
 
   if (!user || !hasProAccess) {
     return (
       <main className="main"><section className="container"><div className="glassCard emptyState">
-        <h1 className="pageTitle">Prospect access required</h1>
+        <h1 className="pageTitle">Lead pipeline access required</h1>
         <Link href={user ? "/pricing" : "/account"} className="button buttonPrimary">{user ? "View plans" : "Sign in"}</Link>
       </div></section></main>
     );
@@ -590,7 +590,7 @@ export default function ProspectDetailPage() {
   if (!prospect && notice) {
     return (
       <main className="main"><section className="container"><div className="glassCard emptyState">
-        <h1 className="pageTitle">Prospect unavailable</h1><p className="muted">{notice}</p><Link href="/prospects" className="button buttonPrimary">Back to pipeline</Link>
+        <h1 className="pageTitle">Lead unavailable</h1><p className="muted">{notice}</p><Link href="/prospects" className="button buttonPrimary">Back to client work</Link>
       </div></section></main>
     );
   }
@@ -600,25 +600,25 @@ export default function ProspectDetailPage() {
       <section className="container">
         <div className="prospectHeader">
           <div>
-            <div className="badge">Prospect workspace</div>
-            <h1 className="pageTitle" style={{ marginTop: 14 }}>{fullName || "Prospect"}</h1>
+            <div className="badge">Client work lead</div>
+            <h1 className="pageTitle" style={{ marginTop: 14 }}>{fullName || "Lead"}</h1>
             <p className="muted" style={{ margin: "8px 0 0" }}>{company || "Loading company..."}</p>
           </div>
-          <Link href="/prospects" className="button buttonSecondary">Back to pipeline</Link>
+          <Link href="/prospects" className="button buttonSecondary">Back to client work</Link>
         </div>
 
         {notice ? <p className="notice">{notice}</p> : null}
 
-        <div className="prospectDetailTabs" role="tablist" aria-label="Prospect details">
+        <div className="prospectDetailTabs" role="tablist" aria-label="Lead details">
           <button type="button" role="tab" aria-selected={detailView === "overview"} className={detailView === "overview" ? "active" : ""} onClick={() => setDetailView("overview")}>Overview</button>
-          <button type="button" role="tab" aria-selected={detailView === "followup"} className={detailView === "followup" ? "active" : ""} onClick={() => setDetailView("followup")}>Follow-up{activeProposalTasks.length + openManualTasks.length ? ` (${activeProposalTasks.length + openManualTasks.length})` : ""}</button>
+          <button type="button" role="tab" aria-selected={detailView === "followup"} className={detailView === "followup" ? "active" : ""} onClick={() => setDetailView("followup")}>Next steps{activeProposalTasks.length + openManualTasks.length ? ` (${activeProposalTasks.length + openManualTasks.length})` : ""}</button>
           <button type="button" role="tab" aria-selected={detailView === "activity"} className={detailView === "activity" ? "active" : ""} onClick={() => setDetailView("activity")}>Activity</button>
         </div>
 
         <div className="prospectDetailLayout">
           <section className="prospectDetailMain">
             <div hidden={detailView !== "overview"}>
-            <div className="prospectSectionHeader"><h2 className="cardTitle">Contact and company</h2></div>
+            <div className="prospectSectionHeader"><h2 className="cardTitle">Lead and company</h2></div>
             <div className="prospectFormGrid">
               <div className="formGroup"><label className="label">Name</label><input className="input" value={fullName} onChange={(event) => setFullName(event.target.value)} /></div>
               <div className="formGroup"><label className="label">Company</label><input className="input" value={company} onChange={(event) => setCompany(event.target.value)} /></div>
@@ -628,21 +628,21 @@ export default function ProspectDetailPage() {
               <div className="formGroup"><label className="label">Lead source</label><input className="input" value={source} onChange={(event) => setSource(event.target.value)} placeholder="Referral, LinkedIn, event..." /></div>
             </div>
 
-            <div className="prospectSectionHeader"><h2 className="cardTitle">Qualification and follow-up</h2></div>
+            <div className="prospectSectionHeader"><h2 className="cardTitle">Deal fit and follow-up</h2></div>
             <div className="prospectFormGrid">
-              <div className="formGroup"><label className="label">Pipeline stage</label><select className="input" value={stage} onChange={(event) => setStage(event.target.value as ProspectStage)}>{PROSPECT_STAGES.map((option) => <option key={option} value={option}>{PROSPECT_STAGE_LABELS[option]}</option>)}</select></div>
-              <div className="formGroup"><label className="label">Stored contract value (GBP)</label><input className="input" type="number" min="0" value={value} onChange={(event) => setValue(event.target.value)} /><p className="small" style={{ margin: "6px 0 0" }}>Use the full fixed, calculated monthly, or annual value defined by your forecast model.</p></div>
+              <div className="formGroup"><label className="label">Client work stage</label><select className="input" value={stage} onChange={(event) => setStage(event.target.value as ProspectStage)}>{PROSPECT_STAGES.map((option) => <option key={option} value={option}>{PROSPECT_STAGE_LABELS[option]}</option>)}</select></div>
+              <div className="formGroup"><label className="label">Potential client work value (GBP)</label><input className="input" type="number" min="0" value={value} onChange={(event) => setValue(event.target.value)} /><p className="small" style={{ margin: "6px 0 0" }}>Use the full fixed, calculated monthly, or annual value of the client work this lead could become.</p></div>
               <div className="formGroup"><label className="label">Next follow-up</label><input className="input" type="date" value={nextFollowUp} onChange={(event) => setNextFollowUp(event.target.value)} /></div>
               <div className="formGroup"><label className="label">Last contacted</label><input className="input" value={lastContactedAt ? new Date(lastContactedAt).toLocaleString() : "Not contacted yet"} disabled /></div>
-              {prospect?.workspace_id ? <div className="formGroup"><label className="label">Prospect owner</label><select className="input" value={teamMembers.find((member) => member.user_id === prospect.assigned_user_id || member.email === prospect.assigned_email)?.id ?? (prospect.assigned_user_id === user.id ? "self" : "")} onChange={(event) => void handleProspectAssignment(event.target.value)}><option value="">Unassigned</option><option value="self">Me ({user.email})</option>{teamMembers.filter((member) => member.user_id !== user.id && member.email !== user.email).map((member) => <option key={member.id} value={member.id}>{member.email} · {member.role}</option>)}</select></div> : null}
+              {prospect?.workspace_id ? <div className="formGroup"><label className="label">Lead owner</label><select className="input" value={teamMembers.find((member) => member.user_id === prospect.assigned_user_id || member.email === prospect.assigned_email)?.id ?? (prospect.assigned_user_id === user.id ? "self" : "")} onChange={(event) => void handleProspectAssignment(event.target.value)}><option value="">Unassigned</option><option value="self">Me ({user.email})</option>{teamMembers.filter((member) => member.user_id !== user.id && member.email !== user.email).map((member) => <option key={member.id} value={member.id}>{member.email} · {member.role}</option>)}</select></div> : null}
             </div>
 
-            <div className="formGroup"><label className="label">Notes</label><textarea className="input" rows={9} value={notes} onChange={(event) => setNotes(event.target.value)} placeholder="Decision criteria, pain points, context, objections, and next steps..." /></div>
+            <div className="formGroup"><label className="label">Notes</label><textarea className="input" rows={9} value={notes} onChange={(event) => setNotes(event.target.value)} placeholder="Decision criteria, pain points, client-work context, objections, and next steps..." /></div>
             </div>
 
             <section className="prospectOpsPanel proposalWorkflowPanel" hidden={detailView !== "followup"}>
               <div className="proposalWorkflowHeader">
-                <div><span className="miniBadge">Sequence schedule</span><h2 className="cardTitle">{nextProposalTask ? "Next scheduled reminder" : "Start a sequence"}</h2><p className="small">{nextProposalTask ? "Work through the active reminders for this prospect. Opening a message loads the right template for the current step." : "Choose a reusable sequence, set the start date, and create the reminders for this prospect."}</p></div>
+                <div><span className="miniBadge">Follow-up sequence</span><h2 className="cardTitle">{nextProposalTask ? "Next message to send" : "Start a client-work sequence"}</h2><p className="small">{nextProposalTask ? "Work through the active reminders for this lead. Opening a message loads the right template for the current step." : "Choose a reusable sequence, set the start date, and create reminders that keep this lead moving."}</p></div>
                 {activeProposalTasks.length ? <span className="statusPill statusPillSuccess">{activeProposalTasks.length} reminder{activeProposalTasks.length === 1 ? "" : "s"} active</span> : <span className="statusPill">No sequence running</span>}
               </div>
               {!nextProposalTask ? <><div className="proposalWorkflowForm">
@@ -651,7 +651,7 @@ export default function ProspectDetailPage() {
                     <div>
                       <span className="miniBadge">{selectedScheduledSequence?.sourceLabel ?? "Not selected"}</span>
                       <strong>{selectedScheduledSequence?.name ?? "Choose a sequence"}</strong>
-                      <p>{selectedScheduledSequence ? `${selectedScheduledSequence.steps.length} step${selectedScheduledSequence.steps.length === 1 ? "" : "s"}` : "Pick the sequence you want to run for this prospect."}</p>
+                      <p>{selectedScheduledSequence ? `${selectedScheduledSequence.steps.length} step${selectedScheduledSequence.steps.length === 1 ? "" : "s"}` : "Pick the sequence that fits this lead and the client work you want to win."}</p>
                     </div>
                     <button type="button" className="button buttonSecondary" onClick={() => setIsSequencePickerOpen((current) => !current)}>
                       {selectedScheduledSequence ? "Change" : "Choose"}
@@ -679,7 +679,7 @@ export default function ProspectDetailPage() {
                       </div>
                     </div>
                   ) : null}
-                  <p className="small" style={{ margin: "6px 0 0" }}>{selectedScheduledSequence ? "This sequence will create the reminders below from the start date." : "Nothing is preselected for this prospect."}</p>
+                  <p className="small" style={{ margin: "6px 0 0" }}>{selectedScheduledSequence ? "This sequence will create the reminders below from the start date." : "Nothing is preselected for this lead."}</p>
                 </div>
                 <div className="formGroup"><label className="label">Start date</label><input className="input" type="date" value={proposalSentDate} onChange={(event) => setProposalSentDate(event.target.value)} /></div>
                 <div className="formGroup"><label className="label">Assigned to</label>{prospect?.workspace_id ? <select className="input" value={taskAssignee} onChange={(event) => setTaskAssignee(event.target.value)}><option value="">Unassigned</option><option value={user.email ?? ""}>Me ({user.email})</option>{teamMembers.filter((member) => member.email !== user.email).map((member) => <option key={member.id} value={member.email}>{member.email}</option>)}</select> : <input className="input" type="email" value={taskAssignee} onChange={(event) => setTaskAssignee(event.target.value)} placeholder="Assignee email" />}</div>
@@ -691,19 +691,19 @@ export default function ProspectDetailPage() {
                   <div><span>{nextProposalTask.due_date ? `Due ${nextProposalTask.due_date}` : "Ready when you are"}</span><strong>{cleanFollowUpTaskTitle(nextProposalTask.title)}</strong><p>{activeProposalTasks.length > 1 ? `${activeProposalTasks.length - 1} later reminder${activeProposalTasks.length - 1 === 1 ? "" : "s"} already scheduled.` : "This is the final scheduled reminder."}</p></div>
                   <div className="proposalTaskActions"><button className="button buttonPrimary" onClick={() => handleDraftProposalFollowUp(nextProposalTask)}>Open message</button><button className="button buttonSecondary" onClick={() => void handleCompleteProposalTask(nextProposalTask)}>Mark sent</button></div>
                 </div>
-                <div className="proposalWorkflowActions proposalOutcomeActions"><span>Close this schedule</span><button className="button buttonSecondary" disabled={isStartingProposalWorkflow} onClick={() => void handleProposalOutcome("replied")}>They replied</button><button className="button buttonSecondary" disabled={isStartingProposalWorkflow} onClick={() => void handleProposalOutcome("won")}>Mark won</button><button className="button buttonUtility" disabled={isStartingProposalWorkflow} onClick={() => void handleProposalOutcome("lost")}>Mark lost</button></div>
+                <div className="proposalWorkflowActions proposalOutcomeActions"><span>Close this schedule</span><button className="button buttonSecondary" disabled={isStartingProposalWorkflow} onClick={() => void handleProposalOutcome("replied")}>They replied</button><button className="button buttonSecondary" disabled={isStartingProposalWorkflow} onClick={() => void handleProposalOutcome("won")}>Booked client work</button><button className="button buttonUtility" disabled={isStartingProposalWorkflow} onClick={() => void handleProposalOutcome("lost")}>Lost / slipped</button></div>
               </>}
             </section>
 
             <div className={detailView === "overview" ? "prospectOpsGrid isHidden" : "prospectOpsGrid prospectOpsGridSingle"}>
               <section className="prospectOpsPanel" hidden={detailView !== "followup"}>
-                <div className="prospectSectionHeader"><h2 className="cardTitle">Tasks and reminders</h2></div>
-                <p className="small">Only open tasks appear here. Completed work is archived automatically so the list stays focused.</p>
-                <div className="formGroup"><label className="label">Next task</label><input className="input" value={taskTitle} onChange={(event) => setTaskTitle(event.target.value)} placeholder="Send case study, call decision-maker..." /></div>
+                <div className="prospectSectionHeader"><h2 className="cardTitle">Lead actions and reminders</h2></div>
+                <p className="small">Only open actions appear here. Completed work is archived automatically so the list stays focused on what could move the lead forward.</p>
+                <div className="formGroup"><label className="label">Next action</label><input className="input" value={taskTitle} onChange={(event) => setTaskTitle(event.target.value)} placeholder="Send case study, call decision-maker..." /></div>
                 <div className="prospectTaskForm">
                   <input className="input" type="date" value={taskDueDate} onChange={(event) => setTaskDueDate(event.target.value)} aria-label="Task due date" />
                   {prospect?.workspace_id ? <select className="input" value={taskAssignee} onChange={(event) => setTaskAssignee(event.target.value)} aria-label="Task assignee"><option value="">Unassigned</option><option value={user.email ?? ""}>Me ({user.email})</option>{teamMembers.filter((member) => member.email !== user.email).map((member) => <option key={member.id} value={member.email}>{member.email}</option>)}</select> : <input className="input" type="email" value={taskAssignee} onChange={(event) => setTaskAssignee(event.target.value)} placeholder="Assignee email" aria-label="Task assignee" />}
-                  <button className="button buttonPrimary" disabled={!taskTitle.trim()} onClick={() => void handleAddTask()}>Add task</button>
+                  <button className="button buttonPrimary" disabled={!taskTitle.trim()} onClick={() => void handleAddTask()}>Add action</button>
                 </div>
                 <div className="prospectTaskList">
                   {openManualTasks.map((task) => (
@@ -713,12 +713,12 @@ export default function ProspectDetailPage() {
                       <button className="button buttonUtility" onClick={() => void handleTaskDelete(task.id)} aria-label={`Delete ${getProspectTaskDisplayTitle(task.title)}`}>Remove</button>
                     </div>
                   ))}
-                  {openManualTasks.length === 0 ? <p className="small">No open tasks.</p> : null}
+                  {openManualTasks.length === 0 ? <p className="small">No open lead actions.</p> : null}
                 </div>
               </section>
 
               <section className="prospectOpsPanel" hidden={detailView !== "activity"}>
-                <div className="prospectActivityHeading"><div><h2 className="cardTitle">Activity timeline</h2><p className="small">Useful shows outreach and deal outcomes. Routine edits stay hidden unless you choose All activity.</p></div><select className="input" value={activityFilter} onChange={(event) => { setActivityFilter(event.target.value as "useful" | "outreach" | "notes" | "all"); setShowAllActivity(false); }} aria-label="Filter prospect activity"><option value="useful">Useful activity</option><option value="outreach">Outreach only</option><option value="notes">Notes only</option><option value="all">All activity</option></select></div>
+                <div className="prospectActivityHeading"><div><h2 className="cardTitle">Activity timeline</h2><p className="small">Useful shows outreach and client-work outcomes. Routine edits stay hidden unless you choose All activity.</p></div><select className="input" value={activityFilter} onChange={(event) => { setActivityFilter(event.target.value as "useful" | "outreach" | "notes" | "all"); setShowAllActivity(false); }} aria-label="Filter lead activity"><option value="useful">Useful activity</option><option value="outreach">Outreach only</option><option value="notes">Notes only</option><option value="all">All activity</option></select></div>
                 <div className="prospectActivityForm">
                   <select className="input" value={activityType} onChange={(event) => setActivityType(event.target.value as ProspectActivityType)} aria-label="Activity type">
                     <option value="note">Note</option><option value="email">Email</option><option value="call">Call</option><option value="meeting">Meeting</option>
@@ -751,27 +751,27 @@ export default function ProspectDetailPage() {
             </section> : null}
 
             <div className="toolbar" hidden={detailView !== "overview"}>
-              <button className="button buttonPrimary" disabled={isWorking} onClick={() => void save()} title="Save changes to this prospect without recording a new contact">{isWorking ? "Saving..." : "Save prospect"}</button>
-              <button className="button buttonSecondary" disabled={isWorking} onClick={() => void save({ markContacted: true })} title="Save changes and record that you contacted this prospect now">Log contact now</button>
-              <button className="button buttonUtility" disabled={isWorking} onClick={() => void handleDelete()}>Delete prospect</button>
+              <button className="button buttonPrimary" disabled={isWorking} onClick={() => void save()} title="Save changes to this lead without recording a new contact">{isWorking ? "Saving..." : "Save lead"}</button>
+              <button className="button buttonSecondary" disabled={isWorking} onClick={() => void save({ markContacted: true })} title="Save changes and record that you contacted this lead now">Log contact now</button>
+              <button className="button buttonUtility" disabled={isWorking} onClick={() => void handleDelete()}>Delete lead</button>
             </div>
             <p className="prospectActionHelp" hidden={detailView !== "overview"}>
-              <strong>Save prospect</strong> stores your edits. <strong>Log contact now</strong> also records the current time as your latest contact and adds it to the activity timeline; it does not send a message.
+              <strong>Save lead</strong> stores your edits. <strong>Log contact now</strong> records the latest touch so this lead does not look warmer than it is; it does not send a message.
             </p>
           </section>
 
           <aside className="prospectActionPanel">
-            <h2 className="cardTitle">Next action</h2>
+            <h2 className="cardTitle">Next best move</h2>
             <p className="muted" style={{ marginTop: 8, lineHeight: 1.7 }}>
-              Move from account context into a relevant message, then return here to log the contact and schedule follow-up.
+              Turn the account context into a relevant message, then come back to log the touch and schedule the next follow-up.
             </p>
             <div style={{ display: "grid", gap: 10, marginTop: 18 }}>
-              <button className="button buttonPrimary" onClick={handleDraftOutreach}>Draft outreach</button>
-              {email ? <a className="button buttonSecondary" href={`mailto:${encodeURIComponent(email)}`}>Email {fullName || "prospect"}</a> : null}
+              <button className="button buttonPrimary" onClick={handleDraftOutreach}>Draft next message</button>
+              {email ? <a className="button buttonSecondary" href={`mailto:${encodeURIComponent(email)}`}>Email {fullName || "lead"}</a> : null}
               {linkedinUrl ? <a className="button buttonSecondary" href={linkedinUrl} target="_blank" rel="noreferrer">Open LinkedIn</a> : null}
             </div>
             <div className="prospectContextBlock">
-              <span>Current stage</span><strong>{PROSPECT_STAGE_LABELS[stage]}</strong>
+              <span>Client work stage</span><strong>{PROSPECT_STAGE_LABELS[stage]}</strong>
               <span>Next follow-up</span><strong>{nextFollowUp || "Not scheduled"}</strong>
               <span>Assigned to</span><strong>{prospect?.assigned_email || "Unassigned"}</strong>
             </div>

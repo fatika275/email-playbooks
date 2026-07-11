@@ -687,7 +687,7 @@ export default function ProspectsPage() {
   }
 
   if (isLoading) {
-    return <main className="main"><section className="container"><div className="glassCard emptyState">Loading pipeline...</div></section></main>;
+    return <main className="main"><section className="container"><div className="glassCard emptyState">Loading client work...</div></section></main>;
   }
 
   if (!user || !hasProAccess) {
@@ -696,11 +696,11 @@ export default function ProspectsPage() {
         <section className="container">
           <div className="glassCard emptyState">
             <div className="badge">Agency pipeline</div>
-            <h1 className="pageTitle" style={{ marginTop: 14 }}>Prospect Pipeline</h1>
+            <h1 className="pageTitle" style={{ marginTop: 14 }}>Client Work Pipeline</h1>
             <p className="muted">
               {user
-                ? "Prospect management is available with Pro, Founder Pro, and Business Pro."
-                : "Sign in first, then choose a plan to manage prospects and follow-ups."}
+                ? "Track leads, chase follow-ups, and stop client work from slipping with Pro, Founder Pro, and Business Pro."
+                : "Sign in first, then choose a plan to track leads and follow-ups."}
             </p>
             <Link href={user ? "/pricing" : "/account"} className="button buttonPrimary">
               {user ? "View plans" : "Sign in"}
@@ -717,11 +717,11 @@ export default function ProspectsPage() {
         <div className="prospectHeader">
           <div>
             <div className="badge">Agency pipeline</div>
-            <h1 className="pageTitle" style={{ marginTop: 14 }}>Prospect Pipeline</h1>
+            <h1 className="pageTitle" style={{ marginTop: 14 }}>Client Work Pipeline</h1>
             <p className="muted" style={{ margin: "8px 0 0" }}>
               {workspaceId
-                ? "Shared Business Pro pipeline"
-                : "Your private prospect pipeline"}
+                ? "Shared Business Pro view of leads, replies, proposals, and won client work"
+                : "Your private view of leads, replies, proposals, and won client work"}
             </p>
           </div>
           <div className="toolbar">
@@ -741,15 +741,15 @@ export default function ProspectsPage() {
               />
             </label>
             <button className="button buttonPrimary" onClick={() => setShowAdd((open) => !open)}>
-              {showAdd ? "Close" : "Add prospect"}
+              {showAdd ? "Close" : "Add lead"}
             </button>
           </div>
         </div>
 
         <div className="prospectMetrics">
-          <div><span>Active prospects</span><strong>{metrics.active}</strong></div>
+          <div><span>Active leads</span><strong>{metrics.active}</strong></div>
           <div><span>Replies needed</span><strong>{dailyDashboard.replyNeeded.length}</strong></div>
-          <div><span>Open value</span><strong>{formatMoney(metrics.value)}</strong></div>
+          <div><span>Potential client work</span><strong>{formatMoney(metrics.value)}</strong></div>
           <div><span>Clients won</span><strong>{metrics.won}</strong></div>
         </div>
 
@@ -765,7 +765,7 @@ export default function ProspectsPage() {
               {valueBasis === "monthly" ? <div className="formGroup"><label className="label">Expected months</label><input className="input" type="number" min="1" max="60" value={valueMonths} onChange={(event) => setValueMonths(Math.max(1, Number(event.target.value) || 1))} /></div> : null}
               <div className="formGroup"><label className="label">Next follow-up</label><input className="input" type="date" value={nextFollowUp} onChange={(event) => setNextFollowUp(event.target.value)} /></div>
             </div>
-            <button className="button buttonPrimary" disabled={isWorking} onClick={() => void handleCreate()}>{isWorking ? "Adding..." : "Add to pipeline"}</button>
+            <button className="button buttonPrimary" disabled={isWorking} onClick={() => void handleCreate()}>{isWorking ? "Adding..." : "Add lead"}</button>
           </section>
         ) : null}
 
@@ -774,11 +774,11 @@ export default function ProspectsPage() {
         <div className="prospectToolbar">
           <div className="authModeTabs prospectViewTabs" role="tablist" aria-label="Prospect view">
             <button className={view === "reports" ? "authModeTab active" : "authModeTab"} onClick={() => setView("reports")}>Dashboard</button>
-            <button className={view === "pipeline" ? "authModeTab active" : "authModeTab"} onClick={() => setView("pipeline")}>Pipeline</button>
-            <button className={view === "today" ? "authModeTab active" : "authModeTab"} onClick={() => setView("today")}>Today</button>
-            <button className={view === "list" ? "authModeTab active" : "authModeTab"} onClick={() => setView("list")}>List</button>
+            <button className={view === "pipeline" ? "authModeTab active" : "authModeTab"} onClick={() => setView("pipeline")}>Opportunities</button>
+            <button className={view === "today" ? "authModeTab active" : "authModeTab"} onClick={() => setView("today")}>Today&apos;s work</button>
+            <button className={view === "list" ? "authModeTab active" : "authModeTab"} onClick={() => setView("list")}>Lead list</button>
           </div>
-          <input className="input prospectSearch" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search name, company, email..." />
+          <input className="input prospectSearch" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search lead, company, email..." />
           <select className="input prospectStageFilter" value={stageFilter} onChange={(event) => setStageFilter(event.target.value as ProspectStage | "all")}>
             <option value="all">All stages</option>
             {PROSPECT_STAGES.map((stage) => <option key={stage} value={stage}>{PROSPECT_STAGE_LABELS[stage]}</option>)}
@@ -787,7 +787,7 @@ export default function ProspectsPage() {
 
         {view === "pipeline" ? (
           <div className="prospectViewSection">
-          <div className="prospectViewHeading"><h2 className="sectionTitle">Pipeline stages</h2><p className="muted">Move leads forward as conversations progress. Use the stage dropdown on a lead or drag it into another lane.</p></div>
+          <div className="prospectViewHeading"><h2 className="sectionTitle">Opportunities by stage</h2><p className="muted">Move leads forward as they get closer to booked client work, or park the ones that have slipped.</p></div>
           <div className="prospectBoard">
             {PROSPECT_STAGES.map((stage) => {
               const stageProspects = filtered.filter((prospect) => prospect.stage === stage);
@@ -825,7 +825,7 @@ export default function ProspectsPage() {
                         </select>
                       </article>
                     ))}
-                    {stageProspects.length === 0 ? <p className="prospectEmpty">No prospects</p> : null}
+                    {stageProspects.length === 0 ? <p className="prospectEmpty">No leads</p> : null}
                   </div>
                 </section>
               );
@@ -834,10 +834,10 @@ export default function ProspectsPage() {
           </div>
         ) : view === "list" ? (
           <div className="prospectViewSection">
-          <div className="prospectViewHeading"><h2 className="sectionTitle">All prospects</h2><p className="muted">Scan every lead in one place, then filter by stage or search by name and company.</p></div>
+          <div className="prospectViewHeading"><h2 className="sectionTitle">All leads</h2><p className="muted">Scan every possible client in one place, then find the replies, proposals, and cold leads that need action.</p></div>
           <div className="prospectTableWrap">
             <table className="prospectTable">
-              <thead><tr><th>Prospect</th><th>Stage</th><th>Value</th><th>Follow-up</th><th>Source</th><th>Actions</th></tr></thead>
+              <thead><tr><th>Lead</th><th>Stage</th><th>Client work value</th><th>Follow-up</th><th>Source</th><th>Actions</th></tr></thead>
               <tbody>
                 {filtered.map((prospect) => (
                   <tr key={prospect.id}>
@@ -851,21 +851,21 @@ export default function ProspectsPage() {
                 ))}
               </tbody>
             </table>
-            {filtered.length === 0 ? <div className="emptyState"><p className="muted">No prospects match this view.</p></div> : null}
+            {filtered.length === 0 ? <div className="emptyState"><p className="muted">No leads match this view.</p></div> : null}
           </div>
           </div>
         ) : view === "today" ? (
           <div className="prospectViewSection">
-          <div className="prospectViewHeading"><h2 className="sectionTitle">Today</h2><p className="muted">Start here each day to complete overdue tasks and follow up with leads before they go cold.</p></div>
+          <div className="prospectViewHeading"><h2 className="sectionTitle">Today&apos;s client-work actions</h2><p className="muted">Start here each day to chase replies, protect proposals, and keep warm leads from slipping.</p></div>
           <div className="prospectTodayGrid">
             <section className="prospectTodayPanel">
-              <div className="prospectSectionHeader"><h2 className="cardTitle">Tasks due</h2></div>
+              <div className="prospectSectionHeader"><h2 className="cardTitle">Actions due</h2></div>
               <div className="prospectTodayList">
                 {todayItems.openTasks.map(({ id, task, prospect }) => (
                   <div key={id} className="prospectTodayItem">
                     <div>
                       <strong>{getProspectTaskDisplayTitle(task.title)}</strong>
-                      <span>{prospect ? `${prospect.full_name} - ${prospect.company}` : "Prospect"}{task.due_date ? ` - Due ${task.due_date}` : ""}</span>
+                      <span>{prospect ? `${prospect.full_name} - ${prospect.company}` : "Lead"}{task.due_date ? ` - Due ${task.due_date}` : ""}</span>
                     </div>
                     <div className="toolbar">
                       {prospect ? <Link href={`/prospects/${prospect.id}`} className="button buttonSecondary">Open</Link> : null}
@@ -873,12 +873,12 @@ export default function ProspectsPage() {
                     </div>
                   </div>
                 ))}
-                {todayItems.openTasks.length === 0 ? <p className="muted">No overdue tasks. Nicely handled.</p> : null}
+                {todayItems.openTasks.length === 0 ? <p className="muted">No overdue lead actions. Nicely handled.</p> : null}
               </div>
             </section>
 
             <section className="prospectTodayPanel">
-              <div className="prospectSectionHeader"><h2 className="cardTitle">Prospects to follow up</h2></div>
+              <div className="prospectSectionHeader"><h2 className="cardTitle">Leads to follow up</h2></div>
               <div className="prospectTodayList">
                 {todayItems.followUps.map(({ id, prospect }) => (
                   <div key={id} className="prospectTodayItem">
@@ -886,7 +886,7 @@ export default function ProspectsPage() {
                     <Link href={`/prospects/${prospect.id}`} className="button buttonPrimary">Follow up</Link>
                   </div>
                 ))}
-                {todayItems.followUps.length === 0 ? <p className="muted">No prospect follow-ups are due.</p> : null}
+                {todayItems.followUps.length === 0 ? <p className="muted">No lead follow-ups are due.</p> : null}
               </div>
             </section>
           </div>
@@ -901,40 +901,40 @@ export default function ProspectsPage() {
                     ? `${dailyDashboard.priorityItems.length} useful action${dailyDashboard.priorityItems.length === 1 ? "" : "s"} to handle.`
                     : "You are clear for today."}
                 </h2>
-                <p className="muted">Start with the live work: follow-ups, replies, proposal nudges, and prospects that are starting to cool off.</p>
+                <p className="muted">Start with the work that books clients: follow-ups, replies, proposal nudges, and leads starting to slip.</p>
               </div>
               <div className="toolbar">
-                <button className="button buttonPrimary" onClick={() => setView("today")}>Open due tasks</button>
-                <button className="button buttonSecondary" onClick={() => setView("pipeline")}>View pipeline</button>
+                <button className="button buttonPrimary" onClick={() => setView("today")}>Open today&apos;s work</button>
+                <button className="button buttonSecondary" onClick={() => setView("pipeline")}>View opportunities</button>
               </div>
             </section>
 
             <section className="prospectDailyCards" aria-label="Today action summary">
               <button type="button" onClick={() => setView("today")}>
                 <strong>{dailyDashboard.followUpsDue}</strong>
-                <span>Follow-ups due today</span>
-                <small>Scheduled reminders and overdue follow-up dates.</small>
+                <span>Follow-ups to send today</span>
+                <small>Warm leads that need a nudge before they slip.</small>
               </button>
               <button type="button" onClick={() => { setStageFilter("replied"); setView("list"); }}>
                 <strong>{dailyDashboard.replyNeeded.length}</strong>
-                <span>Leads need a reply</span>
-                <small>Prospects sitting in Replied.</small>
+                <span>Leads need your reply</span>
+                <small>Conversations waiting for you to move them toward booked work.</small>
               </button>
               <button type="button" onClick={() => setView("today")}>
                 <strong>{dailyDashboard.proposalsToChase.length}</strong>
                 <span>Proposals need chasing</span>
-                <small>Due proposal tasks or late-stage follow-ups.</small>
+                <small>Late-stage client work that needs a decision.</small>
               </button>
               <button type="button" onClick={() => setView("list")}>
                 <strong>{dailyDashboard.coldProspects.length}</strong>
-                <span>Prospects going cold</span>
+                <span>Leads going cold</span>
                 <small>No recent touch for 14+ days.</small>
               </button>
             </section>
 
             <div className="prospectDailyLayout">
               <section className="prospectDailyPanel">
-                <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">Do these first</h3><p className="muted">The highest-friction items are pulled into one short list.</p></div>
+                <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">Do these first</h3><p className="muted">The actions most likely to protect or book client work are pulled into one short list.</p></div>
                 <div className="prospectDailyActionList">
                   {dailyDashboard.priorityItems.map((item) => (
                     <Link key={item.id} href={item.href} className="prospectDailyAction">
@@ -948,17 +948,17 @@ export default function ProspectsPage() {
                   {dailyDashboard.priorityItems.length === 0 ? (
                     <div className="prospectDailyEmpty">
                       <strong>No urgent actions</strong>
-                      <p className="muted">Add prospects, schedule follow-ups, or review the pipeline when you want to create the next set of actions.</p>
+                      <p className="muted">Add leads, schedule follow-ups, or review opportunities when you want to create the next set of client-work actions.</p>
                     </div>
                   ) : null}
                 </div>
               </section>
 
               <section className="prospectDailyPanel">
-                <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">Pipeline health</h3><p className="muted">Enough context to know whether today&apos;s list is healthy or slipping.</p></div>
+                <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">Client work health</h3><p className="muted">Enough context to see whether your next jobs are moving forward or slipping.</p></div>
                 <div className="prospectPipelineNow">
                   <div><span>Active leads</span><strong>{metrics.active}</strong></div>
-                  <div><span>Open value</span><strong>{formatMoney(metrics.value)}</strong></div>
+                  <div><span>Potential client work</span><strong>{formatMoney(metrics.value)}</strong></div>
                   <div><span>Reply rate</span><strong>{acquisitionRates.reply}%</strong></div>
                   <div><span>Closed win rate</span><strong>{report.winRate}%</strong></div>
                 </div>
@@ -966,7 +966,7 @@ export default function ProspectsPage() {
             </div>
 
             <section className="prospectDashboardSection prospectStageSnapshot">
-              <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">Where leads sit</h3><p className="muted">Stage distribution across the whole pipeline.</p></div>
+              <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">Where leads sit</h3><p className="muted">A quick view of what is moving, what needs a reply, and what may be slipping.</p></div>
               <div className="prospectStageRows">
                 {report.stages.map((row) => (
                   <div key={row.stage}><span>{PROSPECT_STAGE_LABELS[row.stage]}</span><i><b style={{ width: `${prospects.length ? (row.count / prospects.length) * 100 : 0}%` }} /></i><strong>{row.count}</strong></div>
@@ -975,11 +975,11 @@ export default function ProspectsPage() {
             </section>
 
             <details className="prospectForecastSettings prospectAdvancedReport">
-              <summary><strong>Advanced forecast settings</strong><span>Optional deal values, probabilities, and weighted forecasting</span></summary>
+              <summary><strong>Client work forecast settings</strong><span>Optional deal values, probabilities, and weighted forecasting</span></summary>
               <div className="prospectAdvancedReportContent">
               <div className="cardTop">
                 <div>
-                  <h2 className="cardTitle">Forecast settings</h2>
+                  <h2 className="cardTitle">Client work forecast</h2>
                   <p className="muted" style={{ margin: "8px 0 0" }}>
                     Weighted forecast = each deal&apos;s stored contract value × its
                     current stage probability.
