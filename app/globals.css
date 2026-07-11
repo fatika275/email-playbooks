@@ -2289,10 +2289,6 @@ details[open] > summary::after {
   line-height: 1.15;
 }
 
-.prospectQuickActions .button:first-child {
-  grid-column: 1 / -1;
-}
-
 .prospectCardStage {
   width: 100%;
   min-height: 30px;
@@ -2367,10 +2363,6 @@ details[open] > summary::after {
   min-width: 220px;
   margin-top: 0;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-}
-
-.prospectTable .prospectQuickActions .button:first-child {
-  grid-column: auto;
 }
 
 .prospectDetailLayout {
