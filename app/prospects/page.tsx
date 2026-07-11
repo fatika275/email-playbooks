@@ -98,6 +98,10 @@ function getFollowUpStep(task: ProspectTask) {
   return Math.min(3, Math.max(1, Number(stepMatch?.[1]) || 1));
 }
 
+function getLeadSource(prospect: Prospect) {
+  return prospect.source?.trim() || "Unknown";
+}
+
 export default function ProspectsPage() {
   const router = useRouter();
   const { user, hasProAccess, isLoading, businessMembership } = useAccount();
@@ -246,6 +250,34 @@ export default function ProspectsPage() {
       const days = daysSince(prospect.last_contacted_at ?? prospect.updated_at);
       return days !== null && days >= 14;
     });
+    const nextMessageQueue = [
+      ...scheduledFollowUps.map(({ task, prospect }) => ({
+        id: `message-task-${task.id}`,
+        label: "Send next",
+        title: prospect?.full_name ?? getProspectTaskDisplayTitle(task.title),
+        meta: prospect
+          ? `${prospect.company} - ${getProspectTaskDisplayTitle(task.title)}`
+          : getProspectTaskDisplayTitle(task.title),
+        href: prospect ? `/prospects/${prospect.id}` : "/prospects",
+        prospect,
+      })),
+      ...dueFollowUps.map(({ prospect }) => ({
+        id: `message-followup-${prospect.id}`,
+        label: "Follow up",
+        title: prospect.full_name,
+        meta: `${prospect.company} - ${PROSPECT_STAGE_LABELS[prospect.stage]}`,
+        href: `/prospects/${prospect.id}`,
+        prospect,
+      })),
+      ...replyNeeded.map((prospect) => ({
+        id: `message-reply-${prospect.id}`,
+        label: "Reply",
+        title: prospect.full_name,
+        meta: `${prospect.company} - keep the conversation moving`,
+        href: `/prospects/${prospect.id}`,
+        prospect,
+      })),
+    ].slice(0, 5);
 
     const priorityItems = [
       ...scheduledFollowUps.slice(0, 4).map(({ task, prospect }) => ({
@@ -292,14 +324,39 @@ export default function ProspectsPage() {
       coldProspects,
       manualDueTasks,
       priorityItems,
+      nextMessageQueue,
     };
   }, [prospects, todayItems]);
 
   const report = useMemo(() => {
     const closed = prospects.filter((prospect) => ["won", "lost"].includes(prospect.stage));
     const won = closed.filter((prospect) => prospect.stage === "won").length;
+    const proposalStages = prospects.filter((prospect) => ["qualified", "meeting"].includes(prospect.stage));
+    const active = prospects.filter((prospect) => ACTIVE_STAGES.includes(prospect.stage));
+    const sourceBreakdown = Object.values(
+      prospects.reduce<Record<string, { source: string; leads: number; won: number; value: number }>>(
+        (summary, prospect) => {
+          const sourceName = getLeadSource(prospect);
+          summary[sourceName] ??= { source: sourceName, leads: 0, won: 0, value: 0 };
+          summary[sourceName].leads += 1;
+          if (prospect.stage === "won") {
+            summary[sourceName].won += 1;
+            summary[sourceName].value += prospect.estimated_value_gbp;
+          }
+          return summary;
+        },
+        {}
+      )
+    ).sort((a, b) => b.won - a.won || b.value - a.value || b.leads - a.leads);
     return {
       weighted: prospects.reduce(
+        (sum, prospect) =>
+          sum + prospect.estimated_value_gbp * (probabilities[prospect.stage] / 100),
+        0
+      ),
+      activeValue: active.reduce((sum, prospect) => sum + prospect.estimated_value_gbp, 0),
+      proposalValue: proposalStages.reduce((sum, prospect) => sum + prospect.estimated_value_gbp, 0),
+      likelyToClose: proposalStages.reduce(
         (sum, prospect) =>
           sum + prospect.estimated_value_gbp * (probabilities[prospect.stage] / 100),
         0
@@ -307,6 +364,7 @@ export default function ProspectsPage() {
       winRate: closed.length ? Math.round((won / closed.length) * 100) : 0,
       closedCount: closed.length,
       confidence: closed.length >= 20 ? "High" : closed.length >= 5 ? "Medium" : "Low",
+      sourceBreakdown,
       stages: PROSPECT_STAGES.map((stage) => {
         const rows = prospects.filter((prospect) => prospect.stage === stage);
         return {
@@ -474,6 +532,14 @@ export default function ProspectsPage() {
 
   async function handleQuickStageChange(prospect: Prospect, stage: ProspectStage) {
     const previous = prospects;
+    const outcomeReason =
+      ["won", "lost"].includes(stage)
+        ? window.prompt(
+            stage === "won"
+              ? "What helped win this client work? (optional)"
+              : "Why did this lead slip or close out? (optional)"
+          )?.trim()
+        : "";
     setProspects((current) =>
       current.map((item) => (item.id === prospect.id ? { ...item, stage } : item))
     );
@@ -487,12 +553,34 @@ export default function ProspectsPage() {
           summary: `${prospect.full_name} marked ${PROSPECT_STAGE_LABELS[stage].toLowerCase()}.`,
         });
       }
+      if (user && outcomeReason) {
+        await createProspectActivity({
+          prospectId: prospect.id,
+          userId: user.id,
+          activityType: "note",
+          summary: `Outcome reason: ${outcomeReason}`,
+        });
+      }
       setNotice(`${prospect.full_name} moved to ${PROSPECT_STAGE_LABELS[stage]}.`);
       await refresh();
     } catch (error) {
       setProspects(previous);
       setNotice(error instanceof Error ? error.message : "Prospect could not be updated.");
     }
+  }
+
+  function handleRescueColdLead(prospect: Prospect) {
+    window.localStorage.setItem(
+      "thalovo_prospect_context",
+      JSON.stringify({
+        name: prospect.full_name,
+        company: prospect.company,
+        email: prospect.email,
+        role: prospect.role,
+        prospectId: prospect.id,
+      })
+    );
+    router.push("/editor/re-engagement-emails/old-lead-restart");
   }
 
   async function handleSnoozeFollowUp(prospect: Prospect, days = 3) {
@@ -957,9 +1045,54 @@ export default function ProspectsPage() {
               </button>
             </section>
 
+            <section className="prospectDashboardOutcomes" aria-label="Client work forecast">
+              <div>
+                <strong>{formatMoney(report.activeValue)}</strong>
+                <span>Active potential work</span>
+              </div>
+              <div>
+                <strong>{formatMoney(report.proposalValue)}</strong>
+                <span>Proposal value waiting</span>
+              </div>
+              <div>
+                <strong>{formatMoney(report.likelyToClose)}</strong>
+                <span>Likely late-stage value</span>
+              </div>
+              <div>
+                <strong>{report.winRate}%</strong>
+                <span>Closed win rate</span>
+              </div>
+            </section>
+
             <div className="prospectDailyLayout">
               <section className="prospectDailyPanel">
-                <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">Do these first</h3><p className="muted">The actions most likely to protect or book client work are pulled into one short list.</p></div>
+                <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">Send this next</h3><p className="muted">A short queue of messages most likely to keep client work moving today.</p></div>
+                <div className="prospectDailyActionList">
+                  {dailyDashboard.nextMessageQueue.map((item) => (
+                    <div key={item.id} className="prospectDailyAction prospectDailyActionWithButton">
+                      <span className="miniBadge">{item.label}</span>
+                      <div>
+                        <strong>{item.title}</strong>
+                        <small>{item.meta}</small>
+                      </div>
+                      {item.prospect ? (
+                        <button className="button buttonPrimary" type="button" onClick={() => handleDraftNextMessage(item.prospect!)}>
+                          Open message
+                        </button>
+                      ) : (
+                        <Link href={item.href} className="button buttonPrimary">Open</Link>
+                      )}
+                    </div>
+                  ))}
+                  {dailyDashboard.nextMessageQueue.length === 0 ? (
+                    <div className="prospectDailyEmpty">
+                      <strong>No messages due</strong>
+                      <p className="muted">Start or schedule sequences for active leads to build this queue.</p>
+                    </div>
+                  ) : null}
+                </div>
+
+                <div className="prospectDashboardSectionHeading prospectDashboardSubsection"><h3 className="sectionTitle">Do these first</h3><p className="muted">The actions most likely to protect or book client work are pulled into one short list.</p></div>
                 <div className="prospectDailyActionList">
                   {dailyDashboard.priorityItems.map((item) => (
                     <Link key={item.id} href={item.href} className="prospectDailyAction">
@@ -987,6 +1120,37 @@ export default function ProspectsPage() {
                   <div><span>Reply rate</span><strong>{acquisitionRates.reply}%</strong></div>
                   <div><span>Closed win rate</span><strong>{report.winRate}%</strong></div>
                 </div>
+
+                <div className="prospectDashboardSectionHeading prospectDashboardSubsection"><h3 className="sectionTitle">Proposal chase mode</h3><p className="muted">Late-stage opportunities that need a decision, not another forgotten check-in.</p></div>
+                <div className="prospectMiniList">
+                  {dailyDashboard.proposalsToChase.slice(0, 4).map((item) => {
+                    const prospect = "prospect" in item ? item.prospect : undefined;
+                    const task = "task" in item ? item.task : undefined;
+                    return (
+                      <Link key={item.id ?? `${prospect?.id}-${task?.id}`} href={prospect ? `/prospects/${prospect.id}` : "/prospects"} className="prospectMiniListItem">
+                        <strong>{prospect?.full_name ?? (task ? getProspectTaskDisplayTitle(task.title) : "Proposal")}</strong>
+                        <span>{prospect ? `${prospect.company} - chase decision` : "Open proposal task"}</span>
+                      </Link>
+                    );
+                  })}
+                  {dailyDashboard.proposalsToChase.length === 0 ? <p className="small">No proposals need chasing right now.</p> : null}
+                </div>
+
+                <div className="prospectDashboardSectionHeading prospectDashboardSubsection"><h3 className="sectionTitle">Stale lead rescue</h3><p className="muted">Leads with no recent touch get a re-engagement message instead of sitting cold.</p></div>
+                <div className="prospectMiniList">
+                  {dailyDashboard.coldProspects.slice(0, 4).map((prospect) => (
+                    <div key={prospect.id} className="prospectMiniListItem prospectMiniListAction">
+                      <div>
+                        <strong>{prospect.full_name}</strong>
+                        <span>{prospect.company} - last touched {daysSince(prospect.last_contacted_at ?? prospect.updated_at)} days ago</span>
+                      </div>
+                      <button className="button buttonSecondary" type="button" onClick={() => handleRescueColdLead(prospect)}>
+                        Rescue
+                      </button>
+                    </div>
+                  ))}
+                  {dailyDashboard.coldProspects.length === 0 ? <p className="small">No stale leads need rescuing.</p> : null}
+                </div>
               </section>
             </div>
 
@@ -996,6 +1160,20 @@ export default function ProspectsPage() {
                 {report.stages.map((row) => (
                   <div key={row.stage}><span>{PROSPECT_STAGE_LABELS[row.stage]}</span><i><b style={{ width: `${prospects.length ? (row.count / prospects.length) * 100 : 0}%` }} /></i><strong>{row.count}</strong></div>
                 ))}
+              </div>
+            </section>
+
+            <section className="prospectDashboardSection">
+              <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">What sources book work</h3><p className="muted">Track where leads come from so the agency can double down on channels that become clients.</p></div>
+              <div className="prospectSourceRows">
+                {report.sourceBreakdown.slice(0, 6).map((row) => (
+                  <div key={row.source}>
+                    <span>{row.source}</span>
+                    <strong>{row.won} won</strong>
+                    <small>{row.leads} lead{row.leads === 1 ? "" : "s"} - {formatMoney(row.value)} booked</small>
+                  </div>
+                ))}
+                {report.sourceBreakdown.length === 0 ? <p className="small">Add sources to leads to see what turns into client work.</p> : null}
               </div>
             </section>
 

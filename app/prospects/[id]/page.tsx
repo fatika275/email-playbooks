@@ -547,6 +547,14 @@ export default function ProspectDetailPage() {
 
   async function handleProposalOutcome(outcome: "replied" | "won" | "lost") {
     if (!id || !user) return;
+    const outcomeReason =
+      outcome === "won" || outcome === "lost"
+        ? window.prompt(
+            outcome === "won"
+              ? "What helped win this client work? (optional)"
+              : "Why did this lead slip or close out? (optional)"
+          )?.trim()
+        : "";
     setIsStartingProposalWorkflow(true);
     try {
       await Promise.all(activeProposalTasks.map((task) => setProspectTaskCompleted(task.id, true)));
@@ -569,6 +577,14 @@ export default function ProspectDetailPage() {
         activityType: "status",
         summary: `Scheduled follow-up closed: ${PROSPECT_STAGE_LABELS[outcome]}.`,
       });
+      if (outcomeReason) {
+        await createProspectActivity({
+          prospectId: id,
+          userId: user.id,
+          activityType: "note",
+          summary: `Outcome reason: ${outcomeReason}`,
+        });
+      }
       setProspect(updated);
       setStage(outcome);
       setNextFollowUp("");

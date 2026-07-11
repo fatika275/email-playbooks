@@ -3060,6 +3060,15 @@ details[open] > summary::after {
   background: #121212;
 }
 
+.prospectDailyActionWithButton {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+}
+
+.prospectDailyActionWithButton .button {
+  min-height: 34px;
+  padding: 0 12px;
+}
+
 .prospectDailyAction div {
   min-width: 0;
   display: grid;
@@ -3167,6 +3176,10 @@ details[open] > summary::after {
   gap: 7px;
 }
 
+.prospectDashboardSubsection {
+  margin-top: 28px;
+}
+
 .prospectDashboardSectionHeading .muted {
   margin: 0;
   line-height: 1.55;
@@ -3229,6 +3242,48 @@ details[open] > summary::after {
   border-bottom: 0;
 }
 
+.prospectMiniList {
+  display: grid;
+  gap: 9px;
+  margin-top: 16px;
+}
+
+.prospectMiniListItem {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+  color: var(--text);
+  text-decoration: none;
+  border: 1px solid var(--border-soft);
+  background: #0d0d0d;
+}
+
+.prospectMiniListItem:hover {
+  border-color: #3a3a3a;
+  background: #121212;
+}
+
+.prospectMiniListItem strong,
+.prospectMiniListItem span {
+  overflow-wrap: anywhere;
+}
+
+.prospectMiniListItem span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.prospectMiniListAction {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.prospectMiniListAction .button {
+  min-height: 32px;
+  padding: 0 12px;
+}
+
 .prospectStageSnapshot {
   border-bottom: 1px solid var(--border);
 }
@@ -3251,6 +3306,34 @@ details[open] > summary::after {
 
 .prospectStageRows strong {
   text-align: right;
+  font-size: 12px;
+}
+
+.prospectSourceRows {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.prospectSourceRows > div {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+  padding: 14px;
+  border: 1px solid var(--border-soft);
+  background: #0d0d0d;
+}
+
+.prospectSourceRows span,
+.prospectSourceRows strong,
+.prospectSourceRows small {
+  overflow-wrap: anywhere;
+}
+
+.prospectSourceRows span,
+.prospectSourceRows small {
+  color: var(--muted);
   font-size: 12px;
 }
 
@@ -4050,6 +4133,17 @@ details[open] > summary::after {
 
   .prospectStageRows {
     grid-template-columns: 1fr;
+  }
+
+  .prospectDailyActionWithButton,
+  .prospectMiniListAction,
+  .prospectSourceRows {
+    grid-template-columns: 1fr;
+  }
+
+  .prospectDailyActionWithButton .button,
+  .prospectMiniListAction .button {
+    justify-self: start;
   }
 
   .prospectMetrics div,
