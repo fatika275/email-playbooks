@@ -2120,6 +2120,73 @@ details[open] > summary::after {
   margin-bottom: 18px;
 }
 
+.prospectOnboarding {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(300px, 0.9fr) auto;
+  gap: 18px;
+  align-items: center;
+  padding: 18px;
+  margin-bottom: 18px;
+  border: 1px solid rgba(201, 166, 72, 0.26);
+  background: linear-gradient(180deg, rgba(201, 166, 72, 0.08), rgba(255, 255, 255, 0.015));
+}
+
+.prospectOnboarding .sectionTitle {
+  margin: 8px 0 6px;
+}
+
+.prospectOnboarding .muted {
+  max-width: 620px;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.prospectOnboardingSteps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.prospectOnboardingSteps div {
+  min-width: 0;
+  display: grid;
+  gap: 7px;
+  padding: 10px;
+  border: 1px solid #242424;
+  background: rgba(0, 0, 0, 0.24);
+}
+
+.prospectOnboardingSteps strong {
+  width: 22px;
+  height: 22px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 999px;
+  color: #101010;
+  background: var(--gold);
+  font-size: 12px;
+}
+
+.prospectOnboardingSteps span {
+  color: #e8e8e8;
+  font-size: 12px;
+  line-height: 1.25;
+}
+
+.prospectOnboardingSteps .isDone {
+  border-color: rgba(132, 184, 132, 0.4);
+  background: rgba(132, 184, 132, 0.08);
+}
+
+.prospectOnboardingSteps .isDone strong {
+  color: #ffffff;
+  background: #3f7f52;
+}
+
+.prospectOnboardingDetail {
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 0.9fr) auto;
+}
+
 .prospectFormGrid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -3916,8 +3983,14 @@ details[open] > summary::after {
 
   .prospectMetrics,
   .prospectFormGrid,
-  .prospectToolbar {
+  .prospectToolbar,
+  .prospectOnboarding,
+  .prospectOnboardingDetail {
     grid-template-columns: 1fr;
+  }
+
+  .prospectOnboardingSteps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .prospectDashboardHero {

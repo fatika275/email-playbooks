@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useAccount } from "@/components/account-provider";
 import { listBusinessMembers, type BusinessMember } from "@/lib/cloud";
 import {
@@ -124,6 +124,7 @@ function addDays(date: string, days: number) {
 export default function ProspectDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user, hasProAccess, isLoading } = useAccount();
   const customTemplates = useCustomTemplates();
   const id = useMemo(() => {
@@ -229,6 +230,20 @@ export default function ProspectDetailPage() {
     return ["email", "call", "meeting", "status"].includes(activity.activity_type);
   }), [activities, activityFilter]);
   const visibleActivities = showAllActivity ? filteredActivities : filteredActivities.slice(0, 8);
+  const showOnboardingGuide =
+    searchParams.get("onboarding") === "1" ||
+    Boolean(prospect && !lastContactedAt && !nextFollowUp && tasks.length === 0);
+  const onboardingSequenceStarted = activeProposalTasks.length > 0 || Boolean(nextFollowUp);
+  const onboardingFirstMessageSent = Boolean(lastContactedAt);
+  const onboardingFollowUpSet = Boolean(lastContactedAt && nextFollowUp);
+
+  useEffect(() => {
+    if (searchParams.get("onboarding") !== "1") return;
+    setDetailView("followup");
+    if (!nextProposalTask && activeProposalTasks.length === 0) {
+      setIsSequencePickerOpen(true);
+    }
+  }, [activeProposalTasks.length, nextProposalTask, searchParams]);
 
   useEffect(() => {
     if (!id || !user || !hasProAccess) return;
@@ -614,6 +629,38 @@ export default function ProspectDetailPage() {
           <button type="button" role="tab" aria-selected={detailView === "followup"} className={detailView === "followup" ? "active" : ""} onClick={() => setDetailView("followup")}>Next steps{activeProposalTasks.length + openManualTasks.length ? ` (${activeProposalTasks.length + openManualTasks.length})` : ""}</button>
           <button type="button" role="tab" aria-selected={detailView === "activity"} className={detailView === "activity" ? "active" : ""} onClick={() => setDetailView("activity")}>Activity</button>
         </div>
+
+        {showOnboardingGuide ? (
+          <section className="prospectOnboarding prospectOnboardingDetail">
+            <div>
+              <span className="miniBadge">First client-work setup</span>
+              <h2 className="sectionTitle">Turn this lead into an action plan</h2>
+              <p className="muted">
+                Choose a sequence, open the first message, then schedule the follow-up so this lead does not disappear after the first touch.
+              </p>
+            </div>
+            <div className="prospectOnboardingSteps">
+              <div className="isDone"><strong>1</strong><span>Lead added</span></div>
+              <div className={onboardingSequenceStarted ? "isDone" : ""}><strong>2</strong><span>Choose a sequence</span></div>
+              <div className={onboardingFirstMessageSent ? "isDone" : ""}><strong>3</strong><span>Send first message</span></div>
+              <div className={onboardingFollowUpSet ? "isDone" : ""}><strong>4</strong><span>Set first follow-up</span></div>
+            </div>
+            <button
+              className="button buttonPrimary"
+              type="button"
+              onClick={() => {
+                if (nextProposalTask) {
+                  handleDraftProposalFollowUp(nextProposalTask);
+                  return;
+                }
+                setDetailView("followup");
+                setIsSequencePickerOpen(true);
+              }}
+            >
+              {nextProposalTask ? "Open first message" : "Choose a sequence"}
+            </button>
+          </section>
+        ) : null}
 
         <div className="prospectDetailLayout">
           <section className="prospectDetailMain">

@@ -342,9 +342,10 @@ export default function ProspectsPage() {
       setNotice("Add the prospect's name and company first.");
       return;
     }
+    const isFirstLead = prospects.length === 0;
     setIsWorking(true);
     try {
-      await createProspect({
+      const created = await createProspect({
         userId: user.id,
         workspaceId,
         input: {
@@ -367,6 +368,9 @@ export default function ProspectsPage() {
       setShowAdd(false);
       setNotice("Prospect added to the pipeline.");
       await refresh();
+      if (isFirstLead) {
+        router.push(`/prospects/${created.id}?onboarding=1`);
+      }
     } catch (error) {
       setNotice(error instanceof Error ? error.message : "Prospect could not be added.");
     } finally {
@@ -752,6 +756,27 @@ export default function ProspectsPage() {
           <div><span>Potential client work</span><strong>{formatMoney(metrics.value)}</strong></div>
           <div><span>Clients won</span><strong>{metrics.won}</strong></div>
         </div>
+
+        {prospects.length === 0 ? (
+          <section className="prospectOnboarding">
+            <div>
+              <span className="miniBadge">First client-work setup</span>
+              <h2 className="sectionTitle">Get your first lead moving</h2>
+              <p className="muted">
+                Add one real lead, choose the sequence that fits, send the first message, then set the follow-up so they do not slip.
+              </p>
+            </div>
+            <div className="prospectOnboardingSteps">
+              <div><strong>1</strong><span>Add first lead</span></div>
+              <div><strong>2</strong><span>Choose a sequence</span></div>
+              <div><strong>3</strong><span>Send first message</span></div>
+              <div><strong>4</strong><span>Set first follow-up</span></div>
+            </div>
+            <button className="button buttonPrimary" type="button" onClick={() => setShowAdd(true)}>
+              Add first lead
+            </button>
+          </section>
+        ) : null}
 
         {showAdd ? (
           <section className="prospectAddPanel">
