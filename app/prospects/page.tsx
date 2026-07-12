@@ -336,8 +336,6 @@ export default function ProspectsPage() {
   const report = useMemo(() => {
     const closed = prospects.filter((prospect) => ["won", "lost"].includes(prospect.stage));
     const won = closed.filter((prospect) => prospect.stage === "won").length;
-    const proposalStages = prospects.filter((prospect) => ["qualified", "meeting"].includes(prospect.stage));
-    const active = prospects.filter((prospect) => ACTIVE_STAGES.includes(prospect.stage));
     const sourceBreakdown = Object.values(
       prospects.reduce<Record<string, { source: string; leads: number; won: number; value: number }>>(
         (summary, prospect) => {
@@ -355,13 +353,6 @@ export default function ProspectsPage() {
     ).sort((a, b) => b.won - a.won || b.value - a.value || b.leads - a.leads);
     return {
       weighted: prospects.reduce(
-        (sum, prospect) =>
-          sum + prospect.estimated_value_gbp * (probabilities[prospect.stage] / 100),
-        0
-      ),
-      activeValue: active.reduce((sum, prospect) => sum + prospect.estimated_value_gbp, 0),
-      proposalValue: proposalStages.reduce((sum, prospect) => sum + prospect.estimated_value_gbp, 0),
-      likelyToClose: proposalStages.reduce(
         (sum, prospect) =>
           sum + prospect.estimated_value_gbp * (probabilities[prospect.stage] / 100),
         0
@@ -1063,7 +1054,7 @@ export default function ProspectsPage() {
           <div className="prospectReports">
             <section className="prospectDailyHero">
               <div>
-                <span className="miniBadge">Daily view</span>
+                <span className="miniBadge">What to do next</span>
                 <h2 className="pageTitle">
                   {dailyDashboard.nextMessageQueue.length
                     ? `Send this next: ${dailyDashboard.nextMessageQueue[0].title}`
@@ -1072,6 +1063,13 @@ export default function ProspectsPage() {
                       : "You are clear for today."}
                 </h2>
                 <p className="muted">Start with the next message most likely to keep client work moving, then chase proposals and rescue slipping leads.</p>
+                <div className="prospectFocusSummary" aria-label="Pipeline summary">
+                  <span>{dailyDashboard.followUpsDue} follow-up{dailyDashboard.followUpsDue === 1 ? "" : "s"} due</span>
+                  <span>{dailyDashboard.replyNeeded.length} repl{dailyDashboard.replyNeeded.length === 1 ? "y" : "ies"} waiting</span>
+                  <span>{dailyDashboard.proposalsToChase.length} proposal{dailyDashboard.proposalsToChase.length === 1 ? "" : "s"} to chase</span>
+                  <span>{dailyDashboard.coldProspects.length} lead{dailyDashboard.coldProspects.length === 1 ? "" : "s"} going cold</span>
+                  <span>{formatMoney(metrics.value)} active potential work</span>
+                </div>
               </div>
               <div className="toolbar">
                 <button
@@ -1088,48 +1086,6 @@ export default function ProspectsPage() {
                   {dailyDashboard.nextMessageQueue.length ? "Open next message" : "Open today's work"}
                 </button>
                 <button className="button buttonSecondary" onClick={() => setView("pipeline")}>View opportunities</button>
-              </div>
-            </section>
-
-            <section className="prospectDailyCards" aria-label="Today action summary">
-              <button type="button" onClick={() => setView("today")}>
-                <strong>{dailyDashboard.followUpsDue}</strong>
-                <span>Follow-ups to send today</span>
-                <small>Warm leads that need a nudge before they slip.</small>
-              </button>
-              <button type="button" onClick={() => { setStageFilter("replied"); setView("list"); }}>
-                <strong>{dailyDashboard.replyNeeded.length}</strong>
-                <span>Leads need your reply</span>
-                <small>Conversations waiting for you to move them toward booked work.</small>
-              </button>
-              <button type="button" onClick={() => setView("today")}>
-                <strong>{dailyDashboard.proposalsToChase.length}</strong>
-                <span>Proposals need chasing</span>
-                <small>Late-stage client work that needs a decision.</small>
-              </button>
-              <button type="button" onClick={() => setView("list")}>
-                <strong>{dailyDashboard.coldProspects.length}</strong>
-                <span>Leads going cold</span>
-                <small>No recent touch for 14+ days.</small>
-              </button>
-            </section>
-
-            <section className="prospectDashboardOutcomes" aria-label="Client work forecast">
-              <div>
-                <strong>{formatMoney(report.activeValue)}</strong>
-                <span>Active potential work</span>
-              </div>
-              <div>
-                <strong>{formatMoney(report.proposalValue)}</strong>
-                <span>Proposal value waiting</span>
-              </div>
-              <div>
-                <strong>{formatMoney(report.likelyToClose)}</strong>
-                <span>Likely late-stage value</span>
-              </div>
-              <div>
-                <strong>{report.winRate}%</strong>
-                <span>Closed win rate</span>
               </div>
             </section>
 
@@ -1190,15 +1146,14 @@ export default function ProspectsPage() {
               </section>
 
               <section className="prospectDailyPanel">
-                <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">Client work health</h3><p className="muted">Enough context to see whether your next jobs are moving forward or slipping.</p></div>
-                <div className="prospectPipelineNow">
+                <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">Chase or rescue</h3><p className="muted">Only the late-stage and stale leads that need attention after the next message.</p></div>
+                <div className="prospectFocusStats">
                   <div><span>Active leads</span><strong>{metrics.active}</strong></div>
-                  <div><span>Potential client work</span><strong>{formatMoney(metrics.value)}</strong></div>
                   <div><span>Reply rate</span><strong>{acquisitionRates.reply}%</strong></div>
                   <div><span>Closed win rate</span><strong>{report.winRate}%</strong></div>
                 </div>
 
-                <div className="prospectDashboardSectionHeading prospectDashboardSubsection"><h3 className="sectionTitle">Proposal chase mode</h3><p className="muted">Late-stage opportunities that need a decision, not another forgotten check-in.</p></div>
+                <div className="prospectDashboardSectionHeading prospectDashboardSubsection"><h3 className="cardTitle">Proposal decisions</h3></div>
                 <div className="prospectMiniList">
                   {dailyDashboard.proposalsToChase.slice(0, 4).map((item) => {
                     const prospect = "prospect" in item ? item.prospect : undefined;
@@ -1213,7 +1168,7 @@ export default function ProspectsPage() {
                   {dailyDashboard.proposalsToChase.length === 0 ? <p className="small">No proposals need chasing right now.</p> : null}
                 </div>
 
-                <div className="prospectDashboardSectionHeading prospectDashboardSubsection"><h3 className="sectionTitle">Stale lead rescue</h3><p className="muted">Leads with no recent touch get a re-engagement message instead of sitting cold.</p></div>
+                <div className="prospectDashboardSectionHeading prospectDashboardSubsection"><h3 className="cardTitle">Cold lead rescue</h3></div>
                 <div className="prospectMiniList">
                   {dailyDashboard.coldProspects.slice(0, 4).map((prospect) => (
                     <div key={prospect.id} className="prospectMiniListItem prospectMiniListAction">

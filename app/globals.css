@@ -2961,51 +2961,48 @@ details[open] > summary::after {
   line-height: 1.7;
 }
 
-.prospectDailyCards {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  border-bottom: 1px solid var(--border);
+.prospectFocusSummary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-width: 760px;
+  margin-top: 18px;
 }
 
-.prospectDailyCards button {
-  min-width: 0;
-  min-height: 142px;
-  padding: 22px 20px;
-  display: grid;
-  gap: 6px;
-  text-align: left;
-  color: var(--text);
-  background: transparent;
-  border: 0;
-  border-right: 1px solid var(--border);
-  cursor: pointer;
+.prospectFocusSummary span,
+.prospectFocusStats > div {
+  border: 1px solid var(--border-soft);
+  background: #0d0d0d;
 }
 
-.prospectDailyCards button:first-child {
-  padding-left: 0;
-}
-
-.prospectDailyCards button:last-child {
-  border-right: 0;
-}
-
-.prospectDailyCards button:hover {
-  background: #0c0c0c;
-}
-
-.prospectDailyCards strong {
-  font-size: 32px;
-  line-height: 1;
-}
-
-.prospectDailyCards span {
-  font-weight: 750;
-}
-
-.prospectDailyCards small {
+.prospectFocusSummary span {
+  padding: 8px 10px;
   color: var(--muted);
   font-size: 12px;
-  line-height: 1.45;
+  line-height: 1.2;
+}
+
+.prospectFocusStats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.prospectFocusStats > div {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+}
+
+.prospectFocusStats span {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.prospectFocusStats strong {
+  font-size: 18px;
 }
 
 .prospectDailyLayout {
@@ -3124,37 +3121,6 @@ details[open] > summary::after {
   max-width: 620px;
   margin: 10px 0 0;
   line-height: 1.7;
-}
-
-.prospectDashboardOutcomes {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  border-bottom: 1px solid var(--border);
-}
-
-.prospectDashboardOutcomes > div {
-  display: grid;
-  gap: 5px;
-  padding: 24px 20px;
-  border-right: 1px solid var(--border);
-}
-
-.prospectDashboardOutcomes > div:first-child {
-  padding-left: 0;
-}
-
-.prospectDashboardOutcomes > div:last-child {
-  border-right: 0;
-}
-
-.prospectDashboardOutcomes strong {
-  font-size: 28px;
-  font-weight: 650;
-}
-
-.prospectDashboardOutcomes span {
-  color: var(--muted);
-  font-size: 12px;
 }
 
 .prospectDashboardSplit {
@@ -4083,45 +4049,12 @@ details[open] > summary::after {
     padding: 26px 0;
   }
 
-  .prospectDailyCards {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .prospectFocusSummary {
+    gap: 6px;
   }
 
-  .prospectDailyCards button {
-    min-height: 124px;
-    padding: 18px 14px;
-  }
-
-  .prospectDailyCards button:first-child {
-    padding-left: 14px;
-  }
-
-  .prospectDailyCards button:nth-child(2) {
-    border-right: 0;
-  }
-
-  .prospectDailyCards button:nth-child(-n + 2) {
-    border-bottom: 1px solid var(--border);
-  }
-
-  .prospectDashboardOutcomes {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .prospectDashboardOutcomes > div {
-    padding: 18px 14px;
-  }
-
-  .prospectDashboardOutcomes > div:first-child {
-    padding-left: 14px;
-  }
-
-  .prospectDashboardOutcomes > div:nth-child(2) {
-    border-right: 0;
-  }
-
-  .prospectDashboardOutcomes > div:nth-child(-n + 2) {
-    border-bottom: 1px solid var(--border);
+  .prospectFocusStats {
+    grid-template-columns: 1fr;
   }
 
   .prospectStageRows {
