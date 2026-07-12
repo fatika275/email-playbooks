@@ -3005,43 +3005,6 @@ details[open] > summary::after {
   font-size: 18px;
 }
 
-.prospectEmailIntegration {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 18px;
-  align-items: center;
-  padding: 18px 0;
-  border-bottom: 1px solid var(--border);
-}
-
-.prospectEmailIntegration .cardTitle {
-  margin-top: 7px;
-}
-
-.prospectEmailIntegration .small {
-  max-width: 780px;
-  margin: 7px 0 0;
-}
-
-.prospectConnectedInboxes {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 12px;
-}
-
-.prospectConnectedInboxes span {
-  padding: 7px 9px;
-  color: var(--muted);
-  font-size: 11px;
-  border: 1px solid var(--border-soft);
-  background: #0d0d0d;
-}
-
-.prospectYahooNote {
-  grid-column: 1 / -1;
-}
-
 .prospectDailyLayout {
   display: grid;
   grid-template-columns: minmax(0, 1.1fr) minmax(300px, 0.9fr);
@@ -4091,10 +4054,6 @@ details[open] > summary::after {
   }
 
   .prospectFocusStats {
-    grid-template-columns: 1fr;
-  }
-
-  .prospectEmailIntegration {
     grid-template-columns: 1fr;
   }
 

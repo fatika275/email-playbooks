@@ -33,16 +33,6 @@ import {
   type ForecastValueBasis,
   type StageProbabilities,
 } from "@/lib/prospects";
-import { getSupabaseBrowserClient } from "@/lib/supabase";
-
-type EmailIntegrationStatus = {
-  id: string;
-  provider: "gmail" | "outlook";
-  email: string;
-  status: string;
-  last_sync_at: string | null;
-  last_error: string | null;
-};
 
 const ACTIVE_STAGES: ProspectStage[] = [
   "new",
@@ -124,9 +114,6 @@ export default function ProspectsPage() {
   const [query, setQuery] = useState("");
   const [stageFilter, setStageFilter] = useState<ProspectStage | "all">("all");
   const [showAdd, setShowAdd] = useState(false);
-  const [emailIntegrations, setEmailIntegrations] = useState<EmailIntegrationStatus[]>([]);
-  const [isEmailIntegrationLoading, setIsEmailIntegrationLoading] = useState(false);
-  const [emailIntegrationMessage, setEmailIntegrationMessage] = useState("");
   const [pendingOutcome, setPendingOutcome] = useState<{
     prospect: Prospect;
     stage: "won" | "lost";
@@ -151,92 +138,6 @@ export default function ProspectsPage() {
     DEFAULT_STAGE_PROBABILITIES
   );
   const [isSavingForecast, setIsSavingForecast] = useState(false);
-
-  const getAccessToken = useCallback(async () => {
-    const client = getSupabaseBrowserClient();
-    const { data } = client ? await client.auth.getSession() : { data: null };
-    const token = data?.session?.access_token;
-    if (!token) throw new Error("Sign in before connecting an inbox.");
-    return token;
-  }, []);
-
-  const loadEmailIntegrations = useCallback(async () => {
-    if (!user || !hasProAccess) return;
-    setIsEmailIntegrationLoading(true);
-    try {
-      const token = await getAccessToken();
-      const response = await fetch("/api/email-integrations", {
-        headers: { authorization: `Bearer ${token}` },
-        cache: "no-store",
-      });
-      const data = (await response.json()) as {
-        integrations?: EmailIntegrationStatus[];
-        error?: string;
-      };
-      if (!response.ok) throw new Error(data.error || "Email integrations could not load.");
-      setEmailIntegrations(data.integrations ?? []);
-    } catch (error) {
-      setEmailIntegrationMessage(
-        error instanceof Error ? error.message : "Email integrations could not load."
-      );
-    } finally {
-      setIsEmailIntegrationLoading(false);
-    }
-  }, [getAccessToken, hasProAccess, user]);
-
-  async function handleConnectEmail(provider: "gmail" | "outlook") {
-    setIsEmailIntegrationLoading(true);
-    setEmailIntegrationMessage("");
-    try {
-      const token = await getAccessToken();
-      const response = await fetch("/api/email-integrations", {
-        method: "POST",
-        headers: {
-          authorization: `Bearer ${token}`,
-          "content-type": "application/json",
-        },
-        body: JSON.stringify({ provider }),
-      });
-      const data = (await response.json()) as { url?: string; error?: string };
-      if (!response.ok || !data.url) {
-        throw new Error(data.error || "Email connection could not start.");
-      }
-      window.location.href = data.url;
-    } catch (error) {
-      setEmailIntegrationMessage(
-        error instanceof Error ? error.message : "Email connection could not start."
-      );
-      setIsEmailIntegrationLoading(false);
-    }
-  }
-
-  async function handleSyncEmailReplies() {
-    setIsEmailIntegrationLoading(true);
-    setEmailIntegrationMessage("");
-    try {
-      const token = await getAccessToken();
-      const response = await fetch("/api/email-integrations", {
-        method: "PATCH",
-        headers: { authorization: `Bearer ${token}` },
-      });
-      const data = (await response.json()) as {
-        checked?: number;
-        matched?: number;
-        error?: string;
-      };
-      if (!response.ok) throw new Error(data.error || "Email replies could not sync.");
-      setEmailIntegrationMessage(
-        `Checked ${data.checked ?? 0} recent inbox message${data.checked === 1 ? "" : "s"} and found ${data.matched ?? 0} lead repl${data.matched === 1 ? "y" : "ies"}.`
-      );
-      await Promise.all([loadEmailIntegrations(), refresh()]);
-    } catch (error) {
-      setEmailIntegrationMessage(
-        error instanceof Error ? error.message : "Email replies could not sync."
-      );
-    } finally {
-      setIsEmailIntegrationLoading(false);
-    }
-  }
 
   const refresh = useCallback(async () => {
     if (!user || !hasProAccess) return;
@@ -278,22 +179,6 @@ export default function ProspectsPage() {
       setNotice(error instanceof Error ? error.message : "Prospects could not load.");
     });
   }, [refresh]);
-
-  useEffect(() => {
-    void loadEmailIntegrations();
-  }, [loadEmailIntegrations]);
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const result = params.get("emailIntegration");
-    if (!result) return;
-    setEmailIntegrationMessage(
-      result === "connected"
-        ? "Inbox connected. Automatic reply detection will run every 15 minutes."
-        : result
-    );
-    void loadEmailIntegrations();
-  }, [loadEmailIntegrations]);
 
   const filtered = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -1202,57 +1087,6 @@ export default function ProspectsPage() {
                 </button>
                 <button className="button buttonSecondary" onClick={() => setView("pipeline")}>View opportunities</button>
               </div>
-            </section>
-
-            <section className="prospectEmailIntegration" aria-label="Email reply detection">
-              <div>
-                <span className="miniBadge">Reply detection</span>
-                <h3 className="cardTitle">Automatically spot client replies</h3>
-                <p className="small">
-                  Connect Gmail or Outlook to check recent inbox metadata, match replies to lead emails, move them to Replied, and clear follow-up reminders.
-                </p>
-                {emailIntegrations.length ? (
-                  <div className="prospectConnectedInboxes">
-                    {emailIntegrations.map((integration) => (
-                      <span key={integration.id}>
-                        {integration.provider === "gmail" ? "Gmail" : "Outlook"} - {integration.email}
-                        {integration.last_sync_at ? ` - synced ${new Date(integration.last_sync_at).toLocaleString()}` : ""}
-                        {integration.last_error ? ` - ${integration.last_error}` : ""}
-                      </span>
-                    ))}
-                  </div>
-                ) : null}
-                {emailIntegrationMessage ? <p className="small">{emailIntegrationMessage}</p> : null}
-              </div>
-              <div className="toolbar">
-                <button
-                  className="button buttonSecondary"
-                  type="button"
-                  disabled={isEmailIntegrationLoading}
-                  onClick={() => void handleConnectEmail("gmail")}
-                >
-                  Connect Gmail
-                </button>
-                <button
-                  className="button buttonSecondary"
-                  type="button"
-                  disabled={isEmailIntegrationLoading}
-                  onClick={() => void handleConnectEmail("outlook")}
-                >
-                  Connect Outlook
-                </button>
-                <button
-                  className="button buttonUtility"
-                  type="button"
-                  disabled={isEmailIntegrationLoading || emailIntegrations.length === 0}
-                  onClick={() => void handleSyncEmailReplies()}
-                >
-                  Sync now
-                </button>
-              </div>
-              <p className="small prospectYahooNote">
-                Yahoo can still use the mail app draft flow. True Yahoo auto-detection needs a separate IMAP/OAuth connector, so it is better as a later add-on after Gmail and Outlook are proven.
-              </p>
             </section>
 
             <div className="prospectDailyLayout">
