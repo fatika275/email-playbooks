@@ -2078,34 +2078,9 @@ details[open] > summary::after {
   margin-bottom: 22px;
 }
 
-.prospectMetrics {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  border: 1px solid var(--border);
-  background: #080808;
-  margin-bottom: 18px;
-}
-
-.prospectMetrics div {
-  min-width: 0;
-  padding: 18px;
-  display: grid;
-  gap: 5px;
-  border-right: 1px solid var(--border);
-}
-
-.prospectMetrics div:last-child {
-  border-right: 0;
-}
-
-.prospectMetrics span,
 .prospectContextBlock span {
   color: var(--muted);
   font-size: 12px;
-}
-
-.prospectMetrics strong {
-  font-size: 21px;
 }
 
 .prospectAddPanel,
@@ -3813,10 +3788,6 @@ details[open] > summary::after {
     grid-template-columns: 1fr;
   }
 
-  .prospectMetrics {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
   .prospectDashboardSplit {
     grid-template-columns: 1fr;
   }
@@ -3843,14 +3814,6 @@ details[open] > summary::after {
 
   .prospectDashboardSplit > .prospectDashboardSection:last-child {
     padding-left: 0;
-  }
-
-  .prospectMetrics div:nth-child(2) {
-    border-right: 0;
-  }
-
-  .prospectMetrics div:nth-child(-n + 2) {
-    border-bottom: 1px solid var(--border);
   }
 
   .prospectDetailLayout {
@@ -4064,7 +4027,6 @@ details[open] > summary::after {
     flex-direction: column;
   }
 
-  .prospectMetrics,
   .prospectFormGrid,
   .prospectToolbar,
   .prospectOnboarding,
@@ -4144,16 +4106,6 @@ details[open] > summary::after {
   .prospectDailyActionWithButton .button,
   .prospectMiniListAction .button {
     justify-self: start;
-  }
-
-  .prospectMetrics div,
-  .prospectMetrics div:nth-child(2) {
-    border-right: 0;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .prospectMetrics div:last-child {
-    border-bottom: 0;
   }
 
   .prospectViewTabs {

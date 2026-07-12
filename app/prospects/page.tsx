@@ -838,13 +838,6 @@ export default function ProspectsPage() {
           </div>
         </div>
 
-        <div className="prospectMetrics">
-          <div><span>Active leads</span><strong>{metrics.active}</strong></div>
-          <div><span>Replies needed</span><strong>{dailyDashboard.replyNeeded.length}</strong></div>
-          <div><span>Potential client work</span><strong>{formatMoney(metrics.value)}</strong></div>
-          <div><span>Clients won</span><strong>{metrics.won}</strong></div>
-        </div>
-
         {prospects.length === 0 ? (
           <section className="prospectOnboarding">
             <div>
