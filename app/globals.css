@@ -2095,6 +2095,22 @@ details[open] > summary::after {
   margin-bottom: 18px;
 }
 
+.prospectOutcomePanel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 0.8fr) auto;
+  gap: 14px;
+  align-items: center;
+  padding: 16px;
+  margin-bottom: 18px;
+  border: 1px solid rgba(201, 166, 72, 0.24);
+  background: #0d0d0d;
+}
+
+.prospectOutcomePanel .cardTitle,
+.prospectOutcomePanel .small {
+  margin: 6px 0 0;
+}
+
 .prospectOnboarding {
   display: grid;
   grid-template-columns: minmax(0, 1.1fr) minmax(300px, 0.9fr) auto;
@@ -3070,6 +3086,20 @@ details[open] > summary::after {
   margin: 6px 0 0;
 }
 
+.prospectExampleList {
+  display: grid;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.prospectExampleList span {
+  padding: 8px 10px;
+  color: var(--muted);
+  font-size: 12px;
+  border: 1px solid var(--border-soft);
+  background: #0f0f0f;
+}
+
 .prospectDashboardHero {
   min-height: 230px;
   display: flex;
@@ -4029,6 +4059,7 @@ details[open] > summary::after {
 
   .prospectFormGrid,
   .prospectToolbar,
+  .prospectOutcomePanel,
   .prospectOnboarding,
   .prospectOnboardingDetail {
     grid-template-columns: 1fr;

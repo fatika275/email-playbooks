@@ -164,6 +164,8 @@ export default function ProspectDetailPage() {
   const [detailView, setDetailView] = useState<"overview" | "followup" | "activity">("overview");
   const [activityFilter, setActivityFilter] = useState<"useful" | "outreach" | "notes" | "all">("useful");
   const [showAllActivity, setShowAllActivity] = useState(false);
+  const [pendingProposalOutcome, setPendingProposalOutcome] = useState<"won" | "lost" | null>(null);
+  const [proposalOutcomeReason, setProposalOutcomeReason] = useState("");
 
   const scheduledSequences = useMemo<ScheduledSequence[]>(() => {
     const builtIn = builtInScheduledSequences.map((playbook) => ({
@@ -517,7 +519,7 @@ export default function ProspectDetailPage() {
         prospectId: id,
         userId: user.id,
         activityType: "email",
-        summary: `${selectedSequence.name} scheduled with ${selectedSequence.steps.length} step${selectedSequence.steps.length === 1 ? "" : "s"}.`,
+        summary: `Proposal/client-work sequence started from ${proposalSentDate}: ${selectedSequence.name} with ${selectedSequence.steps.length} step${selectedSequence.steps.length === 1 ? "" : "s"}.`,
       });
       const firstFollowUp = addDays(proposalSentDate, selectedSequence.steps[0]?.dayOffset ?? 0);
       const updated = await updateProspect(id, {
@@ -537,7 +539,7 @@ export default function ProspectDetailPage() {
       setNextFollowUp(firstFollowUp);
       setLastContactedAt(updated.last_contacted_at);
       await refreshOperations();
-      setNotice(`${selectedSequence.name} started. Your reminders are ready.`);
+      setNotice(`${selectedSequence.name} started from the proposal/client-work sent date. Your reminders are ready.`);
     } catch (error) {
       setNotice(error instanceof Error ? error.message : "Scheduled follow-up could not be started.");
     } finally {
@@ -545,16 +547,8 @@ export default function ProspectDetailPage() {
     }
   }
 
-  async function handleProposalOutcome(outcome: "replied" | "won" | "lost") {
+  async function handleProposalOutcome(outcome: "replied" | "won" | "lost", reason = "") {
     if (!id || !user) return;
-    const outcomeReason =
-      outcome === "won" || outcome === "lost"
-        ? window.prompt(
-            outcome === "won"
-              ? "What helped win this client work? (optional)"
-              : "Why did this lead slip or close out? (optional)"
-          )?.trim()
-        : "";
     setIsStartingProposalWorkflow(true);
     try {
       await Promise.all(activeProposalTasks.map((task) => setProspectTaskCompleted(task.id, true)));
@@ -577,17 +571,19 @@ export default function ProspectDetailPage() {
         activityType: "status",
         summary: `Scheduled follow-up closed: ${PROSPECT_STAGE_LABELS[outcome]}.`,
       });
-      if (outcomeReason) {
+      if (reason.trim()) {
         await createProspectActivity({
           prospectId: id,
           userId: user.id,
           activityType: "note",
-          summary: `Outcome reason: ${outcomeReason}`,
+          summary: `Outcome reason: ${reason.trim()}`,
         });
       }
       setProspect(updated);
       setStage(outcome);
       setNextFollowUp("");
+      setPendingProposalOutcome(null);
+      setProposalOutcomeReason("");
       await refreshOperations();
       setNotice(`Scheduled follow-up closed as ${PROSPECT_STAGE_LABELS[outcome].toLowerCase()}.`);
     } catch (error) {
@@ -744,7 +740,7 @@ export default function ProspectDetailPage() {
                   ) : null}
                   <p className="small" style={{ margin: "6px 0 0" }}>{selectedScheduledSequence ? "This sequence will create the reminders below from the start date." : "Nothing is preselected for this lead."}</p>
                 </div>
-                <div className="formGroup"><label className="label">Start date</label><input className="input" type="date" value={proposalSentDate} onChange={(event) => setProposalSentDate(event.target.value)} /></div>
+                <div className="formGroup"><label className="label">Proposal / first message sent date</label><input className="input" type="date" value={proposalSentDate} onChange={(event) => setProposalSentDate(event.target.value)} /><p className="small" style={{ margin: "6px 0 0" }}>The sequence reminders are scheduled from this client-work touch.</p></div>
                 <div className="formGroup"><label className="label">Assigned to</label>{prospect?.workspace_id ? <select className="input" value={taskAssignee} onChange={(event) => setTaskAssignee(event.target.value)}><option value="">Unassigned</option><option value={user.email ?? ""}>Me ({user.email})</option>{teamMembers.filter((member) => member.email !== user.email).map((member) => <option key={member.id} value={member.email}>{member.email}</option>)}</select> : <input className="input" type="email" value={taskAssignee} onChange={(event) => setTaskAssignee(event.target.value)} placeholder="Assignee email" />}</div>
               </div>
               <div className="proposalWorkflowActions">
@@ -754,7 +750,30 @@ export default function ProspectDetailPage() {
                   <div><span>{nextProposalTask.due_date ? `Due ${nextProposalTask.due_date}` : "Ready when you are"}</span><strong>{cleanFollowUpTaskTitle(nextProposalTask.title)}</strong><p>{activeProposalTasks.length > 1 ? `${activeProposalTasks.length - 1} later reminder${activeProposalTasks.length - 1 === 1 ? "" : "s"} already scheduled.` : "This is the final scheduled reminder."}</p></div>
                   <div className="proposalTaskActions"><button className="button buttonPrimary" onClick={() => handleDraftProposalFollowUp(nextProposalTask)}>Open message</button><button className="button buttonSecondary" onClick={() => void handleCompleteProposalTask(nextProposalTask)}>Mark sent</button></div>
                 </div>
-                <div className="proposalWorkflowActions proposalOutcomeActions"><span>Close this schedule</span><button className="button buttonSecondary" disabled={isStartingProposalWorkflow} onClick={() => void handleProposalOutcome("replied")}>They replied</button><button className="button buttonSecondary" disabled={isStartingProposalWorkflow} onClick={() => void handleProposalOutcome("won")}>Booked client work</button><button className="button buttonUtility" disabled={isStartingProposalWorkflow} onClick={() => void handleProposalOutcome("lost")}>Lost / slipped</button></div>
+                <div className="proposalWorkflowActions proposalOutcomeActions"><span>Close this schedule</span><button className="button buttonSecondary" disabled={isStartingProposalWorkflow} onClick={() => void handleProposalOutcome("replied")}>They replied</button><button className="button buttonSecondary" disabled={isStartingProposalWorkflow} onClick={() => setPendingProposalOutcome("won")}>Booked client work</button><button className="button buttonUtility" disabled={isStartingProposalWorkflow} onClick={() => setPendingProposalOutcome("lost")}>Lost / slipped</button></div>
+                {pendingProposalOutcome ? (
+                  <div className="prospectOutcomePanel">
+                    <div>
+                      <span className="miniBadge">{pendingProposalOutcome === "won" ? "Booked work" : "Lost / slipped"}</span>
+                      <h2 className="cardTitle">{pendingProposalOutcome === "won" ? "What helped win this?" : "Why did this slip?"}</h2>
+                      <p className="small">Optional, but useful for learning which proposal moments turn into client work.</p>
+                    </div>
+                    <input
+                      className="input"
+                      value={proposalOutcomeReason}
+                      onChange={(event) => setProposalOutcomeReason(event.target.value)}
+                      placeholder={pendingProposalOutcome === "won" ? "Strong fit, referral, clear ROI..." : "No reply, price, timing, bad fit..."}
+                    />
+                    <div className="toolbar">
+                      <button className="button buttonPrimary" type="button" disabled={isStartingProposalWorkflow} onClick={() => void handleProposalOutcome(pendingProposalOutcome, proposalOutcomeReason)}>
+                        Mark {pendingProposalOutcome === "won" ? "won" : "lost"}
+                      </button>
+                      <button className="button buttonUtility" type="button" onClick={() => { setPendingProposalOutcome(null); setProposalOutcomeReason(""); }}>
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                ) : null}
               </>}
             </section>
 

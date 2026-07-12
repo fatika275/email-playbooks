@@ -114,6 +114,11 @@ export default function ProspectsPage() {
   const [query, setQuery] = useState("");
   const [stageFilter, setStageFilter] = useState<ProspectStage | "all">("all");
   const [showAdd, setShowAdd] = useState(false);
+  const [pendingOutcome, setPendingOutcome] = useState<{
+    prospect: Prospect;
+    stage: "won" | "lost";
+  } | null>(null);
+  const [outcomeReason, setOutcomeReason] = useState("");
   const [fullName, setFullName] = useState("");
   const [company, setCompany] = useState("");
   const [email, setEmail] = useState("");
@@ -530,16 +535,12 @@ export default function ProspectsPage() {
     router.push(`/prospects/${prospect.id}`);
   }
 
-  async function handleQuickStageChange(prospect: Prospect, stage: ProspectStage) {
+  async function handleQuickStageChange(
+    prospect: Prospect,
+    stage: ProspectStage,
+    reason = ""
+  ) {
     const previous = prospects;
-    const outcomeReason =
-      ["won", "lost"].includes(stage)
-        ? window.prompt(
-            stage === "won"
-              ? "What helped win this client work? (optional)"
-              : "Why did this lead slip or close out? (optional)"
-          )?.trim()
-        : "";
     setProspects((current) =>
       current.map((item) => (item.id === prospect.id ? { ...item, stage } : item))
     );
@@ -553,20 +554,27 @@ export default function ProspectsPage() {
           summary: `${prospect.full_name} marked ${PROSPECT_STAGE_LABELS[stage].toLowerCase()}.`,
         });
       }
-      if (user && outcomeReason) {
+      if (user && reason.trim()) {
         await createProspectActivity({
           prospectId: prospect.id,
           userId: user.id,
           activityType: "note",
-          summary: `Outcome reason: ${outcomeReason}`,
+          summary: `Outcome reason: ${reason.trim()}`,
         });
       }
+      setPendingOutcome(null);
+      setOutcomeReason("");
       setNotice(`${prospect.full_name} moved to ${PROSPECT_STAGE_LABELS[stage]}.`);
       await refresh();
     } catch (error) {
       setProspects(previous);
       setNotice(error instanceof Error ? error.message : "Prospect could not be updated.");
     }
+  }
+
+  function requestOutcome(prospect: Prospect, stage: "won" | "lost") {
+    setPendingOutcome({ prospect, stage });
+    setOutcomeReason("");
   }
 
   function handleRescueColdLead(prospect: Prospect) {
@@ -763,14 +771,14 @@ export default function ProspectsPage() {
         <button
           type="button"
           className="button buttonSecondary"
-          onClick={() => void handleQuickStageChange(prospect, "won")}
+          onClick={() => requestOutcome(prospect, "won")}
         >
           Won
         </button>
         <button
           type="button"
           className="button buttonUtility"
-          onClick={() => void handleQuickStageChange(prospect, "lost")}
+          onClick={() => requestOutcome(prospect, "lost")}
         >
           Lost
         </button>
@@ -876,6 +884,60 @@ export default function ProspectsPage() {
         ) : null}
 
         {notice ? <p className="notice">{notice}</p> : null}
+
+        {pendingOutcome ? (
+          <section className="prospectOutcomePanel" aria-label="Close lead outcome">
+            <div>
+              <span className="miniBadge">
+                {pendingOutcome.stage === "won" ? "Booked work" : "Lost / slipped"}
+              </span>
+              <h2 className="cardTitle">
+                {pendingOutcome.stage === "won"
+                  ? `What helped win ${pendingOutcome.prospect.full_name}?`
+                  : `Why did ${pendingOutcome.prospect.full_name} slip?`}
+              </h2>
+              <p className="small">
+                Optional, but useful later when you want to see which sources,
+                offers, or objections affect booked client work.
+              </p>
+            </div>
+            <input
+              className="input"
+              value={outcomeReason}
+              onChange={(event) => setOutcomeReason(event.target.value)}
+              placeholder={
+                pendingOutcome.stage === "won"
+                  ? "Referral, clear need, strong proposal..."
+                  : "No reply, price, bad fit, timing..."
+              }
+            />
+            <div className="toolbar">
+              <button
+                className="button buttonPrimary"
+                type="button"
+                onClick={() =>
+                  void handleQuickStageChange(
+                    pendingOutcome.prospect,
+                    pendingOutcome.stage,
+                    outcomeReason
+                  )
+                }
+              >
+                Mark {pendingOutcome.stage === "won" ? "won" : "lost"}
+              </button>
+              <button
+                className="button buttonUtility"
+                type="button"
+                onClick={() => {
+                  setPendingOutcome(null);
+                  setOutcomeReason("");
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </section>
+        ) : null}
 
         <div className="prospectToolbar">
           <div className="authModeTabs prospectViewTabs" role="tablist" aria-label="Prospect view">
@@ -1003,14 +1065,28 @@ export default function ProspectsPage() {
               <div>
                 <span className="miniBadge">Daily view</span>
                 <h2 className="pageTitle">
-                  {dailyDashboard.priorityItems.length
-                    ? `${dailyDashboard.priorityItems.length} useful action${dailyDashboard.priorityItems.length === 1 ? "" : "s"} to handle.`
-                    : "You are clear for today."}
+                  {dailyDashboard.nextMessageQueue.length
+                    ? `Send this next: ${dailyDashboard.nextMessageQueue[0].title}`
+                    : dailyDashboard.priorityItems.length
+                      ? `${dailyDashboard.priorityItems.length} useful action${dailyDashboard.priorityItems.length === 1 ? "" : "s"} to handle.`
+                      : "You are clear for today."}
                 </h2>
-                <p className="muted">Start with the work that books clients: follow-ups, replies, proposal nudges, and leads starting to slip.</p>
+                <p className="muted">Start with the next message most likely to keep client work moving, then chase proposals and rescue slipping leads.</p>
               </div>
               <div className="toolbar">
-                <button className="button buttonPrimary" onClick={() => setView("today")}>Open today&apos;s work</button>
+                <button
+                  className="button buttonPrimary"
+                  onClick={() => {
+                    const first = dailyDashboard.nextMessageQueue[0];
+                    if (first?.prospect) {
+                      handleDraftNextMessage(first.prospect);
+                      return;
+                    }
+                    setView("today");
+                  }}
+                >
+                  {dailyDashboard.nextMessageQueue.length ? "Open next message" : "Open today's work"}
+                </button>
                 <button className="button buttonSecondary" onClick={() => setView("pipeline")}>View opportunities</button>
               </div>
             </section>
@@ -1081,6 +1157,10 @@ export default function ProspectsPage() {
                     <div className="prospectDailyEmpty">
                       <strong>No messages due</strong>
                       <p className="muted">Start or schedule sequences for active leads to build this queue.</p>
+                      <div className="prospectExampleList">
+                        <span>Example: Follow up with Maya at Bright Studio</span>
+                        <span>Example: Reply to Sam about next steps</span>
+                      </div>
                     </div>
                   ) : null}
                 </div>
@@ -1100,6 +1180,10 @@ export default function ProspectsPage() {
                     <div className="prospectDailyEmpty">
                       <strong>No urgent actions</strong>
                       <p className="muted">Add leads, schedule follow-ups, or review opportunities when you want to create the next set of client-work actions.</p>
+                      <div className="prospectExampleList">
+                        <span>Example: Chase proposal decision</span>
+                        <span>Example: Rescue a lead after 14 quiet days</span>
+                      </div>
                     </div>
                   ) : null}
                 </div>

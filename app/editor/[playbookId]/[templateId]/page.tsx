@@ -14,8 +14,15 @@ import { downloadHtmlFile } from "@/lib/exportHtml";
 import {
   downloadEmlFile,
   openGmailDraft,
+  openMailtoDraft,
   openOutlookDraft,
 } from "@/lib/exportEmail";
+import {
+  createProspectActivity,
+  getProspect,
+  setProspectTaskCompleted,
+  updateProspect,
+} from "@/lib/prospects";
 import {
   buildObjectionReply,
   detectObjectionCategory,
@@ -171,7 +178,7 @@ function Field({
 export default function EditorPage() {
   const params = useParams();
   const router = useRouter();
-  const { hasProAccess } = useAccount();
+  const { user, hasProAccess } = useAccount();
 
   const rawPlaybookId = useMemo(() => {
     const value = params?.playbookId;
@@ -220,7 +227,10 @@ export default function EditorPage() {
   const prospectContext = useMemo<{
     name?: string;
     company?: string;
+    email?: string | null;
+    role?: string | null;
     prospectId?: string;
+    workflowTaskId?: string;
     workflowStep?: number;
     workflowLabel?: string;
   }>(() => {
@@ -229,7 +239,10 @@ export default function EditorPage() {
       return JSON.parse(rawProspectContext) as {
         name?: string;
         company?: string;
+        email?: string | null;
+        role?: string | null;
         prospectId?: string;
+        workflowTaskId?: string;
         workflowStep?: number;
         workflowLabel?: string;
       };
@@ -358,6 +371,64 @@ export default function EditorPage() {
 
     setSavedMessage("Saved to Saved Emails");
     setTimeout(() => setSavedMessage(""), 2200);
+  }
+
+  async function handleLogProspectEmailSent(source: string) {
+    if (!user || !prospectContext.prospectId) {
+      setSavedMessage("Email opened. Sign in and open this from a lead to log it.");
+      setTimeout(() => setSavedMessage(""), 2600);
+      return;
+    }
+
+    const prospect = await getProspect(prospectContext.prospectId);
+    if (!prospect) {
+      setSavedMessage("Email opened, but the lead could not be updated.");
+      setTimeout(() => setSavedMessage(""), 2600);
+      return;
+    }
+
+    await updateProspect(prospect.id, {
+      full_name: prospect.full_name,
+      company: prospect.company,
+      email: prospect.email ?? "",
+      role: prospect.role ?? "",
+      linkedin_url: prospect.linkedin_url ?? "",
+      source: prospect.source ?? "",
+      stage: prospect.stage === "new" ? "contacted" : prospect.stage,
+      estimated_value_gbp: prospect.estimated_value_gbp,
+      notes: prospect.notes ?? "",
+      next_follow_up: prospect.next_follow_up ?? "",
+      last_contacted_at: new Date().toISOString(),
+    });
+
+    await createProspectActivity({
+      prospectId: prospect.id,
+      userId: user.id,
+      activityType: "email",
+      summary: `Email opened in ${source}: ${finalSubject}`,
+    });
+
+    if (prospectContext.workflowTaskId) {
+      await setProspectTaskCompleted(prospectContext.workflowTaskId, true);
+    }
+
+    setSavedMessage(
+      prospectContext.workflowTaskId
+        ? "Email logged and the scheduled reminder was marked sent."
+        : "Email logged on the lead."
+    );
+    setTimeout(() => setSavedMessage(""), 3200);
+  }
+
+  function handleOpenEmailDraft(source: "Gmail" | "Outlook" | "Mail app") {
+    if (source === "Gmail") {
+      openGmailDraft(finalSubject, finalBody, prospectContext.email);
+    } else if (source === "Outlook") {
+      openOutlookDraft(finalSubject, finalBody, prospectContext.email);
+    } else {
+      openMailtoDraft(finalSubject, finalBody, prospectContext.email);
+    }
+    void handleLogProspectEmailSent(source);
   }
 
   function handleObjectionChange(nextObjection: string) {
@@ -988,16 +1059,23 @@ export default function EditorPage() {
 
                   <button
                     className="button buttonUtility"
-                    onClick={() => openGmailDraft(finalSubject, finalBody)}
+                    onClick={() => handleOpenEmailDraft("Gmail")}
                   >
                     Open in Gmail
                   </button>
 
                   <button
                     className="button buttonUtility"
-                    onClick={() => openOutlookDraft(finalSubject, finalBody)}
+                    onClick={() => handleOpenEmailDraft("Outlook")}
                   >
                     Open in Outlook
+                  </button>
+
+                  <button
+                    className="button buttonUtility"
+                    onClick={() => handleOpenEmailDraft("Mail app")}
+                  >
+                    Open mail app
                   </button>
 
                   <button

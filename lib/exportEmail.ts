@@ -8,23 +8,30 @@ function safeFilename(value: string) {
   );
 }
 
-export function openGmailDraft(subject: string, body: string) {
+export function openGmailDraft(subject: string, body: string, to?: string | null) {
   const query = new URLSearchParams({
     view: "cm",
     fs: "1",
     su: subject,
     body,
   });
+  if (to) query.set("to", to);
   window.open(`https://mail.google.com/mail/?${query.toString()}`, "_blank", "noopener,noreferrer");
 }
 
-export function openOutlookDraft(subject: string, body: string) {
+export function openOutlookDraft(subject: string, body: string, to?: string | null) {
   const query = new URLSearchParams({ subject, body });
+  if (to) query.set("to", to);
   window.open(
     `https://outlook.office.com/mail/deeplink/compose?${query.toString()}`,
     "_blank",
     "noopener,noreferrer"
   );
+}
+
+export function openMailtoDraft(subject: string, body: string, to?: string | null) {
+  const query = new URLSearchParams({ subject, body });
+  window.location.href = `mailto:${encodeURIComponent(to || "")}?${query.toString()}`;
 }
 
 export function downloadEmlFile(subject: string, body: string, filename: string) {
