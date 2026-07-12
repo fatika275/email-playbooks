@@ -95,17 +95,17 @@ textarea {
   position: sticky;
   top: 0;
   z-index: 50;
-  backdrop-filter: blur(18px);
-  background: rgba(5, 5, 5, 0.82);
-  border-bottom: 1px solid var(--border);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset;
+  backdrop-filter: blur(22px);
+  background: rgba(5, 5, 5, 0.74);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.03) inset;
 }
 
 .topbarInner {
-  min-height: 66px;
-  display: flex;
+  min-height: 72px;
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) auto minmax(120px, 1fr);
   align-items: center;
-  justify-content: space-between;
   gap: 18px;
 }
 
@@ -136,28 +136,43 @@ textarea {
 .nav {
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  gap: 2px;
   flex-wrap: wrap;
+  justify-self: center;
+  padding: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  background: rgba(15, 15, 15, 0.72);
+  box-shadow:
+    0 12px 34px rgba(0, 0, 0, 0.24),
+    0 1px 0 rgba(255, 255, 255, 0.04) inset;
+}
+
+.navActions {
+  justify-self: end;
 }
 
 .navLink {
   position: relative;
   text-decoration: none;
   color: var(--muted);
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 650;
   letter-spacing: 0;
   text-transform: none;
-  padding: 8px 11px;
-  border-radius: 8px;
-  transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+  white-space: nowrap;
+  padding: 7px 12px;
+  border-radius: 999px;
+  transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
   border: 1px solid transparent;
 }
 
 .navLink:hover {
   color: var(--text);
-  background: #111111;
-  border-color: #242424;
+  background: rgba(255, 255, 255, 0.06);
+  border-color: transparent;
+  transform: translateY(-0.5px);
 }
 
 .navLink::after {
@@ -172,22 +187,9 @@ textarea {
 
 .navLinkActive {
   color: var(--text);
-  background: #151515;
-  border-color: #2f2f2f;
-  box-shadow: none;
-}
-
-.navLinkPrimary,
-.navLinkPrimary.navLinkActive {
-  color: #080808;
-  background: #f4f4f5;
-  border-color: #f4f4f5;
-}
-
-.navLinkPrimary:hover {
-  color: #080808;
-  background: #ffffff;
-  border-color: #ffffff;
+  background: rgba(255, 255, 255, 0.11);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset;
 }
 
 .hero {
@@ -3925,14 +3927,27 @@ details[open] > summary::after {
   }
 
   .topbarInner {
+    grid-template-columns: 1fr;
     min-height: auto;
     padding: 14px 0;
-    align-items: flex-start;
-    flex-direction: column;
+    align-items: start;
+    gap: 10px;
   }
 
   .nav {
-    gap: 8px;
+    width: 100%;
+    justify-content: flex-start;
+    gap: 2px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .navActions {
+    justify-self: stretch;
   }
 
   .heroCard,

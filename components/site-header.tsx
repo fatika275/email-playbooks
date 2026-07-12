@@ -5,8 +5,9 @@ import { usePathname } from "next/navigation";
 import { useAccount } from "@/components/account-provider";
 
 const navItems = [
-  { href: "/prospects", label: "Pipeline", primary: true },
+  { href: "/prospects", label: "Pipeline" },
   { href: "/library", label: "Message Library" },
+  { href: "/sequence-builder", label: "Sequences" },
   { href: "/workspace", label: "Saved Work" },
   { href: "/team", label: "Team" },
 ];
@@ -58,14 +59,16 @@ export default function SiteHeader() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`navLink ${item.primary ? "navLinkPrimary" : ""} ${active ? "navLinkActive" : ""}`}
+                className={`navLink ${active ? "navLinkActive" : ""}`}
                 aria-current={active ? "page" : undefined}
               >
                 {item.label}
               </Link>
             );
           })}
+        </nav>
 
+        <nav className="nav navActions" aria-label="Account navigation">
           {!user ? (
             <Link
               href="/pricing"
