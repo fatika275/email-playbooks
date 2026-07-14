@@ -35,12 +35,26 @@ export default function AccountPage() {
     user && /verification|verify your email|check your email/i.test(notice)
       ? "Account created. You are signed in."
       : notice;
+  const signupPasswordHint =
+    authMode !== "signup" || !password
+      ? "Use at least 8 characters with a letter and a number."
+      : password.length < 8
+        ? "Use at least 8 characters for your password."
+        : !/[A-Za-z]/.test(password)
+          ? "Add at least one letter to your password."
+          : !/[0-9]/.test(password)
+            ? "Add at least one number to your password."
+            : "Password looks good.";
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     try {
       if (authMode === "signup") {
+        if (signupPasswordHint !== "Password looks good.") {
+          setNotice(signupPasswordHint);
+          return;
+        }
         const result = await signUp(email, password);
         trackEvent("account_signup_requested");
         setNeedsVerification(result.needsVerification);
@@ -297,7 +311,7 @@ export default function AccountPage() {
                     />
                     {authMode === "signup" ? (
                       <p className="small" style={{ marginTop: 8 }}>
-                        Use at least 8 characters with a letter and a number.
+                        {signupPasswordHint}
                       </p>
                     ) : null}
                   </div>

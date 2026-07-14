@@ -136,6 +136,16 @@ function normalizeCloudError(error: unknown) {
     ) {
       const message = ((error as { message: string }).message || "").toLowerCase();
 
+      if (
+        message.includes("token") ||
+        message.includes("otp") ||
+        message.includes("verification")
+      ) {
+        return new Error(
+          "That verification code is wrong or has expired. Check the code and try again."
+        );
+      }
+
       if (message.includes("relation") && message.includes("does not exist")) {
         return new Error(
           "Cloud sync is temporarily unavailable. Your work is still saved on this device."
@@ -161,6 +171,16 @@ function normalizeCloudError(error: unknown) {
   }
 
   const message = error.message.toLowerCase();
+
+  if (
+    message.includes("token") ||
+    message.includes("otp") ||
+    message.includes("verification")
+  ) {
+    return new Error(
+      "That verification code is wrong or has expired. Check the code and try again."
+    );
+  }
 
   if (message.includes("relation") && message.includes("does not exist")) {
     return new Error(
@@ -191,20 +211,28 @@ function isMissingSequenceStepsColumn(error: { code?: string; message?: string }
   );
 }
 
+function getPasswordValidationMessage(password: string) {
+  if (password.length < 8) {
+    return "Use at least 8 characters for your password.";
+  }
+  if (!/[A-Za-z]/.test(password)) {
+    return "Add at least one letter to your password.";
+  }
+  if (!/[0-9]/.test(password)) {
+    return "Add at least one number to your password.";
+  }
+  return "";
+}
+
 export async function signUpWithPassword(email: string, password: string) {
   const client = getSupabaseBrowserClient();
   if (!client) {
     throw new Error("Sign-in is temporarily unavailable. Please try again later.");
   }
 
-  if (
-    password.length < 8 ||
-    !/[A-Za-z]/.test(password) ||
-    !/[0-9]/.test(password)
-  ) {
-    throw new Error(
-      "Use at least 8 characters with at least one letter and one number."
-    );
+  const passwordMessage = getPasswordValidationMessage(password);
+  if (passwordMessage) {
+    throw new Error(passwordMessage);
   }
 
   const { data, error } = await client.auth.signUp({
@@ -303,14 +331,9 @@ export async function updatePassword(password: string) {
     throw new Error("Password recovery is temporarily unavailable.");
   }
 
-  if (
-    password.length < 8 ||
-    !/[A-Za-z]/.test(password) ||
-    !/[0-9]/.test(password)
-  ) {
-    throw new Error(
-      "Use at least 8 characters with at least one letter and one number."
-    );
+  const passwordMessage = getPasswordValidationMessage(password);
+  if (passwordMessage) {
+    throw new Error(passwordMessage);
   }
 
   const { error } = await client.auth.updateUser({ password });
