@@ -28,6 +28,11 @@ export default function AccountPage() {
   const [code, setCode] = useState("");
   const [authMode, setAuthMode] = useState<"login" | "signup">("login");
   const [needsVerification, setNeedsVerification] = useState(false);
+  const [isSetupGuideDismissed, setIsSetupGuideDismissed] = useState(() =>
+    typeof window !== "undefined"
+      ? window.localStorage.getItem("thalovo_setup_guide_dismissed") === "1"
+      : true
+  );
   const [notice, setNotice] = useState("");
 
   const showVerification = !user && needsVerification;
@@ -45,6 +50,11 @@ export default function AccountPage() {
           : !/[0-9]/.test(password)
             ? "Add at least one number to your password."
             : "Password looks good.";
+
+  function dismissSetupGuide() {
+    window.localStorage.setItem("thalovo_setup_guide_dismissed", "1");
+    setIsSetupGuideDismissed(true);
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -390,22 +400,65 @@ export default function AccountPage() {
                 ) : null}
               </>
             ) : (
-              <div className="accountQuickLinks">
-                <Link href="/workspace" className="glassCard clickable accountQuickLink">
-                  <strong>Open workspace</strong>
-                  <span className="muted">Builder, saved emails, and folders</span>
-                </Link>
+              <>
+                {!isSetupGuideDismissed ? (
+                  <section className="accountSetupGuide" aria-label="Getting started">
+                    <div className="accountSetupGuideHeader">
+                      <div>
+                        <span className="miniBadge">Start here</span>
+                        <h3 className="cardTitle">Get from signup to first follow-up</h3>
+                      </div>
+                      <button className="button buttonUtility" type="button" onClick={dismissSetupGuide}>
+                        Hide guide
+                      </button>
+                    </div>
+                    <div className="accountSetupSteps">
+                      <Link href="/library" className="accountSetupStep">
+                        <strong>1</strong>
+                        <span>Pick a message</span>
+                        <small>Start from the library instead of a blank page.</small>
+                      </Link>
+                      <Link href="/prospects" className="accountSetupStep">
+                        <strong>2</strong>
+                        <span>Add a lead</span>
+                        <small>Put a real prospect into the client-work pipeline.</small>
+                      </Link>
+                      <Link href="/sequence-builder" className="accountSetupStep">
+                        <strong>3</strong>
+                        <span>Build a sequence</span>
+                        <small>Save a reusable follow-up system for outreach.</small>
+                      </Link>
+                      <Link href="/pricing" className="accountSetupStep">
+                        <strong>4</strong>
+                        <span>Check your plan</span>
+                        <small>Upgrade when the pipeline becomes daily work.</small>
+                      </Link>
+                    </div>
+                  </section>
+                ) : null}
 
-                <Link href="/pricing" className="glassCard clickable accountQuickLink">
-                  <strong>View plan options</strong>
-                  <span className="muted">Free, Pro, Founder, and Business</span>
-                </Link>
+                <div className="accountQuickLinks">
+                  <Link href="/prospects" className="glassCard clickable accountQuickLink">
+                    <strong>Open pipeline</strong>
+                    <span className="muted">Track leads, replies, and follow-ups</span>
+                  </Link>
 
-                <Link href="/" className="glassCard clickable accountQuickLink">
-                  <strong>Browse library</strong>
-                  <span className="muted">Choose a playbook and write</span>
-                </Link>
-              </div>
+                  <Link href="/library" className="glassCard clickable accountQuickLink">
+                    <strong>Message Library</strong>
+                    <span className="muted">Choose a playbook and write</span>
+                  </Link>
+
+                  <Link href="/sequence-builder" className="glassCard clickable accountQuickLink">
+                    <strong>Build sequences</strong>
+                    <span className="muted">Create reusable follow-up flows</span>
+                  </Link>
+
+                  <Link href="/pricing" className="glassCard clickable accountQuickLink">
+                    <strong>View plan options</strong>
+                    <span className="muted">Free, Pro, Founder, and Business</span>
+                  </Link>
+                </div>
+              </>
             )}
           </section>
         </div>

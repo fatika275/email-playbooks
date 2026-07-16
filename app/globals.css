@@ -1132,6 +1132,77 @@ details[open] > summary::after {
   margin-top: 18px;
 }
 
+.accountSetupGuide {
+  display: grid;
+  gap: 16px;
+  margin-top: 18px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  background: #0d0d0d;
+}
+
+.accountSetupGuideHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.accountSetupGuideHeader .cardTitle {
+  margin-top: 7px;
+}
+
+.accountSetupGuideHeader .button {
+  min-height: 34px;
+  padding: 0 12px;
+}
+
+.accountSetupSteps {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.accountSetupStep {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 2px 10px;
+  align-items: start;
+  padding: 12px;
+  color: var(--text);
+  text-decoration: none;
+  border: 1px solid var(--border-soft);
+  background: #101010;
+}
+
+.accountSetupStep:hover {
+  border-color: #333333;
+  background: #141414;
+}
+
+.accountSetupStep strong {
+  grid-row: span 2;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  color: #080808;
+  font-size: 12px;
+  border-radius: 999px;
+  background: #f4f4f5;
+}
+
+.accountSetupStep span {
+  font-weight: 750;
+}
+
+.accountSetupStep small {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
 .accountQuickLink {
   padding: 16px;
   text-decoration: none;
@@ -4020,6 +4091,14 @@ details[open] > summary::after {
   }
 
   .accountSummaryGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .accountSetupGuideHeader {
+    flex-direction: column;
+  }
+
+  .accountSetupSteps {
     grid-template-columns: 1fr;
   }
 
