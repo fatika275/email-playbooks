@@ -69,15 +69,13 @@ export default function SiteHeader() {
         </nav>
 
         <nav className="nav navActions" aria-label="Account navigation">
-          {!user ? (
-            <Link
-              href="/pricing"
-              className={`navLink ${pathname === "/pricing" ? "navLinkActive" : ""}`}
-              aria-current={pathname === "/pricing" ? "page" : undefined}
-            >
-              Pricing
-            </Link>
-          ) : null}
+          <Link
+            href="/pricing"
+            className={`navLink ${pathname === "/pricing" ? "navLinkActive" : ""}`}
+            aria-current={pathname === "/pricing" ? "page" : undefined}
+          >
+            Pricing
+          </Link>
 
           <Link
             href="/account"
