@@ -17,6 +17,12 @@ function getBodyPreview(body: string, maxLength = 140) {
   return `${clean.slice(0, maxLength).trim()}...`;
 }
 
+function isGenericCampaignName(folder: string) {
+  return ["all", "all campaigns", "campaign", "campaigns"].includes(
+    folder.trim().toLowerCase()
+  );
+}
+
 export default function ReusableSequencesPage() {
   const { hasProAccess } = useAccount();
   const templates = useCustomTemplates();
@@ -53,9 +59,11 @@ export default function ReusableSequencesPage() {
         new Set(
           templates
             .map((template) => template.folder)
-            .filter((folder): folder is string => Boolean(folder))
+            .filter((folder): folder is string => Boolean(folder?.trim()))
+            .map((folder) => folder.trim())
+            .filter((folder) => !isGenericCampaignName(folder))
         )
-      ),
+      ).sort((a, b) => a.localeCompare(b)),
     ],
     [templates]
   );
@@ -82,7 +90,7 @@ export default function ReusableSequencesPage() {
 
           const matchesFavorite = !favoritesOnly || template.isFavorite;
           const matchesFolder =
-            folderFilter === "All" || template.folder === folderFilter;
+            folderFilter === "All" || template.folder?.trim() === folderFilter;
 
           return matchesQuery && matchesFavorite && matchesFolder;
         })
@@ -219,7 +227,7 @@ export default function ReusableSequencesPage() {
                   >
                     {folderOptions.map((option) => (
                       <option key={option} value={option}>
-                        {option === "All" ? "All campaigns" : option}
+                        {option === "All" ? "Any campaign" : option}
                       </option>
                     ))}
                   </select>
@@ -292,11 +300,11 @@ export default function ReusableSequencesPage() {
                             Subject: {template.subject}
                           </p>
 
-                          {template.folder || template.tags.length > 0 ? (
+                          {(template.folder && !isGenericCampaignName(template.folder)) || template.tags.length > 0 ? (
                             <div style={{ marginTop: 8 }}>
-                              {template.folder ? (
+                              {template.folder && !isGenericCampaignName(template.folder) ? (
                                 <p className="small" style={{ margin: "0 0 8px" }}>
-                                  Campaign: {template.folder}
+                                  Campaign: {template.folder.trim()}
                                 </p>
                               ) : null}
                               {template.tags.length > 0 ? (
