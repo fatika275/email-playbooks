@@ -287,6 +287,7 @@ export default function ProspectsPage() {
     const priorityItems = [
       ...scheduledFollowUps.slice(0, 4).map(({ task, prospect }) => ({
         id: `followup-task-${task.id}`,
+        prospectId: prospect?.id,
         label: "Reminder",
         title: getProspectTaskDisplayTitle(task.title),
         meta: prospect ? `${prospect.full_name} - ${prospect.company}` : "Prospect",
@@ -294,6 +295,7 @@ export default function ProspectsPage() {
       })),
       ...dueFollowUps.slice(0, 4).map(({ prospect }) => ({
         id: `followup-prospect-${prospect.id}`,
+        prospectId: prospect.id,
         label: "Due today",
         title: prospect.full_name,
         meta: `${prospect.company} - ${PROSPECT_STAGE_LABELS[prospect.stage]}`,
@@ -301,6 +303,7 @@ export default function ProspectsPage() {
       })),
       ...replyNeeded.slice(0, 3).map((prospect) => ({
         id: `reply-${prospect.id}`,
+        prospectId: prospect.id,
         label: "Needs reply",
         title: prospect.full_name,
         meta: prospect.company,
@@ -308,6 +311,7 @@ export default function ProspectsPage() {
       })),
       ...coldProspects.slice(0, 3).map((prospect) => ({
         id: `cold-${prospect.id}`,
+        prospectId: prospect.id,
         label: "Going cold",
         title: prospect.full_name,
         meta: `${prospect.company} - last touched ${daysSince(prospect.last_contacted_at ?? prospect.updated_at)} days ago`,
@@ -315,12 +319,17 @@ export default function ProspectsPage() {
       })),
       ...manualDueTasks.slice(0, 3).map(({ task, prospect }) => ({
         id: `task-${task.id}`,
+        prospectId: prospect?.id,
         label: "Task due",
         title: getProspectTaskDisplayTitle(task.title),
         meta: prospect ? `${prospect.full_name} - ${prospect.company}` : "Prospect",
         href: prospect ? `/prospects/${prospect.id}` : "/prospects",
       })),
     ].slice(0, 8);
+    const primaryMessage = nextMessageQueue[0];
+    const supportingItems = priorityItems
+      .filter((item) => !primaryMessage?.prospect || item.prospectId !== primaryMessage.prospect.id)
+      .slice(0, 5);
 
     return {
       followUpsDue: scheduledFollowUps.length + dueFollowUps.length,
@@ -329,6 +338,7 @@ export default function ProspectsPage() {
       coldProspects,
       manualDueTasks,
       priorityItems,
+      supportingItems,
       nextMessageQueue,
     };
   }, [prospects, todayItems]);
@@ -1091,39 +1101,9 @@ export default function ProspectsPage() {
 
             <div className="prospectDailyLayout">
               <section className="prospectDailyPanel">
-                <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">Send this next</h3><p className="muted">A short queue of messages most likely to keep client work moving today.</p></div>
+                <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">Other work today</h3><p className="muted">A short backup list after the main action above. Keep it light, then move on.</p></div>
                 <div className="prospectDailyActionList">
-                  {dailyDashboard.nextMessageQueue.map((item) => (
-                    <div key={item.id} className="prospectDailyAction prospectDailyActionWithButton">
-                      <span className="miniBadge">{item.label}</span>
-                      <div>
-                        <strong>{item.title}</strong>
-                        <small>{item.meta}</small>
-                      </div>
-                      {item.prospect ? (
-                        <button className="button buttonPrimary" type="button" onClick={() => handleDraftNextMessage(item.prospect!)}>
-                          Open message
-                        </button>
-                      ) : (
-                        <Link href={item.href} className="button buttonPrimary">Open</Link>
-                      )}
-                    </div>
-                  ))}
-                  {dailyDashboard.nextMessageQueue.length === 0 ? (
-                    <div className="prospectDailyEmpty">
-                      <strong>No messages due</strong>
-                      <p className="muted">Start or schedule sequences for active leads to build this queue.</p>
-                      <div className="prospectExampleList">
-                        <span>Example: Follow up with Maya at Bright Studio</span>
-                        <span>Example: Reply to Sam about next steps</span>
-                      </div>
-                    </div>
-                  ) : null}
-                </div>
-
-                <div className="prospectDashboardSectionHeading prospectDashboardSubsection"><h3 className="sectionTitle">Do these first</h3><p className="muted">The actions most likely to protect or book client work are pulled into one short list.</p></div>
-                <div className="prospectDailyActionList">
-                  {dailyDashboard.priorityItems.map((item) => (
+                  {dailyDashboard.supportingItems.map((item) => (
                     <Link key={item.id} href={item.href} className="prospectDailyAction">
                       <span className="miniBadge">{item.label}</span>
                       <div>
@@ -1132,10 +1112,10 @@ export default function ProspectsPage() {
                       </div>
                     </Link>
                   ))}
-                  {dailyDashboard.priorityItems.length === 0 ? (
+                  {dailyDashboard.supportingItems.length === 0 ? (
                     <div className="prospectDailyEmpty">
-                      <strong>No urgent actions</strong>
-                      <p className="muted">Add leads, schedule follow-ups, or review opportunities when you want to create the next set of client-work actions.</p>
+                      <strong>No extra work queued</strong>
+                      <p className="muted">Handle the main action above, or add leads and schedule follow-ups when you want to create the next set of client-work actions.</p>
                       <div className="prospectExampleList">
                         <span>Example: Chase proposal decision</span>
                         <span>Example: Rescue a lead after 14 quiet days</span>

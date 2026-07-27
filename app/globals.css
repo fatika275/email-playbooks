@@ -3121,15 +3121,6 @@ details[open] > summary::after {
   background: #121212;
 }
 
-.prospectDailyActionWithButton {
-  grid-template-columns: auto minmax(0, 1fr) auto;
-}
-
-.prospectDailyActionWithButton .button {
-  min-height: 34px;
-  padding: 0 12px;
-}
-
 .prospectDailyAction div {
   min-width: 0;
   display: grid;
@@ -4155,13 +4146,11 @@ details[open] > summary::after {
     grid-template-columns: 1fr;
   }
 
-  .prospectDailyActionWithButton,
   .prospectMiniListAction,
   .prospectSourceRows {
     grid-template-columns: 1fr;
   }
 
-  .prospectDailyActionWithButton .button,
   .prospectMiniListAction .button {
     justify-self: start;
   }
