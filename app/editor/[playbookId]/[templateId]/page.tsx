@@ -469,7 +469,7 @@ export default function EditorPage() {
             </h1>
             <p className="muted">
               This editor step belongs to a Pro playbook. Upgrade to use the
-              full playbook library and advanced workflows.
+              full lead capture and outreach library plus advanced workflows.
             </p>
             <div className="toolbar" style={{ justifyContent: "center" }}>
               <button

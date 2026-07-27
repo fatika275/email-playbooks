@@ -179,7 +179,7 @@ export default function ReusableSequencesPage() {
               <div className="glassCard" style={{ padding: 14 }}>
                 <strong>1. Create</strong>
                 <p className="muted" style={{ margin: "6px 0 0" }}>
-                  Start from any playbook step in the Message Library.
+                  Start from lead capture and outreach when you need a message.
                 </p>
               </div>
 
@@ -199,8 +199,8 @@ export default function ReusableSequencesPage() {
             </div>
 
             <div className="toolbar" style={{ justifyContent: "center", marginTop: 20 }}>
-              <Link href="/" className="button buttonPrimary">
-                Browse Message Library
+              <Link href="/library" className="button buttonPrimary">
+                Browse Lead Capture
               </Link>
             </div>
           </div>

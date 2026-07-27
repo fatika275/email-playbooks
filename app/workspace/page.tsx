@@ -9,7 +9,7 @@ const workspaceItems = [
     label: "Saved Emails",
     badge: "Library",
     description:
-      "Reuse the outreach and follow-up messages that help turn leads into calls.",
+      "Reuse the outreach messages that help start conversations and get replies.",
   },
   {
     href: "/custom-templates",

@@ -187,11 +187,11 @@ export default function PlaybookPage() {
           <div className="glassCard emptyState">
             <h1 className="pageTitle">Playbook not found</h1>
             <p className="muted">
-              This playbook does not exist. Try going back to the system library.
+              This playbook does not exist. Try going back to lead capture and outreach.
             </p>
             <div className="toolbar" style={{ justifyContent: "center" }}>
-              <Link href="/" className="button buttonPrimary">
-                Back to Message Library
+              <Link href="/library" className="button buttonPrimary">
+                Back to Lead Capture
               </Link>
             </div>
           </div>
@@ -210,15 +210,15 @@ export default function PlaybookPage() {
               Unlock {playbook.name}
             </h1>
             <p className="muted" style={{ maxWidth: 680, marginInline: "auto" }}>
-              This is part of the Pro library. Free access includes the core
-              playbooks, while Pro unlocks the full system library, reusable
-              workflows, and advanced follow-up tools.
+              This is part of the Pro outreach library. Free access includes
+              the core messages. Pro unlocks more ways to start conversations,
+              follow up, handle objections, and keep promising leads moving.
             </p>
             <div className="toolbar" style={{ justifyContent: "center", marginTop: 20 }}>
               <Link href="/pricing" className="button buttonPrimary">
                 View Pro
               </Link>
-              <Link href="/" className="button buttonSecondary">
+              <Link href="/library" className="button buttonSecondary">
                 Back to Free Library
               </Link>
             </div>
@@ -243,16 +243,15 @@ export default function PlaybookPage() {
 
         <div className="sequenceIntro">
           <div style={{ maxWidth: 760 }}>
-            <p className="sequenceEyebrow">System + Education</p>
+            <p className="sequenceEyebrow">Outreach + Education</p>
             <h2 className="sequenceTitle">
-              Follow the plan and understand the logic behind each message
+              Choose the message that helps this lead reply
             </h2>
             <p className="muted" style={{ marginTop: 14, lineHeight: 1.8 }}>
-              Each step gives you the goal, timing context, what success looks
-              like, and what to do next — plus deeper breakdowns when you want
-              them.
+              Each message gives you the goal, timing context, what success
+              looks like, and what to do next, so you can start conversations
+              faster without rewriting every email from scratch.
             </p>
-
             <div className="toolbar" style={{ marginTop: 18 }}>
               <Link href="/sequence-builder" className="button buttonSecondary">
                 Build Custom Follow-up Plan
@@ -599,3 +598,4 @@ export default function PlaybookPage() {
     </main>
   );
 }
+

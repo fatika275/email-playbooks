@@ -171,7 +171,7 @@ export default function ProspectDetailPage() {
     const builtIn = builtInScheduledSequences.map((playbook) => ({
       id: playbook.id,
       name: playbook.name,
-      sourceLabel: "Message Library",
+      sourceLabel: "Lead Capture",
       steps: playbook.templates.map((template, index) => ({
         playbookId: playbook.id,
         templateId: template.id,

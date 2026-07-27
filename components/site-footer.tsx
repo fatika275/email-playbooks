@@ -25,7 +25,7 @@ export default function SiteFooter() {
               Pipeline
             </Link>
             <Link href="/library" className="footerLink">
-              Message Library
+              Lead Capture
             </Link>
             <Link href="/workspace" className="footerLink">
               Saved Work

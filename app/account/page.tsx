@@ -415,8 +415,8 @@ export default function AccountPage() {
                     <div className="accountSetupSteps">
                       <Link href="/library" className="accountSetupStep">
                         <strong>1</strong>
-                        <span>Pick a message</span>
-                        <small>Start from the library instead of a blank page.</small>
+                        <span>Pick an outreach message</span>
+                        <small>Start conversations faster without rewriting from scratch.</small>
                       </Link>
                       <Link href="/prospects" className="accountSetupStep">
                         <strong>2</strong>
@@ -444,8 +444,8 @@ export default function AccountPage() {
                   </Link>
 
                   <Link href="/library" className="glassCard clickable accountQuickLink">
-                    <strong>Message Library</strong>
-                    <span className="muted">Choose a playbook and write</span>
+                    <strong>Lead capture</strong>
+                    <span className="muted">Choose a message and start conversations</span>
                   </Link>
 
                   <Link href="/sequence-builder" className="glassCard clickable accountQuickLink">

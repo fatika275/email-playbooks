@@ -64,14 +64,15 @@ export default function LibraryPage() {
     <main className="main">
       <section className="container">
         <div className="pageHeader libraryHeader">
-          <div className="badge">Message Library</div>
+          <div className="badge">Lead Capture and Outreach</div>
           <h1 className="pageTitle" style={{ marginTop: 14 }}>
-            Choose the right message for the conversation.
+            Start more conversations without rewriting every message.
           </h1>
           <p className="muted">
-            Browse reusable messages for cold outreach, follow-ups, objections,
-            proposals, and re-engagement. Prospect workflows use this same library
-            to guide you to the right message at the right time.
+            This is where your outreach emails live. Use proven messages for
+            cold leads, inbound replies, follow-ups, objections, proposals, and
+            re-engagement so your agency can sound sharper and get more replies
+            without starting from scratch every time.
           </p>
         </div>
 
@@ -81,7 +82,7 @@ export default function LibraryPage() {
               <label className="label">Search messages</label>
               <input
                 className="input"
-                placeholder="Search by use case, audience, or playbook name"
+                placeholder="Search by use case, reply goal, or playbook name"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
               />
@@ -208,7 +209,7 @@ export default function LibraryPage() {
                       trackEvent("library_open_playbook", { playbookId: playbook.id })
                     }
                   >
-                    Open system
+                    Open messages
                   </Link>
                 )}
               </div>
@@ -218,7 +219,7 @@ export default function LibraryPage() {
 
         {filteredPlaybooks.length === 0 ? (
           <div className="glassCard emptyState" style={{ marginTop: 22 }}>
-            <h3 className="cardTitle">No systems match that search yet</h3>
+            <h3 className="cardTitle">No outreach messages match that search yet</h3>
             <p className="muted" style={{ maxWidth: 620, marginInline: "auto" }}>
               Try clearing the filters or searching with a broader term like
               follow-up, proposal, or outbound.

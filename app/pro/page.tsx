@@ -3,7 +3,7 @@ import { CheckoutButton } from "@/components/checkout-button";
 
 const proFeatures = [
   "Prospect pipeline from first email to booked work",
-  "Full playbook library",
+  "Full lead capture and outreach library",
   "Full follow-up builder",
   "Unlimited saved emails and folders",
   "Saved follow-up plan library",

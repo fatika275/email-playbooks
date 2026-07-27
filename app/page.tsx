@@ -66,8 +66,8 @@ export default function HomePage() {
             <span>First emails, replies, booked calls, and active deals</span>
           </div>
           <div>
-            <strong>{playbooks.length}+ agency playbooks</strong>
-            <span>Reusable wording for outreach and follow-up moments</span>
+            <strong>{playbooks.length}+ outreach playbooks</strong>
+            <span>Templates for starting conversations and getting more replies</span>
           </div>
           <div>
             <strong>Fewer slipped leads</strong>
