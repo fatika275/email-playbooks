@@ -1833,6 +1833,17 @@ details[open] > summary::after {
   margin-bottom: 24px;
 }
 
+.builderHeroSimple {
+  grid-template-columns: minmax(0, 1fr) auto;
+  min-height: 0;
+  align-items: center;
+}
+
+.builderHeroActions {
+  display: flex;
+  justify-content: flex-end;
+}
+
 .builderHero .muted {
   max-width: 700px;
   margin: 12px 0 0;
@@ -1869,7 +1880,7 @@ details[open] > summary::after {
 
 .builderLayout {
   display: grid;
-  grid-template-columns: minmax(260px, 0.74fr) minmax(0, 1.18fr) minmax(330px, 0.82fr);
+  grid-template-columns: minmax(300px, 0.86fr) minmax(0, 1.24fr);
   gap: 18px;
   align-items: start;
 }
@@ -1879,8 +1890,7 @@ details[open] > summary::after {
   padding: 18px;
 }
 
-.builderLibrary,
-.builderPreview {
+.builderLibrary {
   position: sticky;
   top: 92px;
   align-self: start;
@@ -1915,6 +1925,7 @@ details[open] > summary::after {
 
 .builderLibraryControls {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 12px;
   padding-bottom: 16px;
   margin-bottom: 16px;
@@ -2037,6 +2048,10 @@ details[open] > summary::after {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 14px;
+}
+
+.builderSaveActions {
+  justify-content: space-between;
 }
 
 .builderEmptyPanel {

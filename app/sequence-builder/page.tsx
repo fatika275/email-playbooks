@@ -80,7 +80,6 @@ export default function SequenceBuilderPage() {
     playbooks[0]?.id ?? ""
   );
   const [templateQuery, setTemplateQuery] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("All");
   const [steps, setSteps] = useState<BuilderStep[]>([]);
   const [values, setValues] = useState<Record<string, string>>({});
   const [sequenceTitle, setSequenceTitle] = useState("");
@@ -88,11 +87,6 @@ export default function SequenceBuilderPage() {
   const [folder, setFolder] = useState("Follow-up Plans");
   const [tags, setTags] = useState("follow-up, outbound");
   const [notice, setNotice] = useState("");
-
-  const categoryOptions = useMemo(
-    () => ["All", ...Array.from(new Set(playbooks.map((playbook) => playbook.badge)))],
-    []
-  );
 
   const templateOptions = useMemo<TemplateOption[]>(
     () =>
@@ -114,8 +108,6 @@ export default function SequenceBuilderPage() {
     return templateOptions.filter((option) => {
       const matchesPlaybook =
         selectedPlaybookId === "all" || option.playbookId === selectedPlaybookId;
-      const matchesCategory =
-        categoryFilter === "All" || option.badge === categoryFilter;
       const matchesQuery =
         normalizedQuery.length === 0 ||
         [
@@ -130,9 +122,9 @@ export default function SequenceBuilderPage() {
           .toLowerCase()
           .includes(normalizedQuery);
 
-      return matchesPlaybook && matchesCategory && matchesQuery;
+      return matchesPlaybook && matchesQuery;
     });
-  }, [categoryFilter, selectedPlaybookId, templateOptions, templateQuery]);
+  }, [selectedPlaybookId, templateOptions, templateQuery]);
 
   const variables = useMemo(() => getUniqueVariables(steps), [steps]);
   const sequenceSpan = getSequenceSpan(steps);
@@ -284,33 +276,22 @@ export default function SequenceBuilderPage() {
   return (
     <main className="main">
       <section className="container">
-        <div className="builderHero">
+        <div className="builderHero builderHeroSimple">
           <div>
-            <div className="badge">Follow-up Builder</div>
+            <div className="badge">Follow-ups</div>
             <h1 className="pageTitle" style={{ marginTop: 14 }}>
-              Build one reusable follow-up plan.
+              Create a follow-up plan.
             </h1>
             <p className="muted">
-              Pick the messages you want to send, put them in the right order,
-              set the days, and save the plan so leads do not slip after the first touch.
+              A follow-up plan is just the messages you send after the first touch,
+              with the day each reminder should happen. Pick messages, set the days,
+              then save it for future leads.
             </p>
           </div>
-
-          <div className="builderHeroStats" aria-label="Follow-up plan summary">
-            <div>
-              <strong>{steps.length}</strong>
-              <span>{steps.length === 1 ? "message" : "messages"}</span>
-            </div>
-            <div>
-              <strong>{sequenceSpan}</strong>
-              <span>{sequenceSpan === 1 ? "day" : "days"}</span>
-            </div>
-            <div>
-              <strong>
-                {filledVariableCount}/{variables.length}
-              </strong>
-              <span>fields</span>
-            </div>
+          <div className="builderHeroActions">
+            <Link href="/custom-templates" className="button buttonSecondary">
+              View Saved Plans
+            </Link>
           </div>
         </div>
 
@@ -318,20 +299,20 @@ export default function SequenceBuilderPage() {
           <div className="builderLibrary glassCard">
             <div className="builderPanelHeader">
               <div>
-                <span className="miniBadge">Step 1</span>
-                <h2 className="cardTitle">Choose messages</h2>
+                <span className="miniBadge">Message library</span>
+                <h2 className="cardTitle">Add messages to the plan</h2>
               </div>
               <span className="small">{filteredTemplateOptions.length} available</span>
             </div>
 
             <div className="builderLibraryControls">
               <div className="formGroup" style={{ marginBottom: 0 }}>
-                <label className="label">Search</label>
+                <label className="label">Find a message</label>
                 <input
                   className="input"
                   value={templateQuery}
                   onChange={(event) => setTemplateQuery(event.target.value)}
-                  placeholder="Search goal, use case, or playbook"
+                  placeholder="Search by goal or use case"
                 />
               </div>
 
@@ -350,28 +331,13 @@ export default function SequenceBuilderPage() {
                   ))}
                 </select>
               </div>
-
-              <div className="formGroup" style={{ marginBottom: 0 }}>
-                <label className="label">Category</label>
-                <select
-                  className="input"
-                  value={categoryFilter}
-                  onChange={(event) => setCategoryFilter(event.target.value)}
-                >
-                  {categoryOptions.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
-              </div>
             </div>
 
             <div className="builderStepPicker">
               {filteredTemplateOptions.length === 0 ? (
                 <div className="builderEmptyPanel">
                   <strong>No matching messages</strong>
-                  <p className="muted">Try a broader search or reset the category.</p>
+                  <p className="muted">Try a broader search or choose another source.</p>
                 </div>
               ) : (
                 filteredTemplateOptions.map((option) => (
@@ -399,8 +365,12 @@ export default function SequenceBuilderPage() {
             <div className="glassCard builderPanel">
               <div className="builderPanelHeader">
                 <div>
-                  <span className="miniBadge">Step 2</span>
-                  <h2 className="cardTitle">Order the follow-up</h2>
+                  <span className="miniBadge">Your plan</span>
+                  <h2 className="cardTitle">
+                    {steps.length
+                      ? `${steps.length} message${steps.length === 1 ? "" : "s"} over ${sequenceSpan} ${sequenceSpan === 1 ? "day" : "days"}`
+                      : "No messages selected"}
+                  </h2>
                 </div>
                 {steps.length > 0 ? (
                   <button
@@ -414,9 +384,9 @@ export default function SequenceBuilderPage() {
               </div>
               {steps.length === 0 ? (
                 <div className="builderEmptyPanel">
-                  <strong>Your timeline is empty</strong>
+                  <strong>Start with one message</strong>
                   <p className="muted">
-                    Choose messages on the left, then set when each follow-up should happen.
+                    Choose a message from the left. It will appear here with a day number you can change.
                   </p>
                 </div>
               ) : (
@@ -483,24 +453,17 @@ export default function SequenceBuilderPage() {
               )}
             </div>
 
-            <div className="glassCard builderPanel">
-              <div className="builderPanelHeader">
-                <div>
-                  <span className="miniBadge">Details</span>
-                  <h2 className="cardTitle">Fill shared details</h2>
+            {variables.length > 0 ? (
+              <div className="glassCard builderPanel">
+                <div className="builderPanelHeader">
+                  <div>
+                    <span className="miniBadge">Personalisation</span>
+                    <h2 className="cardTitle">Shared fields</h2>
+                  </div>
+                  <span className="small">
+                    {filledVariableCount} of {variables.length} complete
+                  </span>
                 </div>
-                <span className="small">
-                  {filledVariableCount} of {variables.length} complete
-                </span>
-              </div>
-              {variables.length === 0 ? (
-                <div className="builderEmptyPanel">
-                  <strong>No fields yet</strong>
-                  <p className="muted">
-                    Once a message is selected, shared fields will appear here.
-                  </p>
-                </div>
-              ) : (
                 <div className="builderFieldGrid">
                   {variables.map((variable) => (
                     <div key={variable} className="formGroup" style={{ marginBottom: 0 }}>
@@ -516,13 +479,13 @@ export default function SequenceBuilderPage() {
                     </div>
                   ))}
                 </div>
-              )}
-            </div>
+              </div>
+            ) : null}
 
             <div className="glassCard builderPanel">
               <div className="builderPanelHeader">
                 <div>
-                  <span className="miniBadge">Step 3</span>
+                  <span className="miniBadge">Save</span>
                   <h2 className="cardTitle">Save the plan</h2>
                 </div>
               </div>
@@ -569,7 +532,7 @@ export default function SequenceBuilderPage() {
                 </div>
               </div>
 
-              <div className="toolbar" style={{ marginTop: 18 }}>
+              <div className="toolbar builderSaveActions" style={{ marginTop: 18 }}>
                 <button
                   type="button"
                   className={isReadyToSave ? "button buttonPrimary" : "button buttonSecondary"}
@@ -583,52 +546,6 @@ export default function SequenceBuilderPage() {
               </div>
 
               {notice ? <p className="notice">{notice}</p> : null}
-            </div>
-          </div>
-
-          <div className="previewCard builderPreview">
-            <div className="builderPreviewHeader">
-              <div>
-                <div className="previewLabel">Live Preview</div>
-                <h2>{finalTitle}</h2>
-              </div>
-              <span className="miniBadge">{steps.length} messages</span>
-            </div>
-
-            <div className="builderPreviewMeta">
-              <div>
-                <span>Subject</span>
-                <strong>{finalSubject}</strong>
-              </div>
-              <div>
-                <span>Timeline</span>
-                <strong>
-                  {sequenceSpan} {sequenceSpan === 1 ? "day" : "days"}
-                </strong>
-              </div>
-            </div>
-
-            <div className="builderPreviewSteps">
-              {renderedSteps.length === 0 ? (
-                <div className="builderEmptyPanel">
-                  <strong>Preview waiting</strong>
-                  <p className="muted">Selected steps will render here in order.</p>
-                </div>
-              ) : (
-                renderedSteps.map((step) => (
-                  <div key={step.id} className="builderPreviewStep">
-                    <div className="builderPreviewStepTop">
-                      <span className="miniBadge">Day {step.dayOffset}</span>
-                      <span className="small">Step {step.number}</span>
-                    </div>
-                    <h3>{getStepLabel(step.template.label)}</h3>
-                    <strong>Subject: {step.subject}</strong>
-                    <p className="muted">
-                      {step.body}
-                    </p>
-                  </div>
-                ))
-              )}
             </div>
           </div>
         </div>

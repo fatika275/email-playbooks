@@ -5,13 +5,6 @@ import { useAccount } from "@/components/account-provider";
 
 const workspaceItems = [
   {
-    href: "/sequence-builder",
-    label: "Follow-up Builder",
-    badge: "Pro",
-    description:
-      "Build a simple follow-up plan from proven messages and save it for reuse.",
-  },
-  {
     href: "/history",
     label: "Saved Emails",
     badge: "Library",
@@ -57,10 +50,10 @@ export default function WorkspacePage() {
               {hasProAccess ? "Pro workspace active" : "Free workspace preview"}
             </span>
             <h2 className="sectionTitle" style={{ marginTop: 16 }}>
-              Build it once. Reuse what works.
+              Reuse what already works.
             </h2>
             <p className="muted" style={{ marginTop: 10, lineHeight: 1.75 }}>
-              Save strong drafts and follow-up plans here, then organise them by client,
+              Open saved drafts and follow-up plans here, then organise them by client,
               offer, or campaign when your library grows.
             </p>
           </div>
