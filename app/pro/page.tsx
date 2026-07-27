@@ -2,7 +2,7 @@ import Link from "next/link";
 import { CheckoutButton } from "@/components/checkout-button";
 
 const proFeatures = [
-  "Prospect pipeline and follow-up tracking",
+  "Prospect pipeline from first email to booked work",
   "Full playbook library",
   "Full follow-up builder",
   "Unlimited saved emails and folders",
@@ -18,12 +18,12 @@ export default function ProPage() {
           <div>
             <div className="badge">Pro</div>
             <h1 className="pageTitle" style={{ marginTop: 14 }}>
-              Build outbound as a repeatable system.
+              Book more client work without losing leads in the follow-up.
             </h1>
             <p className="muted" style={{ marginTop: 14, lineHeight: 1.75 }}>
-              Pro is for people who send outreach regularly and want more than
-              isolated templates. It gives you the full library, reusable
-              follow-up plans, saved drafts, and a workspace that improves over time.
+              Pro is for agency owners and founders who need outreach, replies,
+              follow-ups, and active deals in one place instead of scattered
+              across inboxes, notes, and memory.
             </p>
           </div>
 
@@ -39,7 +39,7 @@ export default function ProPage() {
             <div className="toolbar" style={{ marginTop: 22 }}>
               <CheckoutButton plan="pro">Start Pro</CheckoutButton>
               <Link href="/workspace" className="button buttonSecondary">
-                View workspace
+                View saved work
               </Link>
             </div>
           </aside>
@@ -59,16 +59,16 @@ export default function ProPage() {
             <div className="glassCard planDetailCard">
               <h2 className="cardTitle">Best for</h2>
               <p className="muted" style={{ marginTop: 10, lineHeight: 1.75 }}>
-                Agencies, founders, and service businesses that want outbound
-                to become a repeatable workflow instead of a blank-page task.
+                Small agency owners, founders, and lean sales teams that have
+                leads coming in but need cleaner follow-up, tracking, and handoff.
               </p>
             </div>
 
             <div className="glassCard planDetailCard">
               <h2 className="cardTitle">What happens next</h2>
               <p className="muted" style={{ marginTop: 10, lineHeight: 1.75 }}>
-                Create an account, complete checkout, and Pro unlocks on that
-                account after Stripe confirms payment.
+                Create an account, complete checkout, then start moving leads
+                from first touch to booked call to active deal.
               </p>
             </div>
           </div>

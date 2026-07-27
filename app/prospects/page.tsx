@@ -797,11 +797,11 @@ export default function ProspectsPage() {
         <section className="container">
           <div className="glassCard emptyState">
             <div className="badge">Agency pipeline</div>
-            <h1 className="pageTitle" style={{ marginTop: 14 }}>Client Work Pipeline</h1>
+            <h1 className="pageTitle" style={{ marginTop: 14 }}>Lead to Booked Work Pipeline</h1>
             <p className="muted">
               {user
-                ? "Track leads, chase follow-ups, and stop client work from slipping with Pro, Founder Pro, and Business Pro."
-                : "Sign in first, then choose a plan to track leads and follow-ups."}
+                ? "Track leads, chase follow-ups, and stop client work from slipping through the cracks with Pro, Founder Pro, and Business Pro."
+                : "Sign in first, then choose a plan to track leads, follow-ups, replies, and booked work."}
             </p>
             <Link href={user ? "/pricing" : "/account"} className="button buttonPrimary">
               {user ? "View plans" : "Sign in"}
@@ -818,11 +818,11 @@ export default function ProspectsPage() {
         <div className="prospectHeader">
           <div>
             <div className="badge">Agency pipeline</div>
-            <h1 className="pageTitle" style={{ marginTop: 14 }}>Client Work Pipeline</h1>
+            <h1 className="pageTitle" style={{ marginTop: 14 }}>Lead to Booked Work Pipeline</h1>
             <p className="muted" style={{ margin: "8px 0 0" }}>
               {workspaceId
-                ? "Shared Business Pro view of leads, replies, proposals, and won client work"
-                : "Your private view of leads, replies, proposals, and won client work"}
+                ? "Shared Business Pro view of first emails, replies, booked calls, proposals, and won client work"
+                : "Your private view of first emails, replies, booked calls, proposals, and won client work"}
             </p>
           </div>
           <div className="toolbar">
@@ -851,7 +851,7 @@ export default function ProspectsPage() {
           <section className="prospectOnboarding">
             <div>
               <span className="miniBadge">First client-work setup</span>
-              <h2 className="sectionTitle">Get your first lead moving</h2>
+              <h2 className="sectionTitle">Move your first lead toward booked work</h2>
               <p className="muted">
                 Add one real lead, choose the follow-up plan that fits, send the first message, then set the follow-up so they do not slip.
               </p>
@@ -956,7 +956,7 @@ export default function ProspectsPage() {
 
         {view === "pipeline" ? (
           <div className="prospectViewSection">
-          <div className="prospectViewHeading"><h2 className="sectionTitle">Opportunities by stage</h2><p className="muted">Move leads forward as they get closer to booked client work, or park the ones that have slipped.</p></div>
+          <div className="prospectViewHeading"><h2 className="sectionTitle">Opportunities by stage</h2><p className="muted">Move prospects from first email to booked call to active deal, or park the ones that have slipped.</p></div>
           <div className="prospectBoard">
             {PROSPECT_STAGES.map((stage) => {
               const stageProspects = filtered.filter((prospect) => prospect.stage === stage);
@@ -1003,7 +1003,7 @@ export default function ProspectsPage() {
           </div>
         ) : view === "list" ? (
           <div className="prospectViewSection">
-          <div className="prospectViewHeading"><h2 className="sectionTitle">All leads</h2><p className="muted">Scan every possible client in one place, then find the replies, proposals, and cold leads that need action.</p></div>
+          <div className="prospectViewHeading"><h2 className="sectionTitle">All leads</h2><p className="muted">Scan every possible client in one place, then find the replies, booked calls, proposals, and cold leads that need action.</p></div>
           <div className="prospectTableWrap">
             <table className="prospectTable">
               <thead><tr><th>Lead</th><th>Stage</th><th>Client work value</th><th>Follow-up</th><th>Source</th><th>Actions</th></tr></thead>
@@ -1072,7 +1072,7 @@ export default function ProspectsPage() {
                       ? `${dailyDashboard.priorityItems.length} useful action${dailyDashboard.priorityItems.length === 1 ? "" : "s"} to handle.`
                       : "You are clear for today."}
                 </h2>
-                <p className="muted">Start with the next message most likely to keep client work moving, then chase proposals and rescue slipping leads.</p>
+                <p className="muted">Start with the next message most likely to move a lead toward booked work, then chase proposals and rescue slipping leads.</p>
                 <div className="prospectFocusSummary" aria-label="Pipeline summary">
                   <span>{dailyDashboard.followUpsDue} follow-up{dailyDashboard.followUpsDue === 1 ? "" : "s"} due</span>
                   <span>{dailyDashboard.replyNeeded.length} repl{dailyDashboard.replyNeeded.length === 1 ? "y" : "ies"} waiting</span>

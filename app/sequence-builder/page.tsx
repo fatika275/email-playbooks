@@ -174,8 +174,8 @@ export default function SequenceBuilderPage() {
             </h1>
             <p className="muted" style={{ maxWidth: 680, marginInline: "auto" }}>
               Free access lets you use the core playbooks. Pro unlocks the
-              builder so you can save the exact follow-up plan you use to keep
-              client leads moving.
+              builder so you can save the exact follow-up plan you use to move
+              leads toward booked calls.
             </p>
             <div className="toolbar" style={{ justifyContent: "center", marginTop: 20 }}>
               <Link href="/pricing" className="button buttonPrimary">
@@ -280,12 +280,12 @@ export default function SequenceBuilderPage() {
           <div>
             <div className="badge">Follow-ups</div>
             <h1 className="pageTitle" style={{ marginTop: 14 }}>
-              Create a follow-up plan.
+              Create a plan for chasing warm leads.
             </h1>
             <p className="muted">
-              A follow-up plan is just the messages you send after the first touch,
-              with the day each reminder should happen. Pick messages, set the days,
-              then save it for future leads.
+              A follow-up plan is the set of messages and reminder days you use
+              after the first touch, so promising leads keep moving toward a
+              booked call instead of going quiet.
             </p>
           </div>
           <div className="builderHeroActions">

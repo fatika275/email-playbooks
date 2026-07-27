@@ -15,7 +15,7 @@ export default function PricingPage() {
           <div className="badge">Pricing</div>
 
           <h1 className="pageTitle" style={{ marginTop: 14 }}>
-            Choose the level of structure you need
+            Choose how much follow-up structure you need
           </h1>
 
           <p
@@ -26,8 +26,8 @@ export default function PricingPage() {
               lineHeight: 1.75,
             }}
           >
-            Start free, choose Pro for one agency owner, or Business Pro when
-            your small team needs one shared pipeline.
+            Start free, choose Pro when outreach becomes daily work, or Business
+            Pro when a small team needs one shared pipeline from lead to booked deal.
           </p>
 
           <p
@@ -41,7 +41,7 @@ export default function PricingPage() {
           >
             {founderEligible
               ? "Founder checkout is unlocked on this account. Complete payment to activate Founder Pro."
-              : "Start with the essentials, then upgrade when outreach becomes a regular workflow."}
+              : "Start with the essentials, then upgrade when follow-up and tracking need to stop living in your head."}
           </p>
         </div>
 
@@ -97,8 +97,8 @@ export default function PricingPage() {
             </h2>
 
             <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
-              Test the core Thalovo writing experience before deciding whether
-              the full outbound workspace fits your workflow.
+              Test the core writing experience before you build a full system
+              for chasing replies and booking client work.
             </p>
 
             <ul className="featureList">
@@ -133,12 +133,12 @@ export default function PricingPage() {
             </h2>
 
             <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
-              For agencies and founders who want a stronger system they can
-              reuse, refine, and learn from.
+              For agency owners and founders who need one place to manage
+              outreach, follow-up, replies, and booked-work opportunities.
             </p>
 
             <ul className="featureList">
-              <li>Prospect pipeline and follow-up tracking</li>
+              <li>Prospect pipeline from first email to booked work</li>
               <li>Full playbook library</li>
               <li>Full follow-up builder</li>
               <li>Unlimited saved emails and folders</li>
@@ -169,13 +169,13 @@ export default function PricingPage() {
             </h2>
 
             <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
-              One payment for a business owner and up to 10 teammates with full
-              Pro access.
+              One shared pipeline for small teams handling outreach, replies,
+              handoffs, and active deals together.
             </p>
 
             <ul className="featureList">
               <li>Everything in Pro</li>
-              <li>One shared prospect pipeline</li>
+              <li>One shared pipeline from lead to booked work</li>
               <li>10 teammate seats included</li>
               <li>Full Pro access for every active member</li>
               <li>Secure team templates and follow-up plans</li>
@@ -196,31 +196,31 @@ export default function PricingPage() {
             <div className="badge">What changes across plans</div>
 
             <h2 className="pageTitle" style={{ marginTop: 14 }}>
-              More structure, more reuse, more refinement
+              More structure, fewer slipped leads
             </h2>
 
             <div className="grid" style={{ marginTop: 20 }}>
               <div className="glassCard" style={{ padding: 20 }}>
                 <h3 className="cardTitle">Free</h3>
                 <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
-                  Best for previewing the core playbooks and checking whether
-                  the structure feels useful before paying.
+                  Best for trying the message playbooks before moving tracking
+                  and follow-up into Thalovo.
                 </p>
               </div>
 
               <div className="glassCard" style={{ padding: 20 }}>
                 <h3 className="cardTitle">Pro</h3>
                 <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
-                  Better if outreach is a regular part of your workflow and you
-                  want stronger systems plus better reuse.
+                  Better if leads are coming in, follow-up is messy, and you
+                  need a daily view of what to chase next.
                 </p>
               </div>
 
               <div className="glassCard" style={{ padding: 20 }}>
                 <h3 className="cardTitle">Business Pro</h3>
                 <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
-                  Best for one business paying centrally while up to 10 teammates
-                  receive full Pro access.
+                  Best when more than one person touches leads and handoffs
+                  need to stay visible.
                 </p>
               </div>
 

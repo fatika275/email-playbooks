@@ -9,14 +9,14 @@ const workspaceItems = [
     label: "Saved Emails",
     badge: "Library",
     description:
-      "Open, copy, duplicate, and organise individual emails you have saved.",
+      "Reuse the outreach and follow-up messages that help turn leads into calls.",
   },
   {
     href: "/custom-templates",
     label: "Saved Follow-up Plans",
     badge: "Pro",
     description:
-      "Keep the follow-up plans that help you book more client work.",
+      "Keep the chasing plans that stop warm prospects slipping after the first touch.",
   },
   {
     href: "/folders",
@@ -36,11 +36,11 @@ export default function WorkspacePage() {
         <div className="pageHeader">
           <div className="badge">Saved Work</div>
           <h1 className="pageTitle" style={{ marginTop: 14 }}>
-            Keep your best outreach ready to reuse.
+            Keep your best client-chasing assets ready to reuse.
           </h1>
           <p className="muted" style={{ maxWidth: 760, lineHeight: 1.75 }}>
-            Find saved emails, follow-up plans, and campaign folders without
-            mixing them into your active prospect pipeline.
+            Find saved messages, follow-up plans, and campaign folders without
+            mixing finished assets into your active lead pipeline.
           </p>
         </div>
 
@@ -50,11 +50,11 @@ export default function WorkspacePage() {
               {hasProAccess ? "Pro workspace active" : "Free workspace preview"}
             </span>
             <h2 className="sectionTitle" style={{ marginTop: 16 }}>
-              Reuse what already works.
+              Reuse what helps leads become booked work.
             </h2>
             <p className="muted" style={{ marginTop: 10, lineHeight: 1.75 }}>
               Open saved drafts and follow-up plans here, then organise them by client,
-              offer, or campaign when your library grows.
+              offer, or campaign when your agency outreach grows.
             </p>
           </div>
 

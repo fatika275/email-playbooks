@@ -3,7 +3,7 @@ import { CheckoutButton } from "@/components/checkout-button";
 
 const businessFeatures = [
   "Everything in Pro",
-  "One shared prospect pipeline",
+  "One shared pipeline from outreach to booked work",
   "One payment for the business",
   "Full Pro access for up to 10 teammates",
   "Secure shared templates and follow-up plans",
@@ -19,12 +19,12 @@ export default function BusinessPage() {
           <div>
             <div className="badge">Business Pro</div>
             <h1 className="pageTitle" style={{ marginTop: 14 }}>
-              One subscription for your working team.
+              One shared place for leads, replies, and handoffs.
             </h1>
             <p className="muted" style={{ marginTop: 14, lineHeight: 1.75 }}>
-              The business owner pays once and invites up to 10 teammates. Each
-              accepted teammate receives full Pro access while they remain part
-              of the active business workspace.
+              For small teams where more than one person touches a lead. Keep
+              follow-ups, replies, booked calls, and deal handoffs visible
+              instead of scattered across individual inboxes.
             </p>
 
             <ul className="featureList">
@@ -41,7 +41,7 @@ export default function BusinessPage() {
             </h2>
             <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
               Only the workspace owner is billed. Invite teammates after payment
-              from Team Library.
+              so everyone works from the same client-work pipeline.
             </p>
             <div style={{ marginTop: 20 }}>
               <CheckoutButton plan="business">Start Business Pro</CheckoutButton>

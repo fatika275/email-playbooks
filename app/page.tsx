@@ -8,15 +8,15 @@ import { trackEvent } from "@/lib/analytics";
 const workflow = [
   {
     title: "Add every lead",
-    text: "Keep each prospect, conversation, and next follow-up in one simple agency pipeline.",
+    text: "Keep every new lead, reply, and handoff in one place before it gets lost.",
   },
   {
-    title: "Send better outreach",
-    text: "Use practical emails and follow-up plans without starting from a blank page.",
+    title: "Follow up at the right time",
+    text: "Use practical messages and reminders to move prospects toward a booked call.",
   },
   {
-    title: "Never lose the follow-up",
-    text: "See what is due today and keep each opportunity moving until the work is booked.",
+    title: "Turn interest into booked work",
+    text: "Track who replied, who needs chasing, and which deals are close to slipping.",
   },
 ];
 
@@ -27,16 +27,17 @@ export default function HomePage() {
         <div className="homeHeroInner">
           <div className="eyebrow">
             <span className="eyebrowDot" />
-            Outreach and pipeline for small agencies
+            Outreach-to-booked-work system for small agencies
           </div>
 
           <h1 className="homeHeroTitle">
-            Book more agency work. Stop losing good leads.
+            Turn outreach into booked work without losing deals in the cracks.
           </h1>
 
           <p className="homeHeroText">
-            Thalovo gives small agencies one simple place to write outreach,
-            remember every follow-up, and move leads toward booked work.
+            Thalovo helps agency owners, founders, and small sales teams move
+            prospects from first email to booked call to active deal, without
+            messy tracking or manual chasing.
           </p>
 
           <div className="heroActions homeHeroActions">
@@ -61,16 +62,16 @@ export default function HomePage() {
       <ScrollReveal as="section" className="container section" delay={80}>
         <div className="homeMetrics">
           <div>
-            <strong>One pipeline</strong>
-            <span>Prospects, stages, tasks, and follow-ups</span>
+            <strong>One client-work pipeline</strong>
+            <span>First emails, replies, booked calls, and active deals</span>
           </div>
           <div>
-            <strong>{playbooks.length}+ message playbooks</strong>
-            <span>Reusable wording for real sales conversations</span>
+            <strong>{playbooks.length}+ agency playbooks</strong>
+            <span>Reusable wording for outreach and follow-up moments</span>
           </div>
           <div>
-            <strong>Nothing forgotten</strong>
-            <span>Tasks, reminders, and a clear Today list</span>
+            <strong>Fewer slipped leads</strong>
+            <span>Daily actions for follow-ups, replies, proposals, and cold leads</span>
           </div>
         </div>
       </ScrollReveal>
@@ -78,10 +79,11 @@ export default function HomePage() {
       <ScrollReveal as="section" className="container section" delay={100}>
         <div className="sectionHeader homeSectionHeader">
           <div>
-            <h2 className="pageTitle">A simple path from lead to booked work</h2>
+            <h2 className="pageTitle">A simple path from first email to booked work</h2>
             <p className="muted">
-              Keep outreach and follow-ups beside the lead so opportunities do
-              not disappear in inboxes and spreadsheets.
+              Keep messages, follow-ups, stages, and next actions beside each
+              lead so promising client work does not disappear in inboxes,
+              spreadsheets, or handoffs.
             </p>
           </div>
         </div>
@@ -104,19 +106,20 @@ export default function HomePage() {
       <ScrollReveal as="section" className="container section" delay={120}>
         <div className="homeProductBand">
           <div>
-            <div className="badge">Workspace</div>
+            <div className="badge">Pipeline</div>
             <h2 className="pageTitle" style={{ marginTop: 14 }}>
-              Outreach belongs beside the lead.
+              Every lead needs a clear next action.
             </h2>
             <p className="muted" style={{ marginTop: 12, maxWidth: 680 }}>
-              Start from a prospect, prepare the right message, then record the
-              contact and schedule the next follow-up.
+              Start from a prospect, send the right message, schedule the next
+              follow-up, and keep moving until there is a booked call, active
+              deal, win, or clean close.
             </p>
           </div>
 
           <div className="homeProductActions">
-            <Link href="/workspace" className="button buttonPrimary">
-              Open workspace
+            <Link href="/prospects" className="button buttonPrimary">
+              Open pipeline
             </Link>
             <Link href="/pricing" className="button buttonSecondary">
               View pricing
