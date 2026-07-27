@@ -31,7 +31,7 @@ export default function PrivacyPage() {
               Thalovo may collect account details such as email address, profile
               information, billing-related information supplied through Stripe,
               and content you save inside the product such as templates, saved
-              emails, and sequence drafts.
+              emails, and follow-up plan drafts.
             </p>
           </div>
 

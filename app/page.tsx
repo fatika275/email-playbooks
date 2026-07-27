@@ -12,7 +12,7 @@ const workflow = [
   },
   {
     title: "Send better outreach",
-    text: "Use practical emails and follow-up sequences without starting from a blank page.",
+    text: "Use practical emails and follow-up plans without starting from a blank page.",
   },
   {
     title: "Never lose the follow-up",

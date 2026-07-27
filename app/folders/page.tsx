@@ -110,7 +110,7 @@ export default function FoldersPage() {
       const matchesType =
         typeFilter === "All" ||
         (typeFilter === "Saved Emails" && item.type === "email") ||
-        (typeFilter === "Reusable Sequences" && item.type === "sequence");
+        (typeFilter === "Follow-up Plans" && item.type === "sequence");
 
       const folder =
         item.type === "email" ? item.item.folder : item.item.folder;
@@ -207,7 +207,7 @@ export default function FoldersPage() {
             </h1>
             <p className="muted" style={{ maxWidth: 680, marginInline: "auto" }}>
               Free access gives you the core playbooks. Pro unlocks folders so
-              saved emails and reusable sequences stay organized as your library
+              saved emails and follow-up plans stay organized as your library
               grows.
             </p>
             <div className="toolbar" style={{ justifyContent: "center", marginTop: 20 }}>
@@ -233,7 +233,7 @@ export default function FoldersPage() {
             Organize Your Outreach Library
           </h1>
           <p className="muted" style={{ maxWidth: 760, lineHeight: 1.75 }}>
-            Folders collect saved emails and reusable sequences in one place so
+            Folders collect saved emails and follow-up plans in one place so
             your best work is easier to find.
           </p>
         </div>
@@ -259,7 +259,7 @@ export default function FoldersPage() {
               >
                 <option>All</option>
                 <option>Saved Emails</option>
-                <option>Reusable Sequences</option>
+                <option>Follow-up Plans</option>
               </select>
             </div>
 
@@ -300,7 +300,7 @@ export default function FoldersPage() {
             >
               <div className="formGroup" style={{ marginBottom: 0 }}>
                 <label className="label" htmlFor="folder-item">
-                  Saved email or sequence
+                  Saved email or follow-up plan
                 </label>
                 <select
                   id="folder-item"
@@ -311,7 +311,7 @@ export default function FoldersPage() {
                   <option value="">Choose an item</option>
                   {allItems.map((item) => (
                     <option key={`${item.type}:${item.id}`} value={`${item.type}:${item.id}`}>
-                      {item.type === "email" ? "Email" : "Sequence"}: {item.title}
+                      {item.type === "email" ? "Email" : "Plan"}: {item.title}
                     </option>
                   ))}
                 </select>
@@ -353,12 +353,12 @@ export default function FoldersPage() {
           <div className="glassCard emptyState">
             <h3 className="cardTitle">No saved work yet</h3>
             <p className="muted" style={{ maxWidth: 620, marginInline: "auto" }}>
-              Save an email or reusable sequence first. Then return here to put
+              Save an email or follow-up plan first. Then return here to put
               it into a folder.
             </p>
             <div className="toolbar" style={{ justifyContent: "center", marginTop: 20 }}>
               <Link href="/sequence-builder" className="button buttonPrimary">
-                Build a Sequence
+                Build a Follow-up Plan
               </Link>
               <Link href="/" className="button buttonSecondary">
                 Browse Playbooks
@@ -393,7 +393,7 @@ export default function FoldersPage() {
                             ? "Favorite"
                             : item.type === "email"
                               ? "Saved Email"
-                              : "Sequence"}
+                              : "Plan"}
                         </span>
                       </div>
 

@@ -74,7 +74,7 @@ export default function SequenceAssetPage() {
     );
 
     return {
-      playbookName: sourcePlaybook?.name || "Reusable Sequence",
+      playbookName: sourcePlaybook?.name || "Saved Follow-up Plan",
       templateLabel: sourceTemplate?.label || "Saved Step",
     };
   }, [template]);
@@ -167,7 +167,7 @@ export default function SequenceAssetPage() {
 
     setOptimisticTemplate(updatedTemplate);
     await saveCustomTemplateRecord(updatedTemplate);
-    setSavedMessage("Sequence details updated.");
+    setSavedMessage("Follow-up plan details updated.");
     setTimeout(() => setSavedMessage(""), 2000);
   }
 
@@ -194,10 +194,10 @@ export default function SequenceAssetPage() {
           <div className="glassCard emptyState">
             <div className="badge">Pro Library</div>
             <h1 className="pageTitle" style={{ marginTop: 14 }}>
-              Reusable Sequences are Pro
+              Saved Follow-up Plans are Pro
             </h1>
             <p className="muted">
-              Upgrade to manage reusable sequence assets and built sequences.
+              Upgrade to manage saved follow-up plans.
             </p>
             <div className="toolbar" style={{ justifyContent: "center" }}>
               <button
@@ -224,16 +224,16 @@ export default function SequenceAssetPage() {
       <main className="main">
         <section className="container">
           <div className="glassCard emptyState">
-            <h1 className="pageTitle">Reusable sequence not found</h1>
+            <h1 className="pageTitle">Follow-up plan not found</h1>
             <p className="muted">
-              This reusable sequence could not be loaded.
+              This follow-up plan could not be loaded.
             </p>
             <div className="toolbar" style={{ justifyContent: "center" }}>
               <button
                 className="button buttonPrimary"
                 onClick={() => router.push("/custom-templates")}
               >
-                Back to Reusable Sequences
+                Back to Follow-up Plans
               </button>
             </div>
           </div>
@@ -246,7 +246,7 @@ export default function SequenceAssetPage() {
     <main className="main">
       <section className="container">
         <div className="pageHeader">
-          <div className="badge">Reusable Sequence</div>
+          <div className="badge">Follow-up Plan</div>
 
           <h1 className="pageTitle" style={{ marginTop: 14 }}>
             {title}
@@ -260,7 +260,7 @@ export default function SequenceAssetPage() {
         <div className="editorLayout">
           <div className="formCard">
             <div className="glassCard" style={{ padding: 18, marginBottom: 18 }}>
-              <h4 style={{ margin: 0 }}>Sequence Details</h4>
+              <h4 style={{ margin: 0 }}>Plan Details</h4>
               <div style={{ display: "grid", gap: 14, marginTop: 14 }}>
                 <div>
                   <p
@@ -371,7 +371,7 @@ export default function SequenceAssetPage() {
             </div>
 
             <div className="glassCard" style={{ padding: 18, marginBottom: 18 }}>
-              <h4 style={{ margin: 0 }}>Organize this sequence</h4>
+              <h4 style={{ margin: 0 }}>Organize this plan</h4>
               <div style={{ display: "grid", gap: 14, marginTop: 14 }}>
                 <div className="formGroup" style={{ marginBottom: 0 }}>
                   <label className="label">Folder</label>
@@ -492,7 +492,7 @@ export default function SequenceAssetPage() {
 
             <div className="toolbar">
               <button className="button buttonPrimary" onClick={handleCopy}>
-                Copy Sequence
+                Copy Plan
               </button>
 
               <button
@@ -531,13 +531,13 @@ export default function SequenceAssetPage() {
                 className="button buttonSecondary"
                 onClick={() => router.push("/custom-templates")}
               >
-                Back to Reusable Sequences
+                Back to Follow-up Plans
               </button>
             </div>
           </div>
 
           <div className="previewCard">
-            <div className="previewLabel">Sequence Preview</div>
+            <div className="previewLabel">Plan Preview</div>
 
             <div className="previewBox">
               <strong>Subject: {subject}</strong>

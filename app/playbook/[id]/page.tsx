@@ -212,7 +212,7 @@ export default function PlaybookPage() {
             <p className="muted" style={{ maxWidth: 680, marginInline: "auto" }}>
               This is part of the Pro library. Free access includes the core
               playbooks, while Pro unlocks the full system library, reusable
-              workflows, and advanced sequence tools.
+              workflows, and advanced follow-up tools.
             </p>
             <div className="toolbar" style={{ justifyContent: "center", marginTop: 20 }}>
               <Link href="/pricing" className="button buttonPrimary">
@@ -245,7 +245,7 @@ export default function PlaybookPage() {
           <div style={{ maxWidth: 760 }}>
             <p className="sequenceEyebrow">System + Education</p>
             <h2 className="sequenceTitle">
-              Follow the sequence and understand the logic behind each step
+              Follow the plan and understand the logic behind each message
             </h2>
             <p className="muted" style={{ marginTop: 14, lineHeight: 1.8 }}>
               Each step gives you the goal, timing context, what success looks
@@ -255,7 +255,7 @@ export default function PlaybookPage() {
 
             <div className="toolbar" style={{ marginTop: 18 }}>
               <Link href="/sequence-builder" className="button buttonSecondary">
-                Build Custom Sequence
+                Build Custom Follow-up Plan
               </Link>
             </div>
           </div>
@@ -577,9 +577,9 @@ export default function PlaybookPage() {
                       <Link
                         href="/custom-templates"
                         className="button buttonSecondary"
-                        onClick={() => setToastMessage("Opening reusable sequences...")}
+                        onClick={() => setToastMessage("Opening follow-up plans...")}
                       >
-                        View Saved Sequences
+                        View Follow-up Plans
                       </Link>
                     )}
                   </div>

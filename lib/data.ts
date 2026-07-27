@@ -31,7 +31,7 @@ export type Playbook = {
 export const playbooks: Playbook[] = [
   {
     id: "cold-outreach-sequence",
-    name: "Agency Cold Outreach Sequence",
+    name: "Agency Cold Outreach Follow-up Plan",
     shortDescription: "Get clients through cold outreach.",
     description:
       "A structured cold outreach system for agencies and founders to start conversations, follow up with intent, and move cold leads toward replies.",
@@ -54,7 +54,7 @@ Would you be open to a quick conversation?
 Best,
 {{yourName}}`,
         whenToUse:
-          "Use this as the first email in a cold outreach sequence when you want to open a conversation without over-explaining.",
+          "Use this as the first email in a cold outreach follow-up plan when you want to open a conversation without over-explaining.",
         whyItWorks:
           "It leads with relevance and outcome instead of making the whole email about you.",
         goal: "Start a conversation with a relevant prospect.",
@@ -604,7 +604,7 @@ Best,
         whyItWorks:
           "It reopens the conversation without guilt, pressure, or pretending nothing happened.",
         goal: "Restart an old conversation cleanly.",
-        nextStep: "If they reply, move them into the relevant sequence from there.",
+        nextStep: "If they reply, move them into the relevant follow-up plan from there.",
         expectedOutcome: "Renewed interest or a clear answer.",
         psychology:
           "People are more willing to re-engage when silence is framed as changed timing rather than rejection.",
@@ -894,10 +894,10 @@ Best,
 
   {
     id: "demo-booking-sequence",
-    name: "Demo Booking Sequence",
+    name: "Demo Booking Follow-up Plan",
     shortDescription: "Move interest into booked calls.",
     description:
-      "A small sequence for turning interest into a booked demo or discovery call without sounding too heavy.",
+      "A small follow-up plan for turning interest into a booked demo or discovery call without sounding too heavy.",
     audience: "Agencies & Founders",
     badge: "Demo",
     templates: [

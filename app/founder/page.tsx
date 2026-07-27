@@ -95,8 +95,8 @@ export default function FounderPage() {
               <li>Access for one individual account</li>
               <li>Locked Founder Pro monthly price</li>
               <li>Full playbook library</li>
-              <li>Full sequence builder</li>
-              <li>Reusable sequences, folders, and saved emails</li>
+              <li>Full follow-up builder</li>
+              <li>Follow-up plans, folders, and saved emails</li>
               <li>Team seats are not included</li>
             </ul>
 

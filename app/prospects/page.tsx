@@ -853,12 +853,12 @@ export default function ProspectsPage() {
               <span className="miniBadge">First client-work setup</span>
               <h2 className="sectionTitle">Get your first lead moving</h2>
               <p className="muted">
-                Add one real lead, choose the sequence that fits, send the first message, then set the follow-up so they do not slip.
+                Add one real lead, choose the follow-up plan that fits, send the first message, then set the follow-up so they do not slip.
               </p>
             </div>
             <div className="prospectOnboardingSteps">
               <div><strong>1</strong><span>Add first lead</span></div>
-              <div><strong>2</strong><span>Choose a sequence</span></div>
+              <div><strong>2</strong><span>Choose a follow-up plan</span></div>
               <div><strong>3</strong><span>Send first message</span></div>
               <div><strong>4</strong><span>Set first follow-up</span></div>
             </div>

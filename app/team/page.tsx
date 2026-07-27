@@ -322,7 +322,7 @@ export default function TeamLibraryPage() {
           <div className="glassCard emptyState">
             <h1 className="pageTitle">Team sharing is a Pro feature</h1>
             <p className="muted">
-              Upgrade to share saved messages and reusable sequences securely.
+              Upgrade to share saved messages and follow-up plans securely.
             </p>
             <Link href="/pricing" className="button buttonPrimary">
               View Pro
@@ -504,7 +504,7 @@ export default function TeamLibraryPage() {
 
         {teamView === "library" ? <>
         <div className="teamLibraryActions">
-          <div><h2 className="sectionTitle">Shared outreach library</h2><p className="muted">Send useful messages and sequences to teammates, or save items they shared with you.</p></div>
+          <div><h2 className="sectionTitle">Shared outreach library</h2><p className="muted">Send useful messages and follow-up plans to teammates, or save items they shared with you.</p></div>
           <div className="toolbar">
           <button
             className="button buttonSecondary"
@@ -517,7 +517,7 @@ export default function TeamLibraryPage() {
             Choose a saved email
           </Link>
           <Link href="/custom-templates" className="button buttonSecondary">
-            Choose a sequence
+            Choose a follow-up plan
           </Link>
           </div>
         </div>
@@ -529,19 +529,19 @@ export default function TeamLibraryPage() {
           </div>
           <div className="sharedLibraryFilters">
             <input className="input" type="search" value={shareSearch} onChange={(event) => { setShareSearch(event.target.value); setSharePage(1); }} placeholder="Search title, subject, or teammate" aria-label="Search shared outreach" />
-            <select className="input" value={shareType} onChange={(event) => { setShareType(event.target.value as "all" | "email" | "sequence"); setSharePage(1); }} aria-label="Filter shared outreach by type"><option value="all">All types</option><option value="email">Messages</option><option value="sequence">Sequences</option></select>
+            <select className="input" value={shareType} onChange={(event) => { setShareType(event.target.value as "all" | "email" | "sequence"); setSharePage(1); }} aria-label="Filter shared outreach by type"><option value="all">All types</option><option value="email">Messages</option><option value="sequence">Follow-up plans</option></select>
           </div>
         </div>
 
         <section className="section sharedLibrarySection">
-          <div className="teamSectionHeading"><h2 className="sectionTitle">{libraryView === "incoming" ? "Shared with me" : "Shared by me"}</h2><p className="muted">{libraryView === "incoming" ? "Messages and sequences teammates have sent to your account." : "Items you have made available to other teammates."}</p></div>
+          <div className="teamSectionHeading"><h2 className="sectionTitle">{libraryView === "incoming" ? "Shared with me" : "Shared by me"}</h2><p className="muted">{libraryView === "incoming" ? "Messages and follow-up plans teammates have sent to your account." : "Items you have made available to other teammates."}</p></div>
           <div className="workspaceGrid" style={{ marginTop: 16 }}>
             {visibleShares.map((share) => (
               <article key={share.id} className="glassCard workspaceCard">
                 <div className="cardTop">
                   <h3 className="cardTitle">{share.title}</h3>
                   <span className="miniBadge">
-                    {share.asset_type === "email" ? "Template" : "Sequence"}
+                    {share.asset_type === "email" ? "Template" : "Follow-up Plan"}
                   </span>
                 </div>
                 <p className="small">{libraryView === "incoming" ? `From ${share.owner_email}` : `Sent to ${share.recipient_email}`}</p>

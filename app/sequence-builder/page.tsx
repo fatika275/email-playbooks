@@ -85,8 +85,8 @@ export default function SequenceBuilderPage() {
   const [values, setValues] = useState<Record<string, string>>({});
   const [sequenceTitle, setSequenceTitle] = useState("");
   const [sequenceSubject, setSequenceSubject] = useState("");
-  const [folder, setFolder] = useState("Built Sequences");
-  const [tags, setTags] = useState("sequence-builder, outbound");
+  const [folder, setFolder] = useState("Follow-up Plans");
+  const [tags, setTags] = useState("follow-up, outbound");
   const [notice, setNotice] = useState("");
 
   const categoryOptions = useMemo(
@@ -153,13 +153,13 @@ export default function SequenceBuilderPage() {
   const finalTitle =
     sequenceTitle.trim() ||
     (steps.length > 0
-      ? `${steps[0].playbookName} - Custom Sequence`
-      : "Custom Sequence");
+      ? `${steps[0].playbookName} - Follow-up Plan`
+      : "Custom Follow-up Plan");
 
   const finalSubject =
     sequenceSubject.trim() ||
     renderedSteps[0]?.subject ||
-    "Custom outreach sequence";
+    "Custom follow-up plan";
 
   const finalBody =
     renderedSteps.length > 0
@@ -169,7 +169,7 @@ export default function SequenceBuilderPage() {
               `Step ${step.number}: ${getStepLabel(step.template.label)}\nSubject: ${step.subject}\n\n${step.body}`
           )
           .join("\n\n---\n\n")
-      : "Add steps to build your sequence.";
+      : "Add messages to build your follow-up plan.";
 
   if (!hasProAccess) {
     return (
@@ -178,12 +178,12 @@ export default function SequenceBuilderPage() {
           <div className="glassCard emptyState">
             <div className="badge">Pro Workflow</div>
             <h1 className="pageTitle" style={{ marginTop: 14 }}>
-              Sequence Builder is a Pro feature
+              Follow-up Builder is a Pro feature
             </h1>
             <p className="muted" style={{ maxWidth: 680, marginInline: "auto" }}>
               Free access lets you use the core playbooks. Pro unlocks the
-              builder so you can assemble multi-step outreach systems and save
-              them into your reusable library.
+              builder so you can save the exact follow-up plan you use to keep
+              client leads moving.
             </p>
             <div className="toolbar" style={{ justifyContent: "center", marginTop: 20 }}>
               <Link href="/pricing" className="button buttonPrimary">
@@ -272,12 +272,12 @@ export default function SequenceBuilderPage() {
         dayOffset: step.dayOffset,
       })),
       tags: parsedTags,
-      folder: folder.trim() || "Built Sequences",
+      folder: folder.trim() || "Follow-up Plans",
       isFavorite: false,
       createdAt: new Date().toISOString(),
     });
 
-    setNotice("Saved to Reusable Sequences.");
+    setNotice("Saved to follow-up plans.");
     setTimeout(() => setNotice(""), 2200);
   }
 
@@ -286,20 +286,20 @@ export default function SequenceBuilderPage() {
       <section className="container">
         <div className="builderHero">
           <div>
-            <div className="badge">Sequence Builder</div>
+            <div className="badge">Follow-up Builder</div>
             <h1 className="pageTitle" style={{ marginTop: 14 }}>
-              Assemble a reusable outreach sequence.
+              Build one reusable follow-up plan.
             </h1>
             <p className="muted">
-              Search the message library, arrange the follow-up timeline, fill
-              shared details once, and save the finished system into your workspace.
+              Pick the messages you want to send, put them in the right order,
+              set the days, and save the plan so leads do not slip after the first touch.
             </p>
           </div>
 
-          <div className="builderHeroStats" aria-label="Sequence summary">
+          <div className="builderHeroStats" aria-label="Follow-up plan summary">
             <div>
               <strong>{steps.length}</strong>
-              <span>{steps.length === 1 ? "step" : "steps"}</span>
+              <span>{steps.length === 1 ? "message" : "messages"}</span>
             </div>
             <div>
               <strong>{sequenceSpan}</strong>
@@ -318,8 +318,8 @@ export default function SequenceBuilderPage() {
           <div className="builderLibrary glassCard">
             <div className="builderPanelHeader">
               <div>
-                <span className="miniBadge">Library</span>
-                <h2 className="cardTitle">Add messages</h2>
+                <span className="miniBadge">Step 1</span>
+                <h2 className="cardTitle">Choose messages</h2>
               </div>
               <span className="small">{filteredTemplateOptions.length} available</span>
             </div>
@@ -399,8 +399,8 @@ export default function SequenceBuilderPage() {
             <div className="glassCard builderPanel">
               <div className="builderPanelHeader">
                 <div>
-                  <span className="miniBadge">Timeline</span>
-                  <h2 className="cardTitle">Arrange sequence</h2>
+                  <span className="miniBadge">Step 2</span>
+                  <h2 className="cardTitle">Order the follow-up</h2>
                 </div>
                 {steps.length > 0 ? (
                   <button
@@ -416,7 +416,7 @@ export default function SequenceBuilderPage() {
                 <div className="builderEmptyPanel">
                   <strong>Your timeline is empty</strong>
                   <p className="muted">
-                    Add messages from the library to build the sequence in order.
+                    Choose messages on the left, then set when each follow-up should happen.
                   </p>
                 </div>
               ) : (
@@ -486,7 +486,7 @@ export default function SequenceBuilderPage() {
             <div className="glassCard builderPanel">
               <div className="builderPanelHeader">
                 <div>
-                  <span className="miniBadge">Variables</span>
+                  <span className="miniBadge">Details</span>
                   <h2 className="cardTitle">Fill shared details</h2>
                 </div>
                 <span className="small">
@@ -522,14 +522,14 @@ export default function SequenceBuilderPage() {
             <div className="glassCard builderPanel">
               <div className="builderPanelHeader">
                 <div>
-                  <span className="miniBadge">Save</span>
-                  <h2 className="cardTitle">Name and file it</h2>
+                  <span className="miniBadge">Step 3</span>
+                  <h2 className="cardTitle">Save the plan</h2>
                 </div>
               </div>
 
               <div className="builderFieldGrid" style={{ marginTop: 16 }}>
                 <div className="formGroup" style={{ marginBottom: 0 }}>
-                  <label className="label">Sequence title</label>
+                  <label className="label">Plan name</label>
                   <input
                     className="input"
                     value={sequenceTitle}
@@ -559,7 +559,7 @@ export default function SequenceBuilderPage() {
                 </div>
 
                 <div className="formGroup" style={{ marginBottom: 0 }}>
-                  <label className="label">Sequence subject</label>
+                  <label className="label">First email subject</label>
                   <input
                     className="input"
                     value={sequenceSubject}
@@ -575,10 +575,10 @@ export default function SequenceBuilderPage() {
                   className={isReadyToSave ? "button buttonPrimary" : "button buttonSecondary"}
                   onClick={() => void handleSaveSequence()}
                 >
-                  Save Sequence
+                  Save Follow-up Plan
                 </button>
                 <Link href="/custom-templates" className="button buttonSecondary">
-                  View Reusable Sequences
+                  View Saved Plans
                 </Link>
               </div>
 
@@ -592,7 +592,7 @@ export default function SequenceBuilderPage() {
                 <div className="previewLabel">Live Preview</div>
                 <h2>{finalTitle}</h2>
               </div>
-              <span className="miniBadge">{steps.length} steps</span>
+              <span className="miniBadge">{steps.length} messages</span>
             </div>
 
             <div className="builderPreviewMeta">

@@ -63,7 +63,7 @@ export default function ReusableSequencesPage() {
 
       return {
         sourcePlaybookId,
-        sourcePlaybookName: playbook?.name || "Reusable Sequence",
+        sourcePlaybookName: playbook?.name || "Saved Follow-up Plan",
         items,
       };
     });
@@ -158,11 +158,11 @@ export default function ReusableSequencesPage() {
           <div className="glassCard emptyState">
             <div className="badge">Pro Library</div>
             <h1 className="pageTitle" style={{ marginTop: 14 }}>
-              Reusable Sequences are Pro
+              Saved Follow-up Plans are Pro
             </h1>
             <p className="muted" style={{ maxWidth: 680, marginInline: "auto" }}>
               Free access includes the core playbooks. Pro unlocks reusable
-              sequences, folders, the sequence builder, and the full playbook
+              follow-up plans, folders, the builder, and the full playbook
               library.
             </p>
             <div className="toolbar" style={{ justifyContent: "center", marginTop: 20 }}>
@@ -183,23 +183,23 @@ export default function ReusableSequencesPage() {
     <main className="main">
       <section className="container">
         <div className="pageHeader">
-          <div className="badge">Reusable Sequences</div>
+          <div className="badge">Follow-up Plans</div>
           <h1 className="pageTitle" style={{ marginTop: 14 }}>
-            Your Sequence Library
+            Your Follow-up Plan Library
           </h1>
           <p className="muted">
-            Save your best sequence steps and build a reusable outbound library
+            Save the follow-up plans that help you book more client work
             over time.
           </p>
         </div>
 
         {templates.length === 0 ? (
           <div className="glassCard emptyState">
-            <h3 className="cardTitle">No reusable sequences yet</h3>
+            <h3 className="cardTitle">No follow-up plans yet</h3>
 
             <p className="muted" style={{ maxWidth: 620, marginInline: "auto" }}>
               Create your first email, save the version you want to keep, and
-              it will appear here as a reusable sequence asset.
+              it will appear here as a saved follow-up plan.
             </p>
 
             <div
@@ -228,7 +228,7 @@ export default function ReusableSequencesPage() {
               <div className="glassCard" style={{ padding: 14 }}>
                 <strong>3. Reuse</strong>
                 <p className="muted" style={{ margin: "6px 0 0" }}>
-                  Come back anytime and open it as part of your sequence library.
+                  Come back anytime and open it as part of your follow-up plan library.
                 </p>
               </div>
             </div>
@@ -244,10 +244,10 @@ export default function ReusableSequencesPage() {
             <div className="glassCard" style={{ padding: 18 }}>
               <div className="grid" style={{ gridTemplateColumns: "1.6fr 1fr 1fr 1fr" }}>
                 <div className="formGroup" style={{ marginBottom: 0 }}>
-                  <label className="label">Search reusable sequences</label>
+                  <label className="label">Search follow-up plans</label>
                   <input
                     className="input"
-                    placeholder="Search by title, subject, or sequence content"
+                    placeholder="Search by title, subject, or message content"
                     value={query}
                     onChange={(event) => setQuery(event.target.value)}
                   />
@@ -337,7 +337,7 @@ export default function ReusableSequencesPage() {
                         style={{ marginTop: 10, marginBottom: 0 }}
                       >
                         {group.items.length} saved{" "}
-                        {group.items.length === 1 ? "sequence" : "sequences"}
+                        {group.items.length === 1 ? "plan" : "plans"}
                       </p>
                     </div>
 
@@ -345,7 +345,7 @@ export default function ReusableSequencesPage() {
                       className="button buttonUtility"
                       onClick={() => toggleGroup(group.sourcePlaybookId)}
                     >
-                      {isOpen ? "Hide Sequences" : "Show Sequences"}
+                      {isOpen ? "Hide Plans" : "Show Plans"}
                     </button>
                   </div>
 
@@ -371,7 +371,7 @@ export default function ReusableSequencesPage() {
                           <div className="cardTop">
                             <h3 className="cardTitle">{template.title}</h3>
                             <span className="miniBadge">
-                              {template.isFavorite ? "Favorite" : "Reusable Sequence"}
+                              {template.isFavorite ? "Favorite" : "Follow-up Plan"}
                             </span>
                           </div>
 
@@ -423,10 +423,10 @@ export default function ReusableSequencesPage() {
 
             {filteredGroups.length === 0 ? (
               <div className="glassCard emptyState">
-                <h3 className="cardTitle">No reusable sequences match that search</h3>
+                <h3 className="cardTitle">No follow-up plans match that search</h3>
                 <p className="muted" style={{ maxWidth: 620, marginInline: "auto" }}>
                   Try clearing the filter or use a broader keyword from the
-                  title, subject, or sequence body.
+                  title, subject, or message body.
                 </p>
               </div>
             ) : null}

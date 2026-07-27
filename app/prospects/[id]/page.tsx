@@ -184,7 +184,7 @@ export default function ProspectDetailPage() {
       .map((template) => ({
         id: `custom:${template.id}`,
         name: template.title,
-        sourceLabel: template.sequenceSteps?.length ? "Saved sequence" : "Saved sequence",
+        sourceLabel: template.sequenceSteps?.length ? "Saved plan" : "Saved plan",
         steps: getLegacyCustomSequenceSteps(template),
       }))
       .filter((sequence) => sequence.steps.length > 0);
@@ -519,7 +519,7 @@ export default function ProspectDetailPage() {
         prospectId: id,
         userId: user.id,
         activityType: "email",
-        summary: `Proposal/client-work sequence started from ${proposalSentDate}: ${selectedSequence.name} with ${selectedSequence.steps.length} step${selectedSequence.steps.length === 1 ? "" : "s"}.`,
+        summary: `Follow-up plan started from ${proposalSentDate}: ${selectedSequence.name} with ${selectedSequence.steps.length} message${selectedSequence.steps.length === 1 ? "" : "s"}.`,
       });
       const firstFollowUp = addDays(proposalSentDate, selectedSequence.steps[0]?.dayOffset ?? 0);
       const updated = await updateProspect(id, {
@@ -648,12 +648,12 @@ export default function ProspectDetailPage() {
               <span className="miniBadge">First client-work setup</span>
               <h2 className="sectionTitle">Turn this lead into an action plan</h2>
               <p className="muted">
-                Choose a sequence, open the first message, then schedule the follow-up so this lead does not disappear after the first touch.
+                Choose a follow-up plan, open the first message, then schedule the first reminder so this lead does not disappear after the first touch.
               </p>
             </div>
             <div className="prospectOnboardingSteps">
               <div className="isDone"><strong>1</strong><span>Lead added</span></div>
-              <div className={onboardingSequenceStarted ? "isDone" : ""}><strong>2</strong><span>Choose a sequence</span></div>
+              <div className={onboardingSequenceStarted ? "isDone" : ""}><strong>2</strong><span>Choose a follow-up plan</span></div>
               <div className={onboardingFirstMessageSent ? "isDone" : ""}><strong>3</strong><span>Send first message</span></div>
               <div className={onboardingFollowUpSet ? "isDone" : ""}><strong>4</strong><span>Set first follow-up</span></div>
             </div>
@@ -669,7 +669,7 @@ export default function ProspectDetailPage() {
                 setIsSequencePickerOpen(true);
               }}
             >
-              {nextProposalTask ? "Open first message" : "Choose a sequence"}
+              {nextProposalTask ? "Open first message" : "Choose follow-up plan"}
             </button>
           </section>
         ) : null}
@@ -701,16 +701,16 @@ export default function ProspectDetailPage() {
 
             <section className="prospectOpsPanel proposalWorkflowPanel" hidden={detailView !== "followup"}>
               <div className="proposalWorkflowHeader">
-                <div><span className="miniBadge">Follow-up sequence</span><h2 className="cardTitle">{nextProposalTask ? "Next message to send" : "Start a client-work sequence"}</h2><p className="small">{nextProposalTask ? "Work through the active reminders for this lead. Opening a message loads the right template for the current step." : "Choose a reusable sequence, set the start date, and create reminders that keep this lead moving."}</p></div>
-                {activeProposalTasks.length ? <span className="statusPill statusPillSuccess">{activeProposalTasks.length} reminder{activeProposalTasks.length === 1 ? "" : "s"} active</span> : <span className="statusPill">No sequence running</span>}
+                <div><span className="miniBadge">Follow-up plan</span><h2 className="cardTitle">{nextProposalTask ? "Next message to send" : "Start follow-up reminders"}</h2><p className="small">{nextProposalTask ? "Work through the active reminders for this lead. Opening a message loads the right template for the current step." : "Choose a saved plan, set the start date, and create reminders that keep this lead moving toward client work."}</p></div>
+                {activeProposalTasks.length ? <span className="statusPill statusPillSuccess">{activeProposalTasks.length} reminder{activeProposalTasks.length === 1 ? "" : "s"} active</span> : <span className="statusPill">No plan running</span>}
               </div>
               {!nextProposalTask ? <><div className="proposalWorkflowForm">
-                <div className="formGroup proposalSequencePicker"><label className="label">Sequence</label>
+                <div className="formGroup proposalSequencePicker"><label className="label">Follow-up plan</label>
                   <div className="proposalSelectedSequence">
                     <div>
                       <span className="miniBadge">{selectedScheduledSequence?.sourceLabel ?? "Not selected"}</span>
-                      <strong>{selectedScheduledSequence?.name ?? "Choose a sequence"}</strong>
-                      <p>{selectedScheduledSequence ? `${selectedScheduledSequence.steps.length} step${selectedScheduledSequence.steps.length === 1 ? "" : "s"}` : "Pick the sequence that fits this lead and the client work you want to win."}</p>
+                      <strong>{selectedScheduledSequence?.name ?? "Choose a follow-up plan"}</strong>
+                      <p>{selectedScheduledSequence ? `${selectedScheduledSequence.steps.length} message${selectedScheduledSequence.steps.length === 1 ? "" : "s"}` : "Pick the plan that fits this lead and the client work you want to win."}</p>
                     </div>
                     <button type="button" className="button buttonSecondary" onClick={() => setIsSequencePickerOpen((current) => !current)}>
                       {selectedScheduledSequence ? "Change" : "Choose"}
@@ -719,32 +719,32 @@ export default function ProspectDetailPage() {
                   {isSequencePickerOpen ? (
                     <div className="proposalSequenceChooser">
                       <div className="proposalSequencePickerActions">
-                        <input className="input" value={sequenceSearch} onChange={(event) => setSequenceSearch(event.target.value)} placeholder="Search by name, source, or step" />
+                        <input className="input" value={sequenceSearch} onChange={(event) => setSequenceSearch(event.target.value)} placeholder="Search plans or messages" />
                         <button type="button" className="button buttonUtility" onClick={() => { setIsSequencePickerOpen(false); setSequenceSearch(""); }}>
                           Close
                         </button>
                       </div>
-                      <div className="proposalSequenceResults" aria-label="Sequence results">
+                      <div className="proposalSequenceResults" aria-label="Follow-up plan results">
                         {filteredScheduledSequences.map((sequence) => (
                           <button key={sequence.id} type="button" className={sequence.id === selectedSequenceId ? "proposalSequenceOption isSelected" : "proposalSequenceOption"} onClick={() => { setSelectedSequenceId(sequence.id); setSequenceSearch(""); setIsSequencePickerOpen(false); }} aria-pressed={sequence.id === selectedSequenceId}>
                             <span>
                               <strong>{sequence.name}</strong>
-                              <small>{sequence.sourceLabel} - {sequence.steps.length} step{sequence.steps.length === 1 ? "" : "s"}</small>
+                              <small>{sequence.sourceLabel} - {sequence.steps.length} message{sequence.steps.length === 1 ? "" : "s"}</small>
                             </span>
                             <span className="miniBadge">{sequence.id === selectedSequenceId ? "Selected" : "Use"}</span>
                           </button>
                         ))}
-                        {filteredScheduledSequences.length === 0 ? <div className="proposalSequenceEmpty">No matching sequences.</div> : null}
+                        {filteredScheduledSequences.length === 0 ? <div className="proposalSequenceEmpty">No matching plans.</div> : null}
                       </div>
                     </div>
                   ) : null}
-                  <p className="small" style={{ margin: "6px 0 0" }}>{selectedScheduledSequence ? "This sequence will create the reminders below from the start date." : "Nothing is preselected for this lead."}</p>
+                  <p className="small" style={{ margin: "6px 0 0" }}>{selectedScheduledSequence ? "This plan will create the reminders below from the start date." : "Nothing is preselected for this lead."}</p>
                 </div>
-                <div className="formGroup"><label className="label">Proposal / first message sent date</label><input className="input" type="date" value={proposalSentDate} onChange={(event) => setProposalSentDate(event.target.value)} /><p className="small" style={{ margin: "6px 0 0" }}>The sequence reminders are scheduled from this client-work touch.</p></div>
+                <div className="formGroup"><label className="label">Proposal / first message sent date</label><input className="input" type="date" value={proposalSentDate} onChange={(event) => setProposalSentDate(event.target.value)} /><p className="small" style={{ margin: "6px 0 0" }}>The reminders are scheduled from this client-work touch.</p></div>
                 <div className="formGroup"><label className="label">Assigned to</label>{prospect?.workspace_id ? <select className="input" value={taskAssignee} onChange={(event) => setTaskAssignee(event.target.value)}><option value="">Unassigned</option><option value={user.email ?? ""}>Me ({user.email})</option>{teamMembers.filter((member) => member.email !== user.email).map((member) => <option key={member.id} value={member.email}>{member.email}</option>)}</select> : <input className="input" type="email" value={taskAssignee} onChange={(event) => setTaskAssignee(event.target.value)} placeholder="Assignee email" />}</div>
               </div>
               <div className="proposalWorkflowActions">
-                <button className="button buttonPrimary" disabled={isStartingProposalWorkflow || !proposalSentDate || !selectedSequenceId} onClick={() => void handleStartProposalWorkflow()}>{isStartingProposalWorkflow ? "Starting..." : "Start sequence"}</button>
+                <button className="button buttonPrimary" disabled={isStartingProposalWorkflow || !proposalSentDate || !selectedSequenceId} onClick={() => void handleStartProposalWorkflow()}>{isStartingProposalWorkflow ? "Starting..." : "Start follow-up plan"}</button>
               </div></> : <>
                 <div className="proposalNextMessage">
                   <div><span>{nextProposalTask.due_date ? `Due ${nextProposalTask.due_date}` : "Ready when you are"}</span><strong>{cleanFollowUpTaskTitle(nextProposalTask.title)}</strong><p>{activeProposalTasks.length > 1 ? `${activeProposalTasks.length - 1} later reminder${activeProposalTasks.length - 1 === 1 ? "" : "s"} already scheduled.` : "This is the final scheduled reminder."}</p></div>

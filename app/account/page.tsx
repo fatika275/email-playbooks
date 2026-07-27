@@ -150,7 +150,7 @@ export default function AccountPage() {
             Your Thalovo account
           </h1>
           <p className="muted" style={{ maxWidth: 720, lineHeight: 1.75 }}>
-            Sign in to keep your saved emails, sequences, and workspace
+            Sign in to keep your saved emails, follow-up plans, and workspace
             available when you come back.
           </p>
         </div>
@@ -425,8 +425,8 @@ export default function AccountPage() {
                       </Link>
                       <Link href="/sequence-builder" className="accountSetupStep">
                         <strong>3</strong>
-                        <span>Build a sequence</span>
-                        <small>Save a reusable follow-up system for outreach.</small>
+                        <span>Build a follow-up plan</span>
+                        <small>Save the reminders that stop leads slipping.</small>
                       </Link>
                       <Link href="/pricing" className="accountSetupStep">
                         <strong>4</strong>
@@ -449,8 +449,8 @@ export default function AccountPage() {
                   </Link>
 
                   <Link href="/sequence-builder" className="glassCard clickable accountQuickLink">
-                    <strong>Build sequences</strong>
-                    <span className="muted">Create reusable follow-up flows</span>
+                    <strong>Build follow-up plans</strong>
+                    <span className="muted">Create reusable client-chasing flows</span>
                   </Link>
 
                   <Link href="/pricing" className="glassCard clickable accountQuickLink">

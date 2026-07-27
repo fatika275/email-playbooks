@@ -4,9 +4,9 @@ import { CheckoutButton } from "@/components/checkout-button";
 const proFeatures = [
   "Prospect pipeline and follow-up tracking",
   "Full playbook library",
-  "Full sequence builder",
+  "Full follow-up builder",
   "Unlimited saved emails and folders",
-  "Reusable sequence library",
+  "Saved follow-up plan library",
   "HTML export for more polished sending",
 ];
 
@@ -23,7 +23,7 @@ export default function ProPage() {
             <p className="muted" style={{ marginTop: 14, lineHeight: 1.75 }}>
               Pro is for people who send outreach regularly and want more than
               isolated templates. It gives you the full library, reusable
-              sequences, saved drafts, and a workspace that improves over time.
+              follow-up plans, saved drafts, and a workspace that improves over time.
             </p>
           </div>
 

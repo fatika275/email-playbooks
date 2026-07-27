@@ -140,9 +140,9 @@ export default function PricingPage() {
             <ul className="featureList">
               <li>Prospect pipeline and follow-up tracking</li>
               <li>Full playbook library</li>
-              <li>Full sequence builder</li>
+              <li>Full follow-up builder</li>
               <li>Unlimited saved emails and folders</li>
-              <li>Reusable sequence library</li>
+              <li>Saved follow-up plan library</li>
               <li>Branded HTML export</li>
             </ul>
 
@@ -178,7 +178,7 @@ export default function PricingPage() {
               <li>One shared prospect pipeline</li>
               <li>10 teammate seats included</li>
               <li>Full Pro access for every active member</li>
-              <li>Secure team templates and sequences</li>
+              <li>Secure team templates and follow-up plans</li>
               <li>Owner-managed access</li>
             </ul>
 

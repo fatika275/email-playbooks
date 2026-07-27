@@ -505,7 +505,7 @@ export default function EditorPage() {
       createdAt: new Date().toISOString(),
     });
 
-    setSavedMessage("Saved to Reusable Sequences");
+    setSavedMessage("Saved to Follow-up Plans");
     setTimeout(() => setSavedMessage(""), 2200);
   }
 
@@ -535,7 +535,7 @@ export default function EditorPage() {
         >
           <p className="muted" style={{ margin: 0, lineHeight: 1.65 }}>
             Free playbooks help you start quickly. Pro unlocks the deeper
-            library, builder, folders, and reusable sequence workflow.
+            library, builder, folders, and saved follow-up plan workflow.
           </p>
         </div>
 
@@ -833,9 +833,9 @@ export default function EditorPage() {
                 </div>
 
                 <div>
-                  <strong>Save Sequence Version</strong>
+                  <strong>Save as Follow-up Plan</strong>
                   <p className="muted" style={{ margin: "6px 0 0" }}>
-                    Save this as a reusable version inside your Reusable Sequences library.
+                    Save this inside your follow-up plan library.
                   </p>
                 </div>
               </div>
@@ -1091,7 +1091,7 @@ export default function EditorPage() {
                     className="button buttonSecondary"
                     onClick={() => void handleSaveSequenceVersion()}
                   >
-                    Save Sequence Version
+                    Save as Follow-up Plan
                   </button>
                 </div>
               ) : null}
@@ -1118,7 +1118,7 @@ export default function EditorPage() {
                 className="button buttonSecondary"
                 onClick={() => router.push("/custom-templates")}
               >
-                Go to Reusable Sequences
+                Go to Follow-up Plans
               </button>
             </div>
           </div>

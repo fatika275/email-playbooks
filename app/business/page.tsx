@@ -6,7 +6,7 @@ const businessFeatures = [
   "One shared prospect pipeline",
   "One payment for the business",
   "Full Pro access for up to 10 teammates",
-  "Secure shared templates and sequences",
+  "Secure shared templates and follow-up plans",
   "Owner-controlled invitations and removals",
   "Central Team Library",
 ];

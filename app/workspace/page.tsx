@@ -6,10 +6,10 @@ import { useAccount } from "@/components/account-provider";
 const workspaceItems = [
   {
     href: "/sequence-builder",
-    label: "Sequence Builder",
+    label: "Follow-up Builder",
     badge: "Pro",
     description:
-      "Build a multi-step sequence from proven playbook steps and save it for reuse.",
+      "Build a simple follow-up plan from proven messages and save it for reuse.",
   },
   {
     href: "/history",
@@ -20,17 +20,17 @@ const workspaceItems = [
   },
   {
     href: "/custom-templates",
-    label: "Reusable Sequences",
+    label: "Saved Follow-up Plans",
     badge: "Pro",
     description:
-      "Keep your strongest sequence versions and reuse them across campaigns.",
+      "Keep the follow-up plans that help you book more client work.",
   },
   {
     href: "/folders",
     label: "Folders",
     badge: "Pro",
     description:
-      "Group saved emails and reusable sequences by client, offer, or campaign.",
+      "Group saved emails and follow-up plans by client, offer, or campaign.",
   },
 ];
 
@@ -46,7 +46,7 @@ export default function WorkspacePage() {
             Keep your best outreach ready to reuse.
           </h1>
           <p className="muted" style={{ maxWidth: 760, lineHeight: 1.75 }}>
-            Find saved emails, reusable sequences, and campaign folders without
+            Find saved emails, follow-up plans, and campaign folders without
             mixing them into your active prospect pipeline.
           </p>
         </div>
@@ -60,7 +60,7 @@ export default function WorkspacePage() {
               Build it once. Reuse what works.
             </h2>
             <p className="muted" style={{ marginTop: 10, lineHeight: 1.75 }}>
-              Save strong drafts and sequences here, then organise them by client,
+              Save strong drafts and follow-up plans here, then organise them by client,
               offer, or campaign when your library grows.
             </p>
           </div>
