@@ -6,12 +6,9 @@ import { type CustomTemplate, useCustomTemplates } from "@/lib/storage";
 import { playbooks } from "@/lib/data";
 import { useAccount } from "@/components/account-provider";
 
-type GroupedTemplates = {
-  sourcePlaybookId: string;
+type EnrichedTemplate = CustomTemplate & {
   sourcePlaybookName: string;
-  items: (CustomTemplate & {
-    sourceTemplateLabel: string;
-  })[];
+  sourceTemplateLabel: string;
 };
 
 function getBodyPreview(body: string, maxLength = 140) {
@@ -23,20 +20,14 @@ function getBodyPreview(body: string, maxLength = 140) {
 export default function ReusableSequencesPage() {
   const { hasProAccess } = useAccount();
   const templates = useCustomTemplates();
-  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
   const [query, setQuery] = useState("");
-  const [playbookFilter, setPlaybookFilter] = useState("All");
   const [favoritesOnly, setFavoritesOnly] = useState(false);
   const [folderFilter, setFolderFilter] = useState("All");
   const [sortBy, setSortBy] = useState("newest");
 
-  const groupedTemplates = useMemo<GroupedTemplates[]>(() => {
-    const groups = new Map<
-      string,
-      (CustomTemplate & { sourceTemplateLabel: string })[]
-    >();
-
-    for (const template of templates) {
+  const enrichedTemplates = useMemo<EnrichedTemplate[]>(
+    () =>
+      templates.map((template) => {
       const sourcePlaybook = playbooks.find(
         (p) => p.id === template.sourcePlaybookId
       );
@@ -46,32 +37,13 @@ export default function ReusableSequencesPage() {
       );
 
       const sourceTemplateLabel = sourceTemplate?.label || "Saved Step";
-      const groupKey = template.sourcePlaybookId || "saved-sequences";
-
-      if (!groups.has(groupKey)) {
-        groups.set(groupKey, []);
-      }
-
-      groups.get(groupKey)?.push({
-        ...template,
-        sourceTemplateLabel,
-      });
-    }
-
-    return Array.from(groups.entries()).map(([sourcePlaybookId, items]) => {
-      const playbook = playbooks.find((p) => p.id === sourcePlaybookId);
-
       return {
-        sourcePlaybookId,
-        sourcePlaybookName: playbook?.name || "Saved Follow-up Plan",
-        items,
+        ...template,
+        sourcePlaybookName: sourcePlaybook?.name || "Saved Follow-up Plan",
+        sourceTemplateLabel,
       };
-    });
-  }, [templates]);
-
-  const playbookOptions = useMemo(
-    () => ["All", ...groupedTemplates.map((group) => group.sourcePlaybookName)],
-    [groupedTemplates]
+    }),
+    [templates]
   );
 
   const folderOptions = useMemo(
@@ -88,13 +60,11 @@ export default function ReusableSequencesPage() {
     [templates]
   );
 
-  const filteredGroups = useMemo(() => {
+  const visibleTemplates = useMemo(() => {
     const normalized = query.trim().toLowerCase();
 
-    return groupedTemplates
-      .map((group) => ({
-        ...group,
-        items: group.items.filter((template) => {
+    return enrichedTemplates
+      .filter((template) => {
           const matchesQuery =
             normalized.length === 0 ||
             [
@@ -102,54 +72,41 @@ export default function ReusableSequencesPage() {
               template.subject,
               template.body,
               template.sourceTemplateLabel,
-              group.sourcePlaybookName,
+              template.sourcePlaybookName,
+              template.folder ?? "",
+              ...template.tags,
             ]
               .join(" ")
               .toLowerCase()
               .includes(normalized);
 
-          const matchesPlaybook =
-            playbookFilter === "All" ||
-            group.sourcePlaybookName === playbookFilter;
-
           const matchesFavorite = !favoritesOnly || template.isFavorite;
           const matchesFolder =
             folderFilter === "All" || template.folder === folderFilter;
 
-          return matchesQuery && matchesPlaybook && matchesFavorite && matchesFolder;
-        }),
-      }))
-      .map((group) => ({
-        ...group,
-        items: [...group.items].sort((a, b) => {
-          if (sortBy === "oldest") {
-            return (
-              new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-            );
-          }
-
-          if (sortBy === "name") {
-            return a.title.localeCompare(b.title);
-          }
-
-          if (sortBy === "favorites") {
-            return Number(b.isFavorite) - Number(a.isFavorite);
-          }
-
+          return matchesQuery && matchesFavorite && matchesFolder;
+        })
+      .sort((a, b) => {
+        if (sortBy === "oldest") {
           return (
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
           );
-        }),
-      }))
-      .filter((group) => group.items.length > 0);
-  }, [groupedTemplates, query, playbookFilter, favoritesOnly, folderFilter, sortBy]);
+        }
 
-  function toggleGroup(groupId: string) {
-    setOpenGroups((prev) => ({
-      ...prev,
-      [groupId]: !prev[groupId],
-    }));
-  }
+        if (sortBy === "name") {
+          return a.title.localeCompare(b.title);
+        }
+
+        if (sortBy === "favorites") {
+          const favoriteOrder = Number(b.isFavorite) - Number(a.isFavorite);
+          if (favoriteOrder !== 0) return favoriteOrder;
+        }
+
+        return (
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+      });
+  }, [enrichedTemplates, query, favoritesOnly, folderFilter, sortBy]);
 
   if (!hasProAccess) {
     return (
@@ -242,7 +199,7 @@ export default function ReusableSequencesPage() {
         ) : (
           <div style={{ display: "grid", gap: 24 }}>
             <div className="glassCard" style={{ padding: 18 }}>
-              <div className="grid" style={{ gridTemplateColumns: "1.6fr 1fr 1fr 1fr" }}>
+              <div className="grid" style={{ gridTemplateColumns: "1.6fr 1fr 1fr" }}>
                 <div className="formGroup" style={{ marginBottom: 0 }}>
                   <label className="label">Search follow-up plans</label>
                   <input
@@ -254,22 +211,7 @@ export default function ReusableSequencesPage() {
                 </div>
 
                 <div className="formGroup" style={{ marginBottom: 0 }}>
-                  <label className="label">Filter by playbook</label>
-                  <select
-                    className="input"
-                    value={playbookFilter}
-                    onChange={(event) => setPlaybookFilter(event.target.value)}
-                  >
-                    {playbookOptions.map((option) => (
-                      <option key={option} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="formGroup" style={{ marginBottom: 0 }}>
-                  <label className="label">Folder</label>
+                  <label className="label">Campaign</label>
                   <select
                     className="input"
                     value={folderFilter}
@@ -277,7 +219,7 @@ export default function ReusableSequencesPage() {
                   >
                     {folderOptions.map((option) => (
                       <option key={option} value={option}>
-                        {option}
+                        {option === "All" ? "All campaigns" : option}
                       </option>
                     ))}
                   </select>
@@ -309,55 +251,26 @@ export default function ReusableSequencesPage() {
               </div>
             </div>
 
-            {filteredGroups.map((group) => {
-              const isOpen =
-                openGroups[group.sourcePlaybookId] === undefined
-                  ? true
-                  : openGroups[group.sourcePlaybookId];
-
-              return (
-                <section
-                  key={group.sourcePlaybookId}
-                  className="glassCard"
-                  style={{ padding: 20 }}
-                >
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      gap: 16,
-                      flexWrap: "wrap",
-                    }}
-                  >
-                    <div>
-                      <div className="badge">{group.sourcePlaybookName}</div>
-                      <p
-                        className="muted"
-                        style={{ marginTop: 10, marginBottom: 0 }}
-                      >
-                        {group.items.length} saved{" "}
-                        {group.items.length === 1 ? "plan" : "plans"}
-                      </p>
-                    </div>
-
-                    <button
-                      className="button buttonUtility"
-                      onClick={() => toggleGroup(group.sourcePlaybookId)}
-                    >
-                      {isOpen ? "Hide Plans" : "Show Plans"}
-                    </button>
+            {visibleTemplates.length > 0 ? (
+              <section className="glassCard" style={{ padding: 20 }}>
+                <div className="cardTop">
+                  <div>
+                    <div className="badge">Saved Plans</div>
+                    <p className="muted" style={{ marginTop: 10, marginBottom: 0 }}>
+                      {visibleTemplates.length} saved{" "}
+                      {visibleTemplates.length === 1 ? "plan" : "plans"}
+                    </p>
                   </div>
+                </div>
 
-                  {isOpen ? (
-                    <div
-                      style={{
-                        display: "grid",
-                        gap: 16,
-                        marginTop: 18,
-                      }}
-                    >
-                      {group.items.map((template) => (
+                <div
+                  style={{
+                    display: "grid",
+                    gap: 16,
+                    marginTop: 18,
+                  }}
+                >
+                      {visibleTemplates.map((template) => (
                         <Link
                           key={template.id}
                           href={`/custom-templates/${template.id}`}
@@ -383,7 +296,7 @@ export default function ReusableSequencesPage() {
                             <div style={{ marginTop: 8 }}>
                               {template.folder ? (
                                 <p className="small" style={{ margin: "0 0 8px" }}>
-                                  Folder: {template.folder}
+                                  Campaign: {template.folder}
                                 </p>
                               ) : null}
                               {template.tags.length > 0 ? (
@@ -399,7 +312,7 @@ export default function ReusableSequencesPage() {
                           ) : null}
 
                           <p className="small">
-                            From: {group.sourcePlaybookName} {"->"}{" "}
+                            Source: {template.sourcePlaybookName} {"->"}{" "}
                             {template.sourceTemplateLabel}
                           </p>
 
@@ -415,17 +328,15 @@ export default function ReusableSequencesPage() {
                           </p>
                         </Link>
                       ))}
-                    </div>
-                  ) : null}
-                </section>
-              );
-            })}
+                </div>
+              </section>
+            ) : null}
 
-            {filteredGroups.length === 0 ? (
+            {visibleTemplates.length === 0 ? (
               <div className="glassCard emptyState">
                 <h3 className="cardTitle">No follow-up plans match that search</h3>
                 <p className="muted" style={{ maxWidth: 620, marginInline: "auto" }}>
-                  Try clearing the filter or use a broader keyword from the
+                  Try clearing the filters or use a broader keyword from the
                   title, subject, or message body.
                 </p>
               </div>
