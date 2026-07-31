@@ -3,12 +3,13 @@ import { CheckoutButton } from "@/components/checkout-button";
 
 const businessFeatures = [
   "Everything in Pro",
-  "One shared pipeline for stages, replies, and handoffs",
+  "Shared access for the people handling leads",
+  "Shared notes, activity, stages, replies, and handoffs",
   "One payment for the business",
   "Full Pro access for up to 10 teammates",
-  "Secure shared templates and follow-up plans",
+  "Shared lead-capture messages and follow-up plans",
   "Owner-controlled invitations and removals",
-  "Central Team Library",
+  "Team visibility to avoid duplicate chasing",
 ];
 
 export default function BusinessPage() {
@@ -19,12 +20,13 @@ export default function BusinessPage() {
           <div>
             <div className="badge">Business Pro</div>
             <h1 className="pageTitle" style={{ marginTop: 14 }}>
-              One shared place for lead stages, replies, and handoffs.
+              One shared place for the team handling leads.
             </h1>
             <p className="muted" style={{ marginTop: 14, lineHeight: 1.75 }}>
-              For small teams where more than one person touches a lead. Keep
-              follow-ups, replies, booked calls, and deal handoffs visible
-              instead of scattered across individual inboxes.
+              For small agencies where the founder is not the only person
+              chasing replies. Keep notes, follow-ups, booked calls, and deal
+              handoffs visible so the team avoids duplicate work and missed
+              leads.
             </p>
 
             <ul className="featureList">
@@ -41,7 +43,7 @@ export default function BusinessPage() {
             </h2>
             <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
               Only the workspace owner is billed. Invite teammates after payment
-              so everyone works from the same client-work pipeline.
+              so everyone works from the same pipeline, notes, and next actions.
             </p>
             <div style={{ marginTop: 20 }}>
               <CheckoutButton plan="business">Start Business Pro</CheckoutButton>

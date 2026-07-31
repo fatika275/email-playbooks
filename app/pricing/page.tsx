@@ -27,7 +27,7 @@ export default function PricingPage() {
             }}
           >
             Start free, choose Pro when outreach becomes daily work, or Business
-            Pro when a small team needs one shared pipeline from lead to booked deal.
+            Pro when a small team needs shared visibility from lead to booked deal.
           </p>
 
           <p
@@ -169,16 +169,17 @@ export default function PricingPage() {
             </h2>
 
             <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
-              One shared pipeline for small teams handling outreach, replies,
-              handoffs, and active deals together.
+              Shared access, notes, and pipeline visibility for small teams
+              handling leads together.
             </p>
 
             <ul className="featureList">
               <li>Everything in Pro</li>
               <li>One shared pipeline from lead to booked work</li>
+              <li>Shared notes and activity history</li>
               <li>10 teammate seats included</li>
               <li>Full Pro access for every active member</li>
-              <li>Secure team templates and follow-up plans</li>
+              <li>Shared lead-capture messages and follow-up plans</li>
               <li>Owner-managed access</li>
             </ul>
 
@@ -219,8 +220,9 @@ export default function PricingPage() {
               <div className="glassCard" style={{ padding: 20 }}>
                 <h3 className="cardTitle">Business Pro</h3>
                 <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
-                  Best when more than one person touches leads and handoffs
-                  need to stay visible.
+                  Best when more than one person handles leads and the team
+                  needs shared visibility to avoid duplicate chasing and missed
+                  follow-ups.
                 </p>
               </div>
 

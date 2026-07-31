@@ -322,7 +322,8 @@ export default function TeamLibraryPage() {
           <div className="glassCard emptyState">
             <h1 className="pageTitle">Team sharing is a Pro feature</h1>
             <p className="muted">
-              Upgrade to share saved messages and follow-up plans securely.
+              Upgrade when more than one person needs shared access to lead
+              notes, follow-ups, and outreach.
             </p>
             <Link href="/pricing" className="button buttonPrimary">
               View Pro
@@ -339,11 +340,11 @@ export default function TeamLibraryPage() {
         <div className="pageHeader">
           <div className="badge">Team workspace</div>
           <h1 className="pageTitle" style={{ marginTop: 14 }}>
-            Keep your agency aligned.
+            Keep everyone handling leads on the same page.
           </h1>
           <p className="muted" style={{ maxWidth: 760, lineHeight: 1.75 }}>
-            Manage who can work with leads, see what needs attention, and keep
-            useful outreach shared across the team.
+            Give teammates shared access, shared notes, and shared visibility
+            so nobody duplicates chasing or lets a good lead slip.
           </p>
         </div>
 
@@ -371,7 +372,7 @@ export default function TeamLibraryPage() {
         </div>
 
         {teamView === "workspace" && (notifications.length || overdueTasks.length) ? <section className="teamAttentionPanel">
-          <div className="cardTop"><div><h2 className="sectionTitle">Needs attention</h2><p className="muted">Overdue work and unread team updates.</p></div><span className="statusPill">{notifications.filter((item) => !item.read_at).length + overdueTasks.length}</span></div>
+          <div className="cardTop"><div><h2 className="sectionTitle">Needs attention</h2><p className="muted">Overdue follow-ups and unread lead updates.</p></div><span className="statusPill">{notifications.filter((item) => !item.read_at).length + overdueTasks.length}</span></div>
           <div className="prospectTimeline">{overdueTasks.map((task) => <div key={`overdue-${task.id}`} className="prospectTimelineItem"><span className="miniBadge">Overdue</span><div><Link href={`/prospects/${task.prospects.id}`}><strong>{getProspectTaskDisplayTitle(task.title)}</strong></Link><p className="small">{task.prospects.full_name} · Due {task.due_date}</p></div></div>)}{notifications.slice(0, 8).map((item) => <div key={item.id} className="prospectTimelineItem"><span className="miniBadge">{item.kind}</span><div><Link href={item.href || "/team"} onClick={() => void markWorkspaceNotificationRead(item.id)}><strong>{item.title}</strong></Link><p className="small">{item.body || "Workspace update"} · {new Date(item.created_at).toLocaleString()}</p></div></div>)}</div>
         </section> : null}
 
@@ -382,7 +383,7 @@ export default function TeamLibraryPage() {
                 <span className="miniBadge">Active workspace</span>
                 <h2 className="pageTitle">{workspace.name}</h2>
                 <p className="muted" style={{ margin: "8px 0 0" }}>
-                  One shared place for agency leads, follow-ups, and outreach.
+                  One shared place for lead notes, follow-ups, outreach, and handoffs.
                 </p>
               </div>
               <Link href="/prospects" className="button buttonPrimary">Open shared pipeline</Link>
@@ -396,7 +397,7 @@ export default function TeamLibraryPage() {
             </div>
 
             <section className="teamPeopleSection">
-              <div className="teamPeopleHeading"><div className="teamSectionHeading"><h3 className="sectionTitle">People</h3><p className="muted">Member for everyday work. Admin for managing team access.</p></div>{workspaces.find((item) => item.id === workspace.id)?.access_role !== "member" ? <button className={`button ${showInvite ? "buttonSecondary" : "buttonPrimary"}`} onClick={() => setShowInvite((current) => !current)}>{showInvite ? "Close invite" : "Invite teammate"}</button> : null}</div>
+              <div className="teamPeopleHeading"><div className="teamSectionHeading"><h3 className="sectionTitle">People</h3><p className="muted">Member for handling leads. Admin for managing team access.</p></div>{workspaces.find((item) => item.id === workspace.id)?.access_role !== "member" ? <button className={`button ${showInvite ? "buttonSecondary" : "buttonPrimary"}`} onClick={() => setShowInvite((current) => !current)}>{showInvite ? "Close invite" : "Invite teammate"}</button> : null}</div>
 
             {showInvite && workspaces.find((item) => item.id === workspace.id)?.access_role !== "member" ? <><div
               className="businessInviteGrid"
@@ -416,7 +417,7 @@ export default function TeamLibraryPage() {
                 />
               </div>
               <div className="formGroup" style={{ marginBottom: 0 }}>
-                <label className="label inviteRoleLabel" htmlFor="business-invite-role"><span>Access level</span><span>Member for most people; Admin can manage teammates.</span></label>
+                <label className="label inviteRoleLabel" htmlFor="business-invite-role"><span>Access level</span><span>Member can work leads; Admin can manage teammates.</span></label>
                 <select id="business-invite-role" className="input" value={inviteRole} onChange={(event) => setInviteRole(event.target.value as "admin" | "member")}>
                   <option value="member">Member - works in the workspace</option>
                   <option value="admin">Admin - also manages teammates</option>
@@ -452,13 +453,13 @@ export default function TeamLibraryPage() {
                   </details> : null}
                 </div>
               ))}
-              {members.length === 0 ? <p className="muted">No teammates yet. Invite the first person when you are ready to share the pipeline.</p> : null}
+              {members.length === 0 ? <p className="muted">No teammates yet. Invite the first person when someone else starts handling leads with you.</p> : null}
             </div>
             </section>
 
             <details className="teamActivitySection teamActivityDisclosure">
               <summary><strong>Workspace activity</strong><span>{filteredActivity.length} useful updates</span></summary>
-              <div className="teamActivityControls"><div><h3 className="cardTitle">Recent activity</h3><p className="small">Key updates hide routine edits so important outreach and task changes stay visible.</p></div><select className="input" value={activityFilter} onChange={(event) => { setActivityFilter(event.target.value as "key" | "outreach" | "tasks" | "all"); setShowAllActivity(false); }} aria-label="Filter workspace activity"><option value="key">Key updates</option><option value="outreach">Outreach only</option><option value="tasks">Tasks only</option><option value="all">All changes</option></select></div>
+              <div className="teamActivityControls"><div><h3 className="cardTitle">Recent activity</h3><p className="small">See who touched each lead so handoffs stay clear and nobody chases twice.</p></div><select className="input" value={activityFilter} onChange={(event) => { setActivityFilter(event.target.value as "key" | "outreach" | "tasks" | "all"); setShowAllActivity(false); }} aria-label="Filter workspace activity"><option value="key">Key updates</option><option value="outreach">Outreach only</option><option value="tasks">Tasks only</option><option value="all">All changes</option></select></div>
               <div className="prospectTimeline">
                 {visibleActivity.map((item) => (
                   <div key={item.id} className="prospectTimelineItem">
@@ -486,15 +487,16 @@ export default function TeamLibraryPage() {
               Your access is covered by your business
             </h2>
             <p className="muted" style={{ margin: "8px 0 0" }}>
-              You receive full Pro access through this team membership. You do
-              not need a separate paid subscription.
+              You can work from the shared pipeline, notes, outreach, and
+              follow-ups without a separate paid subscription.
             </p>
           </section>
         ) : (
           <section className="glassCard" style={{ padding: 22, marginBottom: 22 }}>
             <h2 className="cardTitle">Need access for a whole business?</h2>
             <p className="muted" style={{ margin: "8px 0 14px" }}>
-              Business Pro gives one payer and up to 10 teammates full Pro access.
+              Business Pro gives one payer, shared lead visibility, and up to
+              10 teammates full Pro access.
             </p>
             <Link href="/business" className="button buttonPrimary">
               View Business Pro
@@ -504,7 +506,7 @@ export default function TeamLibraryPage() {
 
         {teamView === "library" ? <>
         <div className="teamLibraryActions">
-          <div><h2 className="sectionTitle">Shared outreach library</h2><p className="muted">Send useful messages and follow-up plans to teammates, or save items they shared with you.</p></div>
+          <div><h2 className="sectionTitle">Shared outreach library</h2><p className="muted">Keep the messages and follow-up plans that win replies available to everyone handling leads.</p></div>
           <div className="toolbar">
           <button
             className="button buttonSecondary"
@@ -534,7 +536,7 @@ export default function TeamLibraryPage() {
         </div>
 
         <section className="section sharedLibrarySection">
-          <div className="teamSectionHeading"><h2 className="sectionTitle">{libraryView === "incoming" ? "Shared with me" : "Shared by me"}</h2><p className="muted">{libraryView === "incoming" ? "Messages and follow-up plans teammates have sent to your account." : "Items you have made available to other teammates."}</p></div>
+          <div className="teamSectionHeading"><h2 className="sectionTitle">{libraryView === "incoming" ? "Shared with me" : "Shared by me"}</h2><p className="muted">{libraryView === "incoming" ? "Lead-capture messages and follow-up plans teammates have sent to your account." : "Items you have made available so teammates can chase leads consistently."}</p></div>
           <div className="workspaceGrid" style={{ marginTop: 16 }}>
             {visibleShares.map((share) => (
               <article key={share.id} className="glassCard workspaceCard">
