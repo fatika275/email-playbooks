@@ -3,7 +3,7 @@ import { CheckoutButton } from "@/components/checkout-button";
 
 const businessFeatures = [
   "Everything in Pro",
-  "One shared pipeline from outreach to booked work",
+  "One shared pipeline for stages, replies, and handoffs",
   "One payment for the business",
   "Full Pro access for up to 10 teammates",
   "Secure shared templates and follow-up plans",
@@ -19,7 +19,7 @@ export default function BusinessPage() {
           <div>
             <div className="badge">Business Pro</div>
             <h1 className="pageTitle" style={{ marginTop: 14 }}>
-              One shared place for leads, replies, and handoffs.
+              One shared place for lead stages, replies, and handoffs.
             </h1>
             <p className="muted" style={{ marginTop: 14, lineHeight: 1.75 }}>
               For small teams where more than one person touches a lead. Keep

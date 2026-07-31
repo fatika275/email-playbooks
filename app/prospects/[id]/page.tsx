@@ -645,10 +645,10 @@ export default function ProspectDetailPage() {
         {showOnboardingGuide ? (
           <section className="prospectOnboarding prospectOnboardingDetail">
             <div>
-              <span className="miniBadge">First client-work setup</span>
-              <h2 className="sectionTitle">Turn this lead into an action plan</h2>
+              <span className="miniBadge">Pipeline setup</span>
+              <h2 className="sectionTitle">Give this lead a stage and a next action</h2>
               <p className="muted">
-                Choose a follow-up plan, open the first message, then schedule the first reminder so this lead does not disappear after the first touch.
+                Choose a follow-up plan, open the first message, then keep the stage and next reminder clear so this lead does not disappear after the first touch.
               </p>
             </div>
             <div className="prospectOnboardingSteps">
@@ -687,7 +687,7 @@ export default function ProspectDetailPage() {
               <div className="formGroup"><label className="label">Lead source</label><input className="input" value={source} onChange={(event) => setSource(event.target.value)} placeholder="Referral, LinkedIn, event..." /></div>
             </div>
 
-            <div className="prospectSectionHeader"><h2 className="cardTitle">Deal fit and follow-up</h2></div>
+            <div className="prospectSectionHeader"><h2 className="cardTitle">Stage, value, and next action</h2></div>
             <div className="prospectFormGrid">
               <div className="formGroup"><label className="label">Client work stage</label><select className="input" value={stage} onChange={(event) => setStage(event.target.value as ProspectStage)}>{PROSPECT_STAGES.map((option) => <option key={option} value={option}>{PROSPECT_STAGE_LABELS[option]}</option>)}</select></div>
               <div className="formGroup"><label className="label">Potential client work value (GBP)</label><input className="input" type="number" min="0" value={value} onChange={(event) => setValue(event.target.value)} /><p className="small" style={{ margin: "6px 0 0" }}>Use the full fixed, calculated monthly, or annual value of the client work this lead could become.</p></div>
@@ -701,7 +701,7 @@ export default function ProspectDetailPage() {
 
             <section className="prospectOpsPanel proposalWorkflowPanel" hidden={detailView !== "followup"}>
               <div className="proposalWorkflowHeader">
-                <div><span className="miniBadge">Follow-up plan</span><h2 className="cardTitle">{nextProposalTask ? "Next message to send" : "Start follow-up reminders"}</h2><p className="small">{nextProposalTask ? "Work through the active reminders for this lead. Opening a message loads the right template for the current step." : "Choose a saved plan, set the start date, and create reminders that keep this lead moving toward client work."}</p></div>
+                <div><span className="miniBadge">Follow-up plan</span><h2 className="cardTitle">{nextProposalTask ? "Next message to send" : "Start follow-up reminders"}</h2><p className="small">{nextProposalTask ? "Work through the active reminders for this lead. Opening a message loads the right template for the current step." : "Choose a saved plan, set the start date, and create reminders that keep the next action visible."}</p></div>
                 {activeProposalTasks.length ? <span className="statusPill statusPillSuccess">{activeProposalTasks.length} reminder{activeProposalTasks.length === 1 ? "" : "s"} active</span> : <span className="statusPill">No plan running</span>}
               </div>
               {!nextProposalTask ? <><div className="proposalWorkflowForm">
@@ -780,7 +780,7 @@ export default function ProspectDetailPage() {
             <div className={detailView === "overview" ? "prospectOpsGrid isHidden" : "prospectOpsGrid prospectOpsGridSingle"}>
               <section className="prospectOpsPanel" hidden={detailView !== "followup"}>
                 <div className="prospectSectionHeader"><h2 className="cardTitle">Lead actions and reminders</h2></div>
-                <p className="small">Only open actions appear here. Completed work is archived automatically so the list stays focused on what could move the lead forward.</p>
+                <p className="small">Only open actions appear here. Completed work is archived automatically so the list stays focused on the next move for this stage.</p>
                 <div className="formGroup"><label className="label">Next action</label><input className="input" value={taskTitle} onChange={(event) => setTaskTitle(event.target.value)} placeholder="Send case study, call decision-maker..." /></div>
                 <div className="prospectTaskForm">
                   <input className="input" type="date" value={taskDueDate} onChange={(event) => setTaskDueDate(event.target.value)} aria-label="Task due date" />
@@ -845,7 +845,7 @@ export default function ProspectDetailPage() {
           <aside className="prospectActionPanel">
             <h2 className="cardTitle">Next best move</h2>
             <p className="muted" style={{ marginTop: 8, lineHeight: 1.7 }}>
-              Turn the account context into a relevant message, then come back to log the touch and schedule the next follow-up.
+              Use the lead context to send the right message, then come back to update the stage, log the touch, and schedule the next action.
             </p>
             <div style={{ display: "grid", gap: 10, marginTop: 18 }}>
               <button className="button buttonPrimary" onClick={handleDraftOutreach}>Draft next message</button>

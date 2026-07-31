@@ -134,11 +134,11 @@ export default function PricingPage() {
 
             <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
               For agency owners and founders who need one place to manage
-              outreach, follow-up, replies, and booked-work opportunities.
+              lead stages, replies, follow-ups, next actions, and booked-work opportunities.
             </p>
 
             <ul className="featureList">
-              <li>Prospect pipeline from first email to booked work</li>
+              <li>Pipeline tracking for stages, replies, and next actions</li>
               <li>Full lead capture and outreach library</li>
               <li>Full follow-up builder</li>
               <li>Unlimited saved emails and folders</li>

@@ -421,7 +421,7 @@ export default function AccountPage() {
                       <Link href="/prospects" className="accountSetupStep">
                         <strong>2</strong>
                         <span>Add a lead</span>
-                        <small>Put a real prospect into the client-work pipeline.</small>
+                        <small>Track stage, reply status, and the next action.</small>
                       </Link>
                       <Link href="/sequence-builder" className="accountSetupStep">
                         <strong>3</strong>
@@ -440,7 +440,7 @@ export default function AccountPage() {
                 <div className="accountQuickLinks">
                   <Link href="/prospects" className="glassCard clickable accountQuickLink">
                     <strong>Open pipeline</strong>
-                    <span className="muted">Track leads, replies, and follow-ups</span>
+                    <span className="muted">Track stages, replies, and next actions</span>
                   </Link>
 
                   <Link href="/library" className="glassCard clickable accountQuickLink">

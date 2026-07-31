@@ -16,7 +16,7 @@ const workflow = [
   },
   {
     title: "Turn interest into booked work",
-    text: "Track who replied, who needs chasing, and which deals are close to slipping.",
+    text: "See who replied, what stage they are in, and what needs to happen next.",
   },
 ];
 
@@ -62,8 +62,8 @@ export default function HomePage() {
       <ScrollReveal as="section" className="container section" delay={80}>
         <div className="homeMetrics">
           <div>
-            <strong>One client-work pipeline</strong>
-            <span>First emails, replies, booked calls, and active deals</span>
+            <strong>Pipeline tracking</strong>
+            <span>Replies, stages, next actions, booked calls, and active deals</span>
           </div>
           <div>
             <strong>{playbooks.length}+ outreach playbooks</strong>
@@ -81,9 +81,9 @@ export default function HomePage() {
           <div>
             <h2 className="pageTitle">A simple path from first email to booked work</h2>
             <p className="muted">
-              Keep messages, follow-ups, stages, and next actions beside each
-              lead so promising client work does not disappear in inboxes,
-              spreadsheets, or handoffs.
+              Lead Capture helps you start conversations. Pipeline Tracking
+              shows where each replied lead is, what stage they are in, and
+              what needs to happen next so deals do not disappear in handoffs.
             </p>
           </div>
         </div>

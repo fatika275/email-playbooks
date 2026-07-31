@@ -2,7 +2,7 @@ import Link from "next/link";
 import { CheckoutButton } from "@/components/checkout-button";
 
 const proFeatures = [
-  "Prospect pipeline from first email to booked work",
+  "Pipeline tracking for stages, replies, and next actions",
   "Full lead capture and outreach library",
   "Full follow-up builder",
   "Unlimited saved emails and folders",
@@ -21,9 +21,9 @@ export default function ProPage() {
               Book more client work without losing leads in the follow-up.
             </h1>
             <p className="muted" style={{ marginTop: 14, lineHeight: 1.75 }}>
-              Pro is for agency owners and founders who need outreach, replies,
-              follow-ups, and active deals in one place instead of scattered
-              across inboxes, notes, and memory.
+              Pro is for agency owners and founders who need to know where each
+              lead is, what stage it is in, and what needs to happen next after
+              someone replies.
             </p>
           </div>
 
