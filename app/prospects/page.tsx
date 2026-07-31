@@ -1025,7 +1025,7 @@ export default function ProspectsPage() {
           </div>
         ) : view === "today" ? (
           <div className="prospectViewSection">
-          <div className="prospectViewHeading"><h2 className="sectionTitle">Today&apos;s pipeline actions</h2><p className="muted">Start here each day to see what needs a reply, what needs a stage move, and which deals need chasing.</p></div>
+          <div className="prospectViewHeading"><h2 className="sectionTitle">Today&apos;s pipeline actions</h2><p className="muted">Start here each day to see what needs a reply, what needs a stage move, and which deals could be lost by delay.</p></div>
           <div className="prospectTodayGrid">
             <section className="prospectTodayPanel">
               <div className="prospectSectionHeader"><h2 className="cardTitle">Actions due</h2></div>
@@ -1072,7 +1072,7 @@ export default function ProspectsPage() {
                       ? `${dailyDashboard.priorityItems.length} useful action${dailyDashboard.priorityItems.length === 1 ? "" : "s"} to handle.`
                       : "You are clear for today."}
                 </h2>
-                <p className="muted">Start with the action most likely to move a lead to the next stage, then chase proposals and rescue slipping deals.</p>
+                <p className="muted">Start with the action most likely to move a lead to the next stage, then use follow-up reminders and context to rescue slipping deals.</p>
                 <div className="prospectFocusSummary" aria-label="Pipeline summary">
                   <span>{dailyDashboard.followUpsDue} follow-up{dailyDashboard.followUpsDue === 1 ? "" : "s"} due</span>
                   <span>{dailyDashboard.replyNeeded.length} repl{dailyDashboard.replyNeeded.length === 1 ? "y" : "ies"} waiting</span>
@@ -1115,7 +1115,7 @@ export default function ProspectsPage() {
                   {dailyDashboard.supportingItems.length === 0 ? (
                     <div className="prospectDailyEmpty">
                       <strong>No extra work queued</strong>
-                      <p className="muted">Handle the main action above, or add leads and schedule follow-ups when you want to create the next set of pipeline actions.</p>
+                      <p className="muted">Handle the main action above, or add leads and schedule follow-ups so delay does not become a lost deal.</p>
                       <div className="prospectExampleList">
                         <span>Example: Chase proposal decision</span>
                         <span>Example: Rescue a lead after 14 quiet days</span>

@@ -11,8 +11,8 @@ const workflow = [
     text: "Keep every new lead, reply, and handoff in one place before it gets lost.",
   },
   {
-    title: "Follow up at the right time",
-    text: "Use practical messages and reminders to move prospects toward a booked call.",
+    title: "Stop delay killing deals",
+    text: "Use saved follow-ups, reminders, and lead context so warm prospects do not go quiet.",
   },
   {
     title: "Turn interest into booked work",
@@ -37,7 +37,7 @@ export default function HomePage() {
           <p className="homeHeroText">
             Thalovo helps agency owners, founders, and small sales teams move
             prospects from first email to booked call to active deal, without
-            messy tracking or manual chasing.
+            messy tracking, delayed follow-up, or manual chasing.
           </p>
 
           <div className="heroActions homeHeroActions">
@@ -70,8 +70,8 @@ export default function HomePage() {
             <span>Templates for starting conversations and getting more replies</span>
           </div>
           <div>
-            <strong>Fewer slipped leads</strong>
-            <span>Daily actions for follow-ups, replies, proposals, and cold leads</span>
+            <strong>Follow-up management</strong>
+            <span>Reminders, saved follow-ups, and context for leads that need chasing</span>
           </div>
         </div>
       </ScrollReveal>
@@ -81,9 +81,10 @@ export default function HomePage() {
           <div>
             <h2 className="pageTitle">A simple path from first email to booked work</h2>
             <p className="muted">
-              Lead Capture helps you start conversations. Pipeline Tracking
-              shows where each replied lead is, what stage they are in, and
-              what needs to happen next so deals do not disappear in handoffs.
+              Lead Capture helps you start conversations. Pipeline Tracking is
+              the heart of the workflow. Follow-up Management sits underneath
+              it, keeping reminders, saved messages, and lead context close so
+              deals are not lost by delay.
             </p>
           </div>
         </div>
@@ -111,9 +112,9 @@ export default function HomePage() {
               Every lead needs a clear next action.
             </h2>
             <p className="muted" style={{ marginTop: 12, maxWidth: 680 }}>
-              Start from a prospect, send the right message, schedule the next
-              follow-up, and keep moving until there is a booked call, active
-              deal, win, or clean close.
+              Start from a prospect, see the context, send the right follow-up,
+              schedule the next reminder, and keep moving until there is a
+              booked call, active deal, win, or clean close.
             </p>
           </div>
 

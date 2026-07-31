@@ -15,7 +15,7 @@ export default function PricingPage() {
           <div className="badge">Pricing</div>
 
           <h1 className="pageTitle" style={{ marginTop: 14 }}>
-            Choose how much follow-up structure you need
+            Choose how much follow-up control you need
           </h1>
 
           <p
@@ -26,8 +26,9 @@ export default function PricingPage() {
               lineHeight: 1.75,
             }}
           >
-            Start free, choose Pro when outreach becomes daily work, or Business
-            Pro when a small team needs shared visibility from lead to booked deal.
+            Start free, choose Pro when leads need proper pipeline and
+            follow-up management, or Business Pro when a small team needs
+            shared visibility from lead to booked deal.
           </p>
 
           <p
@@ -134,15 +135,16 @@ export default function PricingPage() {
 
             <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
               For agency owners and founders who need one place to manage
-              lead stages, replies, follow-ups, next actions, and booked-work opportunities.
+              lead stages, replies, reminders, saved follow-ups, and
+              booked-work opportunities.
             </p>
 
             <ul className="featureList">
               <li>Pipeline tracking for stages, replies, and next actions</li>
               <li>Full lead capture and outreach library</li>
-              <li>Full follow-up builder</li>
+              <li>Follow-up management for deals that need chasing</li>
               <li>Unlimited saved emails and folders</li>
-              <li>Saved follow-up plan library</li>
+              <li>Saved follow-up plan library and reminders</li>
               <li>Branded HTML export</li>
             </ul>
 
@@ -197,7 +199,7 @@ export default function PricingPage() {
             <div className="badge">What changes across plans</div>
 
             <h2 className="pageTitle" style={{ marginTop: 14 }}>
-              More structure, fewer slipped leads
+              Pipeline first, follow-up right behind it
             </h2>
 
             <div className="grid" style={{ marginTop: 20 }}>
@@ -212,8 +214,8 @@ export default function PricingPage() {
               <div className="glassCard" style={{ padding: 20 }}>
                 <h3 className="cardTitle">Pro</h3>
                 <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
-                  Better if leads are coming in, follow-up is messy, and you
-                  need a daily view of what to chase next.
+                  Better if leads are coming in, deals are getting lost by
+                  delay, and you need a daily view of what to chase next.
                 </p>
               </div>
 

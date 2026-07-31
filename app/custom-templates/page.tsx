@@ -127,8 +127,8 @@ export default function ReusableSequencesPage() {
             </h1>
             <p className="muted" style={{ maxWidth: 680, marginInline: "auto" }}>
               Free access includes the core playbooks. Pro unlocks reusable
-              follow-up plans, folders, the builder, and the full playbook
-              library.
+              follow-up plans, reminders, folders, and the full playbook
+              library for leads that need chasing.
             </p>
             <div className="toolbar" style={{ justifyContent: "center", marginTop: 20 }}>
               <Link href="/pricing" className="button buttonPrimary">
@@ -153,8 +153,8 @@ export default function ReusableSequencesPage() {
             Your Follow-up Plan Library
           </h1>
           <p className="muted">
-            Save the follow-up plans that help you book more client work
-            over time.
+            Keep the saved follow-ups you use when deals need another nudge,
+            more context, or a timely reminder.
           </p>
         </div>
 
@@ -163,8 +163,8 @@ export default function ReusableSequencesPage() {
             <h3 className="cardTitle">No follow-up plans yet</h3>
 
             <p className="muted" style={{ maxWidth: 620, marginInline: "auto" }}>
-              Create your first email, save the version you want to keep, and
-              it will appear here as a saved follow-up plan.
+              Build your first follow-up plan, save the version you want to
+              reuse, and it will appear here for the next lead that goes quiet.
             </p>
 
             <div
@@ -179,7 +179,7 @@ export default function ReusableSequencesPage() {
               <div className="glassCard" style={{ padding: 14 }}>
                 <strong>1. Create</strong>
                 <p className="muted" style={{ margin: "6px 0 0" }}>
-                  Start from lead capture and outreach when you need a message.
+                  Start from the follow-up builder when a lead needs chasing.
                 </p>
               </div>
 
@@ -193,7 +193,8 @@ export default function ReusableSequencesPage() {
               <div className="glassCard" style={{ padding: 14 }}>
                 <strong>3. Reuse</strong>
                 <p className="muted" style={{ margin: "6px 0 0" }}>
-                  Come back anytime and open it as part of your follow-up plan library.
+                  Attach it to a lead when you need the next reminder and
+                  message ready.
                 </p>
               </div>
             </div>

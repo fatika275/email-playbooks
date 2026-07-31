@@ -170,12 +170,12 @@ export default function SequenceBuilderPage() {
           <div className="glassCard emptyState">
             <div className="badge">Pro Workflow</div>
             <h1 className="pageTitle" style={{ marginTop: 14 }}>
-              Follow-up Builder is a Pro feature
+              Follow-up management is a Pro feature
             </h1>
             <p className="muted" style={{ maxWidth: 680, marginInline: "auto" }}>
               Free access lets you use the core playbooks. Pro unlocks the
-              builder so you can save the exact follow-up plan you use to move
-              leads toward booked calls.
+              reminders, saved follow-ups, and lead context you need to stop
+              warm deals going quiet.
             </p>
             <div className="toolbar" style={{ justifyContent: "center", marginTop: 20 }}>
               <Link href="/pricing" className="button buttonPrimary">
@@ -280,12 +280,12 @@ export default function SequenceBuilderPage() {
           <div>
             <div className="badge">Follow-ups</div>
             <h1 className="pageTitle" style={{ marginTop: 14 }}>
-              Create a plan for chasing warm leads.
+              Manage the follow-ups that stop warm leads slipping.
             </h1>
             <p className="muted">
-              A follow-up plan is the set of messages and reminder days you use
-              after the first touch, so promising leads keep moving toward a
-              booked call instead of going quiet.
+              Deals are often lost by delay, not rejection. Build the saved
+              messages and reminder days you use after the first touch, then
+              attach the plan to a lead so every chase has context.
             </p>
           </div>
           <div className="builderHeroActions">
@@ -299,7 +299,7 @@ export default function SequenceBuilderPage() {
           <div className="builderLibrary glassCard">
             <div className="builderPanelHeader">
               <div>
-                <span className="miniBadge">Message library</span>
+                <span className="miniBadge">Follow-up messages</span>
                 <h2 className="cardTitle">Add messages to the plan</h2>
               </div>
               <span className="small">{filteredTemplateOptions.length} available</span>
@@ -386,7 +386,8 @@ export default function SequenceBuilderPage() {
                 <div className="builderEmptyPanel">
                   <strong>Start with one message</strong>
                   <p className="muted">
-                    Choose a message from the left. It will appear here with a day number you can change.
+                    Choose the first chase message. It will appear here with a
+                    reminder day you can change.
                   </p>
                 </div>
               ) : (

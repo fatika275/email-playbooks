@@ -3,10 +3,11 @@ import { CheckoutButton } from "@/components/checkout-button";
 
 const proFeatures = [
   "Pipeline tracking for stages, replies, and next actions",
+  "Follow-up management for deals that stall by delay",
   "Full lead capture and outreach library",
-  "Full follow-up builder",
+  "Saved follow-up plans and reminder timing",
   "Unlimited saved emails and folders",
-  "Saved follow-up plan library",
+  "Easy lead context before every chase",
   "HTML export for more polished sending",
 ];
 
@@ -22,8 +23,8 @@ export default function ProPage() {
             </h1>
             <p className="muted" style={{ marginTop: 14, lineHeight: 1.75 }}>
               Pro is for agency owners and founders who need to know where each
-              lead is, what stage it is in, and what needs to happen next after
-              someone replies.
+              lead is, what stage it is in, and which follow-up needs to happen
+              before delay turns interest into silence.
             </p>
           </div>
 
@@ -60,7 +61,8 @@ export default function ProPage() {
               <h2 className="cardTitle">Best for</h2>
               <p className="muted" style={{ marginTop: 10, lineHeight: 1.75 }}>
                 Small agency owners, founders, and lean sales teams that have
-                leads coming in but need cleaner follow-up, tracking, and handoff.
+                leads coming in but need cleaner pipeline tracking, follow-up
+                reminders, and handoff.
               </p>
             </div>
 
