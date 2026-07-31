@@ -245,12 +245,12 @@ export default function PlaybookPage() {
           <div style={{ maxWidth: 760 }}>
             <p className="sequenceEyebrow">Outreach + Education</p>
             <h2 className="sequenceTitle">
-              Choose the message that helps this lead reply
+              Choose the message for this sales moment
             </h2>
             <p className="muted" style={{ marginTop: 14, lineHeight: 1.8 }}>
-              Each message gives you the goal, timing context, what success
-              looks like, and what to do next, so you can start conversations
-              faster without rewriting every email from scratch.
+              Each message is grouped around a clear use case, with the goal,
+              timing context, expected outcome, and next step included so you
+              can move faster without rewriting from scratch.
             </p>
             <div className="toolbar" style={{ marginTop: 18 }}>
               <Link href="/sequence-builder" className="button buttonSecondary">
@@ -261,12 +261,17 @@ export default function PlaybookPage() {
 
           <div className="sequenceMeta">
             <div className="sequenceMetaItem">
-              <span className="sequenceMetaLabel">Audience</span>
+              <span className="sequenceMetaLabel">Client type</span>
               <span className="sequenceMetaValue">{playbook.audience}</span>
             </div>
 
             <div className="sequenceMetaItem">
-              <span className="sequenceMetaLabel">Steps</span>
+              <span className="sequenceMetaLabel">Sales stage</span>
+              <span className="sequenceMetaValue">{playbook.salesStage}</span>
+            </div>
+
+            <div className="sequenceMetaItem">
+              <span className="sequenceMetaLabel">Messages</span>
               <span className="sequenceMetaValue">
                 {playbook.templates.length}
               </span>
@@ -310,6 +315,7 @@ export default function PlaybookPage() {
 
                     <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                       <span className="miniBadge">{playbook.audience}</span>
+                      <span className="miniBadge">{playbook.salesStage}</span>
                       <span
                         className="miniBadge"
                         style={{

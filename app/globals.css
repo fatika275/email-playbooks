@@ -804,7 +804,7 @@ textarea {
 }
 
 .libraryFilterGrid {
-  grid-template-columns: minmax(260px, 1.6fr) minmax(160px, 1fr) minmax(160px, 1fr) minmax(140px, 0.85fr);
+  grid-template-columns: minmax(260px, 1.45fr) minmax(150px, 0.9fr) minmax(150px, 0.9fr) minmax(150px, 0.9fr) minmax(130px, 0.75fr);
 }
 
 .playbookBadges {

@@ -66,8 +66,8 @@ export default function HomePage() {
             <span>Replies, stages, next actions, booked calls, and active deals</span>
           </div>
           <div>
-            <strong>{playbooks.length}+ outreach playbooks</strong>
-            <span>Templates for starting conversations and getting more replies</span>
+            <strong>{playbooks.length}+ use-case playbooks</strong>
+            <span>Templates grouped by outreach type, client type, and sales stage</span>
           </div>
           <div>
             <strong>Follow-up management</strong>
@@ -81,10 +81,10 @@ export default function HomePage() {
           <div>
             <h2 className="pageTitle">A simple path from first email to booked work</h2>
             <p className="muted">
-              Lead Capture helps you start conversations. Pipeline Tracking is
-              the heart of the workflow. Follow-up Management sits underneath
-              it, keeping reminders, saved messages, and lead context close so
-              deals are not lost by delay.
+              Lead Capture gives you use-case templates for the sales moment in
+              front of you. Pipeline Tracking is the heart of the workflow.
+              Follow-up Management sits underneath it, keeping reminders, saved
+              messages, and lead context close so deals are not lost by delay.
             </p>
           </div>
         </div>

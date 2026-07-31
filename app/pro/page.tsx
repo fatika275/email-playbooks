@@ -4,7 +4,7 @@ import { CheckoutButton } from "@/components/checkout-button";
 const proFeatures = [
   "Pipeline tracking for stages, replies, and next actions",
   "Follow-up management for deals that stall by delay",
-  "Full lead capture and outreach library",
+  "Use-case templates by outreach type, client type, and sales stage",
   "Saved follow-up plans and reminder timing",
   "Unlimited saved emails and folders",
   "Easy lead context before every chase",

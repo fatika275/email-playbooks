@@ -103,7 +103,7 @@ export default function PricingPage() {
             </p>
 
             <ul className="featureList">
-              <li>Three core lead capture and outreach playbooks</li>
+              <li>Three core use-case outreach playbooks</li>
               <li>Email drafting and variable replacement</li>
               <li>Copy and TXT download</li>
               <li>Basic saved-email history</li>
@@ -141,7 +141,7 @@ export default function PricingPage() {
 
             <ul className="featureList">
               <li>Pipeline tracking for stages, replies, and next actions</li>
-              <li>Full lead capture and outreach library</li>
+              <li>Use-case templates by outreach type, client type, and stage</li>
               <li>Follow-up management for deals that need chasing</li>
               <li>Unlimited saved emails and folders</li>
               <li>Saved follow-up plan library and reminders</li>

@@ -25,6 +25,7 @@ export type Playbook = {
   description: string;
   audience: string;
   badge: string;
+  salesStage: string;
   templates: Template[];
 };
 
@@ -37,6 +38,7 @@ export const playbooks: Playbook[] = [
       "A structured cold outreach system for agencies and founders to start conversations, follow up with intent, and move cold leads toward replies.",
     audience: "Agencies & Founders",
     badge: "Client Acquisition",
+    salesStage: "First outreach",
     templates: [
       {
         id: "day-1-intro",
@@ -232,6 +234,7 @@ Best,
       "A library of follow-up frameworks for agencies and founders who need better ways to restart, nudge, and progress conversations.",
     audience: "Agencies & Founders",
     badge: "Follow-Up",
+    salesStage: "Follow-up",
     templates: [
       {
         id: "gentle-nudge",
@@ -406,6 +409,7 @@ Best,
       "A set of practical replies for handling pushback on pricing, timing, competitors, and information requests without sounding defensive.",
     audience: "Agencies & Founders",
     badge: "Objections",
+    salesStage: "Objection handling",
     templates: [
       {
         id: "too-expensive",
@@ -585,6 +589,7 @@ Best,
       "A playbook for reviving old leads, reconnecting after timing issues, and reopening conversations that have gone quiet.",
     audience: "Agencies & Founders",
     badge: "Re-Engagement",
+    salesStage: "Re-engagement",
     templates: [
       {
         id: "old-lead-restart",
@@ -713,6 +718,7 @@ Best,
       "A practical library for checking in on proposals, surfacing objections, and moving opportunities toward a decision.",
     audience: "Agencies & Founders",
     badge: "Proposal",
+    salesStage: "Proposal decision",
     templates: [
       {
         id: "proposal-check-in",
@@ -841,6 +847,7 @@ Best,
       "A practical playbook for recapping meetings, confirming decisions, and keeping post-call momentum alive.",
     audience: "Agencies & Founders",
     badge: "Recap",
+    salesStage: "Post-call",
     templates: [
       {
         id: "meeting-recap",
@@ -900,6 +907,7 @@ Best,
       "A small follow-up plan for turning interest into a booked demo or discovery call without sounding too heavy.",
     audience: "Agencies & Founders",
     badge: "Demo",
+    salesStage: "Booking call",
     templates: [
       {
         id: "demo-invite",
@@ -988,6 +996,7 @@ Best,
       "A playbook for replying to inbound leads, qualifying interest, and moving conversations toward a call or clearer next step.",
     audience: "Founders & Small Teams",
     badge: "Inbound",
+    salesStage: "Inbound reply",
     templates: [
       {
         id: "inbound-first-reply",
@@ -1088,6 +1097,7 @@ Best,
       "A playbook for following up after missed calls, reducing awkwardness, and getting the conversation back on track.",
     audience: "Agencies & Founders",
     badge: "Recovery",
+    salesStage: "Missed call",
     templates: [
       {
         id: "missed-call-follow-up",
@@ -1182,6 +1192,7 @@ Best,
       "A playbook for renewing client relationships, opening next-step conversations, and introducing upsell opportunities more naturally.",
     audience: "Agencies & Consultants",
     badge: "Renewal",
+    salesStage: "Renewal / upsell",
     templates: [
       {
         id: "renewal-check-in",

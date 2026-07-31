@@ -11,6 +11,7 @@ export default function LibraryPage() {
   const [query, setQuery] = useState("");
   const [badgeFilter, setBadgeFilter] = useState("All");
   const [audienceFilter, setAudienceFilter] = useState("All");
+  const [stageFilter, setStageFilter] = useState("All");
   const [sortBy, setSortBy] = useState("featured");
   const { hasProAccess } = useAccount();
 
@@ -22,6 +23,13 @@ export default function LibraryPage() {
     () => [
       "All",
       ...Array.from(new Set(playbooks.map((playbook) => playbook.audience))),
+    ],
+    []
+  );
+  const stageOptions = useMemo(
+    () => [
+      "All",
+      ...Array.from(new Set(playbooks.map((playbook) => playbook.salesStage))),
     ],
     []
   );
@@ -37,6 +45,12 @@ export default function LibraryPage() {
           playbook.description,
           playbook.badge,
           playbook.audience,
+          playbook.salesStage,
+          ...playbook.templates.flatMap((template) => [
+            template.label,
+            template.goal,
+            template.whenToUse,
+          ]),
         ]
           .join(" ")
           .toLowerCase()
@@ -46,8 +60,10 @@ export default function LibraryPage() {
         badgeFilter === "All" || playbook.badge === badgeFilter;
       const matchesAudience =
         audienceFilter === "All" || playbook.audience === audienceFilter;
+      const matchesStage =
+        stageFilter === "All" || playbook.salesStage === stageFilter;
 
-      return matchesQuery && matchesBadge && matchesAudience;
+      return matchesQuery && matchesBadge && matchesAudience && matchesStage;
     });
 
     const sorted = [...filtered];
@@ -58,7 +74,7 @@ export default function LibraryPage() {
     }
 
     return sorted;
-  }, [query, badgeFilter, audienceFilter, sortBy]);
+  }, [query, badgeFilter, audienceFilter, stageFilter, sortBy]);
 
   return (
     <main className="main">
@@ -66,30 +82,29 @@ export default function LibraryPage() {
         <div className="pageHeader libraryHeader">
           <div className="badge">Lead Capture and Outreach</div>
           <h1 className="pageTitle" style={{ marginTop: 14 }}>
-            Start more conversations without rewriting every message.
+            Find the right message for the use case in front of you.
           </h1>
           <p className="muted">
-            This is where your outreach emails live. Use proven messages for
-            cold leads, inbound replies, follow-ups, objections, proposals, and
-            re-engagement so your agency can sound sharper and get more replies
-            without starting from scratch every time.
+            Templates are grouped by outreach type, client type, and sales
+            stage so your agency can move faster without digging through a
+            giant generic library.
           </p>
         </div>
 
         <div className="glassCard libraryFilters">
           <div className="grid libraryFilterGrid">
             <div className="formGroup" style={{ marginBottom: 0 }}>
-              <label className="label">Search messages</label>
+              <label className="label">Search use cases</label>
               <input
                 className="input"
-                placeholder="Search by use case, reply goal, or playbook name"
+                placeholder="Search by stage, reply goal, or message type"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
               />
             </div>
 
             <div className="formGroup" style={{ marginBottom: 0 }}>
-              <label className="label">Category</label>
+              <label className="label">Outreach type</label>
               <select
                 className="input"
                 value={badgeFilter}
@@ -97,14 +112,14 @@ export default function LibraryPage() {
               >
                 {badgeOptions.map((option) => (
                   <option key={option} value={option}>
-                    {option}
+                    {option === "All" ? "Any outreach type" : option}
                   </option>
                 ))}
               </select>
             </div>
 
             <div className="formGroup" style={{ marginBottom: 0 }}>
-              <label className="label">Audience</label>
+              <label className="label">Client type</label>
               <select
                 className="input"
                 value={audienceFilter}
@@ -112,7 +127,22 @@ export default function LibraryPage() {
               >
                 {audienceOptions.map((option) => (
                   <option key={option} value={option}>
-                    {option}
+                    {option === "All" ? "Any client type" : option}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="formGroup" style={{ marginBottom: 0 }}>
+              <label className="label">Sales stage</label>
+              <select
+                className="input"
+                value={stageFilter}
+                onChange={(event) => setStageFilter(event.target.value)}
+              >
+                {stageOptions.map((option) => (
+                  <option key={option} value={option}>
+                    {option === "All" ? "Any sales stage" : option}
                   </option>
                 ))}
               </select>
@@ -155,6 +185,7 @@ export default function LibraryPage() {
                 setQuery("");
                 setBadgeFilter("All");
                 setAudienceFilter("All");
+                setStageFilter("All");
                 setSortBy("featured");
               }}
             >
@@ -185,7 +216,7 @@ export default function LibraryPage() {
                 <p className="cardDesc">{playbook.description}</p>
 
                 <div className="cardMeta">
-                  {playbook.audience} . {playbook.templates.length}{" "}
+                  {playbook.badge} . {playbook.audience} . {playbook.salesStage} . {playbook.templates.length}{" "}
                   {playbook.templates.length === 1 ? "step" : "steps"}
                 </div>
 
@@ -209,7 +240,7 @@ export default function LibraryPage() {
                       trackEvent("library_open_playbook", { playbookId: playbook.id })
                     }
                   >
-                    Open messages
+                    Open use-case messages
                   </Link>
                 )}
               </div>
@@ -222,7 +253,7 @@ export default function LibraryPage() {
             <h3 className="cardTitle">No outreach messages match that search yet</h3>
             <p className="muted" style={{ maxWidth: 620, marginInline: "auto" }}>
               Try clearing the filters or searching with a broader term like
-              follow-up, proposal, or outbound.
+              follow-up, proposal, inbound, or cold outreach.
             </p>
           </div>
         ) : null}
