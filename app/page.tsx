@@ -27,17 +27,17 @@ export default function HomePage() {
         <div className="homeHeroInner">
           <div className="eyebrow">
             <span className="eyebrowDot" />
-            Outreach-to-booked-work system for small agencies
+            Lightweight outreach and pipeline tool for small agencies
           </div>
 
           <h1 className="homeHeroTitle">
-            Turn outreach into booked work without losing deals in the cracks.
+            Book more calls and stop losing leads.
           </h1>
 
           <p className="homeHeroText">
-            Thalovo helps agency owners, founders, and small sales teams move
-            prospects from first email to booked call to active deal, without
-            messy tracking, delayed follow-up, or manual chasing.
+            Thalovo is a lightweight outreach and pipeline tool for small
+            agencies that want to move prospects from first message to booked
+            call without messy tracking, delayed follow-up, or manual chasing.
           </p>
 
           <div className="heroActions homeHeroActions">
@@ -81,10 +81,10 @@ export default function HomePage() {
           <div>
             <h2 className="pageTitle">A simple path from first email to booked work</h2>
             <p className="muted">
-              Lead Capture gives you use-case templates for the sales moment in
-              front of you. Pipeline Tracking is the heart of the workflow.
-              Follow-up Management sits underneath it, keeping reminders, saved
-              messages, and lead context close so deals are not lost by delay.
+              One workflow connects the pieces: use-case templates start the
+              outreach, pipeline tracking shows where every lead sits, and
+              follow-up management keeps the next chase visible until there is
+              a booked call or a clean close.
             </p>
           </div>
         </div>

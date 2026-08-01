@@ -9,12 +9,10 @@ export default function SiteFooter() {
             <span className="brandText">Thalovo</span>
           </Link>
           <p className="muted footerCopy">
-            Structured outbound systems for agencies, founders, and service
-            businesses.
+            A lightweight outreach and pipeline tool for small agencies.
           </p>
           <p className="small footerMeta">
-            Built for practical outreach, saved workflows, and reusable email
-            systems.
+            Built to book more calls and stop leads slipping through the cracks.
           </p>
         </div>
 

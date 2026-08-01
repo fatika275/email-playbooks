@@ -15,7 +15,7 @@ export default function PricingPage() {
           <div className="badge">Pricing</div>
 
           <h1 className="pageTitle" style={{ marginTop: 14 }}>
-            Choose how much follow-up control you need
+            Choose the outreach and pipeline setup your agency needs
           </h1>
 
           <p
@@ -26,9 +26,9 @@ export default function PricingPage() {
               lineHeight: 1.75,
             }}
           >
-            Start free, choose Pro when leads need proper pipeline and
-            follow-up management, or Business Pro when a small team needs
-            shared visibility from lead to booked deal.
+            Thalovo keeps one workflow focused: send better outreach, track
+            every lead, follow up on time, and book more calls without losing
+            prospects in the cracks.
           </p>
 
           <p
@@ -42,7 +42,7 @@ export default function PricingPage() {
           >
             {founderEligible
               ? "Founder checkout is unlocked on this account. Complete payment to activate Founder Pro."
-              : "Start with the essentials, then upgrade when follow-up and tracking need to stop living in your head."}
+              : "Start lightweight, then upgrade when your agency needs the full outreach-to-pipeline workflow."}
           </p>
         </div>
 

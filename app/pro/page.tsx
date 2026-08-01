@@ -20,12 +20,12 @@ export default function ProPage() {
           <div>
             <div className="badge">Pro</div>
             <h1 className="pageTitle" style={{ marginTop: 14 }}>
-              Book more client work without losing leads in the follow-up.
+              A lightweight outreach and pipeline tool for small agencies.
             </h1>
             <p className="muted" style={{ marginTop: 14, lineHeight: 1.75 }}>
-              Pro is for agency owners and founders who need to know where each
-              lead is, what stage it is in, and which follow-up needs to happen
-              before delay turns interest into silence.
+              Pro connects your templates, pipeline, follow-ups, and simple
+              reporting so you can book more calls and stop losing leads after
+              the first conversation.
             </p>
           </div>
 
@@ -62,8 +62,8 @@ export default function ProPage() {
               <h2 className="cardTitle">Best for</h2>
               <p className="muted" style={{ marginTop: 10, lineHeight: 1.75 }}>
                 Small agency owners, founders, and lean sales teams that have
-                leads coming in but need cleaner pipeline tracking, follow-up
-                reminders, and handoff.
+                leads coming in but need one clear workflow for outreach,
+                pipeline tracking, follow-up reminders, and handoff.
               </p>
             </div>
 

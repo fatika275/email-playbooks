@@ -15,7 +15,7 @@ import SiteHeader from "@/components/site-header";
 export const metadata: Metadata = {
   title: "Thalovo",
   description:
-    "Thalovo helps small agencies turn outreach into booked work with lead capture messages, follow-up management, and a clear client-work pipeline.",
+    "A lightweight outreach and pipeline tool for small agencies that want to book more calls and stop losing leads.",
 };
 
 export default function RootLayout({

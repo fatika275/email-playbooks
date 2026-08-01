@@ -24,9 +24,9 @@ export default function BusinessPage() {
             </h1>
             <p className="muted" style={{ marginTop: 14, lineHeight: 1.75 }}>
               For small agencies where the founder is not the only person
-              chasing replies. Keep notes, follow-ups, booked calls, and deal
-              handoffs visible so the team avoids duplicate work and missed
-              leads.
+              chasing replies. Share the same lightweight outreach and pipeline
+              workflow so notes, follow-ups, booked calls, and handoffs stay
+              visible.
             </p>
 
             <ul className="featureList">
