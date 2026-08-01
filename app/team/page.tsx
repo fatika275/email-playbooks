@@ -272,7 +272,7 @@ export default function TeamLibraryPage() {
   }
 
   async function handleDeleteWorkspace() {
-    if (!workspace || !window.confirm(`Permanently delete ${workspace.name} and all shared CRM data?`)) return;
+    if (!workspace || !window.confirm(`Permanently delete ${workspace.name} and all shared lead data?`)) return;
     try { await deleteBusinessWorkspace(workspace.id); window.localStorage.removeItem("thalovo_active_workspace_id"); await refreshBusinessTeam(); setNotice("Workspace deleted."); }
     catch (error) { setNotice(error instanceof Error ? error.message : "Workspace could not be deleted."); }
   }
@@ -473,9 +473,9 @@ export default function TeamLibraryPage() {
             </details>
 
             <details className="teamWorkspaceSettings">
-              <summary><strong>Workspace settings</strong><span>Export, ownership, and deletion</span></summary>
+              <summary><strong>Backup and owner controls</strong><span>Rarely needed</span></summary>
               <div className="teamWorkspaceSettingsContent">
-              <div className="cardTop"><div><h3 className="cardTitle">Workspace data</h3><p className="small">Download a backup of members, prospects, tasks, comments, and activity.</p></div>{canExportWorkspace ? <button className="button buttonSecondary" onClick={() => void handleExportWorkspace()}>Export workspace</button> : <span className="miniBadge">Export permission required</span>}</div>
+              <div className="cardTop"><div><h3 className="cardTitle">Backup lead data</h3><p className="small">Download a backup if you need a copy of team leads, notes, tasks, and activity.</p></div>{canExportWorkspace ? <button className="button buttonSecondary" onClick={() => void handleExportWorkspace()}>Download backup</button> : <span className="miniBadge">Owner or admin only</span>}</div>
               {workspaces.find((item) => item.id === workspace.id)?.access_role === "owner" ? <details className="teamOwnerControls"><summary>Ownership and deletion</summary><p className="small">These controls are rarely needed. Transfer ownership changes who controls the workspace. Deleting removes all shared workspace data permanently.</p><div className="teamDangerZone"><select className="input" defaultValue="" onChange={(event) => void handleTransferOwnership(event.target.value)}><option value="" disabled>Transfer ownership to...</option>{members.filter((member) => member.user_id && member.status === "active").map((member) => <option key={member.id} value={member.user_id!}>{member.email}</option>)}</select><button className="button buttonUtility" onClick={() => void handleDeleteWorkspace()}>Delete workspace</button></div></details> : null}
               </div>
             </details>

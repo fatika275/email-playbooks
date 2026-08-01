@@ -7,9 +7,8 @@ const proFeatures = [
   "Use-case templates by outreach type, client type, and sales stage",
   "Saved follow-up plans and reminder timing",
   "Basic reporting for replies, booked calls, and deal stages",
-  "Unlimited saved emails and folders",
+  "Reusable saved messages for faster outreach",
   "Easy lead context before every chase",
-  "HTML export for more polished sending",
 ];
 
 export default function ProPage() {

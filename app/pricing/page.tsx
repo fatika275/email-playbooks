@@ -144,9 +144,8 @@ export default function PricingPage() {
               <li>Use-case templates by outreach type, client type, and stage</li>
               <li>Follow-up management for deals that need chasing</li>
               <li>Basic reporting for replies, booked calls, and deal stages</li>
-              <li>Unlimited saved emails and folders</li>
               <li>Saved follow-up plan library and reminders</li>
-              <li>Branded HTML export</li>
+              <li>Reusable saved messages for faster outreach</li>
             </ul>
 
             <div style={{ marginTop: 24 }}>
@@ -183,7 +182,7 @@ export default function PricingPage() {
               <li>10 teammate seats included</li>
               <li>Full Pro access for every active member</li>
               <li>Shared lead-capture messages and follow-up plans</li>
-              <li>Owner-managed access</li>
+              <li>Simple owner-managed access</li>
             </ul>
 
             <div style={{ marginTop: 24 }}>

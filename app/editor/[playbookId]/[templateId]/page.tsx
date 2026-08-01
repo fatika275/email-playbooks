@@ -534,8 +534,9 @@ export default function EditorPage() {
           }}
         >
           <p className="muted" style={{ margin: 0, lineHeight: 1.65 }}>
-            Free playbooks help you start quickly. Pro unlocks the deeper
-            library, builder, folders, and saved follow-up plan workflow.
+            Free playbooks help you start quickly. Pro unlocks the full message
+            library, follow-up plans, and the pipeline workflow for moving
+            leads faster.
           </p>
         </div>
 
@@ -729,9 +730,9 @@ export default function EditorPage() {
                 }}
               >
                 <div>
-                  <h4 style={{ margin: 0 }}>Branding for HTML export</h4>
+                  <h4 style={{ margin: 0 }}>Optional branding</h4>
                   <p className="muted" style={{ margin: "6px 0 0" }}>
-                    Optional if you want a branded export.
+                    Use this only when a saved message needs your agency name.
                   </p>
                 </div>
 

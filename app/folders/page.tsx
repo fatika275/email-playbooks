@@ -203,12 +203,11 @@ export default function FoldersPage() {
           <div className="glassCard emptyState">
             <div className="badge">Pro Organization</div>
             <h1 className="pageTitle" style={{ marginTop: 14 }}>
-              Folders are a Pro feature
+              Keep saved work tidy when you need it
             </h1>
             <p className="muted" style={{ maxWidth: 680, marginInline: "auto" }}>
-              Free access gives you the core playbooks. Pro unlocks folders so
-              saved emails and follow-up plans stay organized as your library
-              grows.
+              Free access gives you the core playbooks. Pro lets you tidy saved
+              messages and follow-up plans once they start piling up.
             </p>
             <div className="toolbar" style={{ justifyContent: "center", marginTop: 20 }}>
               <Link href="/pricing" className="button buttonPrimary">
@@ -230,11 +229,11 @@ export default function FoldersPage() {
         <div className="pageHeader">
           <div className="badge">Folders</div>
           <h1 className="pageTitle" style={{ marginTop: 14 }}>
-            Organize Your Outreach Library
+            Keep saved outreach easy to find.
           </h1>
           <p className="muted" style={{ maxWidth: 760, lineHeight: 1.75 }}>
-            Folders collect saved emails and follow-up plans in one place so
-            your best work is easier to find.
+            Use folders lightly when they help you find the next message or
+            follow-up plan faster.
           </p>
         </div>
 
@@ -285,8 +284,8 @@ export default function FoldersPage() {
               <div>
                 <h2 className="cardTitle">Add an item to a folder</h2>
                 <p className="muted" style={{ margin: "8px 0 0" }}>
-                  Choose saved work, then use an existing folder name or type a
-                  new one. The first item creates the folder automatically.
+                  Choose saved work, then give it a simple label you will
+                  remember when chasing the next lead.
                 </p>
               </div>
             </div>

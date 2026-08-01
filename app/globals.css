@@ -3489,44 +3489,6 @@ details[open] > summary::after {
   overflow-x: auto;
 }
 
-.prospectForecastSettings {
-  padding: 22px;
-  border: 1px solid var(--border);
-  background: #080808;
-}
-
-.prospectForecastControls {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-  margin-top: 20px;
-}
-
-.prospectProbabilityGrid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(100px, 1fr));
-  gap: 14px;
-  margin-top: 18px;
-}
-
-.prospectProbabilityInput {
-  position: relative;
-}
-
-.prospectProbabilityInput .input {
-  padding-right: 34px;
-}
-
-.prospectProbabilityInput span {
-  position: absolute;
-  top: 50%;
-  right: 12px;
-  color: var(--muted);
-  font-size: 12px;
-  transform: translateY(-50%);
-  pointer-events: none;
-}
-
 .prospectReportBar {
   width: 100%;
   min-width: 140px;
@@ -3900,10 +3862,6 @@ details[open] > summary::after {
     grid-template-columns: 1fr;
   }
 
-  .prospectProbabilityGrid {
-    grid-template-columns: repeat(2, minmax(100px, 1fr));
-  }
-
   .prospectActionPanel {
     position: static;
   }
@@ -4194,8 +4152,7 @@ details[open] > summary::after {
 
   .prospectTaskForm,
   .prospectActivityForm,
-  .prospectReportSummary,
-  .prospectForecastControls {
+  .prospectReportSummary {
     grid-template-columns: 1fr;
   }
 

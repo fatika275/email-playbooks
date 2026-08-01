@@ -20,10 +20,10 @@ const workspaceItems = [
   },
   {
     href: "/folders",
-    label: "Folders",
+    label: "Keep Saved Work Tidy",
     badge: "Pro",
     description:
-      "Group saved emails and follow-up plans by client, offer, or campaign.",
+      "Use folders only when saved messages and follow-up plans start piling up.",
   },
 ];
 
@@ -39,8 +39,8 @@ export default function WorkspacePage() {
             Keep your best client-chasing assets ready to reuse.
           </h1>
           <p className="muted" style={{ maxWidth: 760, lineHeight: 1.75 }}>
-            Find saved messages, follow-up plans, and campaign folders without
-            mixing finished assets into your active lead pipeline.
+            Find saved messages and follow-up plans without slowing down the
+            active lead pipeline.
           </p>
         </div>
 
@@ -53,8 +53,8 @@ export default function WorkspacePage() {
               Reuse what helps leads become booked work.
             </h2>
             <p className="muted" style={{ marginTop: 10, lineHeight: 1.75 }}>
-              Open saved drafts and follow-up plans here, then organise them by client,
-              offer, or campaign when your agency outreach grows.
+              Open saved drafts and follow-up plans here, then get back to the
+              lead you are trying to move.
             </p>
           </div>
 

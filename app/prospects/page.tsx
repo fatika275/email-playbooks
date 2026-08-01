@@ -13,8 +13,6 @@ import {
   createProspectsBatch,
   createProspect,
   createProspectActivity,
-  DEFAULT_STAGE_PROBABILITIES,
-  getForecastSettings,
   listProspectTasks,
   getProspectTaskDisplayTitle,
   getProspectTaskMessageRef,
@@ -22,7 +20,6 @@ import {
   listProspects,
   PROSPECT_STAGES,
   PROSPECT_STAGE_LABELS,
-  saveForecastSettings,
   setProspectTaskCompleted,
   updateProspect,
   updateProspectStage,
@@ -30,8 +27,6 @@ import {
   type ProspectStage,
   type ProspectTask,
   type ProspectActivity,
-  type ForecastValueBasis,
-  type StageProbabilities,
 } from "@/lib/prospects";
 
 const ACTIVE_STAGES: ProspectStage[] = [
@@ -125,7 +120,6 @@ export default function ProspectsPage() {
   const [role, setRole] = useState("");
   const [source, setSource] = useState("");
   const [value, setValue] = useState("");
-  const [valueMonths, setValueMonths] = useState(12);
   const [nextFollowUp, setNextFollowUp] = useState("");
   const [notice, setNotice] = useState("");
   const [isWorking, setIsWorking] = useState(false);
@@ -133,11 +127,6 @@ export default function ProspectsPage() {
   const [activities, setActivities] = useState<ProspectActivity[]>([]);
   const [draggedProspectId, setDraggedProspectId] = useState<string | null>(null);
   const [dragStage, setDragStage] = useState<ProspectStage | null>(null);
-  const [valueBasis, setValueBasis] = useState<ForecastValueBasis>("fixed");
-  const [probabilities, setProbabilities] = useState<StageProbabilities>(
-    DEFAULT_STAGE_PROBABILITIES
-  );
-  const [isSavingForecast, setIsSavingForecast] = useState(false);
 
   const refresh = useCallback(async () => {
     if (!user || !hasProAccess) return;
@@ -163,15 +152,6 @@ export default function ProspectsPage() {
     ]);
     setTasks(nextTasks);
     setActivities(nextActivities);
-    const settings = await getForecastSettings({
-      userId: user.id,
-      workspaceId: activeWorkspaceId,
-    });
-    if (settings) {
-      setValueBasis(settings.value_basis);
-      setValueMonths(settings.default_months);
-      setProbabilities(settings.stage_probabilities);
-    }
   }, [hasProAccess, user]);
 
   useEffect(() => {
@@ -204,12 +184,7 @@ export default function ProspectsPage() {
       won: prospects.filter((prospect) => prospect.stage === "won").length,
     };
   }, [prospects]);
-  const activeWorkspace = workspaces.find((item) => item.id === workspaceId);
-  const canEditForecast = !workspaceId || activeWorkspace?.access_role !== "member";
-  const calculatedInputValue =
-    valueBasis === "monthly"
-      ? (Number(value) || 0) * Math.max(1, valueMonths)
-      : Number(value) || 0;
+  const calculatedInputValue = Number(value) || 0;
 
   const todayItems = useMemo(() => {
     const openTasks = tasks
@@ -362,14 +337,7 @@ export default function ProspectsPage() {
       )
     ).sort((a, b) => b.won - a.won || b.value - a.value || b.leads - a.leads);
     return {
-      weighted: prospects.reduce(
-        (sum, prospect) =>
-          sum + prospect.estimated_value_gbp * (probabilities[prospect.stage] / 100),
-        0
-      ),
       winRate: closed.length ? Math.round((won / closed.length) * 100) : 0,
-      closedCount: closed.length,
-      confidence: closed.length >= 20 ? "High" : closed.length >= 5 ? "Medium" : "Low",
       sourceBreakdown,
       stages: PROSPECT_STAGES.map((stage) => {
         const rows = prospects.filter((prospect) => prospect.stage === stage);
@@ -380,7 +348,7 @@ export default function ProspectsPage() {
         };
       }),
     };
-  }, [probabilities, prospects]);
+  }, [prospects]);
   const outreachMetrics = useMemo(() => {
     const outreachActivities = activities.filter((item) => ["email", "call", "meeting"].includes(item.activity_type));
     const contactedIds = new Set(outreachActivities.map((item) => item.prospect_id));
@@ -720,28 +688,6 @@ export default function ProspectsPage() {
     }
   }
 
-  async function handleSaveForecast() {
-    if (!user || !canEditForecast) return;
-    setIsSavingForecast(true);
-    try {
-      const saved = await saveForecastSettings({
-        owner_id: user.id,
-        workspace_id: workspaceId,
-        value_basis: valueBasis,
-        default_months: valueMonths,
-        stage_probabilities: probabilities,
-      });
-      setValueBasis(saved.value_basis);
-      setValueMonths(saved.default_months);
-      setProbabilities(saved.stage_probabilities);
-      setNotice("Forecast model updated.");
-    } catch (error) {
-      setNotice(error instanceof Error ? error.message : "Forecast settings could not be saved.");
-    } finally {
-      setIsSavingForecast(false);
-    }
-  }
-
   function renderProspectQuickActions(prospect: Prospect) {
     const isSnoozed = isFutureDate(prospect.next_follow_up);
     return (
@@ -876,8 +822,7 @@ export default function ProspectsPage() {
               <div className="formGroup"><label className="label">Work email</label><input className="input" type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="alex@company.com" /></div>
               <div className="formGroup"><label className="label">Role</label><input className="input" value={role} onChange={(event) => setRole(event.target.value)} placeholder="Head of Growth" /></div>
               <div className="formGroup"><label className="label">Source</label><input className="input" value={source} onChange={(event) => setSource(event.target.value)} placeholder="LinkedIn, referral, event" /></div>
-              <div className="formGroup"><label className="label">{valueBasis === "monthly" ? "Monthly fee (GBP)" : valueBasis === "annual" ? "Annual contract value (GBP)" : "Fixed deal value (GBP)"}</label><input className="input" type="number" min="0" value={value} onChange={(event) => setValue(event.target.value)} placeholder="2500" />{valueBasis === "monthly" ? <p className="small" style={{ margin: "6px 0 0" }}>Stored contract value: {formatMoney(calculatedInputValue)}</p> : null}</div>
-              {valueBasis === "monthly" ? <div className="formGroup"><label className="label">Expected months</label><input className="input" type="number" min="1" max="60" value={valueMonths} onChange={(event) => setValueMonths(Math.max(1, Number(event.target.value) || 1))} /></div> : null}
+              <div className="formGroup"><label className="label">Potential work value (GBP)</label><input className="input" type="number" min="0" value={value} onChange={(event) => setValue(event.target.value)} placeholder="2500" /></div>
               <div className="formGroup"><label className="label">Next follow-up</label><input className="input" type="date" value={nextFollowUp} onChange={(event) => setNextFollowUp(event.target.value)} /></div>
             </div>
             <button className="button buttonPrimary" disabled={isWorking} onClick={() => void handleCreate()}>{isWorking ? "Adding..." : "Add lead"}</button>
@@ -1191,67 +1136,10 @@ export default function ProspectsPage() {
                 {report.sourceBreakdown.length === 0 ? <p className="small">Add sources to leads to see what turns into client work.</p> : null}
               </div>
             </section>
-
-            <details className="prospectForecastSettings prospectAdvancedReport">
-              <summary><strong>Optional forecast settings</strong><span>Keep this for later if you want deal values and probabilities</span></summary>
-              <div className="prospectAdvancedReportContent">
-              <div className="cardTop">
-                <div>
-                  <h2 className="cardTitle">Client work forecast</h2>
-                  <p className="muted" style={{ margin: "8px 0 0" }}>
-                    Weighted forecast = each deal&apos;s stored contract value × its
-                    current stage probability.
-                  </p>
-                </div>
-                <span className="statusPill statusPillNeutral">
-                  {report.closedCount} closed deals · {report.confidence} confidence
-                </span>
-              </div>
-
-              <div className="prospectForecastControls">
-                <div className="formGroup" style={{ marginBottom: 0 }}>
-                  <label className="label">Default value basis</label>
-                  <select className="input" value={valueBasis} disabled={!canEditForecast} onChange={(event) => setValueBasis(event.target.value as ForecastValueBasis)}>
-                    <option value="fixed">Fixed project / contract value</option>
-                    <option value="monthly">Monthly fee × expected months</option>
-                    <option value="annual">Annual contract value</option>
-                  </select>
-                </div>
-                {valueBasis === "monthly" ? (
-                  <div className="formGroup" style={{ marginBottom: 0 }}>
-                    <label className="label">Default expected months</label>
-                    <input className="input" type="number" min="1" max="60" value={valueMonths} disabled={!canEditForecast} onChange={(event) => setValueMonths(Math.min(60, Math.max(1, Number(event.target.value) || 1)))} />
-                  </div>
-                ) : null}
-              </div>
-
-              <div className="prospectProbabilityGrid">
-                {PROSPECT_STAGES.map((stage) => (
-                  <div className="formGroup" key={stage} style={{ marginBottom: 0 }}>
-                    <label className="label" htmlFor={`probability-${stage}`}>{PROSPECT_STAGE_LABELS[stage]}</label>
-                    <div className="prospectProbabilityInput">
-                      <input id={`probability-${stage}`} className="input" type="number" min="0" max="100" value={probabilities[stage]} disabled={!canEditForecast || stage === "won" || stage === "lost"} onChange={(event) => setProbabilities((current) => ({ ...current, [stage]: Math.min(100, Math.max(0, Number(event.target.value) || 0)) }))} />
-                      <span>%</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="toolbar" style={{ marginTop: 18 }}>
-                {canEditForecast ? (
-                  <>
-                    <button className="button buttonPrimary" disabled={isSavingForecast} onClick={() => void handleSaveForecast()}>{isSavingForecast ? "Saving..." : "Save forecast model"}</button>
-                    <button className="button buttonUtility" onClick={() => setProbabilities(DEFAULT_STAGE_PROBABILITIES)}>Reset probabilities</button>
-                  </>
-                ) : (
-                  <p className="small">Your Business Pro owner controls the shared forecast model.</p>
-                )}
-              </div>
-              </div>
-            </details>
           </div>
         )}
       </section>
     </main>
   );
 }
+
