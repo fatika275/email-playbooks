@@ -14,14 +14,14 @@ export const PROSPECT_STAGES = [
 export type ProspectStage = (typeof PROSPECT_STAGES)[number];
 
 export const PROSPECT_STAGE_LABELS: Record<ProspectStage, string> = {
-  new: "New",
-  researching: "Researching",
-  contacted: "Contacted",
-  replied: "Replied",
-  qualified: "Qualified",
-  meeting: "Meeting",
-  won: "Won",
-  lost: "Lost",
+  new: "Prospect",
+  researching: "Researching fit",
+  contacted: "Outreach sent",
+  replied: "Conversation started",
+  qualified: "Proposal sent",
+  meeting: "Retainer / handoff",
+  won: "Booked client",
+  lost: "Lost / closed",
 };
 
 export type ForecastValueBasis = "fixed" | "monthly" | "annual";

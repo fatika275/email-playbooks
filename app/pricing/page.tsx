@@ -136,13 +136,13 @@ export default function PricingPage() {
 
             <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
               For agency owners and founders who want a focused way to start
-              conversations, track deals, chase follow-ups, and turn outreach
-              into booked clients faster.
+              conversations, track prospects, chase proposals, and turn
+              outreach into booked client work faster.
             </p>
 
             <ul className="featureList">
               <li>Email templates to start conversations faster</li>
-              <li>Pipeline tracking for replies, booked calls, and deal stages</li>
+              <li>Agency pipeline stages for prospects, proposals, retainers, and client handoff</li>
               <li>Follow-up tools to stop warm leads slipping</li>
               <li>Basic reporting for replies, booked calls, and won deals</li>
               <li>Reusable saved messages and follow-up plans</li>

@@ -11,7 +11,7 @@ const workflow = [
   },
   {
     title: "Pipeline",
-    text: "Track each lead from first message to replied, booked call, active deal, won, or lost.",
+    text: "Track prospects, proposals, retainers, client handoff, booked clients, and slipped leads.",
   },
   {
     title: "Team sharing",
@@ -23,7 +23,7 @@ const workflow = [
   },
   {
     title: "Reporting",
-    text: "See simple proof of what is working: replies, booked calls, won deals, and deal stages.",
+    text: "See simple proof of what is working: replies, booked calls, won work, and agency stages.",
   },
 ];
 
@@ -75,7 +75,7 @@ export default function HomePage() {
           </div>
           <div>
             <strong>Pipeline</strong>
-            <span>Track replies, booked calls, deal stages, and next actions</span>
+            <span>Track prospects, proposals, retainers, handoffs, and next actions</span>
           </div>
           <div>
             <strong>Follow-up tools</strong>
@@ -89,11 +89,11 @@ export default function HomePage() {
           <div>
             <h2 className="pageTitle">A simple path from first email to booked work</h2>
             <p className="muted">
-              Email templates start the conversation, the pipeline tracks the
-              deal, team sharing keeps everyone aligned, follow-up tools prevent
-              leaks, and reporting shows what is working. No heavy sales suite,
-              just the pieces small agencies need to turn outreach into booked
-              clients.
+              Email templates start the conversation. The pipeline tracks
+              prospects, proposals, retainers, and handoffs. Team sharing keeps
+              everyone aligned, follow-up tools prevent leaks, and reporting
+              shows what is working. No heavy sales suite, just the pieces small
+              agencies need to turn outreach into booked clients.
             </p>
           </div>
         </div>

@@ -4,7 +4,7 @@ import { CheckoutButton } from "@/components/checkout-button";
 const businessFeatures = [
   "Everything in Pro",
   "Team sharing to keep everyone aligned on leads",
-  "Shared notes, activity, stages, replies, and handoffs",
+  "Shared notes, activity, proposals, retainers, and handoffs",
   "One payment for the business",
   "Full Pro access for up to 10 teammates",
   "Shared lead-capture messages and follow-up plans",

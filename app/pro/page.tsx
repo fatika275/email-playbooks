@@ -3,7 +3,7 @@ import { CheckoutButton } from "@/components/checkout-button";
 
 const proFeatures = [
   "Email templates to start conversations faster",
-  "Pipeline tracking for replies, booked calls, and deal stages",
+  "Agency pipeline stages for prospects, proposals, retainers, and client handoff",
   "Follow-up tools to stop warm leads slipping",
   "Basic reporting for replies, booked calls, and won deals",
   "Reusable saved messages and follow-up plans",

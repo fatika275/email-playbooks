@@ -689,8 +689,8 @@ export default function ProspectDetailPage() {
 
             <div className="prospectSectionHeader"><h2 className="cardTitle">Stage, value, and next action</h2></div>
             <div className="prospectFormGrid">
-              <div className="formGroup"><label className="label">Client work stage</label><select className="input" value={stage} onChange={(event) => setStage(event.target.value as ProspectStage)}>{PROSPECT_STAGES.map((option) => <option key={option} value={option}>{PROSPECT_STAGE_LABELS[option]}</option>)}</select></div>
-              <div className="formGroup"><label className="label">Potential client work value (GBP)</label><input className="input" type="number" min="0" value={value} onChange={(event) => setValue(event.target.value)} /><p className="small" style={{ margin: "6px 0 0" }}>Use the full fixed, calculated monthly, or annual value of the client work this lead could become.</p></div>
+              <div className="formGroup"><label className="label">Agency stage</label><select className="input" value={stage} onChange={(event) => setStage(event.target.value as ProspectStage)}>{PROSPECT_STAGES.map((option) => <option key={option} value={option}>{PROSPECT_STAGE_LABELS[option]}</option>)}</select></div>
+              <div className="formGroup"><label className="label">Potential client work value (GBP)</label><input className="input" type="number" min="0" value={value} onChange={(event) => setValue(event.target.value)} /><p className="small" style={{ margin: "6px 0 0" }}>Use the likely value of the project, retainer, or client work this lead could become.</p></div>
               <div className="formGroup"><label className="label">Next follow-up</label><input className="input" type="date" value={nextFollowUp} onChange={(event) => setNextFollowUp(event.target.value)} /></div>
               <div className="formGroup"><label className="label">Last contacted</label><input className="input" value={lastContactedAt ? new Date(lastContactedAt).toLocaleString() : "Not contacted yet"} disabled /></div>
               {prospect?.workspace_id ? <div className="formGroup"><label className="label">Lead owner</label><select className="input" value={teamMembers.find((member) => member.user_id === prospect.assigned_user_id || member.email === prospect.assigned_email)?.id ?? (prospect.assigned_user_id === user.id ? "self" : "")} onChange={(event) => void handleProspectAssignment(event.target.value)}><option value="">Unassigned</option><option value="self">Me ({user.email})</option>{teamMembers.filter((member) => member.user_id !== user.id && member.email !== user.email).map((member) => <option key={member.id} value={member.id}>{member.email} · {member.role}</option>)}</select></div> : null}
@@ -853,7 +853,7 @@ export default function ProspectDetailPage() {
               {linkedinUrl ? <a className="button buttonSecondary" href={linkedinUrl} target="_blank" rel="noreferrer">Open LinkedIn</a> : null}
             </div>
             <div className="prospectContextBlock">
-              <span>Client work stage</span><strong>{PROSPECT_STAGE_LABELS[stage]}</strong>
+              <span>Agency stage</span><strong>{PROSPECT_STAGE_LABELS[stage]}</strong>
               <span>Next follow-up</span><strong>{nextFollowUp || "Not scheduled"}</strong>
               <span>Assigned to</span><strong>{prospect?.assigned_email || "Unassigned"}</strong>
             </div>
