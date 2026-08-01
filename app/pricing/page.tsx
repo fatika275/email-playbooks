@@ -140,12 +140,11 @@ export default function PricingPage() {
             </p>
 
             <ul className="featureList">
-              <li>Pipeline tracking for stages, replies, and next actions</li>
-              <li>Use-case templates by outreach type, client type, and stage</li>
-              <li>Follow-up management for deals that need chasing</li>
-              <li>Basic reporting for replies, booked calls, and deal stages</li>
-              <li>Saved follow-up plan library and reminders</li>
-              <li>Reusable saved messages for faster outreach</li>
+              <li>Email templates to start conversations faster</li>
+              <li>Pipeline tracking for replies, booked calls, and deal stages</li>
+              <li>Follow-up tools to stop warm leads slipping</li>
+              <li>Basic reporting for replies, booked calls, and won deals</li>
+              <li>Reusable saved messages and follow-up plans</li>
             </ul>
 
             <div style={{ marginTop: 24 }}>
@@ -177,8 +176,8 @@ export default function PricingPage() {
 
             <ul className="featureList">
               <li>Everything in Pro</li>
-              <li>One shared pipeline from lead to booked work</li>
-              <li>Shared notes and activity history</li>
+              <li>Team sharing to keep everyone aligned on leads</li>
+              <li>Shared pipeline, notes, and activity history</li>
               <li>10 teammate seats included</li>
               <li>Full Pro access for every active member</li>
               <li>Shared lead-capture messages and follow-up plans</li>

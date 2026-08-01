@@ -2,21 +2,28 @@
 
 import Link from "next/link";
 import { ScrollReveal } from "@/components/scroll-reveal";
-import { playbooks } from "@/lib/data";
 import { trackEvent } from "@/lib/analytics";
 
 const workflow = [
   {
-    title: "Add every lead",
-    text: "Keep every new lead, reply, and handoff in one place before it gets lost.",
+    title: "Email templates",
+    text: "Start the conversation faster with use-case messages for outreach, replies, proposals, and re-engagement.",
   },
   {
-    title: "Stop delay killing deals",
-    text: "Use saved follow-ups, reminders, and lead context so warm prospects do not go quiet.",
+    title: "Pipeline",
+    text: "Track each lead from first message to replied, booked call, active deal, won, or lost.",
   },
   {
-    title: "Turn interest into booked work",
-    text: "See who replied, what stage they are in, and what needs to happen next.",
+    title: "Team sharing",
+    text: "Keep notes, ownership, and lead visibility clear when more than one person handles follow-up.",
+  },
+  {
+    title: "Follow-up tools",
+    text: "Use saved plans, reminders, and lead context so warm prospects do not slip after a delay.",
+  },
+  {
+    title: "Reporting",
+    text: "See simple proof of what is working: replies, booked calls, won deals, and deal stages.",
   },
 ];
 
@@ -62,16 +69,16 @@ export default function HomePage() {
       <ScrollReveal as="section" className="container section" delay={80}>
         <div className="homeMetrics">
           <div>
-            <strong>Pipeline tracking</strong>
-            <span>Replies, booked calls, deal stages, next actions, and active deals</span>
+            <strong>Email templates</strong>
+            <span>Start conversations without rewriting from scratch</span>
           </div>
           <div>
-            <strong>{playbooks.length}+ use-case playbooks</strong>
-            <span>Templates grouped by outreach type, client type, and sales stage</span>
+            <strong>Pipeline</strong>
+            <span>Track replies, booked calls, deal stages, and next actions</span>
           </div>
           <div>
-            <strong>Follow-up management</strong>
-            <span>Reminders, saved follow-ups, and context for leads that need chasing</span>
+            <strong>Follow-up tools</strong>
+            <span>Prevent warm leads slipping after the first touch</span>
           </div>
         </div>
       </ScrollReveal>
@@ -81,10 +88,9 @@ export default function HomePage() {
           <div>
             <h2 className="pageTitle">A simple path from first email to booked work</h2>
             <p className="muted">
-              One workflow connects the pieces: use-case templates start the
-              outreach, pipeline tracking shows where every lead sits, and
-              follow-up management keeps the next chase visible until there is
-              a booked call or a clean close.
+              Email templates start the conversation, the pipeline tracks the
+              deal, team sharing keeps everyone aligned, follow-up tools prevent
+              leaks, and reporting shows what is working.
             </p>
           </div>
         </div>

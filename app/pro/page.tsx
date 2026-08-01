@@ -2,13 +2,11 @@ import Link from "next/link";
 import { CheckoutButton } from "@/components/checkout-button";
 
 const proFeatures = [
-  "Pipeline tracking for stages, replies, and next actions",
-  "Follow-up management for deals that stall by delay",
-  "Use-case templates by outreach type, client type, and sales stage",
-  "Saved follow-up plans and reminder timing",
-  "Basic reporting for replies, booked calls, and deal stages",
-  "Reusable saved messages for faster outreach",
-  "Easy lead context before every chase",
+  "Email templates to start conversations faster",
+  "Pipeline tracking for replies, booked calls, and deal stages",
+  "Follow-up tools to stop warm leads slipping",
+  "Basic reporting for replies, booked calls, and won deals",
+  "Reusable saved messages and follow-up plans",
 ];
 
 export default function ProPage() {
@@ -22,9 +20,9 @@ export default function ProPage() {
               A lightweight outreach and pipeline tool for small agencies.
             </h1>
             <p className="muted" style={{ marginTop: 14, lineHeight: 1.75 }}>
-              Pro connects your templates, pipeline, follow-ups, and simple
-              reporting so you can book more calls and stop losing leads after
-              the first conversation.
+              Pro connects the simple pieces small agencies need: templates to
+              start conversations, pipeline tracking, follow-up tools, and
+              reporting that shows what is working.
             </p>
           </div>
 
@@ -62,7 +60,7 @@ export default function ProPage() {
               <p className="muted" style={{ marginTop: 10, lineHeight: 1.75 }}>
                 Small agency owners, founders, and lean sales teams that have
                 leads coming in but need one clear workflow for outreach,
-                pipeline tracking, follow-up reminders, and handoff.
+                tracking deals, chasing follow-ups, and booking calls.
               </p>
             </div>
 
