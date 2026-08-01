@@ -45,6 +45,8 @@ export default function HomePage() {
             Thalovo is a lightweight outreach and pipeline tool for small
             agencies that want to move prospects from first message to booked
             call without messy tracking, delayed follow-up, or manual chasing.
+            It wins on focus, speed, and an agency-native workflow instead of
+            trying to act like a broad CRM.
           </p>
 
           <div className="heroActions homeHeroActions">
@@ -90,7 +92,8 @@ export default function HomePage() {
             <p className="muted">
               Email templates start the conversation, the pipeline tracks the
               deal, team sharing keeps everyone aligned, follow-up tools prevent
-              leaks, and reporting shows what is working.
+              leaks, and reporting shows what is working. No heavy sales suite,
+              just the pieces small agencies need to move leads faster.
             </p>
           </div>
         </div>
@@ -115,7 +118,7 @@ export default function HomePage() {
           <div>
             <div className="badge">Pipeline</div>
             <h2 className="pageTitle" style={{ marginTop: 14 }}>
-              Every lead needs a clear next action.
+              Built for speed, not CRM sprawl.
             </h2>
             <p className="muted" style={{ marginTop: 12, maxWidth: 680 }}>
               Start from a prospect, see the context, send the right follow-up,

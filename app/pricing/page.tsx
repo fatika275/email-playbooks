@@ -28,7 +28,8 @@ export default function PricingPage() {
           >
             Thalovo keeps one workflow focused: send better outreach, track
             every lead, follow up on time, and book more calls without losing
-            prospects in the cracks.
+            prospects in the cracks. It is built for speed and clarity, not for
+            out-featuring a large CRM.
           </p>
 
           <p
@@ -134,9 +135,9 @@ export default function PricingPage() {
             </h2>
 
             <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
-              For agency owners and founders who need one place to manage
-              lead stages, replies, reminders, saved follow-ups, and
-              booked-work opportunities.
+              For agency owners and founders who want a focused way to start
+              conversations, track deals, chase follow-ups, and book calls
+              faster.
             </p>
 
             <ul className="featureList">
@@ -198,7 +199,7 @@ export default function PricingPage() {
             <div className="badge">What changes across plans</div>
 
             <h2 className="pageTitle" style={{ marginTop: 14 }}>
-              Pipeline first, follow-up right behind it
+              Focus, speed, and agency-native workflow
             </h2>
 
             <div className="grid" style={{ marginTop: 20 }}>
@@ -213,8 +214,8 @@ export default function PricingPage() {
               <div className="glassCard" style={{ padding: 20 }}>
                 <h3 className="cardTitle">Pro</h3>
                 <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
-                  Better if leads are coming in, deals are getting lost by
-                  delay, and you need a daily view of what to chase next.
+                  Better if leads are coming in and you need the fastest route
+                  from outreach to tracked deal to booked call.
                 </p>
               </div>
 

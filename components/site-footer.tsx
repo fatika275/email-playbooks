@@ -12,7 +12,7 @@ export default function SiteFooter() {
             A lightweight outreach and pipeline tool for small agencies.
           </p>
           <p className="small footerMeta">
-            Built to book more calls and stop leads slipping through the cracks.
+            Focused on speed, clarity, and agency-native lead workflow.
           </p>
         </div>
 
