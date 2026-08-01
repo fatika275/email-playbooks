@@ -63,7 +63,7 @@ export default function HomePage() {
         <div className="homeMetrics">
           <div>
             <strong>Pipeline tracking</strong>
-            <span>Replies, stages, next actions, booked calls, and active deals</span>
+            <span>Replies, booked calls, deal stages, next actions, and active deals</span>
           </div>
           <div>
             <strong>{playbooks.length}+ use-case playbooks</strong>

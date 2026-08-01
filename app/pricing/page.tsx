@@ -143,6 +143,7 @@ export default function PricingPage() {
               <li>Pipeline tracking for stages, replies, and next actions</li>
               <li>Use-case templates by outreach type, client type, and stage</li>
               <li>Follow-up management for deals that need chasing</li>
+              <li>Basic reporting for replies, booked calls, and deal stages</li>
               <li>Unlimited saved emails and folders</li>
               <li>Saved follow-up plan library and reminders</li>
               <li>Branded HTML export</li>

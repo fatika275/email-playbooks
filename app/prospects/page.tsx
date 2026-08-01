@@ -1126,12 +1126,15 @@ export default function ProspectsPage() {
               </section>
 
               <section className="prospectDailyPanel">
-                <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">Chase or rescue</h3><p className="muted">Late-stage and stale leads where the next action is unclear or overdue.</p></div>
+                <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">Basic reporting</h3><p className="muted">Simple proof of what is working: replies, booked calls, and won client work.</p></div>
                 <div className="prospectFocusStats">
-                  <div><span>Active leads</span><strong>{metrics.active}</strong></div>
-                  <div><span>Reply rate</span><strong>{acquisitionRates.reply}%</strong></div>
-                  <div><span>Closed win rate</span><strong>{report.winRate}%</strong></div>
+                  <div><span>Replies</span><strong>{outreachMetrics.replied}</strong></div>
+                  <div><span>Booked calls</span><strong>{outreachMetrics.meetings}</strong></div>
+                  <div><span>Won deals</span><strong>{outreachMetrics.won}</strong></div>
                 </div>
+                <p className="small" style={{ margin: "10px 0 0" }}>
+                  Reply rate {acquisitionRates.reply}% from {outreachMetrics.contacted} contacted lead{outreachMetrics.contacted === 1 ? "" : "s"}.
+                </p>
 
                 <div className="prospectDashboardSectionHeading prospectDashboardSubsection"><h3 className="cardTitle">Proposal decisions</h3></div>
                 <div className="prospectMiniList">
@@ -1167,7 +1170,7 @@ export default function ProspectsPage() {
             </div>
 
             <section className="prospectDashboardSection prospectStageSnapshot">
-              <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">Where leads sit</h3><p className="muted">Your stage map: what is new, who replied, what is near a booked call, and what may be slipping.</p></div>
+              <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">Deal stages</h3><p className="muted">A simple stage map showing what is new, who replied, what is near a booked call, and what may be slipping.</p></div>
               <div className="prospectStageRows">
                 {report.stages.map((row) => (
                   <div key={row.stage}><span>{PROSPECT_STAGE_LABELS[row.stage]}</span><i><b style={{ width: `${prospects.length ? (row.count / prospects.length) * 100 : 0}%` }} /></i><strong>{row.count}</strong></div>
@@ -1176,7 +1179,7 @@ export default function ProspectsPage() {
             </section>
 
             <section className="prospectDashboardSection">
-              <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">What sources book work</h3><p className="muted">Track where leads come from so the agency can double down on channels that become clients.</p></div>
+              <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">What is working</h3><p className="muted">Light source reporting only: enough to see where replies and booked work are coming from early.</p></div>
               <div className="prospectSourceRows">
                 {report.sourceBreakdown.slice(0, 6).map((row) => (
                   <div key={row.source}>
@@ -1190,7 +1193,7 @@ export default function ProspectsPage() {
             </section>
 
             <details className="prospectForecastSettings prospectAdvancedReport">
-              <summary><strong>Client work forecast settings</strong><span>Optional deal values, probabilities, and weighted forecasting</span></summary>
+              <summary><strong>Optional forecast settings</strong><span>Keep this for later if you want deal values and probabilities</span></summary>
               <div className="prospectAdvancedReportContent">
               <div className="cardTop">
                 <div>

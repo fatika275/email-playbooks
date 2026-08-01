@@ -6,6 +6,7 @@ const proFeatures = [
   "Follow-up management for deals that stall by delay",
   "Use-case templates by outreach type, client type, and sales stage",
   "Saved follow-up plans and reminder timing",
+  "Basic reporting for replies, booked calls, and deal stages",
   "Unlimited saved emails and folders",
   "Easy lead context before every chase",
   "HTML export for more polished sending",
