@@ -26,10 +26,10 @@ export default function PricingPage() {
               lineHeight: 1.75,
             }}
           >
-            Thalovo keeps one workflow focused: send better outreach, track
-            every lead, follow up on time, and book more calls without losing
-            prospects in the cracks. It is built for speed and clarity, not for
-            out-featuring a large CRM.
+            Thalovo is built for one job: turn outreach into booked clients.
+            It helps small agencies send better outreach, track each deal,
+            follow up on time, and show what is working without becoming a
+            general CRM for every business.
           </p>
 
           <p
@@ -136,8 +136,8 @@ export default function PricingPage() {
 
             <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
               For agency owners and founders who want a focused way to start
-              conversations, track deals, chase follow-ups, and book calls
-              faster.
+              conversations, track deals, chase follow-ups, and turn outreach
+              into booked clients faster.
             </p>
 
             <ul className="featureList">
@@ -199,7 +199,7 @@ export default function PricingPage() {
             <div className="badge">What changes across plans</div>
 
             <h2 className="pageTitle" style={{ marginTop: 14 }}>
-              Focus, speed, and agency-native workflow
+              One job: turn outreach into booked clients
             </h2>
 
             <div className="grid" style={{ marginTop: 20 }}>
@@ -215,7 +215,7 @@ export default function PricingPage() {
                 <h3 className="cardTitle">Pro</h3>
                 <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
                   Better if leads are coming in and you need the fastest route
-                  from outreach to tracked deal to booked call.
+                  from outreach to tracked deal to booked client.
                 </p>
               </div>
 

@@ -38,15 +38,14 @@ export default function HomePage() {
           </div>
 
           <h1 className="homeHeroTitle">
-            Book more calls and stop losing leads.
+            Turn outreach into booked clients.
           </h1>
 
           <p className="homeHeroText">
-            Thalovo is a lightweight outreach and pipeline tool for small
-            agencies that want to move prospects from first message to booked
-            call without messy tracking, delayed follow-up, or manual chasing.
-            It wins on focus, speed, and an agency-native workflow instead of
-            trying to act like a broad CRM.
+            Thalovo is built for one job: helping small agencies turn outreach
+            into booked clients. It keeps templates, pipeline, follow-ups, team
+            visibility, and simple reporting focused on that workflow instead
+            of acting like a general CRM for every business.
           </p>
 
           <div className="heroActions homeHeroActions">
@@ -93,7 +92,8 @@ export default function HomePage() {
               Email templates start the conversation, the pipeline tracks the
               deal, team sharing keeps everyone aligned, follow-up tools prevent
               leaks, and reporting shows what is working. No heavy sales suite,
-              just the pieces small agencies need to move leads faster.
+              just the pieces small agencies need to turn outreach into booked
+              clients.
             </p>
           </div>
         </div>
@@ -118,12 +118,12 @@ export default function HomePage() {
           <div>
             <div className="badge">Pipeline</div>
             <h2 className="pageTitle" style={{ marginTop: 14 }}>
-              Built for speed, not CRM sprawl.
+              Built for one job, not CRM sprawl.
             </h2>
             <p className="muted" style={{ marginTop: 12, maxWidth: 680 }}>
               Start from a prospect, see the context, send the right follow-up,
               schedule the next reminder, and keep moving until there is a
-              booked call, active deal, win, or clean close.
+              booked call, active client, win, or clean close.
             </p>
           </div>
 

@@ -17,13 +17,13 @@ export default function ProPage() {
           <div>
             <div className="badge">Pro</div>
             <h1 className="pageTitle" style={{ marginTop: 14 }}>
-              A lightweight outreach and pipeline tool for small agencies.
+              Built for one job: turn outreach into booked clients.
             </h1>
             <p className="muted" style={{ marginTop: 14, lineHeight: 1.75 }}>
               Pro connects the simple pieces small agencies need: templates to
               start conversations, pipeline tracking, follow-up tools, and
-              reporting that shows what is working. It is built to move leads
-              faster, not to become another oversized CRM.
+              reporting that shows what is working. It is not a general CRM for
+              every business; it is a focused workflow for booking client work.
             </p>
           </div>
 
@@ -61,7 +61,7 @@ export default function ProPage() {
               <p className="muted" style={{ marginTop: 10, lineHeight: 1.75 }}>
                 Small agency owners, founders, and lean sales teams that have
                 leads coming in but need one clear workflow for outreach,
-                tracking deals, chasing follow-ups, and booking calls without
+                tracking deals, chasing follow-ups, and booking clients without
                 a heavy sales platform.
               </p>
             </div>
@@ -70,7 +70,7 @@ export default function ProPage() {
               <h2 className="cardTitle">What happens next</h2>
               <p className="muted" style={{ marginTop: 10, lineHeight: 1.75 }}>
                 Create an account, complete checkout, then start moving leads
-                from first touch to booked call to active deal.
+                from first touch to booked call to active client.
               </p>
             </div>
           </div>

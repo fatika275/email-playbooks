@@ -26,7 +26,7 @@ export default function BusinessPage() {
               For small agencies where the founder is not the only person
               chasing replies. Share the same lightweight outreach and pipeline
               workflow so notes, follow-ups, booked calls, and handoffs stay
-              visible without adding a heavy CRM process.
+              visible while the team turns outreach into booked clients.
             </p>
 
             <ul className="featureList">
