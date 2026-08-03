@@ -9,7 +9,7 @@ export default function SiteFooter() {
             <span className="brandText">Thalovo</span>
           </Link>
           <p className="muted footerCopy">
-            A lightweight outreach and pipeline tool for small agencies.
+            A focused, agency-native outreach and pipeline tool for small agencies.
           </p>
           <p className="small footerMeta">
             Built for one job: turn outreach into booked clients.

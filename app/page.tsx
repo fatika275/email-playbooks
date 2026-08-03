@@ -43,9 +43,9 @@ export default function HomePage() {
 
           <p className="homeHeroText">
             Thalovo is built for one job: helping small agencies turn outreach
-            into booked clients. It keeps templates, pipeline, follow-ups, team
-            visibility, and simple reporting focused on that workflow instead
-            of acting like a general CRM for every business.
+            into booked clients. It wins on focus, speed, and agency-native
+            workflow: templates, pipeline, follow-ups, team visibility, and
+            simple reporting without the weight of a broad CRM.
           </p>
 
           <div className="heroActions homeHeroActions">
@@ -118,12 +118,13 @@ export default function HomePage() {
           <div>
             <div className="badge">Pipeline</div>
             <h2 className="pageTitle" style={{ marginTop: 14 }}>
-              Built for one job, not CRM sprawl.
+              Focused enough to move fast.
             </h2>
             <p className="muted" style={{ marginTop: 12, maxWidth: 680 }}>
-              Start from a prospect, see the context, send the right follow-up,
-              schedule the next reminder, and keep moving until there is a
-              booked call, active client, win, or clean close.
+              Larger platforms can cover every sales motion. Thalovo stays
+              intentionally narrow: start from a prospect, send the right
+              follow-up, move proposals and retainers forward, and keep client
+              handoff visible.
             </p>
           </div>
 

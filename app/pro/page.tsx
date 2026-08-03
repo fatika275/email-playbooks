@@ -21,9 +21,9 @@ export default function ProPage() {
             </h1>
             <p className="muted" style={{ marginTop: 14, lineHeight: 1.75 }}>
               Pro connects the simple pieces small agencies need: templates to
-              start conversations, pipeline tracking, follow-up tools, and
-              reporting that shows what is working. It is not a general CRM for
-              every business; it is a focused workflow for booking client work.
+              start conversations, agency-native pipeline tracking, follow-up
+              tools, and reporting that shows what is working. It is built to
+              move fast, not to out-feature larger CRM platforms.
             </p>
           </div>
 
@@ -61,8 +61,8 @@ export default function ProPage() {
               <p className="muted" style={{ marginTop: 10, lineHeight: 1.75 }}>
                 Small agency owners, founders, and lean sales teams that have
                 leads coming in but need one clear workflow for outreach,
-                tracking deals, chasing follow-ups, and booking clients without
-                a heavy sales platform.
+                proposals, retainers, follow-ups, and booking clients without a
+                heavy sales platform.
               </p>
             </div>
 
