@@ -17,11 +17,40 @@ export const PROSPECT_STAGE_LABELS: Record<ProspectStage, string> = {
   new: "Prospect",
   researching: "Researching fit",
   contacted: "Outreach sent",
-  replied: "Conversation started",
+  replied: "Reply / discovery",
   qualified: "Proposal sent",
-  meeting: "Retainer / handoff",
-  won: "Booked client",
+  meeting: "Retainer discussion",
+  won: "Client handoff",
   lost: "Lost / closed",
+};
+
+export const PROSPECT_WORKFLOW_VIEWS = [
+  "all",
+  "prospects",
+  "proposals",
+  "retainers",
+  "handoff",
+] as const;
+
+export type ProspectWorkflowView = (typeof PROSPECT_WORKFLOW_VIEWS)[number];
+
+export const PROSPECT_WORKFLOW_LABELS: Record<ProspectWorkflowView, string> = {
+  all: "All agency work",
+  prospects: "Prospects",
+  proposals: "Proposals",
+  retainers: "Retainers",
+  handoff: "Client handoff",
+};
+
+export const PROSPECT_WORKFLOW_STAGES: Record<
+  ProspectWorkflowView,
+  ProspectStage[]
+> = {
+  all: [...PROSPECT_STAGES],
+  prospects: ["new", "researching", "contacted", "replied"],
+  proposals: ["qualified"],
+  retainers: ["meeting"],
+  handoff: ["won"],
 };
 
 export type ForecastValueBasis = "fixed" | "monthly" | "annual";

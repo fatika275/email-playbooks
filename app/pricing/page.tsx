@@ -144,7 +144,7 @@ export default function PricingPage() {
               <li>Email templates to start conversations faster</li>
               <li>Agency pipeline stages for prospects, proposals, retainers, and client handoff</li>
               <li>Follow-up tools to stop warm leads slipping</li>
-              <li>Basic reporting for replies, booked calls, and won deals</li>
+              <li>Basic reporting for replies, booked calls, and client handoffs</li>
               <li>Reusable saved messages and follow-up plans</li>
             </ul>
 

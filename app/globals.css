@@ -2274,10 +2274,10 @@ details[open] > summary::after {
 
 .prospectToolbar {
   display: grid;
-  grid-template-columns: auto minmax(240px, 1fr) 190px;
+  grid-template-columns: auto minmax(240px, 1fr);
   align-items: center;
   gap: 12px;
-  margin-bottom: 16px;
+  margin-bottom: 10px;
 }
 
 .prospectViewTabs {
@@ -2294,6 +2294,88 @@ details[open] > summary::after {
 .prospectSearch,
 .prospectStageFilter {
   min-width: 0;
+}
+
+.prospectWorkflowTabs {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.prospectWorkflowTab {
+  min-width: 0;
+  min-height: 54px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: #b8b8b8;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #080808;
+  cursor: pointer;
+  transition: border-color 0.16s ease, background 0.16s ease, color 0.16s ease;
+}
+
+.prospectWorkflowTab:hover,
+.prospectWorkflowTab.isActive {
+  color: #ffffff;
+  border-color: #3a3a3a;
+  background: #101010;
+}
+
+.prospectWorkflowTab span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.prospectWorkflowTab strong {
+  flex: 0 0 auto;
+  color: #ffffff;
+  font-size: 13px;
+}
+
+.prospectWorkflowSummary {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.prospectWorkflowSummaryItem {
+  min-width: 0;
+  min-height: 74px;
+  padding: 12px;
+  display: grid;
+  align-content: space-between;
+  gap: 12px;
+  text-align: left;
+  color: #c7c7c7;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #080808;
+  cursor: pointer;
+}
+
+.prospectWorkflowSummaryItem:hover {
+  color: #ffffff;
+  border-color: #3a3a3a;
+  background: #101010;
+}
+
+.prospectWorkflowSummaryItem span {
+  overflow-wrap: anywhere;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.prospectWorkflowSummaryItem strong {
+  color: #ffffff;
+  font-size: 18px;
 }
 
 .prospectImportButton {
@@ -4130,6 +4212,11 @@ details[open] > summary::after {
 
   .prospectViewTabs {
     width: 100%;
+  }
+
+  .prospectWorkflowTabs,
+  .prospectWorkflowSummary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .prospectColumn {

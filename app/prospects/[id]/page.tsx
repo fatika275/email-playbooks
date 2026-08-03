@@ -750,12 +750,12 @@ export default function ProspectDetailPage() {
                   <div><span>{nextProposalTask.due_date ? `Due ${nextProposalTask.due_date}` : "Ready when you are"}</span><strong>{cleanFollowUpTaskTitle(nextProposalTask.title)}</strong><p>{activeProposalTasks.length > 1 ? `${activeProposalTasks.length - 1} later reminder${activeProposalTasks.length - 1 === 1 ? "" : "s"} already scheduled.` : "This is the final scheduled reminder."}</p></div>
                   <div className="proposalTaskActions"><button className="button buttonPrimary" onClick={() => handleDraftProposalFollowUp(nextProposalTask)}>Open message</button><button className="button buttonSecondary" onClick={() => void handleCompleteProposalTask(nextProposalTask)}>Mark sent</button></div>
                 </div>
-                <div className="proposalWorkflowActions proposalOutcomeActions"><span>Close this schedule</span><button className="button buttonSecondary" disabled={isStartingProposalWorkflow} onClick={() => void handleProposalOutcome("replied")}>They replied</button><button className="button buttonSecondary" disabled={isStartingProposalWorkflow} onClick={() => setPendingProposalOutcome("won")}>Booked client work</button><button className="button buttonUtility" disabled={isStartingProposalWorkflow} onClick={() => setPendingProposalOutcome("lost")}>Lost / slipped</button></div>
+                <div className="proposalWorkflowActions proposalOutcomeActions"><span>Close this schedule</span><button className="button buttonSecondary" disabled={isStartingProposalWorkflow} onClick={() => void handleProposalOutcome("replied")}>They replied</button><button className="button buttonSecondary" disabled={isStartingProposalWorkflow} onClick={() => setPendingProposalOutcome("won")}>Move to handoff</button><button className="button buttonUtility" disabled={isStartingProposalWorkflow} onClick={() => setPendingProposalOutcome("lost")}>Lost / slipped</button></div>
                 {pendingProposalOutcome ? (
                   <div className="prospectOutcomePanel">
                     <div>
-                      <span className="miniBadge">{pendingProposalOutcome === "won" ? "Booked work" : "Lost / slipped"}</span>
-                      <h2 className="cardTitle">{pendingProposalOutcome === "won" ? "What helped win this?" : "Why did this slip?"}</h2>
+                      <span className="miniBadge">{pendingProposalOutcome === "won" ? "Client handoff" : "Lost / slipped"}</span>
+                      <h2 className="cardTitle">{pendingProposalOutcome === "won" ? "What made this ready for handoff?" : "Why did this slip?"}</h2>
                       <p className="small">Optional, but useful for learning which proposal moments turn into client work.</p>
                     </div>
                     <input

@@ -23,7 +23,7 @@ const workflow = [
   },
   {
     title: "Reporting",
-    text: "See simple proof of what is working: replies, booked calls, won work, and agency stages.",
+    text: "See simple proof of what is working: replies, booked calls, client handoffs, and agency stages.",
   },
 ];
 

@@ -20,11 +20,15 @@ import {
   listProspects,
   PROSPECT_STAGES,
   PROSPECT_STAGE_LABELS,
+  PROSPECT_WORKFLOW_LABELS,
+  PROSPECT_WORKFLOW_STAGES,
+  PROSPECT_WORKFLOW_VIEWS,
   setProspectTaskCompleted,
   updateProspect,
   updateProspectStage,
   type Prospect,
   type ProspectStage,
+  type ProspectWorkflowView,
   type ProspectTask,
   type ProspectActivity,
 } from "@/lib/prospects";
@@ -107,7 +111,7 @@ export default function ProspectsPage() {
   const [workspaces, setWorkspaces] = useState<BusinessWorkspaceAccess[]>([]);
   const [view, setView] = useState<"pipeline" | "list" | "today" | "reports">("reports");
   const [query, setQuery] = useState("");
-  const [stageFilter, setStageFilter] = useState<ProspectStage | "all">("all");
+  const [workflowView, setWorkflowView] = useState<ProspectWorkflowView>("all");
   const [showAdd, setShowAdd] = useState(false);
   const [pendingOutcome, setPendingOutcome] = useState<{
     prospect: Prospect;
@@ -162,8 +166,9 @@ export default function ProspectsPage() {
 
   const filtered = useMemo(() => {
     const normalized = query.trim().toLowerCase();
+    const workflowStages = PROSPECT_WORKFLOW_STAGES[workflowView];
     return prospects.filter((prospect) => {
-      const matchesStage = stageFilter === "all" || prospect.stage === stageFilter;
+      const matchesWorkflow = workflowStages.includes(prospect.stage);
       const matchesQuery =
         !normalized ||
         [prospect.full_name, prospect.company, prospect.email, prospect.role, prospect.source]
@@ -171,9 +176,27 @@ export default function ProspectsPage() {
           .join(" ")
           .toLowerCase()
           .includes(normalized);
-      return matchesStage && matchesQuery;
+      return matchesWorkflow && matchesQuery;
     });
-  }, [prospects, query, stageFilter]);
+  }, [prospects, query, workflowView]);
+
+  const visiblePipelineStages = useMemo(
+    () => PROSPECT_WORKFLOW_STAGES[workflowView],
+    [workflowView]
+  );
+
+  const workflowCounts = useMemo(
+    () =>
+      Object.fromEntries(
+        PROSPECT_WORKFLOW_VIEWS.map((item) => [
+          item,
+          prospects.filter((prospect) =>
+            PROSPECT_WORKFLOW_STAGES[item].includes(prospect.stage)
+          ).length,
+        ])
+      ) as Record<ProspectWorkflowView, number>,
+    [prospects]
+  );
 
   const metrics = useMemo(() => {
     const active = prospects.filter((prospect) => ACTIVE_STAGES.includes(prospect.stage));
@@ -720,14 +743,14 @@ export default function ProspectsPage() {
           className="button buttonSecondary"
           onClick={() => requestOutcome(prospect, "won")}
         >
-          Won
+          Handoff
         </button>
         <button
           type="button"
           className="button buttonUtility"
           onClick={() => requestOutcome(prospect, "lost")}
         >
-          Lost
+          Closed
         </button>
       </div>
     );
@@ -835,11 +858,11 @@ export default function ProspectsPage() {
           <section className="prospectOutcomePanel" aria-label="Close lead outcome">
             <div>
               <span className="miniBadge">
-                {pendingOutcome.stage === "won" ? "Booked work" : "Lost / slipped"}
+                {pendingOutcome.stage === "won" ? "Client handoff" : "Lost / slipped"}
               </span>
               <h2 className="cardTitle">
                 {pendingOutcome.stage === "won"
-                  ? `What helped win ${pendingOutcome.prospect.full_name}?`
+                  ? `What made ${pendingOutcome.prospect.full_name} ready for handoff?`
                   : `Why did ${pendingOutcome.prospect.full_name} slip?`}
               </h2>
               <p className="small">
@@ -853,7 +876,7 @@ export default function ProspectsPage() {
               onChange={(event) => setOutcomeReason(event.target.value)}
               placeholder={
                 pendingOutcome.stage === "won"
-                  ? "Referral, clear need, strong proposal..."
+                  ? "Signed retainer, kickoff booked, clear next step..."
                   : "No reply, price, bad fit, timing..."
               }
             />
@@ -869,7 +892,7 @@ export default function ProspectsPage() {
                   )
                 }
               >
-                Mark {pendingOutcome.stage === "won" ? "won" : "lost"}
+                Mark {pendingOutcome.stage === "won" ? "handoff" : "closed"}
               </button>
               <button
                 className="button buttonUtility"
@@ -890,20 +913,30 @@ export default function ProspectsPage() {
             <button className={view === "reports" ? "authModeTab active" : "authModeTab"} onClick={() => setView("reports")}>Dashboard</button>
             <button className={view === "pipeline" ? "authModeTab active" : "authModeTab"} onClick={() => setView("pipeline")}>Agency pipeline</button>
             <button className={view === "today" ? "authModeTab active" : "authModeTab"} onClick={() => setView("today")}>Today&apos;s work</button>
-            <button className={view === "list" ? "authModeTab active" : "authModeTab"} onClick={() => setView("list")}>Lead list</button>
+            <button className={view === "list" ? "authModeTab active" : "authModeTab"} onClick={() => setView("list")}>Workflow list</button>
           </div>
           <input className="input prospectSearch" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search lead, company, email..." />
-          <select className="input prospectStageFilter" value={stageFilter} onChange={(event) => setStageFilter(event.target.value as ProspectStage | "all")}>
-            <option value="all">All stages</option>
-            {PROSPECT_STAGES.map((stage) => <option key={stage} value={stage}>{PROSPECT_STAGE_LABELS[stage]}</option>)}
-          </select>
+        </div>
+
+        <div className="prospectWorkflowTabs" aria-label="Agency workflow view">
+          {PROSPECT_WORKFLOW_VIEWS.map((item) => (
+            <button
+              key={item}
+              type="button"
+              className={workflowView === item ? "prospectWorkflowTab isActive" : "prospectWorkflowTab"}
+              onClick={() => setWorkflowView(item)}
+            >
+              <span>{PROSPECT_WORKFLOW_LABELS[item]}</span>
+              <strong>{workflowCounts[item]}</strong>
+            </button>
+          ))}
         </div>
 
         {view === "pipeline" ? (
           <div className="prospectViewSection">
-          <div className="prospectViewHeading"><h2 className="sectionTitle">Agency pipeline by stage</h2><p className="muted">See each prospect, proposal, retainer, and client handoff in the right place with a clear next action.</p></div>
+          <div className="prospectViewHeading"><h2 className="sectionTitle">{PROSPECT_WORKFLOW_LABELS[workflowView]} by stage</h2><p className="muted">Switch between prospects, proposals, retainers, and client handoff without losing the next action for each lead.</p></div>
           <div className="prospectBoard">
-            {PROSPECT_STAGES.map((stage) => {
+            {visiblePipelineStages.map((stage) => {
               const stageProspects = filtered.filter((prospect) => prospect.stage === stage);
               return (
                 <section
@@ -948,7 +981,7 @@ export default function ProspectsPage() {
           </div>
         ) : view === "list" ? (
           <div className="prospectViewSection">
-          <div className="prospectViewHeading"><h2 className="sectionTitle">All prospects</h2><p className="muted">Scan every possible client in one place, then find the replies, proposals, retainers, handoffs, and cold leads that need action.</p></div>
+          <div className="prospectViewHeading"><h2 className="sectionTitle">{PROSPECT_WORKFLOW_LABELS[workflowView]}</h2><p className="muted">A focused list for this part of the agency workflow, from first prospect through proposal, retainer, and client handoff.</p></div>
           <div className="prospectTableWrap">
             <table className="prospectTable">
               <thead><tr><th>Lead</th><th>Stage</th><th>Client work value</th><th>Follow-up</th><th>Source</th><th>Actions</th></tr></thead>
@@ -1040,7 +1073,7 @@ export default function ProspectsPage() {
                 >
                   {dailyDashboard.nextMessageQueue.length ? "Open next message" : "Open today's work"}
                 </button>
-                <button className="button buttonSecondary" onClick={() => setView("pipeline")}>View opportunities</button>
+                <button className="button buttonSecondary" onClick={() => setView("pipeline")}>View pipeline</button>
               </div>
             </section>
 
@@ -1071,11 +1104,11 @@ export default function ProspectsPage() {
               </section>
 
               <section className="prospectDailyPanel">
-                <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">Basic reporting</h3><p className="muted">Simple proof of what is working: replies, booked calls, and won client work.</p></div>
+                <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">Basic reporting</h3><p className="muted">Simple proof of what is working: replies, booked calls, and client handoffs.</p></div>
                 <div className="prospectFocusStats">
                   <div><span>Replies</span><strong>{outreachMetrics.replied}</strong></div>
                   <div><span>Booked calls</span><strong>{outreachMetrics.meetings}</strong></div>
-                  <div><span>Won deals</span><strong>{outreachMetrics.won}</strong></div>
+                  <div><span>Client handoffs</span><strong>{outreachMetrics.won}</strong></div>
                 </div>
                 <p className="small" style={{ margin: "10px 0 0" }}>
                   Reply rate {acquisitionRates.reply}% from {outreachMetrics.contacted} contacted lead{outreachMetrics.contacted === 1 ? "" : "s"}.
@@ -1115,7 +1148,34 @@ export default function ProspectsPage() {
             </div>
 
             <section className="prospectDashboardSection prospectStageSnapshot">
-              <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">Agency stages</h3><p className="muted">A simple stage map for prospects, proposals, retainers, client handoff, booked clients, and slipped leads.</p></div>
+              <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">Agency workflow</h3><p className="muted">A simple view of where work sits: prospects, proposals, retainers, client handoff, and lost leads.</p></div>
+              <div className="prospectWorkflowSummary">
+                {PROSPECT_WORKFLOW_VIEWS.filter((item) => item !== "all").map((item) => (
+                  <button
+                    key={item}
+                    type="button"
+                    className="prospectWorkflowSummaryItem"
+                    onClick={() => {
+                      setWorkflowView(item);
+                      setView("pipeline");
+                    }}
+                  >
+                    <span>{PROSPECT_WORKFLOW_LABELS[item]}</span>
+                    <strong>{workflowCounts[item]}</strong>
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  className="prospectWorkflowSummaryItem"
+                  onClick={() => {
+                    setWorkflowView("all");
+                    setView("pipeline");
+                  }}
+                >
+                  <span>Lost / closed</span>
+                  <strong>{prospects.filter((prospect) => prospect.stage === "lost").length}</strong>
+                </button>
+              </div>
               <div className="prospectStageRows">
                 {report.stages.map((row) => (
                   <div key={row.stage}><span>{PROSPECT_STAGE_LABELS[row.stage]}</span><i><b style={{ width: `${prospects.length ? (row.count / prospects.length) * 100 : 0}%` }} /></i><strong>{row.count}</strong></div>
@@ -1129,8 +1189,8 @@ export default function ProspectsPage() {
                 {report.sourceBreakdown.slice(0, 6).map((row) => (
                   <div key={row.source}>
                     <span>{row.source}</span>
-                    <strong>{row.won} won</strong>
-                    <small>{row.leads} lead{row.leads === 1 ? "" : "s"} - {formatMoney(row.value)} booked</small>
+                    <strong>{row.won} handoff{row.won === 1 ? "" : "s"}</strong>
+                    <small>{row.leads} lead{row.leads === 1 ? "" : "s"} - {formatMoney(row.value)} client work</small>
                   </div>
                 ))}
                 {report.sourceBreakdown.length === 0 ? <p className="small">Add sources to leads to see what turns into client work.</p> : null}

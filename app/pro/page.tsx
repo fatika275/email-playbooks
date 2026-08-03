@@ -5,7 +5,7 @@ const proFeatures = [
   "Email templates to start conversations faster",
   "Agency pipeline stages for prospects, proposals, retainers, and client handoff",
   "Follow-up tools to stop warm leads slipping",
-  "Basic reporting for replies, booked calls, and won deals",
+  "Basic reporting for replies, booked calls, and client handoffs",
   "Reusable saved messages and follow-up plans",
 ];
 
