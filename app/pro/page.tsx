@@ -22,8 +22,9 @@ export default function ProPage() {
             <p className="muted" style={{ marginTop: 14, lineHeight: 1.75 }}>
               Pro connects the simple pieces small agencies need: templates to
               start conversations, agency-native pipeline tracking, follow-up
-              tools, and reporting that shows what is working. It is built to
-              move fast, not to out-feature larger CRM platforms.
+              tools, and reporting that shows what is working. It is built for
+              one job: turn outreach into booked clients, not act like a general
+              CRM for every business.
             </p>
           </div>
 

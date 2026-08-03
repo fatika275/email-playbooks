@@ -12,7 +12,7 @@ export default function SiteFooter() {
             A focused, agency-native outreach and pipeline tool for small agencies.
           </p>
           <p className="small footerMeta">
-            Built for one job: turn outreach into booked clients.
+            Built for one job: turn outreach into booked clients, not a general CRM.
           </p>
         </div>
 

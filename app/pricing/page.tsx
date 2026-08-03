@@ -28,9 +28,8 @@ export default function PricingPage() {
           >
             Thalovo is built for one job: turn outreach into booked clients.
             It helps small agencies send better outreach, track prospects,
-            chase proposals, and show what is working. The advantage is focus,
-            speed, and agency-native workflow, not trying to out-feature larger
-            CRM platforms.
+            chase proposals, and show what is working instead of being a
+            general CRM for every business.
           </p>
 
           <p
