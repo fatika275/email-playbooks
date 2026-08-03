@@ -819,8 +819,8 @@ export default function ProspectsPage() {
         {prospects.length === 0 ? (
           <section className="prospectOnboarding">
             <div>
-              <span className="miniBadge">First client-work setup</span>
-              <h2 className="sectionTitle">Track your first lead after they reply</h2>
+              <span className="miniBadge">Start in minutes</span>
+              <h2 className="sectionTitle">Set up the first lead, not a whole CRM</h2>
               <p className="muted">
                 Add one real lead, choose the follow-up plan that fits, send the first message, then keep their stage and next action clear.
               </p>

@@ -405,7 +405,7 @@ export default function AccountPage() {
                   <section className="accountSetupGuide" aria-label="Getting started">
                     <div className="accountSetupGuideHeader">
                       <div>
-                        <span className="miniBadge">Start here</span>
+                        <span className="miniBadge">Start in minutes</span>
                         <h3 className="cardTitle">Get from signup to first follow-up</h3>
                       </div>
                       <button className="button buttonUtility" type="button" onClick={dismissSetupGuide}>
@@ -416,17 +416,17 @@ export default function AccountPage() {
                       <Link href="/library" className="accountSetupStep">
                         <strong>1</strong>
                         <span>Pick an outreach message</span>
-                        <small>Start conversations faster without rewriting from scratch.</small>
+                        <small>Use a ready message instead of building a template system first.</small>
                       </Link>
                       <Link href="/prospects" className="accountSetupStep">
                         <strong>2</strong>
                         <span>Add a lead</span>
-                        <small>Track stage, reply status, and the next action.</small>
+                        <small>Start with one real prospect, not days of pipeline setup.</small>
                       </Link>
                       <Link href="/sequence-builder" className="accountSetupStep">
                         <strong>3</strong>
                         <span>Build a follow-up plan</span>
-                        <small>Save the reminders that stop leads slipping.</small>
+                        <small>Save the reminders that stop leads slipping after the first touch.</small>
                       </Link>
                       <Link href="/pricing" className="accountSetupStep">
                         <strong>4</strong>
@@ -440,7 +440,7 @@ export default function AccountPage() {
                 <div className="accountQuickLinks">
                   <Link href="/prospects" className="glassCard clickable accountQuickLink">
                     <strong>Open pipeline</strong>
-                    <span className="muted">Track stages, replies, and next actions</span>
+                    <span className="muted">Track prospects, proposals, retainers, and handoff</span>
                   </Link>
 
                   <Link href="/library" className="glassCard clickable accountQuickLink">

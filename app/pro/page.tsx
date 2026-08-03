@@ -3,6 +3,7 @@ import { CheckoutButton } from "@/components/checkout-button";
 
 const proFeatures = [
   "Email templates to start conversations faster",
+  "Start with one prospect and a ready-made agency workflow",
   "Agency pipeline stages for prospects, proposals, retainers, and client handoff",
   "Follow-up tools to stop warm leads slipping",
   "Basic reporting for replies, booked calls, and client handoffs",
@@ -24,7 +25,8 @@ export default function ProPage() {
               start conversations, agency-native pipeline tracking, follow-up
               tools, and reporting that shows what is working. It is built for
               one job: turn outreach into booked clients, not act like a general
-              CRM for every business.
+              CRM for every business. Start in minutes instead of spending days
+              configuring a sales system.
             </p>
           </div>
 
@@ -63,15 +65,16 @@ export default function ProPage() {
                 Small agency owners, founders, and lean sales teams that have
                 leads coming in but need one clear workflow for outreach,
                 proposals, retainers, follow-ups, and booking clients without a
-                heavy sales platform.
+                heavy sales platform or a long setup project.
               </p>
             </div>
 
             <div className="glassCard planDetailCard">
               <h2 className="cardTitle">What happens next</h2>
               <p className="muted" style={{ marginTop: 10, lineHeight: 1.75 }}>
-                Create an account, complete checkout, then start moving leads
-                from first touch to booked call to active client.
+                Create an account, complete checkout, add one prospect, choose a
+                follow-up plan, and start moving leads from first touch to
+                booked client work.
               </p>
             </div>
           </div>

@@ -645,10 +645,10 @@ export default function ProspectDetailPage() {
         {showOnboardingGuide ? (
           <section className="prospectOnboarding prospectOnboardingDetail">
             <div>
-              <span className="miniBadge">Pipeline setup</span>
+              <span className="miniBadge">Minutes, not days</span>
               <h2 className="sectionTitle">Give this lead a stage and a next action</h2>
               <p className="muted">
-                Choose a follow-up plan, open the first message, then keep the stage and next reminder clear so this lead does not disappear after the first touch.
+                Choose a follow-up plan, open the first message, then set the next reminder. No custom CRM setup needed before the agency can start chasing work.
               </p>
             </div>
             <div className="prospectOnboardingSteps">

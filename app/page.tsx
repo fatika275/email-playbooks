@@ -45,7 +45,8 @@ export default function HomePage() {
             Thalovo is built for one job: turn outreach into booked clients.
             It gives small agencies the focused workflow for templates,
             pipeline, follow-ups, team visibility, and reporting instead of
-            being a general CRM for every business.
+            being a general CRM for every business. Start in minutes with one
+            prospect, one message, and one follow-up.
           </p>
 
           <div className="heroActions homeHeroActions">
@@ -70,6 +71,10 @@ export default function HomePage() {
       <ScrollReveal as="section" className="container section" delay={80}>
         <div className="homeMetrics">
           <div>
+            <strong>Fast setup</strong>
+            <span>Start with one prospect instead of configuring a system for days</span>
+          </div>
+          <div>
             <strong>Email templates</strong>
             <span>Start conversations without rewriting from scratch</span>
           </div>
@@ -92,8 +97,9 @@ export default function HomePage() {
               Email templates start the conversation. The pipeline tracks
               prospects, proposals, retainers, and handoffs. Team sharing keeps
               everyone aligned, follow-up tools prevent leaks, and reporting
-              shows what is working. No heavy sales suite, just the pieces small
-              agencies need to turn outreach into booked clients.
+              shows what is working. No days of setup, no heavy sales suite,
+              just the pieces small agencies need to turn outreach into booked
+              clients.
             </p>
           </div>
         </div>
@@ -124,7 +130,8 @@ export default function HomePage() {
               Thalovo stays intentionally narrow: start from a prospect, send
               the right follow-up, move proposals and retainers forward, and
               keep client handoff visible without the clutter of a platform
-              built for every sales team.
+              built for every sales team. Add the first lead and start using it
+              the same day.
             </p>
           </div>
 
