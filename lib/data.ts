@@ -37,7 +37,7 @@ export const playbooks: Playbook[] = [
     description:
       "A structured cold outreach system for agencies and founders to start conversations, follow up with intent, and move cold leads toward replies.",
     audience: "Agencies & Founders",
-    badge: "Client Acquisition",
+    badge: "Outreach sequence",
     salesStage: "First outreach",
     templates: [
       {
@@ -233,7 +233,7 @@ Best,
     description:
       "A library of follow-up frameworks for agencies and founders who need better ways to restart, nudge, and progress conversations.",
     audience: "Agencies & Founders",
-    badge: "Follow-Up",
+    badge: "Follow-up template",
     salesStage: "Follow-up",
     templates: [
       {
@@ -408,7 +408,7 @@ Best,
     description:
       "A set of practical replies for handling pushback on pricing, timing, competitors, and information requests without sounding defensive.",
     audience: "Agencies & Founders",
-    badge: "Objections",
+    badge: "Follow-up template",
     salesStage: "Objection handling",
     templates: [
       {
@@ -583,13 +583,13 @@ Best,
 
   {
     id: "re-engagement-emails",
-    name: "Agency Re-Engagement Emails",
-    shortDescription: "Restart conversations that went cold.",
+    name: "Agency Client Win-Back Emails",
+    shortDescription: "Restart conversations with cold leads and past clients.",
     description:
       "A playbook for reviving old leads, reconnecting after timing issues, and reopening conversations that have gone quiet.",
     audience: "Agencies & Founders",
-    badge: "Re-Engagement",
-    salesStage: "Re-engagement",
+    badge: "Client win-back",
+    salesStage: "Win-back",
     templates: [
       {
         id: "old-lead-restart",
@@ -712,12 +712,12 @@ Best,
 
   {
     id: "proposal-follow-up",
-    name: "Proposal Follow-Up",
-    shortDescription: "Keep deals moving after sending a proposal.",
+    name: "Proposal Reminder Flow",
+    shortDescription: "Keep proposals moving after sending scope or pricing.",
     description:
       "A practical library for checking in on proposals, surfacing objections, and moving opportunities toward a decision.",
     audience: "Agencies & Founders",
-    badge: "Proposal",
+    badge: "Proposal reminder",
     salesStage: "Proposal decision",
     templates: [
       {
@@ -846,7 +846,7 @@ Best,
     description:
       "A practical playbook for recapping meetings, confirming decisions, and keeping post-call momentum alive.",
     audience: "Agencies & Founders",
-    badge: "Recap",
+    badge: "Follow-up template",
     salesStage: "Post-call",
     templates: [
       {
@@ -906,7 +906,7 @@ Best,
     description:
       "A small follow-up plan for turning interest into a booked demo or discovery call without sounding too heavy.",
     audience: "Agencies & Founders",
-    badge: "Demo",
+    badge: "Outreach sequence",
     salesStage: "Booking call",
     templates: [
       {
@@ -995,7 +995,7 @@ Best,
     description:
       "A playbook for replying to inbound leads, qualifying interest, and moving conversations toward a call or clearer next step.",
     audience: "Founders & Small Teams",
-    badge: "Inbound",
+    badge: "Outreach sequence",
     salesStage: "Inbound reply",
     templates: [
       {
@@ -1096,7 +1096,7 @@ Best,
     description:
       "A playbook for following up after missed calls, reducing awkwardness, and getting the conversation back on track.",
     audience: "Agencies & Founders",
-    badge: "Recovery",
+    badge: "Follow-up template",
     salesStage: "Missed call",
     templates: [
       {
@@ -1186,13 +1186,13 @@ Best,
 
   {
     id: "client-renewal-upsell",
-    name: "Client Renewal & Upsell",
-    shortDescription: "Extend client work and open the next conversation.",
+    name: "Client Win-Back & Renewal",
+    shortDescription: "Extend client work and reopen past-client conversations.",
     description:
       "A playbook for renewing client relationships, opening next-step conversations, and introducing upsell opportunities more naturally.",
     audience: "Agencies & Consultants",
-    badge: "Renewal",
-    salesStage: "Renewal / upsell",
+    badge: "Client win-back",
+    salesStage: "Win-back / renewal",
     templates: [
       {
         id: "renewal-check-in",

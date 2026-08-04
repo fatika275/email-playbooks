@@ -142,7 +142,7 @@ export default function PricingPage() {
             </p>
 
             <ul className="featureList">
-              <li>Email templates to start conversations faster</li>
+              <li>Outreach sequences, follow-up templates, proposal reminders, and client win-back flows</li>
               <li>Start with one prospect and a ready-made agency workflow</li>
               <li>Agency pipeline stages for prospects, proposals, retainers, and client handoff</li>
               <li>Follow-up tools to stop warm leads slipping</li>

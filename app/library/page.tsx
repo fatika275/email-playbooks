@@ -7,8 +7,49 @@ import { getPlaybookAccess } from "@/lib/access";
 import { trackEvent } from "@/lib/analytics";
 import { playbooks } from "@/lib/data";
 
+const TEMPLATE_GROUPS = [
+  {
+    id: "all",
+    label: "All agency templates",
+    description: "Every saved message flow.",
+    playbookIds: playbooks.map((playbook) => playbook.id),
+  },
+  {
+    id: "outreach",
+    label: "Outreach sequences",
+    description: "Start conversations with new prospects.",
+    playbookIds: ["cold-outreach-sequence", "demo-booking-sequence", "inbound-lead-replies"],
+  },
+  {
+    id: "followup",
+    label: "Follow-up templates",
+    description: "Keep warm leads moving after the first touch.",
+    playbookIds: ["follow-up-frameworks", "meeting-follow-up", "no-show-recovery", "objection-handling-replies"],
+  },
+  {
+    id: "proposal",
+    label: "Proposal reminders",
+    description: "Chase decisions after sending scope or pricing.",
+    playbookIds: ["proposal-follow-up"],
+  },
+  {
+    id: "winback",
+    label: "Client win-back flows",
+    description: "Restart cold leads and past-client conversations.",
+    playbookIds: ["re-engagement-emails", "client-renewal-upsell"],
+  },
+] satisfies {
+  id: string;
+  label: string;
+  description: string;
+  playbookIds: string[];
+}[];
+
+type TemplateGroupId = (typeof TEMPLATE_GROUPS)[number]["id"];
+
 export default function LibraryPage() {
   const [query, setQuery] = useState("");
+  const [templateGroup, setTemplateGroup] = useState<TemplateGroupId>("all");
   const [badgeFilter, setBadgeFilter] = useState("All");
   const [audienceFilter, setAudienceFilter] = useState("All");
   const [stageFilter, setStageFilter] = useState("All");
@@ -36,7 +77,9 @@ export default function LibraryPage() {
 
   const filteredPlaybooks = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
+    const activeGroup = TEMPLATE_GROUPS.find((group) => group.id === templateGroup) ?? TEMPLATE_GROUPS[0];
     const filtered = playbooks.filter((playbook) => {
+      const matchesTemplateGroup = activeGroup.playbookIds.includes(playbook.id);
       const matchesQuery =
         normalizedQuery.length === 0 ||
         [
@@ -63,7 +106,7 @@ export default function LibraryPage() {
       const matchesStage =
         stageFilter === "All" || playbook.salesStage === stageFilter;
 
-      return matchesQuery && matchesBadge && matchesAudience && matchesStage;
+      return matchesTemplateGroup && matchesQuery && matchesBadge && matchesAudience && matchesStage;
     });
 
     const sorted = [...filtered];
@@ -74,21 +117,35 @@ export default function LibraryPage() {
     }
 
     return sorted;
-  }, [query, badgeFilter, audienceFilter, stageFilter, sortBy]);
+  }, [query, templateGroup, badgeFilter, audienceFilter, stageFilter, sortBy]);
 
   return (
     <main className="main">
       <section className="container">
         <div className="pageHeader libraryHeader">
-          <div className="badge">Lead Capture and Outreach</div>
+          <div className="badge">Agency template library</div>
           <h1 className="pageTitle" style={{ marginTop: 14 }}>
-            Find the right message for the use case in front of you.
+            Templates that match agency work.
           </h1>
           <p className="muted">
-            Templates are grouped by outreach type, client type, and sales
-            stage so your agency can move faster without digging through a
-            giant generic library.
+            Start with outreach sequences, follow-up templates, proposal
+            reminders, and client win-back flows so your agency can move leads
+            forward without digging through a giant generic library.
           </p>
+        </div>
+
+        <div className="libraryTemplateGroups" aria-label="Agency template type">
+          {TEMPLATE_GROUPS.map((group) => (
+            <button
+              key={group.id}
+              type="button"
+              className={templateGroup === group.id ? "libraryTemplateGroup isActive" : "libraryTemplateGroup"}
+              onClick={() => setTemplateGroup(group.id)}
+            >
+              <span>{group.label}</span>
+              <small>{group.description}</small>
+            </button>
+          ))}
         </div>
 
         <div className="glassCard libraryFilters">
@@ -183,6 +240,7 @@ export default function LibraryPage() {
               className="button buttonUtility"
               onClick={() => {
                 setQuery("");
+                setTemplateGroup("all");
                 setBadgeFilter("All");
                 setAudienceFilter("All");
                 setStageFilter("All");

@@ -130,7 +130,7 @@ export default function SavedEmailsPage() {
 
             <div className="toolbar" style={{ justifyContent: "center", marginTop: 20 }}>
               <Link href="/library" className="button buttonPrimary">
-                Browse Lead Capture
+                Browse Agency Templates
               </Link>
             </div>
           </div>

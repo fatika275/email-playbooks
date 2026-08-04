@@ -23,7 +23,7 @@ export default function SiteFooter() {
               Pipeline
             </Link>
             <Link href="/library" className="footerLink">
-              Lead Capture
+              Agency Templates
             </Link>
             <Link href="/workspace" className="footerLink">
               Saved Work

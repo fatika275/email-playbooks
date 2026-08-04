@@ -185,13 +185,13 @@ export default function PlaybookPage() {
       <main className="main">
         <section className="container">
           <div className="glassCard emptyState">
-            <h1 className="pageTitle">Playbook not found</h1>
+            <h1 className="pageTitle">Template flow not found</h1>
             <p className="muted">
-              This playbook does not exist. Try going back to lead capture and outreach.
+              This template flow does not exist. Try going back to the agency template library.
             </p>
             <div className="toolbar" style={{ justifyContent: "center" }}>
               <Link href="/library" className="button buttonPrimary">
-                Back to Lead Capture
+                Back to Agency Templates
               </Link>
             </div>
           </div>
@@ -205,21 +205,22 @@ export default function PlaybookPage() {
       <main className="main">
         <section className="container">
           <div className="glassCard emptyState">
-            <div className="badge">Pro Playbook</div>
+            <div className="badge">Pro template flow</div>
             <h1 className="pageTitle" style={{ marginTop: 14 }}>
               Unlock {playbook.name}
             </h1>
             <p className="muted" style={{ maxWidth: 680, marginInline: "auto" }}>
-              This is part of the Pro outreach library. Free access includes
-              the core messages. Pro unlocks more ways to start conversations,
-              follow up, handle objections, and keep promising leads moving.
+              This is part of the Pro agency template library. Free access
+              includes the core messages. Pro unlocks outreach sequences,
+              follow-up templates, proposal reminders, and client win-back
+              flows.
             </p>
             <div className="toolbar" style={{ justifyContent: "center", marginTop: 20 }}>
               <Link href="/pricing" className="button buttonPrimary">
                 View Pro
               </Link>
               <Link href="/library" className="button buttonSecondary">
-                Back to Free Library
+                Back to Template Library
               </Link>
             </div>
           </div>

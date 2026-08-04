@@ -803,6 +803,52 @@ textarea {
   margin-bottom: 22px;
 }
 
+.libraryTemplateGroups {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.libraryTemplateGroup {
+  min-width: 0;
+  min-height: 86px;
+  padding: 13px;
+  display: grid;
+  align-content: start;
+  gap: 7px;
+  color: #b8b8b8;
+  text-align: left;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #080808;
+  cursor: pointer;
+  transition: border-color 0.16s ease, background 0.16s ease, color 0.16s ease;
+}
+
+.libraryTemplateGroup:hover,
+.libraryTemplateGroup.isActive {
+  color: #ffffff;
+  border-color: #3a3a3a;
+  background: #101010;
+}
+
+.libraryTemplateGroup span,
+.libraryTemplateGroup small {
+  overflow-wrap: anywhere;
+}
+
+.libraryTemplateGroup span {
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.libraryTemplateGroup small {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.35;
+}
+
 .libraryFilterGrid {
   grid-template-columns: minmax(260px, 1.45fr) minmax(150px, 0.9fr) minmax(150px, 0.9fr) minmax(150px, 0.9fr) minmax(130px, 0.75fr);
 }
@@ -3865,6 +3911,10 @@ details[open] > summary::after {
   .libraryGrid,
   .libraryFilterGrid {
     grid-template-columns: 1fr;
+  }
+
+  .libraryTemplateGroups {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .homeMetrics {

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { CheckoutButton } from "@/components/checkout-button";
 
 const proFeatures = [
-  "Email templates to start conversations faster",
+  "Outreach sequences, follow-up templates, proposal reminders, and client win-back flows",
   "Start with one prospect and a ready-made agency workflow",
   "Agency pipeline stages for prospects, proposals, retainers, and client handoff",
   "Follow-up tools to stop warm leads slipping",
@@ -21,12 +21,12 @@ export default function ProPage() {
               Built for one job: turn outreach into booked clients.
             </h1>
             <p className="muted" style={{ marginTop: 14, lineHeight: 1.75 }}>
-              Pro connects the simple pieces small agencies need: templates to
-              start conversations, agency-native pipeline tracking, follow-up
-              tools, and reporting that shows what is working. It is built for
-              one job: turn outreach into booked clients, not act like a general
-              CRM for every business. Start in minutes instead of spending days
-              configuring a sales system.
+              Pro connects the simple pieces small agencies need: outreach
+              sequences, follow-up templates, proposal reminders, client
+              win-back flows, agency-native pipeline tracking, and reporting
+              that shows what is working. It is built for one job: turn outreach
+              into booked clients, not act like a general CRM for every
+              business.
             </p>
           </div>
 

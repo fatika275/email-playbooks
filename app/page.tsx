@@ -7,7 +7,7 @@ import { trackEvent } from "@/lib/analytics";
 const workflow = [
   {
     title: "Email templates",
-    text: "Start the conversation faster with use-case messages for outreach, replies, proposals, and re-engagement.",
+    text: "Use outreach sequences, follow-up templates, proposal reminders, and client win-back flows.",
   },
   {
     title: "Pipeline",
@@ -76,7 +76,7 @@ export default function HomePage() {
           </div>
           <div>
             <strong>Email templates</strong>
-            <span>Start conversations without rewriting from scratch</span>
+            <span>Outreach, follow-up, proposal, and win-back messages</span>
           </div>
           <div>
             <strong>Pipeline</strong>
@@ -94,12 +94,11 @@ export default function HomePage() {
           <div>
             <h2 className="pageTitle">A simple path from first email to booked work</h2>
             <p className="muted">
-              Email templates start the conversation. The pipeline tracks
-              prospects, proposals, retainers, and handoffs. Team sharing keeps
-              everyone aligned, follow-up tools prevent leaks, and reporting
-              shows what is working. No days of setup, no heavy sales suite,
-              just the pieces small agencies need to turn outreach into booked
-              clients.
+              Outreach sequences start the conversation. Follow-up templates,
+              proposal reminders, and client win-back flows keep leads moving.
+              The pipeline tracks prospects, proposals, retainers, and
+              handoffs. No days of setup, no heavy sales suite, just the pieces
+              small agencies need to turn outreach into booked clients.
             </p>
           </div>
         </div>
