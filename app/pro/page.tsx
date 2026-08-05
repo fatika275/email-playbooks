@@ -6,7 +6,7 @@ const proFeatures = [
   "Start with one prospect and a ready-made agency workflow",
   "Agency pipeline stages for prospects, proposals, retainers, and client handoff",
   "Follow-up tools to stop warm leads slipping",
-  "Basic reporting for replies, booked calls, and client handoffs",
+  "Outcome reporting for replies, booked calls, closed deals, and lead leakage",
   "Reusable saved messages and follow-up plans",
 ];
 
@@ -23,10 +23,10 @@ export default function ProPage() {
             <p className="muted" style={{ marginTop: 14, lineHeight: 1.75 }}>
               Pro connects the simple pieces small agencies need: outreach
               sequences, follow-up templates, proposal reminders, client
-              win-back flows, agency-native pipeline tracking, and reporting
-              that shows what is working. It is built for one job: turn outreach
-              into booked clients, not act like a general CRM for every
-              business.
+              win-back flows, agency-native pipeline tracking, and outcome
+              reporting for replies, booked calls, closed deals, and lead
+              leakage. It is built for one job: turn outreach into booked
+              clients, not act like a general CRM for every business.
             </p>
           </div>
 

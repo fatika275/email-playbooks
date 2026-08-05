@@ -28,9 +28,10 @@ export default function PricingPage() {
           >
             Thalovo is built for one job: turn outreach into booked clients.
             It helps small agencies send better outreach, track prospects,
-            chase proposals, and show what is working instead of being a
-            general CRM for every business. Start in minutes, not after days of
-            configuring fields, stages, dashboards, and menus.
+            chase proposals, and see replies, booked calls, closed deals, and
+            lead leakage instead of being a general CRM for every business.
+            Start in minutes, not after days of configuring fields, stages,
+            dashboards, and menus.
           </p>
 
           <p
@@ -146,7 +147,7 @@ export default function PricingPage() {
               <li>Start with one prospect and a ready-made agency workflow</li>
               <li>Agency pipeline stages for prospects, proposals, retainers, and client handoff</li>
               <li>Follow-up tools to stop warm leads slipping</li>
-              <li>Basic reporting for replies, booked calls, and client handoffs</li>
+              <li>Outcome reporting for replies, booked calls, closed deals, and lead leakage</li>
               <li>Reusable saved messages and follow-up plans</li>
             </ul>
 

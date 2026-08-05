@@ -910,7 +910,7 @@ export default function ProspectsPage() {
 
         <div className="prospectToolbar">
           <div className="authModeTabs prospectViewTabs" role="tablist" aria-label="Prospect view">
-            <button className={view === "reports" ? "authModeTab active" : "authModeTab"} onClick={() => setView("reports")}>Dashboard</button>
+            <button className={view === "reports" ? "authModeTab active" : "authModeTab"} onClick={() => setView("reports")}>Outcomes</button>
             <button className={view === "pipeline" ? "authModeTab active" : "authModeTab"} onClick={() => setView("pipeline")}>Agency pipeline</button>
             <button className={view === "today" ? "authModeTab active" : "authModeTab"} onClick={() => setView("today")}>Today&apos;s work</button>
             <button className={view === "list" ? "authModeTab active" : "authModeTab"} onClick={() => setView("list")}>Workflow list</button>
@@ -1055,7 +1055,7 @@ export default function ProspectsPage() {
                   <span>{dailyDashboard.followUpsDue} follow-up{dailyDashboard.followUpsDue === 1 ? "" : "s"} due</span>
                   <span>{dailyDashboard.replyNeeded.length} repl{dailyDashboard.replyNeeded.length === 1 ? "y" : "ies"} waiting</span>
                   <span>{dailyDashboard.proposalsToChase.length} proposal{dailyDashboard.proposalsToChase.length === 1 ? "" : "s"} to chase</span>
-                  <span>{dailyDashboard.coldProspects.length} lead{dailyDashboard.coldProspects.length === 1 ? "" : "s"} going cold</span>
+                  <span>{dailyDashboard.coldProspects.length} leakage risk{dailyDashboard.coldProspects.length === 1 ? "" : "s"}</span>
                   <span>{formatMoney(metrics.value)} active potential work</span>
                 </div>
               </div>
@@ -1093,7 +1093,7 @@ export default function ProspectsPage() {
                   {dailyDashboard.supportingItems.length === 0 ? (
                     <div className="prospectDailyEmpty">
                       <strong>No extra work queued</strong>
-                      <p className="muted">Handle the main action above, or add leads and schedule follow-ups so delay does not become a lost deal.</p>
+                      <p className="muted">Handle the main action above, or add leads and schedule follow-ups so delay does not become lead leakage.</p>
                       <div className="prospectExampleList">
                         <span>Example: Chase proposal decision</span>
                         <span>Example: Rescue a lead after 14 quiet days</span>
@@ -1104,11 +1104,12 @@ export default function ProspectsPage() {
               </section>
 
               <section className="prospectDailyPanel">
-                <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">Basic reporting</h3><p className="muted">Simple proof of what is working: replies, booked calls, and client handoffs.</p></div>
+                <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">Outcome reporting</h3><p className="muted">Track replies, booked calls, closed deals, and lead leakage instead of generic dashboards.</p></div>
                 <div className="prospectFocusStats">
                   <div><span>Replies</span><strong>{outreachMetrics.replied}</strong></div>
                   <div><span>Booked calls</span><strong>{outreachMetrics.meetings}</strong></div>
-                  <div><span>Client handoffs</span><strong>{outreachMetrics.won}</strong></div>
+                  <div><span>Closed deals</span><strong>{outreachMetrics.won}</strong></div>
+                  <div><span>Lead leakage</span><strong>{dailyDashboard.coldProspects.length}</strong></div>
                 </div>
                 <p className="small" style={{ margin: "10px 0 0" }}>
                   Reply rate {acquisitionRates.reply}% from {outreachMetrics.contacted} contacted lead{outreachMetrics.contacted === 1 ? "" : "s"}.
@@ -1129,7 +1130,7 @@ export default function ProspectsPage() {
                   {dailyDashboard.proposalsToChase.length === 0 ? <p className="small">No proposals need chasing right now.</p> : null}
                 </div>
 
-                <div className="prospectDashboardSectionHeading prospectDashboardSubsection"><h3 className="cardTitle">Cold lead rescue</h3></div>
+                <div className="prospectDashboardSectionHeading prospectDashboardSubsection"><h3 className="cardTitle">Lead leakage</h3></div>
                 <div className="prospectMiniList">
                   {dailyDashboard.coldProspects.slice(0, 4).map((prospect) => (
                     <div key={prospect.id} className="prospectMiniListItem prospectMiniListAction">
@@ -1142,7 +1143,7 @@ export default function ProspectsPage() {
                       </button>
                     </div>
                   ))}
-                  {dailyDashboard.coldProspects.length === 0 ? <p className="small">No stale leads need rescuing.</p> : null}
+                  {dailyDashboard.coldProspects.length === 0 ? <p className="small">No leads are leaking right now.</p> : null}
                 </div>
               </section>
             </div>
@@ -1184,7 +1185,7 @@ export default function ProspectsPage() {
             </section>
 
             <section className="prospectDashboardSection">
-              <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">What is working</h3><p className="muted">Light source reporting only: enough to see where replies and booked work are coming from early.</p></div>
+              <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">What is working</h3><p className="muted">Outcome source reporting only: enough to see where replies, calls, and closed work are coming from early.</p></div>
               <div className="prospectSourceRows">
                 {report.sourceBreakdown.slice(0, 6).map((row) => (
                   <div key={row.source}>

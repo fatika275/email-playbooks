@@ -22,8 +22,8 @@ const workflow = [
     text: "Use saved plans, reminders, and lead context so warm prospects do not slip after a delay.",
   },
   {
-    title: "Reporting",
-    text: "See simple proof of what is working: replies, booked calls, client handoffs, and agency stages.",
+    title: "Outcome reporting",
+    text: "Track replies, booked calls, closed deals, and lead leakage, not generic dashboards.",
   },
 ];
 
@@ -44,7 +44,7 @@ export default function HomePage() {
           <p className="homeHeroText">
             Thalovo is built for one job: turn outreach into booked clients.
             It gives small agencies the focused workflow for templates,
-            pipeline, follow-ups, team visibility, and reporting instead of
+            pipeline, follow-ups, team visibility, and outcome reporting instead of
             being a general CRM for every business. Start in minutes with one
             prospect, one message, and one follow-up, not a maze of menus and
             settings.
