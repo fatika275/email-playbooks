@@ -15,7 +15,7 @@ export default function PricingPage() {
           <div className="badge">Pricing</div>
 
           <h1 className="pageTitle" style={{ marginTop: 14 }}>
-            Choose the outreach and pipeline setup your agency needs
+            Simple pricing for agencies turning outreach into booked work
           </h1>
 
           <p
@@ -44,8 +44,8 @@ export default function PricingPage() {
             }}
           >
             {founderEligible
-              ? "Founder checkout is unlocked on this account. Complete payment to activate Founder Pro."
-              : "Start lightweight, then upgrade when your agency needs the full outreach-to-pipeline workflow."}
+              ? "Founder checkout is unlocked on this account. Complete payment to lock in your early supporter price."
+              : "Start free, upgrade to Pro when you are ready to track real leads, or choose Business Pro when the team needs shared pipeline access."}
           </p>
         </div>
 
@@ -57,10 +57,10 @@ export default function PricingPage() {
               <span className="muted">/month locked</span>
             </h2>
             <p className="muted" style={{ marginTop: 10, lineHeight: 1.75 }}>
-              Founder Pro gives selected early users the full Pro feature set
-              at a lower locked monthly price. It is invite-only, and you can
-              register interest without booking a call. Founder Pro covers one
-              individual account and does not include Business Pro team seats.
+              Founder Pro is the early supporter price for selected users: full
+              Pro access for one individual account, locked while your account
+              stays active. It is invite-only and does not include Business Pro
+              team seats.
             </p>
           </div>
 
@@ -137,9 +137,8 @@ export default function PricingPage() {
             </h2>
 
             <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
-              For agency owners and founders who want a focused way to start
-              conversations, track prospects, chase proposals, and turn
-              outreach into booked client work faster without a long setup.
+              For solo agency owners who want to turn outreach into booked
+              client work without setting up a full CRM.
             </p>
 
             <ul className="featureList">
@@ -174,8 +173,8 @@ export default function PricingPage() {
             </h2>
 
             <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
-              Shared pipeline, shared notes, and simple ownership rules for
-              small teams handling leads together.
+              For small agency teams that need a shared pipeline, shared notes,
+              and simple lead ownership.
             </p>
 
             <ul className="featureList">
@@ -210,25 +209,24 @@ export default function PricingPage() {
               <div className="glassCard" style={{ padding: 20 }}>
                 <h3 className="cardTitle">Free</h3>
                 <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
-                  Best for trying the message playbooks before moving tracking
-                  and follow-up into Thalovo.
+                  Best for trying agency templates before moving follow-up and
+                  pipeline tracking into Thalovo.
                 </p>
               </div>
 
               <div className="glassCard" style={{ padding: 20 }}>
                 <h3 className="cardTitle">Pro</h3>
                 <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
-                  Better if leads are coming in and you need the fastest route
-                  from outreach to proposal, retainer, and booked client.
+                  Best for solo agency owners turning outreach into booked
+                  client work.
                 </p>
               </div>
 
               <div className="glassCard" style={{ padding: 20 }}>
                 <h3 className="cardTitle">Business Pro</h3>
                 <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
-                  Best when more than one person handles leads and the team
-                  needs a shared pipeline, shared notes, and clear lead owners
-                  without extra menus, settings, or CRM admin overhead.
+                  Best for small teams sharing pipeline, notes, templates, and
+                  lead ownership without extra menus or CRM admin overhead.
                 </p>
               </div>
 

@@ -21,7 +21,7 @@ export default function BusinessPage() {
           <div>
             <div className="badge">Business Pro</div>
             <h1 className="pageTitle" style={{ marginTop: 14 }}>
-              Team collaboration without CRM bloat.
+              For small agency teams sharing pipeline, notes, and lead ownership.
             </h1>
             <p className="muted" style={{ marginTop: 14, lineHeight: 1.75 }}>
               For small agencies where the founder is not the only person
@@ -44,8 +44,8 @@ export default function BusinessPage() {
               GBP 29<span className="muted">/month</span>
             </h2>
             <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
-              Only the workspace owner is billed. Invite teammates after payment
-              so everyone works from the same pipeline, notes, lead owners, and
+              One workspace, one payment, and up to 10 teammates included so
+              everyone works from the same pipeline, notes, lead owners, and
               next actions.
             </p>
             <div style={{ marginTop: 20 }}>

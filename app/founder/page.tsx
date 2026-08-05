@@ -57,13 +57,13 @@ export default function FounderPage() {
         <div className="pageHeader">
           <div className="badge">Founder Pro</div>
           <h1 className="pageTitle" style={{ marginTop: 14 }}>
-            Locked Pro access for early users
+            Lock in the early supporter price.
           </h1>
           <p className="muted" style={{ maxWidth: 760, lineHeight: 1.75 }}>
-            Founder Pro is for selected early users who want the full Pro system
-            at a lower monthly price while Thalovo continues to improve. It is
-            an individual plan for one person; businesses that need teammate
-            access should use Business Pro.
+            Founder Pro is for selected early users who want full Pro at a
+            lower monthly price while Thalovo keeps improving. It is one
+            individual account, not a team plan; choose Business Pro when
+            teammates need shared pipeline access.
           </p>
         </div>
 
@@ -86,7 +86,7 @@ export default function FounderPage() {
 
             <p className="muted" style={{ marginTop: 10, lineHeight: 1.75 }}>
               If your account is approved, Founder checkout unlocks on this
-              account. Payment activates the plan.
+              account. Payment activates the locked early supporter price.
             </p>
 
             <ul className="featureList">
@@ -111,7 +111,7 @@ export default function FounderPage() {
             </h2>
             <p className="muted" style={{ marginTop: 10, lineHeight: 1.75 }}>
               {founderEligible
-                ? "Your account is approved for Founder pricing. Complete checkout to activate Founder Pro."
+                ? "Your account is approved for the early supporter price. Complete checkout to activate Founder Pro."
                 : user
                   ? "Join the Founder waitlist with your signed-in account. If selected, the Founder checkout unlocks on pricing."
                   : "Sign in or create an account first so your Founder request can be linked to a real profile for approval."}
