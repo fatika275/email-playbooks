@@ -799,7 +799,7 @@ textarea {
 }
 
 .libraryFilters {
-  padding: 22px;
+  padding: 16px;
   margin-bottom: 22px;
 }
 
@@ -850,7 +850,10 @@ textarea {
 }
 
 .libraryFilterGrid {
-  grid-template-columns: minmax(260px, 1.45fr) minmax(150px, 0.9fr) minmax(150px, 0.9fr) minmax(150px, 0.9fr) minmax(130px, 0.75fr);
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) auto;
+  align-items: end;
+  gap: 10px;
 }
 
 .playbookBadges {

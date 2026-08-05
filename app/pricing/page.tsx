@@ -30,7 +30,7 @@ export default function PricingPage() {
             It helps small agencies send better outreach, track prospects,
             chase proposals, and show what is working instead of being a
             general CRM for every business. Start in minutes, not after days of
-            configuring fields, stages, and dashboards.
+            configuring fields, stages, dashboards, and menus.
           </p>
 
           <p
@@ -185,7 +185,7 @@ export default function PricingPage() {
               <li>10 teammate seats included</li>
               <li>Full Pro access for every active member</li>
               <li>Shared agency templates and follow-up plans</li>
-              <li>Owner-managed access without CRM admin bloat</li>
+              <li>Owner-managed access without CRM admin overhead</li>
             </ul>
 
             <div style={{ marginTop: 24 }}>
@@ -227,7 +227,7 @@ export default function PricingPage() {
                 <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
                   Best when more than one person handles leads and the team
                   needs a shared pipeline, shared notes, and clear lead owners
-                  without configuring a broad CRM.
+                  without extra menus, settings, or CRM admin overhead.
                 </p>
               </div>
 

@@ -50,35 +50,12 @@ type TemplateGroupId = (typeof TEMPLATE_GROUPS)[number]["id"];
 export default function LibraryPage() {
   const [query, setQuery] = useState("");
   const [templateGroup, setTemplateGroup] = useState<TemplateGroupId>("all");
-  const [badgeFilter, setBadgeFilter] = useState("All");
-  const [audienceFilter, setAudienceFilter] = useState("All");
-  const [stageFilter, setStageFilter] = useState("All");
-  const [sortBy, setSortBy] = useState("featured");
   const { hasProAccess } = useAccount();
-
-  const badgeOptions = useMemo(
-    () => ["All", ...Array.from(new Set(playbooks.map((playbook) => playbook.badge)))],
-    []
-  );
-  const audienceOptions = useMemo(
-    () => [
-      "All",
-      ...Array.from(new Set(playbooks.map((playbook) => playbook.audience))),
-    ],
-    []
-  );
-  const stageOptions = useMemo(
-    () => [
-      "All",
-      ...Array.from(new Set(playbooks.map((playbook) => playbook.salesStage))),
-    ],
-    []
-  );
 
   const filteredPlaybooks = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
     const activeGroup = TEMPLATE_GROUPS.find((group) => group.id === templateGroup) ?? TEMPLATE_GROUPS[0];
-    const filtered = playbooks.filter((playbook) => {
+    return playbooks.filter((playbook) => {
       const matchesTemplateGroup = activeGroup.playbookIds.includes(playbook.id);
       const matchesQuery =
         normalizedQuery.length === 0 ||
@@ -99,25 +76,9 @@ export default function LibraryPage() {
           .toLowerCase()
           .includes(normalizedQuery);
 
-      const matchesBadge =
-        badgeFilter === "All" || playbook.badge === badgeFilter;
-      const matchesAudience =
-        audienceFilter === "All" || playbook.audience === audienceFilter;
-      const matchesStage =
-        stageFilter === "All" || playbook.salesStage === stageFilter;
-
-      return matchesTemplateGroup && matchesQuery && matchesBadge && matchesAudience && matchesStage;
+      return matchesTemplateGroup && matchesQuery;
     });
-
-    const sorted = [...filtered];
-    if (sortBy === "name") {
-      sorted.sort((a, b) => a.name.localeCompare(b.name));
-    } else if (sortBy === "steps") {
-      sorted.sort((a, b) => b.templates.length - a.templates.length);
-    }
-
-    return sorted;
-  }, [query, templateGroup, badgeFilter, audienceFilter, stageFilter, sortBy]);
+  }, [query, templateGroup]);
 
   return (
     <main className="main">
@@ -149,91 +110,16 @@ export default function LibraryPage() {
         </div>
 
         <div className="glassCard libraryFilters">
-          <div className="grid libraryFilterGrid">
+          <div className="libraryFilterGrid">
             <div className="formGroup" style={{ marginBottom: 0 }}>
-              <label className="label">Search use cases</label>
+              <label className="label">Search templates</label>
               <input
                 className="input"
-                placeholder="Search by stage, reply goal, or message type"
+                placeholder="Search proposal, win-back, follow-up..."
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
               />
             </div>
-
-            <div className="formGroup" style={{ marginBottom: 0 }}>
-              <label className="label">Outreach type</label>
-              <select
-                className="input"
-                value={badgeFilter}
-                onChange={(event) => setBadgeFilter(event.target.value)}
-              >
-                {badgeOptions.map((option) => (
-                  <option key={option} value={option}>
-                    {option === "All" ? "Any outreach type" : option}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="formGroup" style={{ marginBottom: 0 }}>
-              <label className="label">Client type</label>
-              <select
-                className="input"
-                value={audienceFilter}
-                onChange={(event) => setAudienceFilter(event.target.value)}
-              >
-                {audienceOptions.map((option) => (
-                  <option key={option} value={option}>
-                    {option === "All" ? "Any client type" : option}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="formGroup" style={{ marginBottom: 0 }}>
-              <label className="label">Sales stage</label>
-              <select
-                className="input"
-                value={stageFilter}
-                onChange={(event) => setStageFilter(event.target.value)}
-              >
-                {stageOptions.map((option) => (
-                  <option key={option} value={option}>
-                    {option === "All" ? "Any sales stage" : option}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="formGroup" style={{ marginBottom: 0 }}>
-              <label className="label">Sort</label>
-              <select
-                className="input"
-                value={sortBy}
-                onChange={(event) => setSortBy(event.target.value)}
-              >
-                <option value="featured">Featured</option>
-                <option value="name">Name</option>
-                <option value="steps">Most steps</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="toolbar" style={{ marginTop: 16 }}>
-            {badgeOptions.slice(1).map((option) => (
-              <button
-                key={option}
-                type="button"
-                className={
-                  badgeFilter === option
-                    ? "button buttonPrimary"
-                    : "button buttonUtility"
-                }
-                onClick={() => setBadgeFilter(option)}
-              >
-                {option}
-              </button>
-            ))}
 
             <button
               type="button"
@@ -241,13 +127,9 @@ export default function LibraryPage() {
               onClick={() => {
                 setQuery("");
                 setTemplateGroup("all");
-                setBadgeFilter("All");
-                setAudienceFilter("All");
-                setStageFilter("All");
-                setSortBy("featured");
               }}
             >
-              Reset filters
+              Reset
             </button>
           </div>
         </div>
@@ -310,7 +192,7 @@ export default function LibraryPage() {
           <div className="glassCard emptyState" style={{ marginTop: 22 }}>
             <h3 className="cardTitle">No outreach messages match that search yet</h3>
             <p className="muted" style={{ maxWidth: 620, marginInline: "auto" }}>
-              Try clearing the filters or searching with a broader term like
+              Try clearing the search or using a broader term like
               follow-up, proposal, inbound, or cold outreach.
             </p>
           </div>

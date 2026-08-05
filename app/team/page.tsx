@@ -446,9 +446,9 @@ export default function TeamLibraryPage() {
                     </p>
                   </div>
                   {workspaces.find((item) => item.id === workspace.id)?.access_role !== "member" ? <details className="teamMemberManage">
-                    <summary>Manage</summary>
+                    <summary>Edit</summary>
                     <div className="teamMemberMenu">
-                      <label className="label">Access level<select className="input" value={member.role} aria-label={`Role for ${member.email}`} onChange={(event) => void handleMemberUpdate(member, { role: event.target.value as "admin" | "member" })}><option value="member">Member</option><option value="admin">Admin</option></select></label>
+                      <label className="label">Simple role<select className="input" value={member.role} aria-label={`Role for ${member.email}`} onChange={(event) => void handleMemberUpdate(member, { role: event.target.value as "admin" | "member" })}><option value="member">Member</option><option value="admin">Admin</option></select></label>
                       <div className="toolbar">{member.status === "invited" ? <button className="button buttonSecondary" onClick={() => handleResendInvite(member)}>Resend invite</button> : null}<button className="button buttonSecondary" onClick={() => void handleMemberUpdate(member, { access_active: !member.access_active })}>{member.access_active ? "Pause access" : "Restore access"}</button><button className="button buttonUtility" onClick={() => void handleRemoveMember(member.id)}>Remove</button></div>
                     </div>
                   </details> : null}
@@ -474,10 +474,10 @@ export default function TeamLibraryPage() {
             </details>
 
             <details className="teamWorkspaceSettings">
-              <summary><strong>Backup and owner controls</strong><span>Rarely needed</span></summary>
+              <summary><strong>Workspace backup</strong><span>Optional</span></summary>
               <div className="teamWorkspaceSettingsContent">
               <div className="cardTop"><div><h3 className="cardTitle">Backup lead data</h3><p className="small">Download a backup if you need a copy of team leads, notes, tasks, and activity.</p></div>{canExportWorkspace ? <button className="button buttonSecondary" onClick={() => void handleExportWorkspace()}>Download backup</button> : <span className="miniBadge">Owner or admin only</span>}</div>
-              {workspaces.find((item) => item.id === workspace.id)?.access_role === "owner" ? <details className="teamOwnerControls"><summary>Ownership and deletion</summary><p className="small">These controls are rarely needed. Transfer ownership changes who controls the workspace. Deleting removes all shared workspace data permanently.</p><div className="teamDangerZone"><select className="input" defaultValue="" onChange={(event) => void handleTransferOwnership(event.target.value)}><option value="" disabled>Transfer ownership to...</option>{members.filter((member) => member.user_id && member.status === "active").map((member) => <option key={member.id} value={member.user_id!}>{member.email}</option>)}</select><button className="button buttonUtility" onClick={() => void handleDeleteWorkspace()}>Delete workspace</button></div></details> : null}
+              {workspaces.find((item) => item.id === workspace.id)?.access_role === "owner" ? <details className="teamOwnerControls"><summary>Owner-only changes</summary><p className="small">Most teams never need these. Transfer ownership only changes who owns the workspace. Deleting removes shared workspace data permanently.</p><div className="teamDangerZone"><select className="input" defaultValue="" onChange={(event) => void handleTransferOwnership(event.target.value)}><option value="" disabled>Transfer ownership to...</option>{members.filter((member) => member.user_id && member.status === "active").map((member) => <option key={member.id} value={member.user_id!}>{member.email}</option>)}</select><button className="button buttonUtility" onClick={() => void handleDeleteWorkspace()}>Delete workspace</button></div></details> : null}
               </div>
             </details>
           </section>

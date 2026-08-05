@@ -46,7 +46,8 @@ export default function HomePage() {
             It gives small agencies the focused workflow for templates,
             pipeline, follow-ups, team visibility, and reporting instead of
             being a general CRM for every business. Start in minutes with one
-            prospect, one message, and one follow-up.
+            prospect, one message, and one follow-up, not a maze of menus and
+            settings.
           </p>
 
           <div className="heroActions homeHeroActions">
@@ -98,7 +99,8 @@ export default function HomePage() {
               proposal reminders, and client win-back flows keep leads moving.
               The pipeline tracks prospects, proposals, retainers, and
               handoffs. No days of setup, no heavy sales suite, just the pieces
-              small agencies need to turn outreach into booked clients.
+              small agencies need to turn outreach into booked clients in a
+              lightweight, readable workspace.
             </p>
           </div>
         </div>

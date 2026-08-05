@@ -28,7 +28,7 @@ export default function BusinessPage() {
               chasing replies. Give the team one shared pipeline, shared notes,
               and simple ownership rules so prospects, proposals, retainers,
               and handoffs stay visible without turning Thalovo into a heavy
-              CRM.
+              CRM or an admin project.
             </p>
 
             <ul className="featureList">
