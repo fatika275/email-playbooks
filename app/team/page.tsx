@@ -68,7 +68,7 @@ export default function TeamLibraryPage() {
       setShares(await listTeamShares());
     } catch (error) {
       setNotice(
-        error instanceof Error ? error.message : "Team Library could not load."
+        error instanceof Error ? error.message : "Shared templates could not load."
       );
     } finally {
       setIsLoadingShares(false);
@@ -293,7 +293,7 @@ export default function TeamLibraryPage() {
     return (
       <main className="main">
         <section className="container">
-          <div className="glassCard emptyState">Loading Team Library...</div>
+          <div className="glassCard emptyState">Loading team workspace...</div>
         </section>
       </main>
     );
@@ -304,8 +304,8 @@ export default function TeamLibraryPage() {
       <main className="main">
         <section className="container">
           <div className="glassCard emptyState">
-            <h1 className="pageTitle">Sign in to use Team Library</h1>
-            <p className="muted">Shared items are matched to your account email.</p>
+            <h1 className="pageTitle">Sign in to use the team workspace</h1>
+            <p className="muted">Shared pipelines, notes, and templates are matched to your account email.</p>
             <Link href="/account" className="button buttonPrimary">
               Sign in
             </Link>
@@ -322,8 +322,8 @@ export default function TeamLibraryPage() {
           <div className="glassCard emptyState">
             <h1 className="pageTitle">Team sharing is a Pro feature</h1>
             <p className="muted">
-              Upgrade when more than one person needs shared access to lead
-              notes, follow-ups, and outreach.
+              Upgrade when more than one person needs a shared pipeline, shared
+              notes, and simple ownership for lead follow-up.
             </p>
             <Link href="/pricing" className="button buttonPrimary">
               View Pro
@@ -338,13 +338,14 @@ export default function TeamLibraryPage() {
     <main className="main">
       <section className="container">
         <div className="pageHeader">
-          <div className="badge">Team workspace</div>
+          <div className="badge">Team collaboration</div>
           <h1 className="pageTitle" style={{ marginTop: 14 }}>
-            Keep everyone handling leads on the same page.
+            Shared pipeline and notes, without CRM bloat.
           </h1>
           <p className="muted" style={{ maxWidth: 760, lineHeight: 1.75 }}>
-            Give teammates shared access, shared notes, and shared visibility
-            so nobody duplicates chasing or lets a good lead slip.
+            Give teammates one place to see lead status, leave context, and own
+            the next action so nobody duplicates chasing or lets a good lead
+            slip.
           </p>
         </div>
 
@@ -367,7 +368,7 @@ export default function TeamLibraryPage() {
             className={teamView === "library" ? "teamViewTab active" : "teamViewTab"}
             onClick={() => setTeamView("library")}
           >
-            Shared outreach{incoming.length ? ` (${incoming.length})` : ""}
+            Shared templates{incoming.length ? ` (${incoming.length})` : ""}
           </button>
         </div>
 
@@ -383,7 +384,7 @@ export default function TeamLibraryPage() {
                 <span className="miniBadge">Active workspace</span>
                 <h2 className="pageTitle">{workspace.name}</h2>
                 <p className="muted" style={{ margin: "8px 0 0" }}>
-                  One shared place for lead notes, follow-ups, outreach, and handoffs.
+                  One shared pipeline for lead notes, ownership, follow-ups, and handoffs.
                 </p>
               </div>
               <Link href="/prospects" className="button buttonPrimary">Open shared pipeline</Link>
@@ -393,11 +394,11 @@ export default function TeamLibraryPage() {
               <div><strong>{members.filter((member) => member.status === "active" && member.access_active).length}</strong><span>Active teammates</span></div>
               <div><strong>{members.filter((member) => member.status === "invited" && member.access_active).length}</strong><span>Pending invites</span></div>
               <div><strong>{workspace.seat_limit - members.length}</strong><span>Seats available</span></div>
-              <div><strong>{incoming.length + outgoing.length}</strong><span>Shared items</span></div>
+              <div><strong>{incoming.length + outgoing.length}</strong><span>Shared templates</span></div>
             </div>
 
             <section className="teamPeopleSection">
-              <div className="teamPeopleHeading"><div className="teamSectionHeading"><h3 className="sectionTitle">People</h3><p className="muted">Member for handling leads. Admin for managing team access.</p></div>{workspaces.find((item) => item.id === workspace.id)?.access_role !== "member" ? <button className={`button ${showInvite ? "buttonSecondary" : "buttonPrimary"}`} onClick={() => setShowInvite((current) => !current)}>{showInvite ? "Close invite" : "Invite teammate"}</button> : null}</div>
+              <div className="teamPeopleHeading"><div className="teamSectionHeading"><h3 className="sectionTitle">People and ownership</h3><p className="muted">Member works assigned leads. Admin can also manage teammate access. Lead ownership stays simple.</p></div>{workspaces.find((item) => item.id === workspace.id)?.access_role !== "member" ? <button className={`button ${showInvite ? "buttonSecondary" : "buttonPrimary"}`} onClick={() => setShowInvite((current) => !current)}>{showInvite ? "Close invite" : "Invite teammate"}</button> : null}</div>
 
             {showInvite && workspaces.find((item) => item.id === workspace.id)?.access_role !== "member" ? <><div
               className="businessInviteGrid"
@@ -417,10 +418,10 @@ export default function TeamLibraryPage() {
                 />
               </div>
               <div className="formGroup" style={{ marginBottom: 0 }}>
-                <label className="label inviteRoleLabel" htmlFor="business-invite-role"><span>Access level</span><span>Member can work leads; Admin can manage teammates.</span></label>
+                <label className="label inviteRoleLabel" htmlFor="business-invite-role"><span>Ownership rule</span><span>Member can own and work leads; Admin can also manage teammates.</span></label>
                 <select id="business-invite-role" className="input" value={inviteRole} onChange={(event) => setInviteRole(event.target.value as "admin" | "member")}>
-                  <option value="member">Member - works in the workspace</option>
-                  <option value="admin">Admin - also manages teammates</option>
+                  <option value="member">Member - owns and works assigned leads</option>
+                  <option value="admin">Admin - owns leads and manages teammates</option>
                 </select>
               </div>
               <button
@@ -495,8 +496,8 @@ export default function TeamLibraryPage() {
           <section className="glassCard" style={{ padding: 22, marginBottom: 22 }}>
             <h2 className="cardTitle">Need access for a whole business?</h2>
             <p className="muted" style={{ margin: "8px 0 14px" }}>
-              Business Pro gives one payer, shared lead visibility, and up to
-              10 teammates full Pro access.
+              Business Pro gives one payer, a shared pipeline, shared notes,
+              simple ownership rules, and up to 10 teammates full Pro access.
             </p>
             <Link href="/business" className="button buttonPrimary">
               View Business Pro
@@ -506,7 +507,7 @@ export default function TeamLibraryPage() {
 
         {teamView === "library" ? <>
         <div className="teamLibraryActions">
-          <div><h2 className="sectionTitle">Shared outreach library</h2><p className="muted">Keep the messages and follow-up plans that win replies available to everyone handling leads.</p></div>
+          <div><h2 className="sectionTitle">Shared agency templates</h2><p className="muted">Keep the messages and follow-up plans that win replies available to everyone handling leads.</p></div>
           <div className="toolbar">
           <button
             className="button buttonSecondary"
@@ -525,18 +526,18 @@ export default function TeamLibraryPage() {
         </div>
 
         <div className="sharedLibraryControls">
-          <div className="sharedLibraryTabs" role="tablist" aria-label="Shared outreach direction">
+          <div className="sharedLibraryTabs" role="tablist" aria-label="Shared template direction">
             <button type="button" role="tab" aria-selected={libraryView === "incoming"} className={libraryView === "incoming" ? "sharedLibraryTab active" : "sharedLibraryTab"} onClick={() => { setLibraryView("incoming"); setSharePage(1); }}>Shared with me <span>{incoming.length}</span></button>
             <button type="button" role="tab" aria-selected={libraryView === "outgoing"} className={libraryView === "outgoing" ? "sharedLibraryTab active" : "sharedLibraryTab"} onClick={() => { setLibraryView("outgoing"); setSharePage(1); }}>Shared by me <span>{outgoing.length}</span></button>
           </div>
           <div className="sharedLibraryFilters">
-            <input className="input" type="search" value={shareSearch} onChange={(event) => { setShareSearch(event.target.value); setSharePage(1); }} placeholder="Search title, subject, or teammate" aria-label="Search shared outreach" />
-            <select className="input" value={shareType} onChange={(event) => { setShareType(event.target.value as "all" | "email" | "sequence"); setSharePage(1); }} aria-label="Filter shared outreach by type"><option value="all">All types</option><option value="email">Messages</option><option value="sequence">Follow-up plans</option></select>
+            <input className="input" type="search" value={shareSearch} onChange={(event) => { setShareSearch(event.target.value); setSharePage(1); }} placeholder="Search title, subject, or teammate" aria-label="Search shared templates" />
+            <select className="input" value={shareType} onChange={(event) => { setShareType(event.target.value as "all" | "email" | "sequence"); setSharePage(1); }} aria-label="Filter shared templates by type"><option value="all">All types</option><option value="email">Messages</option><option value="sequence">Follow-up plans</option></select>
           </div>
         </div>
 
         <section className="section sharedLibrarySection">
-          <div className="teamSectionHeading"><h2 className="sectionTitle">{libraryView === "incoming" ? "Shared with me" : "Shared by me"}</h2><p className="muted">{libraryView === "incoming" ? "Lead-capture messages and follow-up plans teammates have sent to your account." : "Items you have made available so teammates can chase leads consistently."}</p></div>
+          <div className="teamSectionHeading"><h2 className="sectionTitle">{libraryView === "incoming" ? "Shared with me" : "Shared by me"}</h2><p className="muted">{libraryView === "incoming" ? "Agency templates and follow-up plans teammates have sent to your account." : "Items you have made available so teammates can chase leads consistently."}</p></div>
           <div className="workspaceGrid" style={{ marginTop: 16 }}>
             {visibleShares.map((share) => (
               <article key={share.id} className="glassCard workspaceCard">

@@ -173,18 +173,19 @@ export default function PricingPage() {
             </h2>
 
             <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
-              Shared access, notes, and pipeline visibility for small teams
-              handling leads together.
+              Shared pipeline, shared notes, and simple ownership rules for
+              small teams handling leads together.
             </p>
 
             <ul className="featureList">
               <li>Everything in Pro</li>
-              <li>Team sharing to keep everyone aligned on leads</li>
-              <li>Shared pipeline, notes, and activity history</li>
+              <li>Shared pipeline for prospects, proposals, retainers, and handoff</li>
+              <li>Shared notes and activity history for lead context</li>
+              <li>Simple ownership rules for who is chasing each lead</li>
               <li>10 teammate seats included</li>
               <li>Full Pro access for every active member</li>
-              <li>Shared lead-capture messages and follow-up plans</li>
-              <li>Simple owner-managed access</li>
+              <li>Shared agency templates and follow-up plans</li>
+              <li>Owner-managed access without CRM admin bloat</li>
             </ul>
 
             <div style={{ marginTop: 24 }}>
@@ -225,8 +226,8 @@ export default function PricingPage() {
                 <h3 className="cardTitle">Business Pro</h3>
                 <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
                   Best when more than one person handles leads and the team
-                  needs shared visibility to avoid duplicate chasing and missed
-                  follow-ups.
+                  needs a shared pipeline, shared notes, and clear lead owners
+                  without configuring a broad CRM.
                 </p>
               </div>
 

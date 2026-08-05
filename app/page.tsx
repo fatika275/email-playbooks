@@ -15,7 +15,7 @@ const workflow = [
   },
   {
     title: "Team sharing",
-    text: "Keep notes, ownership, and lead visibility clear when more than one person handles follow-up.",
+    text: "Use a shared pipeline, shared notes, and simple ownership rules without CRM bloat.",
   },
   {
     title: "Follow-up tools",

@@ -3,13 +3,14 @@ import { CheckoutButton } from "@/components/checkout-button";
 
 const businessFeatures = [
   "Everything in Pro",
-  "Team sharing to keep everyone aligned on leads",
-  "Shared notes, activity, proposals, retainers, and handoffs",
+  "Shared pipeline for prospects, proposals, retainers, and handoff",
+  "Shared notes so lead context does not live in one person's head",
+  "Simple ownership rules for who is chasing each lead",
   "One payment for the business",
   "Full Pro access for up to 10 teammates",
-  "Shared lead-capture messages and follow-up plans",
+  "Shared agency templates and follow-up plans",
   "Owner-controlled invitations and removals",
-  "Team visibility to avoid duplicate chasing",
+  "Team visibility without CRM bloat or duplicate chasing",
 ];
 
 export default function BusinessPage() {
@@ -20,13 +21,14 @@ export default function BusinessPage() {
           <div>
             <div className="badge">Business Pro</div>
             <h1 className="pageTitle" style={{ marginTop: 14 }}>
-              One shared place for the team handling leads.
+              Team collaboration without CRM bloat.
             </h1>
             <p className="muted" style={{ marginTop: 14, lineHeight: 1.75 }}>
               For small agencies where the founder is not the only person
-              chasing replies. Share the same lightweight outreach and pipeline
-              workflow so notes, follow-ups, booked calls, and handoffs stay
-              visible while the team turns outreach into booked clients.
+              chasing replies. Give the team one shared pipeline, shared notes,
+              and simple ownership rules so prospects, proposals, retainers,
+              and handoffs stay visible without turning Thalovo into a heavy
+              CRM.
             </p>
 
             <ul className="featureList">
@@ -43,7 +45,8 @@ export default function BusinessPage() {
             </h2>
             <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
               Only the workspace owner is billed. Invite teammates after payment
-              so everyone works from the same pipeline, notes, and next actions.
+              so everyone works from the same pipeline, notes, lead owners, and
+              next actions.
             </p>
             <div style={{ marginTop: 20 }}>
               <CheckoutButton plan="business">Start Business Pro</CheckoutButton>

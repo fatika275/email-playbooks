@@ -52,7 +52,7 @@ export function ShareWithTeam({
         body,
       });
       setNotice(
-        `Shared with ${email.trim().toLowerCase()}. They will see it in Team Library after signing in.`
+        `Shared with ${email.trim().toLowerCase()}. They will see it in Shared templates after signing in.`
       );
       setEmail("");
     } catch (error) {
@@ -108,7 +108,7 @@ export function ShareWithTeam({
               {isSharing ? "Sharing..." : "Share with teammate"}
             </button>
             <Link href="/team" className="button buttonSecondary">
-              Open Team Library
+              Open team workspace
             </Link>
           </div>
         </div>
