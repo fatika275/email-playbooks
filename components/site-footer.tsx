@@ -12,7 +12,7 @@ export default function SiteFooter() {
             A focused, agency-native outreach and pipeline tool for small agencies.
           </p>
           <p className="small footerMeta">
-            Built for one job: turn outreach into booked clients, not a general CRM.
+            Built for one job: turn outreach into booked clients for service agencies.
           </p>
         </div>
 
@@ -20,13 +20,13 @@ export default function SiteFooter() {
           <div className="footerColumn">
             <div className="footerHeading">Product</div>
             <Link href="/prospects" className="footerLink">
-              Pipeline
+              Client Pipeline
             </Link>
             <Link href="/library" className="footerLink">
-              Agency Templates
+              Outreach Templates
             </Link>
             <Link href="/workspace" className="footerLink">
-              Saved Work
+              Agency Assets
             </Link>
             <Link href="/pricing" className="footerLink">
               Pricing

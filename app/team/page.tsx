@@ -181,7 +181,7 @@ export default function TeamLibraryPage() {
         });
       }
 
-      setNotice(`Saved “${share.title}” to your workspace.`);
+      setNotice(`Saved "${share.title}" to your agency assets.`);
     } catch (error) {
       setNotice(
         error instanceof Error ? error.message : "Could not save this shared item."
@@ -203,7 +203,7 @@ export default function TeamLibraryPage() {
 
   async function handleInviteMember() {
     if (!workspace) {
-      setNotice("Your Business Pro workspace is not ready yet. Refresh after payment.");
+      setNotice("Your Business Pro agency workspace is not ready yet. Refresh after payment.");
       return;
     }
 
@@ -245,7 +245,7 @@ export default function TeamLibraryPage() {
   function handleResendInvite(member: BusinessMember) {
     const subject = encodeURIComponent(`You have been invited to ${workspace?.name ?? "Thalovo"}`);
     const body = encodeURIComponent(
-      `You have been invited to our Thalovo workspace. Sign up or sign in using ${member.email}, then open the Team page to access the workspace.\n\nhttps://thalovo.com/account`
+      `You have been invited to our Thalovo agency workspace. Sign up or sign in using ${member.email}, then open the Team page to access the shared pipeline.\n\nhttps://thalovo.com/account`
     );
     window.location.href = `mailto:${encodeURIComponent(member.email)}?subject=${subject}&body=${body}`;
   }
@@ -261,20 +261,20 @@ export default function TeamLibraryPage() {
       const payload = { exported_at: new Date().toISOString(), workspace, members, prospects, tasks, activities: activity, comments };
       const url = URL.createObjectURL(new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" }));
       const anchor = document.createElement("a"); anchor.href = url; anchor.download = `${workspace.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-export.json`; anchor.click(); URL.revokeObjectURL(url);
-      setNotice("Workspace export downloaded.");
-    } catch (error) { setNotice(error instanceof Error ? error.message : "Workspace export failed."); }
+      setNotice("Agency data export downloaded.");
+    } catch (error) { setNotice(error instanceof Error ? error.message : "Agency data export failed."); }
   }
 
   async function handleTransferOwnership(userId: string) {
     if (!workspace || !userId || !window.confirm("Transfer ownership permanently to this teammate?")) return;
-    try { await transferBusinessWorkspace(workspace.id, userId); await refreshBusinessTeam(); setNotice("Workspace ownership transferred."); }
+    try { await transferBusinessWorkspace(workspace.id, userId); await refreshBusinessTeam(); setNotice("Agency workspace ownership transferred."); }
     catch (error) { setNotice(error instanceof Error ? error.message : "Ownership could not be transferred."); }
   }
 
   async function handleDeleteWorkspace() {
     if (!workspace || !window.confirm(`Permanently delete ${workspace.name} and all shared lead data?`)) return;
-    try { await deleteBusinessWorkspace(workspace.id); window.localStorage.removeItem("thalovo_active_workspace_id"); await refreshBusinessTeam(); setNotice("Workspace deleted."); }
-    catch (error) { setNotice(error instanceof Error ? error.message : "Workspace could not be deleted."); }
+    try { await deleteBusinessWorkspace(workspace.id); window.localStorage.removeItem("thalovo_active_workspace_id"); await refreshBusinessTeam(); setNotice("Agency workspace deleted."); }
+    catch (error) { setNotice(error instanceof Error ? error.message : "Agency workspace could not be deleted."); }
   }
 
   async function handleRemoveMember(id: string) {
@@ -293,7 +293,7 @@ export default function TeamLibraryPage() {
     return (
       <main className="main">
         <section className="container">
-          <div className="glassCard emptyState">Loading team workspace...</div>
+          <div className="glassCard emptyState">Loading team deal room...</div>
         </section>
       </main>
     );
@@ -304,7 +304,7 @@ export default function TeamLibraryPage() {
       <main className="main">
         <section className="container">
           <div className="glassCard emptyState">
-            <h1 className="pageTitle">Sign in to use the team workspace</h1>
+            <h1 className="pageTitle">Sign in to use the team deal room</h1>
             <p className="muted">Shared pipelines, notes, and templates are matched to your account email.</p>
             <Link href="/account" className="button buttonPrimary">
               Sign in
@@ -340,7 +340,7 @@ export default function TeamLibraryPage() {
         <div className="pageHeader">
           <div className="badge">Team collaboration</div>
           <h1 className="pageTitle" style={{ marginTop: 14 }}>
-            Shared pipeline and notes, without CRM bloat.
+            Shared pipeline, notes, and lead ownership for agency teams.
           </h1>
           <p className="muted" style={{ maxWidth: 760, lineHeight: 1.75 }}>
             Give teammates one place to see lead status, leave context, and own
@@ -359,7 +359,7 @@ export default function TeamLibraryPage() {
             className={teamView === "workspace" ? "teamViewTab active" : "teamViewTab"}
             onClick={() => setTeamView("workspace")}
           >
-            Team workspace
+            Agency workspace
           </button>
           <button
             type="button"
@@ -374,14 +374,14 @@ export default function TeamLibraryPage() {
 
         {teamView === "workspace" && (notifications.length || overdueTasks.length) ? <section className="teamAttentionPanel">
           <div className="cardTop"><div><h2 className="sectionTitle">Needs attention</h2><p className="muted">Overdue follow-ups and unread lead updates.</p></div><span className="statusPill">{notifications.filter((item) => !item.read_at).length + overdueTasks.length}</span></div>
-          <div className="prospectTimeline">{overdueTasks.map((task) => <div key={`overdue-${task.id}`} className="prospectTimelineItem"><span className="miniBadge">Overdue</span><div><Link href={`/prospects/${task.prospects.id}`}><strong>{getProspectTaskDisplayTitle(task.title)}</strong></Link><p className="small">{task.prospects.full_name} · Due {task.due_date}</p></div></div>)}{notifications.slice(0, 8).map((item) => <div key={item.id} className="prospectTimelineItem"><span className="miniBadge">{item.kind}</span><div><Link href={item.href || "/team"} onClick={() => void markWorkspaceNotificationRead(item.id)}><strong>{item.title}</strong></Link><p className="small">{item.body || "Workspace update"} · {new Date(item.created_at).toLocaleString()}</p></div></div>)}</div>
+          <div className="prospectTimeline">{overdueTasks.map((task) => <div key={`overdue-${task.id}`} className="prospectTimelineItem"><span className="miniBadge">Overdue</span><div><Link href={`/prospects/${task.prospects.id}`}><strong>{getProspectTaskDisplayTitle(task.title)}</strong></Link><p className="small">{task.prospects.full_name} · Due {task.due_date}</p></div></div>)}{notifications.slice(0, 8).map((item) => <div key={item.id} className="prospectTimelineItem"><span className="miniBadge">{item.kind}</span><div><Link href={item.href || "/team"} onClick={() => void markWorkspaceNotificationRead(item.id)}><strong>{item.title}</strong></Link><p className="small">{item.body || "Agency update"} · {new Date(item.created_at).toLocaleString()}</p></div></div>)}</div>
         </section> : null}
 
         {teamView === "workspace" ? (workspace ? (
           <section className="teamWorkspaceOverview">
             <div className="teamWorkspaceHero">
               <div>
-                <span className="miniBadge">Active workspace</span>
+                <span className="miniBadge">Active agency workspace</span>
                 <h2 className="pageTitle">{workspace.name}</h2>
                 <p className="muted" style={{ margin: "8px 0 0" }}>
                   One shared pipeline for lead notes, ownership, follow-ups, and handoffs.
@@ -459,8 +459,8 @@ export default function TeamLibraryPage() {
             </section>
 
             <details className="teamActivitySection teamActivityDisclosure">
-              <summary><strong>Workspace activity</strong><span>{filteredActivity.length} useful updates</span></summary>
-              <div className="teamActivityControls"><div><h3 className="cardTitle">Recent activity</h3><p className="small">See who touched each lead so handoffs stay clear and nobody chases twice.</p></div><select className="input" value={activityFilter} onChange={(event) => { setActivityFilter(event.target.value as "key" | "outreach" | "tasks" | "all"); setShowAllActivity(false); }} aria-label="Filter workspace activity"><option value="key">Key updates</option><option value="outreach">Outreach only</option><option value="tasks">Tasks only</option><option value="all">All changes</option></select></div>
+              <summary><strong>Agency activity</strong><span>{filteredActivity.length} useful updates</span></summary>
+              <div className="teamActivityControls"><div><h3 className="cardTitle">Recent activity</h3><p className="small">See who touched each lead so handoffs stay clear and nobody chases twice.</p></div><select className="input" value={activityFilter} onChange={(event) => { setActivityFilter(event.target.value as "key" | "outreach" | "tasks" | "all"); setShowAllActivity(false); }} aria-label="Filter agency activity"><option value="key">Key updates</option><option value="outreach">Outreach only</option><option value="tasks">Tasks only</option><option value="all">All changes</option></select></div>
               <div className="prospectTimeline">
                 {visibleActivity.map((item) => (
                   <div key={item.id} className="prospectTimelineItem">
@@ -474,10 +474,10 @@ export default function TeamLibraryPage() {
             </details>
 
             <details className="teamWorkspaceSettings">
-              <summary><strong>Workspace backup</strong><span>Optional</span></summary>
+              <summary><strong>Agency data backup</strong><span>Optional</span></summary>
               <div className="teamWorkspaceSettingsContent">
               <div className="cardTop"><div><h3 className="cardTitle">Backup lead data</h3><p className="small">Download a backup if you need a copy of team leads, notes, tasks, and activity.</p></div>{canExportWorkspace ? <button className="button buttonSecondary" onClick={() => void handleExportWorkspace()}>Download backup</button> : <span className="miniBadge">Owner or admin only</span>}</div>
-              {workspaces.find((item) => item.id === workspace.id)?.access_role === "owner" ? <details className="teamOwnerControls"><summary>Owner-only changes</summary><p className="small">Most teams never need these. Transfer ownership only changes who owns the workspace. Deleting removes shared workspace data permanently.</p><div className="teamDangerZone"><select className="input" defaultValue="" onChange={(event) => void handleTransferOwnership(event.target.value)}><option value="" disabled>Transfer ownership to...</option>{members.filter((member) => member.user_id && member.status === "active").map((member) => <option key={member.id} value={member.user_id!}>{member.email}</option>)}</select><button className="button buttonUtility" onClick={() => void handleDeleteWorkspace()}>Delete workspace</button></div></details> : null}
+              {workspaces.find((item) => item.id === workspace.id)?.access_role === "owner" ? <details className="teamOwnerControls"><summary>Owner-only changes</summary><p className="small">Most teams never need these. Transfer ownership only changes who owns the agency workspace. Deleting removes shared lead data permanently.</p><div className="teamDangerZone"><select className="input" defaultValue="" onChange={(event) => void handleTransferOwnership(event.target.value)}><option value="" disabled>Transfer ownership to...</option>{members.filter((member) => member.user_id && member.status === "active").map((member) => <option key={member.id} value={member.user_id!}>{member.email}</option>)}</select><button className="button buttonUtility" onClick={() => void handleDeleteWorkspace()}>Delete agency workspace</button></div></details> : null}
               </div>
             </details>
           </section>
@@ -558,7 +558,7 @@ export default function TeamLibraryPage() {
                   className="button buttonPrimary"
                   onClick={() => void handleSaveToWorkspace(share)}
                 >
-                  Save to my workspace
+                  Save to my agency assets
                 </button> : <button className="button buttonUtility" onClick={() => void handleRemoveShare(share.id)}>Remove access</button>}
               </article>
             ))}

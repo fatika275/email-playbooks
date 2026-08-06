@@ -108,7 +108,7 @@ export function ShareWithTeam({
               {isSharing ? "Sharing..." : "Share with teammate"}
             </button>
             <Link href="/team" className="button buttonSecondary">
-              Open team workspace
+              Open team deal room
             </Link>
           </div>
         </div>

@@ -103,7 +103,7 @@ export default function SavedEmailViewPage() {
             </p>
             <div className="toolbar" style={{ justifyContent: "center" }}>
               <Link href="/history" className="button buttonPrimary">
-                Back to Saved Emails
+                Back to Saved Outreach
               </Link>
             </div>
           </div>
@@ -286,7 +286,7 @@ export default function SavedEmailViewPage() {
               </button>
 
               <Link href="/history" className="button buttonSecondary">
-                Back to Saved Emails
+                Back to Saved Outreach
               </Link>
             </div>
           </div>

@@ -28,10 +28,9 @@ export default function PricingPage() {
           >
             Thalovo is built for one job: turn outreach into booked clients.
             It helps small agencies send better outreach, track prospects,
-            chase proposals, and see replies, booked calls, closed deals, and
-            lead leakage instead of being a general CRM for every business.
-            Start in minutes, not after days of configuring fields, stages,
-            dashboards, and menus.
+            chase proposals, and see replies, booked calls, signed client work,
+            and lead leakage. Start in minutes with the service-sales workflow
+            your agency already uses.
           </p>
 
           <p
@@ -138,7 +137,7 @@ export default function PricingPage() {
 
             <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
               For solo agency owners who want to turn outreach into booked
-              client work without setting up a full CRM.
+              client work with one clear path from first touch to handoff.
             </p>
 
             <ul className="featureList">
@@ -146,7 +145,7 @@ export default function PricingPage() {
               <li>Start with one prospect and a ready-made agency workflow</li>
               <li>Agency pipeline stages for prospects, proposals, retainers, and client handoff</li>
               <li>Follow-up tools to stop warm leads slipping</li>
-              <li>Outcome reporting for replies, booked calls, closed deals, and lead leakage</li>
+              <li>Outcome reporting for replies, booked calls, signed work, and lead leakage</li>
               <li>Reusable saved messages and follow-up plans</li>
             </ul>
 
@@ -185,7 +184,7 @@ export default function PricingPage() {
               <li>10 teammate seats included</li>
               <li>Full Pro access for every active member</li>
               <li>Shared agency templates and follow-up plans</li>
-              <li>Owner-managed access without CRM admin overhead</li>
+              <li>Owner-managed access without extra sales admin</li>
             </ul>
 
             <div style={{ marginTop: 24 }}>
@@ -226,7 +225,7 @@ export default function PricingPage() {
                 <h3 className="cardTitle">Business Pro</h3>
                 <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
                   Best for small teams sharing pipeline, notes, templates, and
-                  lead ownership without extra menus or CRM admin overhead.
+                  lead ownership without extra menus or sales admin overhead.
                 </p>
               </div>
 

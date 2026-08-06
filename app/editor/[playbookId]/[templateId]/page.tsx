@@ -369,7 +369,7 @@ export default function EditorPage() {
       createdAt: new Date().toISOString(),
     });
 
-    setSavedMessage("Saved to Saved Emails");
+    setSavedMessage("Saved to Saved Outreach");
     setTimeout(() => setSavedMessage(""), 2200);
   }
 
@@ -829,7 +829,7 @@ export default function EditorPage() {
                 >
                   <strong>Save Email</strong>
                   <p className="muted" style={{ margin: "6px 0 0" }}>
-                    Save this email so you can reuse it later from your Saved Emails page.
+                    Save this email so you can reuse it later from your Saved Outreach page.
                   </p>
                 </div>
 
@@ -1113,7 +1113,7 @@ export default function EditorPage() {
                 className="button buttonSecondary"
                 onClick={() => router.push("/history")}
               >
-                Go to Saved Emails
+                Go to Saved Outreach
               </button>
               <button
                 className="button buttonSecondary"

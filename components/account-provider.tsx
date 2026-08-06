@@ -152,7 +152,7 @@ export function AccountProvider({ children }: { children: ReactNode }) {
 
       if (nextUser) {
         setSyncErrorMessage("");
-        setStatusMessage("You are signed in. Syncing your workspace...");
+        setStatusMessage("You are signed in. Syncing your agency work...");
         setIsSyncing(true);
         void refreshAccountState(nextUser)
           .catch(() => {
@@ -207,7 +207,7 @@ export function AccountProvider({ children }: { children: ReactNode }) {
       async signInWithPassword(email: string, password: string) {
         await signInWithPasswordCloud(email, password);
         setSyncErrorMessage("");
-        setStatusMessage("You are signed in. Syncing your workspace...");
+        setStatusMessage("You are signed in. Syncing your agency work...");
       },
       async signUpWithPassword(email: string, password: string) {
         const result = await signUpWithPasswordCloud(email, password);

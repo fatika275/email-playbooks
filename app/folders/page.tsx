@@ -109,7 +109,7 @@ export default function FoldersPage() {
     const items = allItems.filter((item) => {
       const matchesType =
         typeFilter === "All" ||
-        (typeFilter === "Saved Emails" && item.type === "email") ||
+        (typeFilter === "Saved Outreach" && item.type === "email") ||
         (typeFilter === "Follow-up Plans" && item.type === "sequence");
 
       const folder =
@@ -186,7 +186,7 @@ export default function FoldersPage() {
         await saveCustomTemplateRecord({ ...item.item, folder: nextFolder });
       }
 
-      setFolderNotice(`Moved “${item.title}” to ${nextFolder}.`);
+      setFolderNotice(`Moved "${item.title}" to ${nextFolder}.`);
       setSelectedItemKey("");
       setFolderName("");
     } catch (error) {
@@ -203,7 +203,7 @@ export default function FoldersPage() {
           <div className="glassCard emptyState">
             <div className="badge">Pro Organization</div>
             <h1 className="pageTitle" style={{ marginTop: 14 }}>
-              Keep saved work tidy when you need it
+              Keep agency assets tidy when you need them
             </h1>
             <p className="muted" style={{ maxWidth: 680, marginInline: "auto" }}>
               Free access gives you the core playbooks. Pro lets you tidy saved
@@ -257,7 +257,7 @@ export default function FoldersPage() {
                 onChange={(event) => setTypeFilter(event.target.value)}
               >
                 <option>All</option>
-                <option>Saved Emails</option>
+                <option>Saved Outreach</option>
                 <option>Follow-up Plans</option>
               </select>
             </div>
@@ -284,7 +284,7 @@ export default function FoldersPage() {
               <div>
                 <h2 className="cardTitle">Add an item to a folder</h2>
                 <p className="muted" style={{ margin: "8px 0 0" }}>
-                  Choose saved work, then give it a simple label you will
+                  Choose an outreach asset, then give it a simple label you will
                   remember when chasing the next lead.
                 </p>
               </div>
@@ -299,7 +299,7 @@ export default function FoldersPage() {
             >
               <div className="formGroup" style={{ marginBottom: 0 }}>
                 <label className="label" htmlFor="folder-item">
-                  Saved email or follow-up plan
+                  Saved outreach or follow-up plan
                 </label>
                 <select
                   id="folder-item"
@@ -350,7 +350,7 @@ export default function FoldersPage() {
 
         {totalItems === 0 ? (
           <div className="glassCard emptyState">
-            <h3 className="cardTitle">No saved work yet</h3>
+            <h3 className="cardTitle">No agency assets yet</h3>
             <p className="muted" style={{ maxWidth: 620, marginInline: "auto" }}>
               Save an email or follow-up plan first. Then return here to put
               it into a folder.

@@ -447,9 +447,9 @@ export default function ProspectsPage() {
       ]);
       setTasks(nextTasks);
       setActivities(nextActivities);
-      setNotice("Workspace switched.");
+      setNotice("Agency workspace switched.");
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : "Workspace could not be opened.");
+      setNotice(error instanceof Error ? error.message : "Agency workspace could not be opened.");
     } finally {
       setIsWorking(false);
     }
@@ -750,7 +750,7 @@ export default function ProspectsPage() {
           className="button buttonUtility"
           onClick={() => requestOutcome(prospect, "lost")}
         >
-          Closed
+          Lost
         </button>
       </div>
     );
@@ -766,7 +766,7 @@ export default function ProspectsPage() {
         <section className="container">
           <div className="glassCard emptyState">
             <div className="badge">Pipeline tracking</div>
-            <h1 className="pageTitle" style={{ marginTop: 14 }}>Know where every replied lead stands</h1>
+            <h1 className="pageTitle" style={{ marginTop: 14 }}>Move leads from reply to booked work</h1>
             <p className="muted">
               {user
                 ? "Track prospects, proposals, retainers, handoffs, and next actions so promising client work does not slip through the cracks."
@@ -787,15 +787,15 @@ export default function ProspectsPage() {
         <div className="prospectHeader">
           <div>
             <div className="badge">Pipeline tracking</div>
-            <h1 className="pageTitle" style={{ marginTop: 14 }}>Know where every replied lead stands</h1>
+            <h1 className="pageTitle" style={{ marginTop: 14 }}>Move leads from reply to booked work</h1>
             <p className="muted" style={{ margin: "8px 0 0" }}>
               {workspaceId
-                ? "Shared Business Pro view of prospects, proposals, retainers, handoffs, follow-ups, and booked clients"
+                ? "Shared agency view of prospects, proposals, retainers, handoffs, follow-ups, and booked clients"
                 : "Your private view of prospects, proposals, retainers, handoffs, follow-ups, and booked clients"}
             </p>
           </div>
           <div className="toolbar">
-            {workspaces.length > 1 ? <select className="input prospectWorkspaceSelect" value={workspaceId ?? ""} aria-label="Active workspace" onChange={(event) => void handleWorkspaceChange(event.target.value)}>{workspaces.map((item) => <option key={item.id} value={item.id}>{item.name} · {item.access_role}</option>)}</select> : null}
+            {workspaces.length > 1 ? <select className="input prospectWorkspaceSelect" value={workspaceId ?? ""} aria-label="Active agency workspace" onChange={(event) => void handleWorkspaceChange(event.target.value)}>{workspaces.map((item) => <option key={item.id} value={item.id}>{item.name} · {item.access_role}</option>)}</select> : null}
             <label className="button buttonSecondary prospectImportButton">
               Import CSV
               <input
@@ -820,7 +820,7 @@ export default function ProspectsPage() {
           <section className="prospectOnboarding">
             <div>
               <span className="miniBadge">Start in minutes</span>
-              <h2 className="sectionTitle">Set up the first lead, not a whole CRM</h2>
+              <h2 className="sectionTitle">Set up the first lead, not a whole sales system</h2>
               <p className="muted">
                 Add one real lead, choose the follow-up plan that fits, send the first message, then keep their stage and next action clear.
               </p>
@@ -910,10 +910,10 @@ export default function ProspectsPage() {
 
         <div className="prospectToolbar">
           <div className="authModeTabs prospectViewTabs" role="tablist" aria-label="Prospect view">
-            <button className={view === "reports" ? "authModeTab active" : "authModeTab"} onClick={() => setView("reports")}>Outcomes</button>
-            <button className={view === "pipeline" ? "authModeTab active" : "authModeTab"} onClick={() => setView("pipeline")}>Agency pipeline</button>
-            <button className={view === "today" ? "authModeTab active" : "authModeTab"} onClick={() => setView("today")}>Today&apos;s work</button>
-            <button className={view === "list" ? "authModeTab active" : "authModeTab"} onClick={() => setView("list")}>Workflow list</button>
+            <button className={view === "reports" ? "authModeTab active" : "authModeTab"} onClick={() => setView("reports")}>Next actions</button>
+            <button className={view === "pipeline" ? "authModeTab active" : "authModeTab"} onClick={() => setView("pipeline")}>Pipeline board</button>
+            <button className={view === "today" ? "authModeTab active" : "authModeTab"} onClick={() => setView("today")}>Today&apos;s chase list</button>
+            <button className={view === "list" ? "authModeTab active" : "authModeTab"} onClick={() => setView("list")}>All leads</button>
           </div>
           <input className="input prospectSearch" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search lead, company, email..." />
         </div>
@@ -1104,11 +1104,11 @@ export default function ProspectsPage() {
               </section>
 
               <section className="prospectDailyPanel">
-                <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">Outcome reporting</h3><p className="muted">Track replies, booked calls, closed deals, and lead leakage instead of generic dashboards.</p></div>
+                <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">Outcome reporting</h3><p className="muted">Track replies, booked calls, signed work, and lead leakage by source and stage.</p></div>
                 <div className="prospectFocusStats">
                   <div><span>Replies</span><strong>{outreachMetrics.replied}</strong></div>
                   <div><span>Booked calls</span><strong>{outreachMetrics.meetings}</strong></div>
-                  <div><span>Closed deals</span><strong>{outreachMetrics.won}</strong></div>
+                  <div><span>Signed work</span><strong>{outreachMetrics.won}</strong></div>
                   <div><span>Lead leakage</span><strong>{dailyDashboard.coldProspects.length}</strong></div>
                 </div>
                 <p className="small" style={{ margin: "10px 0 0" }}>
@@ -1185,7 +1185,7 @@ export default function ProspectsPage() {
             </section>
 
             <section className="prospectDashboardSection">
-              <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">What is working</h3><p className="muted">Outcome source reporting only: enough to see where replies, calls, and closed work are coming from early.</p></div>
+              <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">What is working</h3><p className="muted">Outcome source reporting only: enough to see where replies, calls, and signed client work are coming from early.</p></div>
               <div className="prospectSourceRows">
                 {report.sourceBreakdown.slice(0, 6).map((row) => (
                   <div key={row.source}>

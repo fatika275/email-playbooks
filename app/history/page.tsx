@@ -77,10 +77,10 @@ export default function SavedEmailsPage() {
     <main className="main">
       <section className="container">
         <div className="pageHeader">
-          <div className="badge">Saved Emails</div>
+          <div className="badge">Saved Outreach</div>
 
           <h1 className="pageTitle" style={{ marginTop: 14 }}>
-            Your Saved Emails
+            Your Saved Outreach
           </h1>
 
           <p className="muted">
@@ -94,7 +94,7 @@ export default function SavedEmailsPage() {
 
             <p className="muted" style={{ maxWidth: 620, marginInline: "auto" }}>
               Create your first email, save it, and come back to reuse it
-              anytime from your Saved Emails library.
+              anytime from your Saved Outreach library.
             </p>
 
             <div

@@ -6,8 +6,8 @@ import { useAccount } from "@/components/account-provider";
 const workspaceItems = [
   {
     href: "/history",
-    label: "Saved Emails",
-    badge: "Library",
+    label: "Saved Outreach",
+    badge: "Messages",
     description:
       "Reuse the outreach messages that help start conversations and get replies.",
   },
@@ -20,7 +20,7 @@ const workspaceItems = [
   },
   {
     href: "/folders",
-    label: "Keep Saved Work Tidy",
+    label: "Organise Agency Assets",
     badge: "Pro",
     description:
       "Use folders only when saved messages and follow-up plans start piling up.",
@@ -34,37 +34,37 @@ export default function WorkspacePage() {
     <main className="main">
       <section className="container">
         <div className="pageHeader">
-          <div className="badge">Saved Work</div>
+          <div className="badge">Agency Assets</div>
           <h1 className="pageTitle" style={{ marginTop: 14 }}>
-            Keep your best client-chasing assets ready to reuse.
+            Keep your best outreach and follow-up assets ready to reuse.
           </h1>
           <p className="muted" style={{ maxWidth: 760, lineHeight: 1.75 }}>
-            Find saved messages and follow-up plans without slowing down the
-            active lead pipeline.
+            Find the messages, proposal chasers, and follow-up plans that help
+            leads become booked client work.
           </p>
         </div>
 
         <div className="workspaceHero glassCard">
           <div>
             <span className={hasProAccess ? "statusPill statusPillSuccess" : "statusPill statusPillWarning"}>
-              {hasProAccess ? "Pro workspace active" : "Free workspace preview"}
+              {hasProAccess ? "Agency assets active" : "Free asset preview"}
             </span>
             <h2 className="sectionTitle" style={{ marginTop: 16 }}>
               Reuse what helps leads become booked work.
             </h2>
             <p className="muted" style={{ marginTop: 10, lineHeight: 1.75 }}>
-              Open saved drafts and follow-up plans here, then get back to the
-              lead you are trying to move.
+              Open saved drafts, proposal chasers, and follow-up plans here,
+              then get back to the lead you are trying to move.
             </p>
           </div>
 
           {!hasProAccess ? (
             <Link href="/pricing" className="button buttonPrimary">
-              Unlock Pro Workspace
+              Unlock Pro Assets
             </Link>
           ) : (
             <Link href="/history" className="button buttonPrimary">
-              Open Saved Emails
+              Open Saved Outreach
             </Link>
           )}
         </div>

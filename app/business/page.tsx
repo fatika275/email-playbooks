@@ -10,7 +10,7 @@ const businessFeatures = [
   "Full Pro access for up to 10 teammates",
   "Shared agency templates and follow-up plans",
   "Owner-controlled invitations and removals",
-  "Team visibility without CRM bloat or duplicate chasing",
+  "Team visibility for proposals, retainers, and handoff without duplicate chasing",
 ];
 
 export default function BusinessPage() {
@@ -27,8 +27,8 @@ export default function BusinessPage() {
               For small agencies where the founder is not the only person
               chasing replies. Give the team one shared pipeline, shared notes,
               and simple ownership rules so prospects, proposals, retainers,
-              and handoffs stay visible without turning Thalovo into a heavy
-              CRM or an admin project.
+              and handoffs stay visible without turning follow-up into an admin
+              project.
             </p>
 
             <ul className="featureList">
@@ -44,7 +44,7 @@ export default function BusinessPage() {
               GBP 29<span className="muted">/month</span>
             </h2>
             <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
-              One workspace, one payment, and up to 10 teammates included so
+              One agency workspace, one payment, and up to 10 teammates included so
               everyone works from the same pipeline, notes, lead owners, and
               next actions.
             </p>

@@ -6,7 +6,7 @@ const proFeatures = [
   "Start with one prospect and a ready-made agency workflow",
   "Agency pipeline stages for prospects, proposals, retainers, and client handoff",
   "Follow-up tools to stop warm leads slipping",
-  "Outcome reporting for replies, booked calls, closed deals, and lead leakage",
+  "Outcome reporting for replies, booked calls, signed work, and lead leakage",
   "Reusable saved messages and follow-up plans",
 ];
 
@@ -24,8 +24,8 @@ export default function ProPage() {
               Pro connects the simple pieces a solo agency owner needs to stop
               leads slipping: outreach sequences, follow-up templates, proposal
               reminders, client win-back flows, agency-native pipeline
-              tracking, and outcome reporting for replies, booked calls, closed
-              deals, and lead leakage.
+              tracking, and outcome reporting for replies, booked calls, signed
+              client work, and lead leakage.
             </p>
           </div>
 
@@ -41,7 +41,7 @@ export default function ProPage() {
             <div className="toolbar" style={{ marginTop: 22 }}>
               <CheckoutButton plan="pro">Start Pro</CheckoutButton>
               <Link href="/workspace" className="button buttonSecondary">
-                View saved work
+                View agency assets
               </Link>
             </div>
           </aside>
@@ -63,8 +63,7 @@ export default function ProPage() {
               <p className="muted" style={{ marginTop: 10, lineHeight: 1.75 }}>
                 Solo agency owners and founders who have leads coming in but
                 need one clear workflow for outreach, proposals, retainers,
-                follow-ups, and booking clients without a heavy sales platform
-                or a long setup project.
+                follow-ups, and booking clients without a long setup project.
               </p>
             </div>
 

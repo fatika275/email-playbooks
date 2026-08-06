@@ -98,7 +98,7 @@ export default function DuplicateEmailPage() {
                 className="button buttonPrimary"
                 onClick={() => router.push("/history")}
               >
-                Back to Saved Emails
+                Back to Saved Outreach
               </button>
             </div>
           </div>
@@ -217,7 +217,7 @@ export default function DuplicateEmailPage() {
                 className="button buttonSecondary"
                 onClick={() => router.push("/history")}
               >
-                Back to Saved Emails
+                Back to Saved Outreach
               </button>
             </div>
           </div>

@@ -150,8 +150,8 @@ export default function AccountPage() {
             Your Thalovo account
           </h1>
           <p className="muted" style={{ maxWidth: 720, lineHeight: 1.75 }}>
-            Sign in to keep your saved emails, follow-up plans, and workspace
-            available when you come back.
+            Sign in to keep your outreach templates, follow-up plans, pipeline,
+            and agency assets available when you come back.
           </p>
         </div>
 
@@ -173,7 +173,7 @@ export default function AccountPage() {
 
             <p className="muted" style={{ marginTop: 10, lineHeight: 1.75 }}>
               {user
-                ? "Your workspace is connected to this account."
+                ? "Your agency workspace is connected to this account."
                 : "You can browse the free library without an account. Sign in when you want your work kept in one place."}
             </p>
 
@@ -191,7 +191,7 @@ export default function AccountPage() {
               </div>
 
               <div className="accountMetaItem">
-                <span className="accountMetaLabel">Workspace</span>
+                <span className="accountMetaLabel">Agency workspace</span>
                 <span className="accountMetaValue">
                   {user ? "Sync available" : "Local browsing"}
                 </span>
@@ -216,14 +216,14 @@ export default function AccountPage() {
                     try {
                       await syncNow();
                       trackEvent("account_sync_success");
-                      setNotice("Your workspace is up to date.");
+                      setNotice("Your agency workspace is up to date.");
                     } catch {
                       trackEvent("account_sync_failed");
                       setNotice("Sync could not finish right now. Please try again.");
                     }
                   }}
                 >
-                  {isSyncing ? "Syncing..." : "Sync workspace"}
+                  {isSyncing ? "Syncing..." : "Sync agency work"}
                 </button>
 
                 <button
@@ -237,7 +237,7 @@ export default function AccountPage() {
 
             {syncErrorMessage ? (
               <p className="notice">
-                We could not sync your workspace right now. Your local work is
+                We could not sync your agency work right now. Your local work is
                 still available on this device.
               </p>
             ) : null}

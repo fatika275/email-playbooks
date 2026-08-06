@@ -5,11 +5,11 @@ import { usePathname } from "next/navigation";
 import { useAccount } from "@/components/account-provider";
 
 const navItems = [
-  { href: "/prospects", label: "Pipeline" },
-  { href: "/library", label: "Agency Templates" },
-  { href: "/sequence-builder", label: "Follow-ups" },
-  { href: "/workspace", label: "Saved Work" },
-  { href: "/team", label: "Team" },
+  { href: "/prospects", label: "Client Pipeline" },
+  { href: "/library", label: "Outreach Templates" },
+  { href: "/sequence-builder", label: "Follow-up Plans" },
+  { href: "/workspace", label: "Agency Assets" },
+  { href: "/team", label: "Team Deal Room" },
 ];
 
 const workspacePaths = [

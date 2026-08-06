@@ -15,7 +15,7 @@ import SiteHeader from "@/components/site-header";
 export const metadata: Metadata = {
   title: "Thalovo",
   description:
-    "Built for one job: helping small agencies turn outreach into booked clients with a lightweight, readable workspace instead of CRM admin overhead.",
+    "Built for one job: helping small agencies turn outreach into booked clients with a lightweight workflow for prospects, proposals, retainers, and handoff.",
 };
 
 export default function RootLayout({

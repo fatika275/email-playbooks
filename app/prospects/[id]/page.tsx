@@ -648,7 +648,7 @@ export default function ProspectDetailPage() {
               <span className="miniBadge">Minutes, not days</span>
               <h2 className="sectionTitle">Give this lead a stage and a next action</h2>
               <p className="muted">
-                Choose a follow-up plan, open the first message, then set the next reminder. No custom CRM setup needed before the agency can start chasing work.
+                Choose a follow-up plan, open the first message, then set the next reminder. No blank setup project needed before the agency can start chasing work.
               </p>
             </div>
             <div className="prospectOnboardingSteps">
