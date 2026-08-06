@@ -377,7 +377,7 @@ export default function ProspectsPage() {
     const contactedIds = new Set(outreachActivities.map((item) => item.prospect_id));
     prospects.filter((item) => item.last_contacted_at).forEach((item) => contactedIds.add(item.id));
     const meetingIds = new Set(activities.filter((item) => item.activity_type === "meeting").map((item) => item.prospect_id));
-    prospects.filter((item) => ["meeting", "won"].includes(item.stage)).forEach((item) => meetingIds.add(item.id));
+    prospects.filter((item) => ["qualified", "meeting", "won"].includes(item.stage)).forEach((item) => meetingIds.add(item.id));
     return {
       actions: outreachActivities.length,
       contacted: contactedIds.size,
@@ -769,7 +769,7 @@ export default function ProspectsPage() {
             <h1 className="pageTitle" style={{ marginTop: 14 }}>Move leads from reply to booked work</h1>
             <p className="muted">
               {user
-                ? "Track prospects, proposals, retainers, handoffs, and next actions so promising client work does not slip through the cracks."
+                ? "Track inquiries, scoping calls, proposals, negotiation, handoffs, and next actions so promising client work does not slip through the cracks."
                 : "Sign in first, then choose a plan to track where each lead is, what stage it is in, and what needs to happen next."}
             </p>
             <Link href={user ? "/pricing" : "/account"} className="button buttonPrimary">
@@ -790,8 +790,8 @@ export default function ProspectsPage() {
             <h1 className="pageTitle" style={{ marginTop: 14 }}>Move leads from reply to booked work</h1>
             <p className="muted" style={{ margin: "8px 0 0" }}>
               {workspaceId
-                ? "Shared agency view of prospects, proposals, retainers, handoffs, follow-ups, and booked clients"
-                : "Your private view of prospects, proposals, retainers, handoffs, follow-ups, and booked clients"}
+                ? "Shared agency view of inquiries, scoping calls, proposals, negotiation, handoffs, follow-ups, and booked clients"
+                : "Your private view of inquiries, scoping calls, proposals, negotiation, handoffs, follow-ups, and booked clients"}
             </p>
           </div>
           <div className="toolbar">
@@ -892,7 +892,7 @@ export default function ProspectsPage() {
                   )
                 }
               >
-                Mark {pendingOutcome.stage === "won" ? "handoff" : "closed"}
+                Mark {pendingOutcome.stage === "won" ? "handoff" : "slipped"}
               </button>
               <button
                 className="button buttonUtility"
@@ -934,7 +934,7 @@ export default function ProspectsPage() {
 
         {view === "pipeline" ? (
           <div className="prospectViewSection">
-          <div className="prospectViewHeading"><h2 className="sectionTitle">{PROSPECT_WORKFLOW_LABELS[workflowView]} by stage</h2><p className="muted">Switch between prospects, proposals, retainers, and client handoff without losing the next action for each lead.</p></div>
+          <div className="prospectViewHeading"><h2 className="sectionTitle">{PROSPECT_WORKFLOW_LABELS[workflowView]} by stage</h2><p className="muted">Switch between inquiries, scoping calls, proposal negotiation, and client handoff without losing the next action for each lead.</p></div>
           <div className="prospectBoard">
             {visiblePipelineStages.map((stage) => {
               const stageProspects = filtered.filter((prospect) => prospect.stage === stage);
@@ -981,7 +981,7 @@ export default function ProspectsPage() {
           </div>
         ) : view === "list" ? (
           <div className="prospectViewSection">
-          <div className="prospectViewHeading"><h2 className="sectionTitle">{PROSPECT_WORKFLOW_LABELS[workflowView]}</h2><p className="muted">A focused list for this part of the agency workflow, from first prospect through proposal, retainer, and client handoff.</p></div>
+          <div className="prospectViewHeading"><h2 className="sectionTitle">{PROSPECT_WORKFLOW_LABELS[workflowView]}</h2><p className="muted">A focused list for this part of the agency workflow, from first inquiry through scoping call, proposal, negotiation, and client handoff.</p></div>
           <div className="prospectTableWrap">
             <table className="prospectTable">
               <thead><tr><th>Lead</th><th>Stage</th><th>Client work value</th><th>Follow-up</th><th>Source</th><th>Actions</th></tr></thead>
@@ -1003,7 +1003,7 @@ export default function ProspectsPage() {
           </div>
         ) : view === "today" ? (
           <div className="prospectViewSection">
-          <div className="prospectViewHeading"><h2 className="sectionTitle">Today&apos;s agency pipeline actions</h2><p className="muted">Start here each day to see what needs a reply, proposal chase, retainer handoff, or stage move.</p></div>
+          <div className="prospectViewHeading"><h2 className="sectionTitle">Today&apos;s agency pipeline actions</h2><p className="muted">Start here each day to see what needs a reply, scoping call, proposal chase, negotiation move, or handoff.</p></div>
           <div className="prospectTodayGrid">
             <section className="prospectTodayPanel">
               <div className="prospectSectionHeader"><h2 className="cardTitle">Actions due</h2></div>
@@ -1050,11 +1050,11 @@ export default function ProspectsPage() {
                       ? `${dailyDashboard.priorityItems.length} useful action${dailyDashboard.priorityItems.length === 1 ? "" : "s"} to handle.`
                       : "You are clear for today."}
                 </h2>
-                <p className="muted">Start with the action most likely to move a lead toward proposal, retainer, handoff, or booked client.</p>
+                <p className="muted">Start with the action most likely to move a lead toward scoping call, proposal, negotiation, handoff, or booked client.</p>
                 <div className="prospectFocusSummary" aria-label="Pipeline summary">
                   <span>{dailyDashboard.followUpsDue} follow-up{dailyDashboard.followUpsDue === 1 ? "" : "s"} due</span>
                   <span>{dailyDashboard.replyNeeded.length} repl{dailyDashboard.replyNeeded.length === 1 ? "y" : "ies"} waiting</span>
-                  <span>{dailyDashboard.proposalsToChase.length} proposal{dailyDashboard.proposalsToChase.length === 1 ? "" : "s"} to chase</span>
+                  <span>{dailyDashboard.proposalsToChase.length} close action{dailyDashboard.proposalsToChase.length === 1 ? "" : "s"}</span>
                   <span>{dailyDashboard.coldProspects.length} leakage risk{dailyDashboard.coldProspects.length === 1 ? "" : "s"}</span>
                   <span>{formatMoney(metrics.value)} active potential work</span>
                 </div>
@@ -1079,7 +1079,7 @@ export default function ProspectsPage() {
 
             <div className="prospectDailyLayout">
               <section className="prospectDailyPanel">
-                <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">Other agency pipeline work today</h3><p className="muted">A short backup list after the main action above: replies, proposal chases, follow-ups, stage moves, and handoffs.</p></div>
+                <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">Other agency pipeline work today</h3><p className="muted">A short backup list after the main action above: replies, scoping calls, proposal chases, negotiation moves, follow-ups, and handoffs.</p></div>
                 <div className="prospectDailyActionList">
                   {dailyDashboard.supportingItems.map((item) => (
                     <Link key={item.id} href={item.href} className="prospectDailyAction">
@@ -1115,7 +1115,7 @@ export default function ProspectsPage() {
                   Reply rate {acquisitionRates.reply}% from {outreachMetrics.contacted} contacted lead{outreachMetrics.contacted === 1 ? "" : "s"}.
                 </p>
 
-                <div className="prospectDashboardSectionHeading prospectDashboardSubsection"><h3 className="cardTitle">Proposal decisions</h3></div>
+                <div className="prospectDashboardSectionHeading prospectDashboardSubsection"><h3 className="cardTitle">Proposal / negotiation</h3></div>
                 <div className="prospectMiniList">
                   {dailyDashboard.proposalsToChase.slice(0, 4).map((item) => {
                     const prospect = "prospect" in item ? item.prospect : undefined;
@@ -1123,11 +1123,11 @@ export default function ProspectsPage() {
                     return (
                       <Link key={item.id ?? `${prospect?.id}-${task?.id}`} href={prospect ? `/prospects/${prospect.id}` : "/prospects"} className="prospectMiniListItem">
                         <strong>{prospect?.full_name ?? (task ? getProspectTaskDisplayTitle(task.title) : "Proposal")}</strong>
-                        <span>{prospect ? `${prospect.company} - chase decision` : "Open proposal task"}</span>
+                        <span>{prospect ? `${prospect.company} - chase the next close step` : "Open proposal task"}</span>
                       </Link>
                     );
                   })}
-                  {dailyDashboard.proposalsToChase.length === 0 ? <p className="small">No proposals need chasing right now.</p> : null}
+                  {dailyDashboard.proposalsToChase.length === 0 ? <p className="small">No scoping, proposal, or negotiation steps need chasing right now.</p> : null}
                 </div>
 
                 <div className="prospectDashboardSectionHeading prospectDashboardSubsection"><h3 className="cardTitle">Lead leakage</h3></div>
@@ -1149,7 +1149,7 @@ export default function ProspectsPage() {
             </div>
 
             <section className="prospectDashboardSection prospectStageSnapshot">
-              <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">Agency workflow</h3><p className="muted">A simple view of where work sits: prospects, proposals, retainers, client handoff, and lost leads.</p></div>
+              <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">Agency workflow</h3><p className="muted">A simple view of where work sits: inquiries, scoping calls, proposal negotiation, client handoff, and slipped leads.</p></div>
               <div className="prospectWorkflowSummary">
                 {PROSPECT_WORKFLOW_VIEWS.filter((item) => item !== "all").map((item) => (
                   <button
@@ -1173,7 +1173,7 @@ export default function ProspectsPage() {
                     setView("pipeline");
                   }}
                 >
-                  <span>Lost / closed</span>
+                  <span>Lost / slipped</span>
                   <strong>{prospects.filter((prospect) => prospect.stage === "lost").length}</strong>
                 </button>
               </div>

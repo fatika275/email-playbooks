@@ -3,14 +3,14 @@ import { CheckoutButton } from "@/components/checkout-button";
 
 const businessFeatures = [
   "Everything in Pro",
-  "Shared pipeline for prospects, proposals, retainers, and handoff",
+  "Shared pipeline for inquiries, scoping calls, proposals, negotiation, and handoff",
   "Shared notes so lead context does not live in one person's head",
   "Simple ownership rules for who is chasing each lead",
   "One payment for the business",
   "Full Pro access for up to 10 teammates",
   "Shared agency templates and follow-up plans",
   "Owner-controlled invitations and removals",
-  "Team visibility for proposals, retainers, and handoff without duplicate chasing",
+  "Team visibility for scoping calls, proposals, negotiation, and handoff without duplicate chasing",
 ];
 
 export default function BusinessPage() {
@@ -26,9 +26,9 @@ export default function BusinessPage() {
             <p className="muted" style={{ marginTop: 14, lineHeight: 1.75 }}>
               For small agencies where the founder is not the only person
               chasing replies. Give the team one shared pipeline, shared notes,
-              and simple ownership rules so prospects, proposals, retainers,
-              and handoffs stay visible without turning follow-up into an admin
-              project.
+              and simple ownership rules so inquiries, scoping calls,
+              proposals, negotiation, and handoffs stay visible without turning
+              follow-up into an admin project.
             </p>
 
             <ul className="featureList">

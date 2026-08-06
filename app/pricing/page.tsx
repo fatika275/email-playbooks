@@ -27,10 +27,10 @@ export default function PricingPage() {
             }}
           >
             Thalovo is built for one job: turn outreach into booked clients.
-            It helps small agencies send better outreach, track prospects,
-            chase proposals, and see replies, booked calls, signed client work,
-            and lead leakage. Start in minutes with the service-sales workflow
-            your agency already uses.
+            It helps small agencies send better outreach, track inquiries,
+            manage scoping calls, chase proposals, handle negotiation, and see
+            replies, booked calls, signed client work, and lead leakage. Start
+            in minutes with the service-sales workflow your agency already uses.
           </p>
 
           <p
@@ -143,7 +143,7 @@ export default function PricingPage() {
             <ul className="featureList">
               <li>Outreach sequences, follow-up templates, proposal reminders, and client win-back flows</li>
               <li>Start with one prospect and a ready-made agency workflow</li>
-              <li>Agency pipeline stages for prospects, proposals, retainers, and client handoff</li>
+              <li>Agency pipeline stages for inquiries, scoping calls, proposals, negotiation, and handoff</li>
               <li>Follow-up tools to stop warm leads slipping</li>
               <li>Outcome reporting for replies, booked calls, signed work, and lead leakage</li>
               <li>Reusable saved messages and follow-up plans</li>
@@ -178,7 +178,7 @@ export default function PricingPage() {
 
             <ul className="featureList">
               <li>Everything in Pro</li>
-              <li>Shared pipeline for prospects, proposals, retainers, and handoff</li>
+              <li>Shared pipeline for inquiries, scoping calls, proposals, negotiation, and handoff</li>
               <li>Shared notes and activity history for lead context</li>
               <li>Simple ownership rules for who is chasing each lead</li>
               <li>10 teammate seats included</li>

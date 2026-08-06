@@ -11,7 +11,7 @@ const workflow = [
   },
   {
     title: "Pipeline",
-    text: "Track prospects, proposals, retainers, client handoff, booked clients, and slipped leads.",
+    text: "Track inquiries, scoping calls, proposals, negotiation, client handoff, booked clients, and slipped leads.",
   },
   {
     title: "Team sharing",
@@ -73,7 +73,7 @@ export default function HomePage() {
             It gives small agencies the focused workflow for templates,
             pipeline, follow-ups, team visibility, and outcome reporting. Start
             in minutes with one prospect, one message, and one follow-up, then
-            keep proposals, retainers, handoff, and lead ownership moving in
+            keep scoping calls, proposals, negotiation, handoff, and lead ownership moving in
             one readable place.
           </p>
 
@@ -108,7 +108,7 @@ export default function HomePage() {
           </div>
           <div>
             <strong>Pipeline</strong>
-            <span>Track prospects, proposals, retainers, handoffs, and next actions</span>
+            <span>Track inquiries, scoping calls, proposals, negotiation, and next actions</span>
           </div>
           <div>
             <strong>Follow-up tools</strong>
@@ -124,10 +124,10 @@ export default function HomePage() {
             <p className="muted">
               Outreach sequences start the conversation. Follow-up templates,
               proposal reminders, and client win-back flows keep leads moving.
-              The pipeline tracks prospects, proposals, retainers, and
-              handoffs. No days of setup, just the pieces small agencies need
-              to turn outreach into booked clients in a lightweight, readable
-              agency workflow.
+              The pipeline tracks inquiries, scoping calls, proposals,
+              negotiation, and handoff. No days of setup, just the pieces small
+              agencies need to turn outreach into booked clients in a
+              lightweight, readable agency workflow.
             </p>
           </div>
         </div>
@@ -153,8 +153,9 @@ export default function HomePage() {
             <h2 className="pageTitle">Built around how small agencies sell services</h2>
             <p className="muted">
               Thalovo follows the work your team actually does after outreach:
-              qualify the lead, chase the proposal, move toward retainer, and
-              hand off the client with context still intact.
+              qualify the lead, book the scoping call, chase the proposal,
+              handle negotiation, and hand off the client with context still
+              intact.
             </p>
           </div>
         </div>
@@ -183,7 +184,7 @@ export default function HomePage() {
             </h2>
             <p className="muted" style={{ marginTop: 12, maxWidth: 680 }}>
               Thalovo stays intentionally narrow: start from a prospect, send
-              the right follow-up, move proposals and retainers forward, and
+              the right follow-up, move scoping calls and proposals forward, and
               keep client handoff visible. Add the first lead and start using
               it the same day.
             </p>

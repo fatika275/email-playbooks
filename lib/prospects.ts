@@ -14,21 +14,21 @@ export const PROSPECT_STAGES = [
 export type ProspectStage = (typeof PROSPECT_STAGES)[number];
 
 export const PROSPECT_STAGE_LABELS: Record<ProspectStage, string> = {
-  new: "Prospect",
-  researching: "Researching fit",
-  contacted: "Outreach sent",
-  replied: "Reply / discovery",
-  qualified: "Proposal sent",
-  meeting: "Retainer discussion",
+  new: "Inquiry",
+  researching: "Fit check",
+  contacted: "First touch sent",
+  replied: "Reply received",
+  qualified: "Scoping call",
+  meeting: "Proposal / negotiation",
   won: "Client handoff",
-  lost: "Lost / closed",
+  lost: "Lost / slipped",
 };
 
 export const PROSPECT_WORKFLOW_VIEWS = [
   "all",
-  "prospects",
+  "inquiries",
+  "scoping",
   "proposals",
-  "retainers",
   "handoff",
 ] as const;
 
@@ -36,9 +36,9 @@ export type ProspectWorkflowView = (typeof PROSPECT_WORKFLOW_VIEWS)[number];
 
 export const PROSPECT_WORKFLOW_LABELS: Record<ProspectWorkflowView, string> = {
   all: "All agency work",
-  prospects: "Prospects",
-  proposals: "Proposals",
-  retainers: "Retainers",
+  inquiries: "Inquiries",
+  scoping: "Scoping calls",
+  proposals: "Proposal / negotiation",
   handoff: "Client handoff",
 };
 
@@ -47,9 +47,9 @@ export const PROSPECT_WORKFLOW_STAGES: Record<
   ProspectStage[]
 > = {
   all: [...PROSPECT_STAGES],
-  prospects: ["new", "researching", "contacted", "replied"],
-  proposals: ["qualified"],
-  retainers: ["meeting"],
+  inquiries: ["new", "researching", "contacted", "replied"],
+  scoping: ["qualified"],
+  proposals: ["meeting"],
   handoff: ["won"],
 };
 

@@ -440,7 +440,7 @@ export default function AccountPage() {
                 <div className="accountQuickLinks">
                   <Link href="/prospects" className="glassCard clickable accountQuickLink">
                     <strong>Open pipeline</strong>
-                    <span className="muted">Track prospects, proposals, retainers, and handoff</span>
+                    <span className="muted">Track inquiries, scoping calls, proposals, negotiation, and handoff</span>
                   </Link>
 
                   <Link href="/library" className="glassCard clickable accountQuickLink">
