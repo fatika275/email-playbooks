@@ -15,7 +15,7 @@ const workflow = [
   },
   {
     title: "Team sharing",
-    text: "Use a shared pipeline, shared notes, and simple ownership rules for leads, proposals, and handoff.",
+    text: "Use shared notes and owner context when one teammate starts the deal and another continues it.",
   },
   {
     title: "Follow-up tools",
@@ -50,7 +50,7 @@ const agencyWorkflowDepth = [
   },
   {
     title: "Hand off the client",
-    text: "Keep notes, owner, outcome reason, and next steps visible when sales turns into active client work.",
+    text: "Keep owner, scope, decision-maker, outcome reason, and next steps visible when sales turns into active client work.",
   },
 ];
 

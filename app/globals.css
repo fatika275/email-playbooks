@@ -2729,9 +2729,15 @@ details[open] > summary::after {
   border-top: 1px solid var(--border);
 }
 
+.prospectContextBlock div {
+  display: grid;
+  gap: 6px;
+}
+
 .prospectContextBlock strong {
   margin-bottom: 8px;
   overflow-wrap: anywhere;
+  white-space: pre-wrap;
 }
 
 .prospectOpsGrid,

@@ -340,12 +340,12 @@ export default function TeamLibraryPage() {
         <div className="pageHeader">
           <div className="badge">Team collaboration</div>
           <h1 className="pageTitle" style={{ marginTop: 14 }}>
-            Shared pipeline, notes, and lead ownership for agency teams.
+            Shared notes and handoff visibility for agency teams.
           </h1>
           <p className="muted" style={{ maxWidth: 760, lineHeight: 1.75 }}>
-            Give teammates one place to see lead status, leave context, and own
-            the next action so nobody duplicates chasing or lets a good lead
-            slip.
+            Give teammates one place to see who started the deal, who owns it
+            now, and what context needs to travel with the lead so nobody
+            duplicates chasing or lets a good opportunity slip.
           </p>
         </div>
 
@@ -384,7 +384,7 @@ export default function TeamLibraryPage() {
                 <span className="miniBadge">Active agency workspace</span>
                 <h2 className="pageTitle">{workspace.name}</h2>
                 <p className="muted" style={{ margin: "8px 0 0" }}>
-                  One shared pipeline for lead notes, ownership, follow-ups, and handoffs.
+                  One shared pipeline for lead ownership, shared notes, follow-ups, and handoff context.
                 </p>
               </div>
               <Link href="/prospects" className="button buttonPrimary">Open shared pipeline</Link>
@@ -398,7 +398,7 @@ export default function TeamLibraryPage() {
             </div>
 
             <section className="teamPeopleSection">
-              <div className="teamPeopleHeading"><div className="teamSectionHeading"><h3 className="sectionTitle">People and ownership</h3><p className="muted">Member works assigned leads. Admin can also manage teammate access. Lead ownership stays simple.</p></div>{workspaces.find((item) => item.id === workspace.id)?.access_role !== "member" ? <button className={`button ${showInvite ? "buttonSecondary" : "buttonPrimary"}`} onClick={() => setShowInvite((current) => !current)}>{showInvite ? "Close invite" : "Invite teammate"}</button> : null}</div>
+              <div className="teamPeopleHeading"><div className="teamSectionHeading"><h3 className="sectionTitle">People and ownership</h3><p className="muted">Assign the lead owner, then keep scope, decision-maker, and next action visible when someone else continues the deal.</p></div>{workspaces.find((item) => item.id === workspace.id)?.access_role !== "member" ? <button className={`button ${showInvite ? "buttonSecondary" : "buttonPrimary"}`} onClick={() => setShowInvite((current) => !current)}>{showInvite ? "Close invite" : "Invite teammate"}</button> : null}</div>
 
             {showInvite && workspaces.find((item) => item.id === workspace.id)?.access_role !== "member" ? <><div
               className="businessInviteGrid"
@@ -460,7 +460,7 @@ export default function TeamLibraryPage() {
 
             <details className="teamActivitySection teamActivityDisclosure">
               <summary><strong>Agency activity</strong><span>{filteredActivity.length} useful updates</span></summary>
-              <div className="teamActivityControls"><div><h3 className="cardTitle">Recent activity</h3><p className="small">See who touched each lead so handoffs stay clear and nobody chases twice.</p></div><select className="input" value={activityFilter} onChange={(event) => { setActivityFilter(event.target.value as "key" | "outreach" | "tasks" | "all"); setShowAllActivity(false); }} aria-label="Filter agency activity"><option value="key">Key updates</option><option value="outreach">Outreach only</option><option value="tasks">Tasks only</option><option value="all">All changes</option></select></div>
+              <div className="teamActivityControls"><div><h3 className="cardTitle">Recent activity</h3><p className="small">See who started it, who owns it now, and the latest context before anyone continues the deal.</p></div><select className="input" value={activityFilter} onChange={(event) => { setActivityFilter(event.target.value as "key" | "outreach" | "tasks" | "all"); setShowAllActivity(false); }} aria-label="Filter agency activity"><option value="key">Key updates</option><option value="outreach">Outreach only</option><option value="tasks">Tasks only</option><option value="all">All changes</option></select></div>
               <div className="prospectTimeline">
                 {visibleActivity.map((item) => (
                   <div key={item.id} className="prospectTimelineItem">
@@ -496,7 +496,7 @@ export default function TeamLibraryPage() {
           <section className="glassCard" style={{ padding: 22, marginBottom: 22 }}>
             <h2 className="cardTitle">Need access for a whole business?</h2>
             <p className="muted" style={{ margin: "8px 0 14px" }}>
-              Business Pro gives one payer, a shared pipeline, shared notes,
+              Business Pro gives one payer, a shared pipeline, handoff notes,
               simple ownership rules, and up to 10 teammates full Pro access.
             </p>
             <Link href="/business" className="button buttonPrimary">

@@ -172,14 +172,14 @@ export default function PricingPage() {
             </h2>
 
             <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
-              For small agency teams that need a shared pipeline, shared notes,
+              For small agency teams that need a shared pipeline, handoff notes,
               and simple lead ownership.
             </p>
 
             <ul className="featureList">
               <li>Everything in Pro</li>
               <li>Shared pipeline for inquiries, scoping calls, proposals, negotiation, and handoff</li>
-              <li>Shared notes and activity history for lead context</li>
+              <li>Shared notes and handoff context for lead owner changes</li>
               <li>Simple ownership rules for who is chasing each lead</li>
               <li>10 teammate seats included</li>
               <li>Full Pro access for every active member</li>

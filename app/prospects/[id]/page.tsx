@@ -121,6 +121,10 @@ function addDays(date: string, days: number) {
   return result.toISOString().slice(0, 10);
 }
 
+function contextValue(value: string | null | undefined, fallback: string) {
+  return value?.trim() || fallback;
+}
+
 export default function ProspectDetailPage() {
   const params = useParams();
   const router = useRouter();
@@ -237,6 +241,21 @@ export default function ProspectDetailPage() {
     return ["email", "call", "meeting", "status"].includes(activity.activity_type);
   }), [activities, activityFilter]);
   const visibleActivities = showAllActivity ? filteredActivities : filteredActivities.slice(0, 8);
+  const latestSharedNote = comments[0];
+  const latestSharedNotePreview = latestSharedNote
+    ? latestSharedNote.body.length > 220
+      ? `${latestSharedNote.body.slice(0, 220)}...`
+      : latestSharedNote.body
+    : "No handoff note yet";
+  const handoffSummary = [
+    { label: "Owner now", value: prospect?.assigned_email || "Unassigned" },
+    { label: "Agency stage", value: PROSPECT_STAGE_LABELS[stage] },
+    { label: "Next follow-up", value: nextFollowUp || "Not scheduled" },
+    { label: "Service type", value: contextValue(serviceType, "Not scoped") },
+    { label: "Budget", value: contextValue(budgetRange, "Not captured") },
+    { label: "Timeline", value: contextValue(timeline, "Not captured") },
+    { label: "Decision-maker", value: contextValue(decisionMaker, "Not captured") },
+  ];
   const showOnboardingGuide =
     searchParams.get("onboarding") === "1" ||
     Boolean(prospect && !lastContactedAt && !nextFollowUp && tasks.length === 0);
@@ -373,9 +392,9 @@ export default function ProspectDetailPage() {
       await createProspectComment({ prospectId: id, workspaceId: prospect.workspace_id, userId: user.id, userEmail: user.email, body: commentBody, members: teamMembers });
       setCommentBody("");
       await refreshOperations();
-      setNotice("Comment added.");
+      setNotice("Shared handoff note added.");
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : "Comment could not be added.");
+      setNotice(error instanceof Error ? error.message : "Shared note could not be added.");
     }
   }
 
@@ -423,6 +442,8 @@ export default function ProspectDetailPage() {
     if (!id) return;
     const member = teamMembers.find((item) => item.id === value);
     const assigningSelf = value === "self";
+    const previousOwner = prospect?.assigned_email || "Unassigned";
+    const nextOwner = member?.email ?? (assigningSelf ? user?.email : null) ?? "Unassigned";
     try {
       const updated = await updateProspectAssignment({
         id,
@@ -431,8 +452,25 @@ export default function ProspectDetailPage() {
         actorId: user?.id,
       });
       setProspect(updated);
+      if (user && prospect?.workspace_id && previousOwner !== nextOwner) {
+        const scopeParts = [serviceType, budgetRange, timeline].map((item) => item.trim()).filter(Boolean);
+        await createProspectComment({
+          prospectId: id,
+          workspaceId: prospect.workspace_id,
+          userId: user.id,
+          userEmail: user.email,
+          body: [
+            `Handoff: ${previousOwner} -> ${nextOwner}.`,
+            `Stage: ${PROSPECT_STAGE_LABELS[stage]}.`,
+            `Next follow-up: ${nextFollowUp || "Not scheduled"}.`,
+            `Scope: ${scopeParts.length ? scopeParts.join(" / ") : "Not scoped yet"}.`,
+            `Decision-maker: ${decisionMaker.trim() || "Not captured"}.`,
+          ].join("\n"),
+          members: teamMembers,
+        });
+      }
       await refreshOperations();
-      setNotice(member || assigningSelf ? "Prospect assigned." : "Prospect unassigned.");
+      setNotice(member || assigningSelf ? "Lead handed off with shared context." : "Lead unassigned and handoff context saved.");
     } catch (error) {
       setNotice(error instanceof Error ? error.message : "Assignment could not be updated.");
     }
@@ -731,7 +769,7 @@ export default function ProspectDetailPage() {
               <div className="formGroup"><label className="label">Potential client work value (GBP)</label><input className="input" type="number" min="0" value={value} onChange={(event) => setValue(event.target.value)} /><p className="small" style={{ margin: "6px 0 0" }}>Use the likely value of the project, retainer, or client work this lead could become.</p></div>
               <div className="formGroup"><label className="label">Next follow-up</label><input className="input" type="date" value={nextFollowUp} onChange={(event) => setNextFollowUp(event.target.value)} /></div>
               <div className="formGroup"><label className="label">Last contacted</label><input className="input" value={lastContactedAt ? new Date(lastContactedAt).toLocaleString() : "Not contacted yet"} disabled /></div>
-              {prospect?.workspace_id ? <div className="formGroup"><label className="label">Lead owner</label><select className="input" value={teamMembers.find((member) => member.user_id === prospect.assigned_user_id || member.email === prospect.assigned_email)?.id ?? (prospect.assigned_user_id === user.id ? "self" : "")} onChange={(event) => void handleProspectAssignment(event.target.value)}><option value="">Unassigned</option><option value="self">Me ({user.email})</option>{teamMembers.filter((member) => member.user_id !== user.id && member.email !== user.email).map((member) => <option key={member.id} value={member.id}>{member.email} · {member.role}</option>)}</select></div> : null}
+              {prospect?.workspace_id ? <div className="formGroup"><label className="label">Lead owner</label><select className="input" value={teamMembers.find((member) => member.user_id === prospect.assigned_user_id || member.email === prospect.assigned_email)?.id ?? (prospect.assigned_user_id === user.id ? "self" : "")} onChange={(event) => void handleProspectAssignment(event.target.value)}><option value="">Unassigned</option><option value="self">Me ({user.email})</option>{teamMembers.filter((member) => member.user_id !== user.id && member.email !== user.email).map((member) => <option key={member.id} value={member.id}>{member.email} - {member.role}</option>)}</select><p className="small" style={{ margin: "6px 0 0" }}>Changing owner creates a shared handoff note with stage, scope, decision-maker, and next follow-up.</p></div> : null}
             </div>
 
             <div className="prospectSectionHeader"><h2 className="cardTitle">Scope and qualification</h2></div>
@@ -743,7 +781,7 @@ export default function ProspectDetailPage() {
               <div className="formGroup"><label className="label">Deliverables</label><textarea className="input" rows={4} value={deliverables} onChange={(event) => setDeliverables(event.target.value)} placeholder="Landing page, email sequence, monthly reporting..." /></div>
             </div>
 
-            <div className="formGroup"><label className="label">Notes</label><textarea className="input" rows={9} value={notes} onChange={(event) => setNotes(event.target.value)} placeholder="Decision criteria, pain points, client-work context, objections, and next steps..." /></div>
+            <div className="formGroup"><label className="label">Internal lead notes</label><textarea className="input" rows={9} value={notes} onChange={(event) => setNotes(event.target.value)} placeholder="Decision criteria, pain points, client-work context, objections, and next steps..." /></div>
             </div>
 
             <section className="prospectOpsPanel proposalWorkflowPanel" hidden={detailView !== "followup"}>
@@ -869,13 +907,13 @@ export default function ProspectDetailPage() {
             </div>
 
             {prospect?.workspace_id ? <section className="prospectOpsPanel prospectCommentsPanel" hidden={detailView !== "activity"}>
-              <div className="prospectSectionHeader"><h2 className="cardTitle">Team comments</h2></div>
-              <p className="small">Mention a teammate using their full email, for example @{teamMembers[0]?.email || "teammate@company.com"}.</p>
-              <textarea className="input" rows={3} value={commentBody} onChange={(event) => setCommentBody(event.target.value)} placeholder="Add context, ask a question, or mention a teammate..." />
-              <button className="button buttonPrimary" disabled={!commentBody.trim()} onClick={() => void handleAddComment()}>Add comment</button>
+              <div className="prospectSectionHeader"><h2 className="cardTitle">Shared notes and handoff context</h2></div>
+              <p className="small">Leave the context the next teammate needs: what was promised, who decides, what to send next, and anything that could stop the deal moving.</p>
+              <textarea className="input" rows={3} value={commentBody} onChange={(event) => setCommentBody(event.target.value)} placeholder={`Handoff note: ${fullName || "this lead"} cares about..., next step is..., watch out for...`} />
+              <button className="button buttonPrimary" disabled={!commentBody.trim()} onClick={() => void handleAddComment()}>Add shared note</button>
               <div className="prospectTimeline">
-                {comments.slice(0, 8).map((comment) => <div key={comment.id} className="prospectTimelineItem"><span className="miniBadge">Comment</span><div><strong>{comment.author_email || "Teammate"}</strong><p className="muted" style={{ whiteSpace: "pre-wrap", margin: "4px 0" }}>{comment.body}</p><p className="small">{new Date(comment.created_at).toLocaleString()}</p></div></div>)}
-                {comments.length === 0 ? <p className="small">No comments yet.</p> : null}
+                {comments.slice(0, 8).map((comment) => <div key={comment.id} className="prospectTimelineItem"><span className="miniBadge">Shared note</span><div><strong>{comment.author_email || "Teammate"}</strong><p className="muted" style={{ whiteSpace: "pre-wrap", margin: "4px 0" }}>{comment.body}</p><p className="small">{new Date(comment.created_at).toLocaleString()}</p></div></div>)}
+                {comments.length === 0 ? <p className="small">No shared handoff notes yet.</p> : null}
               </div>
             </section> : null}
 
@@ -900,13 +938,13 @@ export default function ProspectDetailPage() {
               {linkedinUrl ? <a className="button buttonSecondary" href={linkedinUrl} target="_blank" rel="noreferrer">Open LinkedIn</a> : null}
             </div>
             <div className="prospectContextBlock">
-              <span>Agency stage</span><strong>{PROSPECT_STAGE_LABELS[stage]}</strong>
-              <span>Service type</span><strong>{serviceType || "Not scoped"}</strong>
-              <span>Budget</span><strong>{budgetRange || "Not captured"}</strong>
-              <span>Timeline</span><strong>{timeline || "Not captured"}</strong>
-              <span>Decision-maker</span><strong>{decisionMaker || "Not captured"}</strong>
-              <span>Next follow-up</span><strong>{nextFollowUp || "Not scheduled"}</strong>
-              <span>Assigned to</span><strong>{prospect?.assigned_email || "Unassigned"}</strong>
+              <span>Handoff snapshot</span><strong>For the next teammate</strong>
+              {handoffSummary.map((item) => (
+                <div key={item.label}>
+                  <span>{item.label}</span><strong>{item.value}</strong>
+                </div>
+              ))}
+              <span>Latest shared note</span><strong>{latestSharedNotePreview}</strong>
             </div>
           </aside>
         </div>
