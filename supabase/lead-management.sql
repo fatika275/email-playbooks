@@ -41,6 +41,11 @@ create table if not exists public.prospects (
   role text,
   linkedin_url text,
   source text,
+  budget_range text,
+  deliverables text,
+  timeline text,
+  decision_maker text,
+  service_type text,
   stage text not null default 'new'
     check (stage in ('new', 'researching', 'contacted', 'replied', 'qualified', 'meeting', 'won', 'lost')),
   estimated_value_gbp integer not null default 0 check (estimated_value_gbp >= 0),
@@ -50,6 +55,13 @@ create table if not exists public.prospects (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+alter table public.prospects
+  add column if not exists budget_range text,
+  add column if not exists deliverables text,
+  add column if not exists timeline text,
+  add column if not exists decision_maker text,
+  add column if not exists service_type text;
 
 create index if not exists prospects_owner_idx
   on public.prospects (owner_id, updated_at desc);

@@ -140,6 +140,11 @@ begin
      or old.company is distinct from new.company
      or old.email is distinct from new.email
      or old.role is distinct from new.role
+     or old.budget_range is distinct from new.budget_range
+     or old.deliverables is distinct from new.deliverables
+     or old.timeline is distinct from new.timeline
+     or old.decision_maker is distinct from new.decision_maker
+     or old.service_type is distinct from new.service_type
      or old.estimated_value_gbp is distinct from new.estimated_value_gbp
      or old.notes is distinct from new.notes
      or old.next_follow_up is distinct from new.next_follow_up then

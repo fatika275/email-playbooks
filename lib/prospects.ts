@@ -88,6 +88,11 @@ export type Prospect = {
   role: string | null;
   linkedin_url: string | null;
   source: string | null;
+  budget_range: string | null;
+  deliverables: string | null;
+  timeline: string | null;
+  decision_maker: string | null;
+  service_type: string | null;
   stage: ProspectStage;
   estimated_value_gbp: number;
   notes: string | null;
@@ -104,6 +109,11 @@ export type ProspectInput = {
   role?: string;
   linkedin_url?: string;
   source?: string;
+  budget_range?: string;
+  deliverables?: string;
+  timeline?: string;
+  decision_maker?: string;
+  service_type?: string;
   stage?: ProspectStage;
   estimated_value_gbp?: number;
   notes?: string;
@@ -305,6 +315,11 @@ export async function createProspect(options: {
       role: optional(input.role),
       linkedin_url: optional(input.linkedin_url),
       source: optional(input.source),
+      budget_range: optional(input.budget_range),
+      deliverables: optional(input.deliverables),
+      timeline: optional(input.timeline),
+      decision_maker: optional(input.decision_maker),
+      service_type: optional(input.service_type),
       stage: input.stage ?? "new",
       estimated_value_gbp: Math.max(0, input.estimated_value_gbp ?? 0),
       notes: optional(input.notes),
@@ -333,6 +348,11 @@ export async function createProspectsBatch(options: {
     role: optional(input.role),
     linkedin_url: optional(input.linkedin_url),
     source: optional(input.source),
+    budget_range: optional(input.budget_range),
+    deliverables: optional(input.deliverables),
+    timeline: optional(input.timeline),
+    decision_maker: optional(input.decision_maker),
+    service_type: optional(input.service_type),
     stage: input.stage ?? "new",
     estimated_value_gbp: Math.max(0, input.estimated_value_gbp ?? 0),
     notes: optional(input.notes),
@@ -355,6 +375,11 @@ export async function updateProspect(id: string, input: ProspectInput) {
       role: optional(input.role),
       linkedin_url: optional(input.linkedin_url),
       source: optional(input.source),
+      budget_range: optional(input.budget_range),
+      deliverables: optional(input.deliverables),
+      timeline: optional(input.timeline),
+      decision_maker: optional(input.decision_maker),
+      service_type: optional(input.service_type),
       stage: input.stage ?? "new",
       estimated_value_gbp: Math.max(0, input.estimated_value_gbp ?? 0),
       notes: optional(input.notes),

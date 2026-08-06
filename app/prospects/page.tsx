@@ -123,6 +123,11 @@ export default function ProspectsPage() {
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("");
   const [source, setSource] = useState("");
+  const [budgetRange, setBudgetRange] = useState("");
+  const [deliverables, setDeliverables] = useState("");
+  const [timeline, setTimeline] = useState("");
+  const [decisionMaker, setDecisionMaker] = useState("");
+  const [serviceType, setServiceType] = useState("");
   const [value, setValue] = useState("");
   const [nextFollowUp, setNextFollowUp] = useState("");
   const [notice, setNotice] = useState("");
@@ -171,7 +176,18 @@ export default function ProspectsPage() {
       const matchesWorkflow = workflowStages.includes(prospect.stage);
       const matchesQuery =
         !normalized ||
-        [prospect.full_name, prospect.company, prospect.email, prospect.role, prospect.source]
+        [
+          prospect.full_name,
+          prospect.company,
+          prospect.email,
+          prospect.role,
+          prospect.source,
+          prospect.budget_range,
+          prospect.deliverables,
+          prospect.timeline,
+          prospect.decision_maker,
+          prospect.service_type,
+        ]
           .filter(Boolean)
           .join(" ")
           .toLowerCase()
@@ -409,6 +425,11 @@ export default function ProspectsPage() {
           email,
           role,
           source,
+          budget_range: budgetRange,
+          deliverables,
+          timeline,
+          decision_maker: decisionMaker,
+          service_type: serviceType,
           estimated_value_gbp: calculatedInputValue,
           next_follow_up: nextFollowUp,
         },
@@ -418,6 +439,11 @@ export default function ProspectsPage() {
       setEmail("");
       setRole("");
       setSource("");
+      setBudgetRange("");
+      setDeliverables("");
+      setTimeline("");
+      setDecisionMaker("");
+      setServiceType("");
       setValue("");
       setNextFollowUp("");
       setShowAdd(false);
@@ -475,6 +501,11 @@ export default function ProspectsPage() {
       role: overrides.role ?? prospect.role ?? "",
       linkedin_url: overrides.linkedin_url ?? prospect.linkedin_url ?? "",
       source: overrides.source ?? prospect.source ?? "",
+      budget_range: overrides.budget_range ?? prospect.budget_range ?? "",
+      deliverables: overrides.deliverables ?? prospect.deliverables ?? "",
+      timeline: overrides.timeline ?? prospect.timeline ?? "",
+      decision_maker: overrides.decision_maker ?? prospect.decision_maker ?? "",
+      service_type: overrides.service_type ?? prospect.service_type ?? "",
       stage: overrides.stage ?? prospect.stage,
       estimated_value_gbp:
         overrides.estimated_value_gbp ?? prospect.estimated_value_gbp,
@@ -673,6 +704,11 @@ export default function ProspectsPage() {
                   role: row.role || row.job_title || row.title || "",
                   linkedin_url: row.linkedin_url || row.linkedin || "",
                   source: row.source || "CSV import",
+                  budget_range: row.budget_range || row.budget || row.budget_band || "",
+                  deliverables: row.deliverables || row.scope || row.services_needed || "",
+                  timeline: row.timeline || row.start_timeline || row.project_timeline || "",
+                  decision_maker: row.decision_maker || row.buyer || row.primary_decision_maker || "",
+                  service_type: row.service_type || row.service || row.offer || "",
                   stage,
                   estimated_value_gbp: Number(
                     row.estimated_value_gbp || row.value || row.deal_value || 0
@@ -845,8 +881,13 @@ export default function ProspectsPage() {
               <div className="formGroup"><label className="label">Work email</label><input className="input" type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="alex@company.com" /></div>
               <div className="formGroup"><label className="label">Role</label><input className="input" value={role} onChange={(event) => setRole(event.target.value)} placeholder="Head of Growth" /></div>
               <div className="formGroup"><label className="label">Source</label><input className="input" value={source} onChange={(event) => setSource(event.target.value)} placeholder="LinkedIn, referral, event" /></div>
+              <div className="formGroup"><label className="label">Service type</label><input className="input" value={serviceType} onChange={(event) => setServiceType(event.target.value)} placeholder="Paid ads, SEO, web design..." /></div>
+              <div className="formGroup"><label className="label">Budget range</label><input className="input" value={budgetRange} onChange={(event) => setBudgetRange(event.target.value)} placeholder="GBP 2k-5k, 5k+/month..." /></div>
+              <div className="formGroup"><label className="label">Timeline</label><input className="input" value={timeline} onChange={(event) => setTimeline(event.target.value)} placeholder="ASAP, this quarter, after funding..." /></div>
+              <div className="formGroup"><label className="label">Decision-maker</label><input className="input" value={decisionMaker} onChange={(event) => setDecisionMaker(event.target.value)} placeholder="Founder, CMO, budget holder..." /></div>
               <div className="formGroup"><label className="label">Potential work value (GBP)</label><input className="input" type="number" min="0" value={value} onChange={(event) => setValue(event.target.value)} placeholder="2500" /></div>
               <div className="formGroup"><label className="label">Next follow-up</label><input className="input" type="date" value={nextFollowUp} onChange={(event) => setNextFollowUp(event.target.value)} /></div>
+              <div className="formGroup"><label className="label">Deliverables</label><input className="input" value={deliverables} onChange={(event) => setDeliverables(event.target.value)} placeholder="Landing page, 3-email sequence, monthly reporting..." /></div>
             </div>
             <button className="button buttonPrimary" disabled={isWorking} onClick={() => void handleCreate()}>{isWorking ? "Adding..." : "Add lead"}</button>
           </section>
@@ -964,6 +1005,7 @@ export default function ProspectsPage() {
                             <div><strong>{prospect.full_name}</strong><span>{prospect.company}</span></div>
                             {prospect.estimated_value_gbp > 0 ? <span className="prospectCardValue">{formatMoney(prospect.estimated_value_gbp)}</span> : null}
                           </div>
+                          {prospect.service_type || prospect.budget_range ? <span className="prospectCardFollowUp">{[prospect.service_type, prospect.budget_range].filter(Boolean).join(" - ")}</span> : null}
                           {prospect.next_follow_up ? <span className={isDue(prospect.next_follow_up) ? "prospectCardFollowUp prospectDue" : "prospectCardFollowUp"}>{isDue(prospect.next_follow_up) ? "Due" : "Follow up"} {prospect.next_follow_up}</span> : null}
                         </Link>
                         {renderProspectQuickActions(prospect)}
@@ -984,12 +1026,13 @@ export default function ProspectsPage() {
           <div className="prospectViewHeading"><h2 className="sectionTitle">{PROSPECT_WORKFLOW_LABELS[workflowView]}</h2><p className="muted">A focused list for this part of the agency workflow, from first inquiry through scoping call, proposal, negotiation, and client handoff.</p></div>
           <div className="prospectTableWrap">
             <table className="prospectTable">
-              <thead><tr><th>Lead</th><th>Stage</th><th>Client work value</th><th>Follow-up</th><th>Source</th><th>Actions</th></tr></thead>
+              <thead><tr><th>Lead</th><th>Stage</th><th>Scope</th><th>Client work value</th><th>Follow-up</th><th>Source</th><th>Actions</th></tr></thead>
               <tbody>
                 {filtered.map((prospect) => (
                   <tr key={prospect.id}>
                     <td><Link href={`/prospects/${prospect.id}`}><strong>{prospect.full_name}</strong><span>{prospect.company}{prospect.role ? ` - ${prospect.role}` : ""}</span></Link></td>
                     <td><select className="input prospectTableStage" value={prospect.stage} onChange={(event) => void handleStageChange(prospect.id, event.target.value as ProspectStage)}>{PROSPECT_STAGES.map((stage) => <option key={stage} value={stage}>{PROSPECT_STAGE_LABELS[stage]}</option>)}</select></td>
+                    <td>{[prospect.service_type, prospect.budget_range, prospect.timeline].filter(Boolean).join(" - ") || "-"}</td>
                     <td>{formatMoney(prospect.estimated_value_gbp)}</td>
                     <td className={isDue(prospect.next_follow_up) ? "prospectDue" : ""}>{prospect.next_follow_up || "Not set"}</td>
                     <td>{prospect.source || "-"}</td>

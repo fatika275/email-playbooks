@@ -139,6 +139,11 @@ export default function ProspectDetailPage() {
   const [role, setRole] = useState("");
   const [linkedinUrl, setLinkedinUrl] = useState("");
   const [source, setSource] = useState("");
+  const [budgetRange, setBudgetRange] = useState("");
+  const [deliverables, setDeliverables] = useState("");
+  const [timeline, setTimeline] = useState("");
+  const [decisionMaker, setDecisionMaker] = useState("");
+  const [serviceType, setServiceType] = useState("");
   const [stage, setStage] = useState<ProspectStage>("new");
   const [value, setValue] = useState("");
   const [nextFollowUp, setNextFollowUp] = useState("");
@@ -262,6 +267,11 @@ export default function ProspectDetailPage() {
         setRole(record.role ?? "");
         setLinkedinUrl(record.linkedin_url ?? "");
         setSource(record.source ?? "");
+        setBudgetRange(record.budget_range ?? "");
+        setDeliverables(record.deliverables ?? "");
+        setTimeline(record.timeline ?? "");
+        setDecisionMaker(record.decision_maker ?? "");
+        setServiceType(record.service_type ?? "");
         setStage(record.stage);
         setValue(String(record.estimated_value_gbp || ""));
         setNextFollowUp(record.next_follow_up ?? "");
@@ -311,6 +321,11 @@ export default function ProspectDetailPage() {
         role,
         linkedin_url: linkedinUrl,
         source,
+        budget_range: budgetRange,
+        deliverables,
+        timeline,
+        decision_maker: decisionMaker,
+        service_type: serviceType,
         stage: options?.markContacted && stage === "new" ? "contacted" : stage,
         estimated_value_gbp: Number(value) || 0,
         next_follow_up: nextFollowUp,
@@ -479,6 +494,11 @@ export default function ProspectDetailPage() {
         role,
         linkedin_url: linkedinUrl,
         source,
+        budget_range: budgetRange,
+        deliverables,
+        timeline,
+        decision_maker: decisionMaker,
+        service_type: serviceType,
         stage,
         estimated_value_gbp: Number(value) || 0,
         next_follow_up: nextDate,
@@ -529,6 +549,11 @@ export default function ProspectDetailPage() {
         role,
         linkedin_url: linkedinUrl,
         source,
+        budget_range: budgetRange,
+        deliverables,
+        timeline,
+        decision_maker: decisionMaker,
+        service_type: serviceType,
         stage,
         estimated_value_gbp: Number(value) || 0,
         next_follow_up: firstFollowUp,
@@ -559,6 +584,11 @@ export default function ProspectDetailPage() {
         role,
         linkedin_url: linkedinUrl,
         source,
+        budget_range: budgetRange,
+        deliverables,
+        timeline,
+        decision_maker: decisionMaker,
+        service_type: serviceType,
         stage: outcome,
         estimated_value_gbp: Number(value) || 0,
         next_follow_up: "",
@@ -596,7 +626,15 @@ export default function ProspectDetailPage() {
   function handleDraftOutreach() {
     localStorage.setItem(
       "thalovo_prospect_context",
-      JSON.stringify({ name: fullName, company, email, role, prospectId: id })
+      JSON.stringify({
+        name: fullName,
+        company,
+        email,
+        role,
+        prospectId: id,
+        serviceType,
+        timeline,
+      })
     );
     router.push("/library");
   }
@@ -694,6 +732,15 @@ export default function ProspectDetailPage() {
               <div className="formGroup"><label className="label">Next follow-up</label><input className="input" type="date" value={nextFollowUp} onChange={(event) => setNextFollowUp(event.target.value)} /></div>
               <div className="formGroup"><label className="label">Last contacted</label><input className="input" value={lastContactedAt ? new Date(lastContactedAt).toLocaleString() : "Not contacted yet"} disabled /></div>
               {prospect?.workspace_id ? <div className="formGroup"><label className="label">Lead owner</label><select className="input" value={teamMembers.find((member) => member.user_id === prospect.assigned_user_id || member.email === prospect.assigned_email)?.id ?? (prospect.assigned_user_id === user.id ? "self" : "")} onChange={(event) => void handleProspectAssignment(event.target.value)}><option value="">Unassigned</option><option value="self">Me ({user.email})</option>{teamMembers.filter((member) => member.user_id !== user.id && member.email !== user.email).map((member) => <option key={member.id} value={member.id}>{member.email} · {member.role}</option>)}</select></div> : null}
+            </div>
+
+            <div className="prospectSectionHeader"><h2 className="cardTitle">Scope and qualification</h2></div>
+            <div className="prospectFormGrid">
+              <div className="formGroup"><label className="label">Service type</label><input className="input" value={serviceType} onChange={(event) => setServiceType(event.target.value)} placeholder="Paid ads, SEO, web design..." /></div>
+              <div className="formGroup"><label className="label">Budget range</label><input className="input" value={budgetRange} onChange={(event) => setBudgetRange(event.target.value)} placeholder="GBP 2k-5k, 5k+/month..." /></div>
+              <div className="formGroup"><label className="label">Timeline</label><input className="input" value={timeline} onChange={(event) => setTimeline(event.target.value)} placeholder="ASAP, this quarter, after funding..." /></div>
+              <div className="formGroup"><label className="label">Decision-maker</label><input className="input" value={decisionMaker} onChange={(event) => setDecisionMaker(event.target.value)} placeholder="Founder, CMO, budget holder..." /></div>
+              <div className="formGroup"><label className="label">Deliverables</label><textarea className="input" rows={4} value={deliverables} onChange={(event) => setDeliverables(event.target.value)} placeholder="Landing page, email sequence, monthly reporting..." /></div>
             </div>
 
             <div className="formGroup"><label className="label">Notes</label><textarea className="input" rows={9} value={notes} onChange={(event) => setNotes(event.target.value)} placeholder="Decision criteria, pain points, client-work context, objections, and next steps..." /></div>
@@ -854,6 +901,10 @@ export default function ProspectDetailPage() {
             </div>
             <div className="prospectContextBlock">
               <span>Agency stage</span><strong>{PROSPECT_STAGE_LABELS[stage]}</strong>
+              <span>Service type</span><strong>{serviceType || "Not scoped"}</strong>
+              <span>Budget</span><strong>{budgetRange || "Not captured"}</strong>
+              <span>Timeline</span><strong>{timeline || "Not captured"}</strong>
+              <span>Decision-maker</span><strong>{decisionMaker || "Not captured"}</strong>
               <span>Next follow-up</span><strong>{nextFollowUp || "Not scheduled"}</strong>
               <span>Assigned to</span><strong>{prospect?.assigned_email || "Unassigned"}</strong>
             </div>
