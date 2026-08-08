@@ -618,7 +618,7 @@ export default function EditorPage() {
                   className="input"
                   value={targetAudience}
                   onChange={(e) => setTargetAudience(e.target.value)}
-                  placeholder="Example: agency founders"
+                  placeholder="Example: small agency owners"
                 />
               </div>
 

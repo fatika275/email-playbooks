@@ -35,8 +35,8 @@ export const playbooks: Playbook[] = [
     name: "Agency Cold Outreach Follow-up Plan",
     shortDescription: "Get clients through cold outreach.",
     description:
-      "A structured cold outreach system for agencies and founders to start conversations, follow up with intent, and move cold leads toward replies.",
-    audience: "Agencies & Founders",
+      "A structured cold outreach system for small agencies to start conversations, follow up with intent, and move cold leads toward replies.",
+    audience: "Small agencies",
     badge: "Outreach sequence",
     salesStage: "First outreach",
     templates: [
@@ -231,8 +231,8 @@ Best,
     name: "Agency Follow-Up Frameworks",
     shortDescription: "Reusable follow-up structures for stalled conversations.",
     description:
-      "A library of follow-up frameworks for agencies and founders who need better ways to restart, nudge, and progress conversations.",
-    audience: "Agencies & Founders",
+      "A library of follow-up frameworks for small agencies that need better ways to restart, nudge, and progress conversations.",
+    audience: "Small agencies",
     badge: "Follow-up template",
     salesStage: "Follow-up",
     templates: [
@@ -407,7 +407,7 @@ Best,
     shortDescription: "Reply frameworks for common client objections.",
     description:
       "A set of practical replies for handling pushback on pricing, timing, competitors, and information requests without sounding defensive.",
-    audience: "Agencies & Founders",
+    audience: "Small agencies",
     badge: "Follow-up template",
     salesStage: "Objection handling",
     templates: [
@@ -587,7 +587,7 @@ Best,
     shortDescription: "Restart conversations with cold leads and past clients.",
     description:
       "A playbook for reviving old leads, reconnecting after timing issues, and reopening conversations that have gone quiet.",
-    audience: "Agencies & Founders",
+    audience: "Small agencies",
     badge: "Client win-back",
     salesStage: "Win-back",
     templates: [
@@ -716,7 +716,7 @@ Best,
     shortDescription: "Keep proposals moving after sending scope or pricing.",
     description:
       "A practical library for checking in on proposals, surfacing objections, and moving opportunities toward a decision.",
-    audience: "Agencies & Founders",
+    audience: "Small agencies",
     badge: "Proposal reminder",
     salesStage: "Proposal decision",
     templates: [
@@ -845,7 +845,7 @@ Best,
     shortDescription: "Turn conversations into clear next steps.",
     description:
       "A practical playbook for recapping meetings, confirming decisions, and keeping post-call momentum alive.",
-    audience: "Agencies & Founders",
+    audience: "Small agencies",
     badge: "Follow-up template",
     salesStage: "Post-call",
     templates: [
@@ -901,32 +901,32 @@ Best,
 
   {
     id: "demo-booking-sequence",
-    name: "Demo Booking Follow-up Plan",
-    shortDescription: "Move interest into booked calls.",
+    name: "Discovery Call Booking Follow-up Plan",
+    shortDescription: "Move interest into scoping calls.",
     description:
-      "A small follow-up plan for turning interest into a booked demo or discovery call without sounding too heavy.",
-    audience: "Agencies & Founders",
+      "A small follow-up plan for turning interest into a booked discovery or scoping call without sounding too heavy.",
+    audience: "Small agencies",
     badge: "Outreach sequence",
-    salesStage: "Booking call",
+    salesStage: "Scoping call",
     templates: [
       {
         id: "demo-invite",
-        label: "Demo Invite",
-        subject: "Worth a quick walkthrough?",
+        label: "Discovery Call Invite",
+        subject: "Worth a quick scoping call?",
         variables: ["name", "offer", "yourName"],
         body: `Hi {{name}},
 
-Happy to walk you through how {{offer}} works and where it could fit for you.
+Happy to talk through where {{offer}} could fit and whether there is a useful project here.
 
 Would you be open to a quick call?
 
 Best,
 {{yourName}}`,
         whenToUse:
-          "Use this when someone has shown enough interest to consider a live walkthrough or short call.",
+          "Use this when someone has shown enough interest to consider a short discovery or scoping call.",
         whyItWorks:
           "It turns vague interest into a clear, low-friction next step.",
-        goal: "Book a call.",
+        goal: "Book a discovery call.",
         nextStep: "If there is no reply, send a short reminder after a few days.",
         expectedOutcome: "A booked meeting or timing response.",
         psychology:
@@ -941,7 +941,7 @@ Best,
           },
         ],
         commonMistakes: [
-          "Making the demo sound too formal.",
+          "Making the call sound too formal.",
           "Not explaining why the call matters.",
           "Asking for too much time.",
           "Using a weak CTA.",
@@ -949,22 +949,22 @@ Best,
       },
       {
         id: "demo-reminder",
-        label: "Demo Reminder",
+        label: "Discovery Call Reminder",
         subject: "Still worth exploring?",
         variables: ["name", "yourName"],
         body: `Hi {{name}},
 
-Just checking if it would still be useful to do a quick walkthrough.
+Just checking if it would still be useful to do a quick scoping call.
 
 Happy to keep it simple.
 
 Best,
 {{yourName}}`,
         whenToUse:
-          "Use this after the initial demo invite if they did not reply.",
+          "Use this after the initial discovery call invite if they did not reply.",
         whyItWorks:
           "It keeps the ask small and reduces perceived effort.",
-        goal: "Recover the demo opportunity.",
+        goal: "Recover the discovery call opportunity.",
         nextStep: "Pause if there is still no reply.",
         expectedOutcome: "A yes, no, or clearer timing signal.",
         psychology:
@@ -994,7 +994,7 @@ Best,
     shortDescription: "Reply to inbound interest with more structure.",
     description:
       "A playbook for replying to inbound leads, qualifying interest, and moving conversations toward a call or clearer next step.",
-    audience: "Founders & Small Teams",
+    audience: "Small agencies",
     badge: "Outreach sequence",
     salesStage: "Inbound reply",
     templates: [
@@ -1095,7 +1095,7 @@ Best,
     shortDescription: "Recover momentum after missed calls or meetings.",
     description:
       "A playbook for following up after missed calls, reducing awkwardness, and getting the conversation back on track.",
-    audience: "Agencies & Founders",
+    audience: "Small agencies",
     badge: "Follow-up template",
     salesStage: "Missed call",
     templates: [
@@ -1190,7 +1190,7 @@ Best,
     shortDescription: "Extend client work and reopen past-client conversations.",
     description:
       "A playbook for renewing client relationships, opening next-step conversations, and introducing upsell opportunities more naturally.",
-    audience: "Agencies & Consultants",
+    audience: "Service agencies",
     badge: "Client win-back",
     salesStage: "Win-back / renewal",
     templates: [

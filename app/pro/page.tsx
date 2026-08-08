@@ -62,7 +62,7 @@ export default function ProPage() {
             <div className="glassCard planDetailCard">
               <h2 className="cardTitle">Best for</h2>
               <p className="muted" style={{ marginTop: 10, lineHeight: 1.75 }}>
-                Solo agency owners and founders who have leads coming in but
+                Solo agency owners and small service teams who have leads coming in but
                 need one clear workflow for outreach, scoping calls, proposals,
                 negotiation, follow-up reminders, and booking clients without a
                 long setup project.

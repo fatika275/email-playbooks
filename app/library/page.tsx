@@ -18,13 +18,13 @@ const TEMPLATE_GROUPS = [
     id: "outreach",
     label: "Outreach sequences",
     description: "Start conversations with new prospects.",
-    playbookIds: ["cold-outreach-sequence", "demo-booking-sequence", "inbound-lead-replies"],
+    playbookIds: ["cold-outreach-sequence", "inbound-lead-replies"],
   },
   {
     id: "followup",
     label: "Follow-up reminders",
     description: "Chase warm leads after the first touch.",
-    playbookIds: ["follow-up-frameworks", "meeting-follow-up", "no-show-recovery", "objection-handling-replies"],
+    playbookIds: ["follow-up-frameworks", "meeting-follow-up", "demo-booking-sequence", "no-show-recovery", "objection-handling-replies"],
   },
   {
     id: "proposal",
