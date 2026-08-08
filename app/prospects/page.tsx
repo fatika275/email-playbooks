@@ -79,6 +79,15 @@ function daysSince(date: string | null) {
   return Math.floor((today.getTime() - then.getTime()) / 86_400_000);
 }
 
+function average(values: number[]) {
+  if (!values.length) return 0;
+  return Math.round(values.reduce((sum, value) => sum + value, 0) / values.length);
+}
+
+function formatDays(value: number) {
+  return `${value} day${value === 1 ? "" : "s"}`;
+}
+
 function isScheduledTask(task: ProspectTask) {
   const title = getProspectTaskDisplayTitle(task.title).toLowerCase();
   return title.includes("follow-up") || title.includes("follow up");
@@ -363,8 +372,20 @@ export default function ProspectsPage() {
   }, [prospects, todayItems]);
 
   const report = useMemo(() => {
-    const closed = prospects.filter((prospect) => ["won", "lost"].includes(prospect.stage));
-    const won = closed.filter((prospect) => prospect.stage === "won").length;
+    const won = prospects.filter((prospect) => prospect.stage === "won").length;
+    const replied = prospects.filter((item) => ["replied", "qualified", "meeting", "won"].includes(item.stage)).length;
+    const bookedCalls = new Set(activities.filter((item) => item.activity_type === "meeting").map((item) => item.prospect_id));
+    prospects.filter((item) => ["qualified", "meeting", "won"].includes(item.stage)).forEach((item) => bookedCalls.add(item.id));
+    const proposalSent = new Set(
+      [
+        ...tasks.filter(isProposalTask).map((task) => task.prospect_id),
+        ...activities
+          .filter((item) => item.summary.toLowerCase().includes("proposal"))
+          .map((item) => item.prospect_id),
+      ].filter((id): id is string => Boolean(id))
+    );
+    prospects.filter((item) => ["meeting", "won", "lost"].includes(item.stage)).forEach((item) => proposalSent.add(item.id));
+    const currentStageAges = prospects.map((prospect) => daysSince(prospect.updated_at) ?? 0);
     const sourceBreakdown = Object.values(
       prospects.reduce<Record<string, { source: string; leads: number; won: number; value: number }>>(
         (summary, prospect) => {
@@ -381,37 +402,27 @@ export default function ProspectsPage() {
       )
     ).sort((a, b) => b.won - a.won || b.value - a.value || b.leads - a.leads);
     return {
-      winRate: closed.length ? Math.round((won / closed.length) * 100) : 0,
+      outcomes: {
+        replied,
+        bookedCalls: bookedCalls.size,
+        proposalSent: proposalSent.size,
+        won,
+        lost: prospects.filter((prospect) => prospect.stage === "lost").length,
+        averageCurrentStageDays: average(currentStageAges),
+      },
       sourceBreakdown,
       stages: PROSPECT_STAGES.map((stage) => {
         const rows = prospects.filter((prospect) => prospect.stage === stage);
+        const stageAges = rows.map((prospect) => daysSince(prospect.updated_at) ?? 0);
         return {
           stage,
           count: rows.length,
           value: rows.reduce((sum, prospect) => sum + prospect.estimated_value_gbp, 0),
+          averageCurrentStageDays: average(stageAges),
         };
       }),
     };
-  }, [prospects]);
-  const outreachMetrics = useMemo(() => {
-    const outreachActivities = activities.filter((item) => ["email", "call", "meeting"].includes(item.activity_type));
-    const contactedIds = new Set(outreachActivities.map((item) => item.prospect_id));
-    prospects.filter((item) => item.last_contacted_at).forEach((item) => contactedIds.add(item.id));
-    const meetingIds = new Set(activities.filter((item) => item.activity_type === "meeting").map((item) => item.prospect_id));
-    prospects.filter((item) => ["qualified", "meeting", "won"].includes(item.stage)).forEach((item) => meetingIds.add(item.id));
-    return {
-      actions: outreachActivities.length,
-      contacted: contactedIds.size,
-      replied: prospects.filter((item) => ["replied", "qualified", "meeting", "won"].includes(item.stage)).length,
-      meetings: meetingIds.size,
-      won: prospects.filter((item) => item.stage === "won").length,
-    };
-  }, [activities, prospects]);
-  const acquisitionRates = useMemo(() => ({
-    reply: outreachMetrics.contacted ? Math.min(100, Math.round((outreachMetrics.replied / outreachMetrics.contacted) * 100)) : 0,
-    meeting: outreachMetrics.contacted ? Math.min(100, Math.round((outreachMetrics.meetings / outreachMetrics.contacted) * 100)) : 0,
-    win: outreachMetrics.contacted ? Math.min(100, Math.round((outreachMetrics.won / outreachMetrics.contacted) * 100)) : 0,
-  }), [outreachMetrics]);
+  }, [activities, prospects, tasks]);
 
   async function handleCreate() {
     if (!user || !fullName.trim() || !company.trim()) {
@@ -1153,15 +1164,17 @@ export default function ProspectsPage() {
               </section>
 
               <section className="prospectDailyPanel">
-                <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">Outcome reporting</h3><p className="muted">Track replies, booked calls, signed work, and lead leakage by source and stage.</p></div>
+                <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">Simple reporting</h3><p className="muted">Track the outcomes that show whether outreach is turning into booked work: replies, calls, proposals, wins, losses, and stage speed.</p></div>
                 <div className="prospectFocusStats">
-                  <div><span>Replies</span><strong>{outreachMetrics.replied}</strong></div>
-                  <div><span>Booked calls</span><strong>{outreachMetrics.meetings}</strong></div>
-                  <div><span>Signed work</span><strong>{outreachMetrics.won}</strong></div>
-                  <div><span>Lead leakage</span><strong>{dailyDashboard.coldProspects.length}</strong></div>
+                  <div><span>Replies</span><strong>{report.outcomes.replied}</strong></div>
+                  <div><span>Booked calls</span><strong>{report.outcomes.bookedCalls}</strong></div>
+                  <div><span>Proposal sent</span><strong>{report.outcomes.proposalSent}</strong></div>
+                  <div><span>Won</span><strong>{report.outcomes.won}</strong></div>
+                  <div><span>Lost</span><strong>{report.outcomes.lost}</strong></div>
+                  <div><span>Avg time in stage</span><strong>{formatDays(report.outcomes.averageCurrentStageDays)}</strong></div>
                 </div>
                 <p className="small" style={{ margin: "10px 0 0" }}>
-                  Reply rate {acquisitionRates.reply}% from {outreachMetrics.contacted} contacted lead{outreachMetrics.contacted === 1 ? "" : "s"}.
+                  Average time in stage uses how long each lead has been sitting in its current stage.
                 </p>
 
                 <div className="prospectDashboardSectionHeading prospectDashboardSubsection"><h3 className="cardTitle">Proposal / negotiation</h3></div>
@@ -1198,7 +1211,7 @@ export default function ProspectsPage() {
             </div>
 
             <section className="prospectDashboardSection prospectStageSnapshot">
-              <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">Agency workflow</h3><p className="muted">A simple view of where work sits: inquiries, scoping calls, proposal negotiation, client handoff, and slipped leads.</p></div>
+              <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">Average time in stage</h3><p className="muted">A simple view of where work sits and which stages are starting to stall.</p></div>
               <div className="prospectWorkflowSummary">
                 {PROSPECT_WORKFLOW_VIEWS.filter((item) => item !== "all").map((item) => (
                   <button
@@ -1228,7 +1241,7 @@ export default function ProspectsPage() {
               </div>
               <div className="prospectStageRows">
                 {report.stages.map((row) => (
-                  <div key={row.stage}><span>{PROSPECT_STAGE_LABELS[row.stage]}</span><i><b style={{ width: `${prospects.length ? (row.count / prospects.length) * 100 : 0}%` }} /></i><strong>{row.count}</strong></div>
+                  <div key={row.stage}><span>{PROSPECT_STAGE_LABELS[row.stage]}</span><i><b style={{ width: `${prospects.length ? (row.count / prospects.length) * 100 : 0}%` }} /></i><strong>{row.count} / {formatDays(row.averageCurrentStageDays)}</strong></div>
                 ))}
               </div>
             </section>
