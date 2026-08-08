@@ -181,7 +181,7 @@ export default function TeamLibraryPage() {
         });
       }
 
-      setNotice(`Saved "${share.title}" to your agency assets.`);
+      setNotice(`Saved "${share.title}" to your saved work.`);
     } catch (error) {
       setNotice(
         error instanceof Error ? error.message : "Could not save this shared item."
@@ -245,7 +245,7 @@ export default function TeamLibraryPage() {
   function handleResendInvite(member: BusinessMember) {
     const subject = encodeURIComponent(`You have been invited to ${workspace?.name ?? "Thalovo"}`);
     const body = encodeURIComponent(
-      `You have been invited to our Thalovo agency workspace. Sign up or sign in using ${member.email}, then open the Team page to access the shared pipeline.\n\nhttps://thalovo.com/account`
+      `You have been invited to our Thalovo team pipeline. Sign up or sign in using ${member.email}, then open the Team page to access the shared leads.\n\nhttps://thalovo.com/account`
     );
     window.location.href = `mailto:${encodeURIComponent(member.email)}?subject=${subject}&body=${body}`;
   }
@@ -267,14 +267,14 @@ export default function TeamLibraryPage() {
 
   async function handleTransferOwnership(userId: string) {
     if (!workspace || !userId || !window.confirm("Transfer ownership permanently to this teammate?")) return;
-    try { await transferBusinessWorkspace(workspace.id, userId); await refreshBusinessTeam(); setNotice("Agency workspace ownership transferred."); }
+    try { await transferBusinessWorkspace(workspace.id, userId); await refreshBusinessTeam(); setNotice("Team pipeline ownership transferred."); }
     catch (error) { setNotice(error instanceof Error ? error.message : "Ownership could not be transferred."); }
   }
 
   async function handleDeleteWorkspace() {
     if (!workspace || !window.confirm(`Permanently delete ${workspace.name} and all shared lead data?`)) return;
-    try { await deleteBusinessWorkspace(workspace.id); window.localStorage.removeItem("thalovo_active_workspace_id"); await refreshBusinessTeam(); setNotice("Agency workspace deleted."); }
-    catch (error) { setNotice(error instanceof Error ? error.message : "Agency workspace could not be deleted."); }
+    try { await deleteBusinessWorkspace(workspace.id); window.localStorage.removeItem("thalovo_active_workspace_id"); await refreshBusinessTeam(); setNotice("Team pipeline deleted."); }
+    catch (error) { setNotice(error instanceof Error ? error.message : "Team pipeline could not be deleted."); }
   }
 
   async function handleRemoveMember(id: string) {
@@ -359,7 +359,7 @@ export default function TeamLibraryPage() {
             className={teamView === "workspace" ? "teamViewTab active" : "teamViewTab"}
             onClick={() => setTeamView("workspace")}
           >
-            Agency workspace
+            Team pipeline
           </button>
           <button
             type="button"
@@ -381,7 +381,7 @@ export default function TeamLibraryPage() {
           <section className="teamWorkspaceOverview">
             <div className="teamWorkspaceHero">
               <div>
-                <span className="miniBadge">Active agency workspace</span>
+                <span className="miniBadge">Active team pipeline</span>
                 <h2 className="pageTitle">{workspace.name}</h2>
                 <p className="muted" style={{ margin: "8px 0 0" }}>
                   One shared pipeline for lead ownership, shared notes, follow-ups, and handoff context.
@@ -418,10 +418,10 @@ export default function TeamLibraryPage() {
                 />
               </div>
               <div className="formGroup" style={{ marginBottom: 0 }}>
-                <label className="label inviteRoleLabel" htmlFor="business-invite-role"><span>Ownership rule</span><span>Member can own and work leads; Admin can also manage teammates.</span></label>
+                <label className="label inviteRoleLabel" htmlFor="business-invite-role"><span>Teammate access</span><span>Most people only need lead access. Team leads can also invite teammates.</span></label>
                 <select id="business-invite-role" className="input" value={inviteRole} onChange={(event) => setInviteRole(event.target.value as "admin" | "member")}>
-                  <option value="member">Member - owns and works assigned leads</option>
-                  <option value="admin">Admin - owns leads and manages teammates</option>
+                  <option value="member">Teammate - owns and works assigned leads</option>
+                  <option value="admin">Team lead - can invite teammates too</option>
                 </select>
               </div>
               <button
@@ -442,13 +442,13 @@ export default function TeamLibraryPage() {
                   <div>
                     <strong>{member.email}</strong>
                     <p className="small" style={{ margin: "4px 0 0" }}>
-                      {member.access_active ? (member.status === "active" ? "Active" : "Pending invitation") : "Access paused"} · {member.role}
+                      {member.access_active ? (member.status === "active" ? "Active" : "Pending invitation") : "Access paused"} - {member.role === "admin" ? "Team lead" : "Teammate"}
                     </p>
                   </div>
                   {workspaces.find((item) => item.id === workspace.id)?.access_role !== "member" ? <details className="teamMemberManage">
                     <summary>Edit</summary>
                     <div className="teamMemberMenu">
-                      <label className="label">Simple role<select className="input" value={member.role} aria-label={`Role for ${member.email}`} onChange={(event) => void handleMemberUpdate(member, { role: event.target.value as "admin" | "member" })}><option value="member">Member</option><option value="admin">Admin</option></select></label>
+                      <label className="label">Access<select className="input" value={member.role} aria-label={`Access for ${member.email}`} onChange={(event) => void handleMemberUpdate(member, { role: event.target.value as "admin" | "member" })}><option value="member">Teammate</option><option value="admin">Team lead</option></select></label>
                       <div className="toolbar">{member.status === "invited" ? <button className="button buttonSecondary" onClick={() => handleResendInvite(member)}>Resend invite</button> : null}<button className="button buttonSecondary" onClick={() => void handleMemberUpdate(member, { access_active: !member.access_active })}>{member.access_active ? "Pause access" : "Restore access"}</button><button className="button buttonUtility" onClick={() => void handleRemoveMember(member.id)}>Remove</button></div>
                     </div>
                   </details> : null}
@@ -474,10 +474,10 @@ export default function TeamLibraryPage() {
             </details>
 
             <details className="teamWorkspaceSettings">
-              <summary><strong>Agency data backup</strong><span>Optional</span></summary>
+              <summary><strong>Download backup</strong><span>Optional</span></summary>
               <div className="teamWorkspaceSettingsContent">
-              <div className="cardTop"><div><h3 className="cardTitle">Backup lead data</h3><p className="small">Download a backup if you need a copy of team leads, notes, tasks, and activity.</p></div>{canExportWorkspace ? <button className="button buttonSecondary" onClick={() => void handleExportWorkspace()}>Download backup</button> : <span className="miniBadge">Owner or admin only</span>}</div>
-              {workspaces.find((item) => item.id === workspace.id)?.access_role === "owner" ? <details className="teamOwnerControls"><summary>Owner-only changes</summary><p className="small">Most teams never need these. Transfer ownership only changes who owns the agency workspace. Deleting removes shared lead data permanently.</p><div className="teamDangerZone"><select className="input" defaultValue="" onChange={(event) => void handleTransferOwnership(event.target.value)}><option value="" disabled>Transfer ownership to...</option>{members.filter((member) => member.user_id && member.status === "active").map((member) => <option key={member.id} value={member.user_id!}>{member.email}</option>)}</select><button className="button buttonUtility" onClick={() => void handleDeleteWorkspace()}>Delete agency workspace</button></div></details> : null}
+              <div className="cardTop"><div><h3 className="cardTitle">Backup lead data</h3><p className="small">Download a copy of team leads, notes, tasks, and activity when you need one.</p></div>{canExportWorkspace ? <button className="button buttonSecondary" onClick={() => void handleExportWorkspace()}>Download backup</button> : <span className="miniBadge">Team lead only</span>}</div>
+              {workspaces.find((item) => item.id === workspace.id)?.access_role === "owner" ? <details className="teamOwnerControls"><summary>Rare account changes</summary><p className="small">Most teams never need these. Transfer ownership only changes who controls billing and invites. Deleting removes shared lead data permanently.</p><div className="teamDangerZone"><select className="input" defaultValue="" onChange={(event) => void handleTransferOwnership(event.target.value)}><option value="" disabled>Transfer ownership to...</option>{members.filter((member) => member.user_id && member.status === "active").map((member) => <option key={member.id} value={member.user_id!}>{member.email}</option>)}</select><button className="button buttonUtility" onClick={() => void handleDeleteWorkspace()}>Delete team pipeline</button></div></details> : null}
               </div>
             </details>
           </section>
@@ -558,7 +558,7 @@ export default function TeamLibraryPage() {
                   className="button buttonPrimary"
                   onClick={() => void handleSaveToWorkspace(share)}
                 >
-                  Save to my agency assets
+                  Save to saved work
                 </button> : <button className="button buttonUtility" onClick={() => void handleRemoveShare(share.id)}>Remove access</button>}
               </article>
             ))}

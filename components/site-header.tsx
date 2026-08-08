@@ -5,19 +5,10 @@ import { usePathname } from "next/navigation";
 import { useAccount } from "@/components/account-provider";
 
 const navItems = [
-  { href: "/prospects", label: "Client Pipeline" },
-  { href: "/library", label: "Agency Templates" },
-  { href: "/sequence-builder", label: "Follow-up Plans" },
-  { href: "/workspace", label: "Agency Assets" },
-  { href: "/team", label: "Team Deal Room" },
-];
-
-const workspacePaths = [
-  "/workspace",
-  "/sequence-builder",
-  "/history",
-  "/custom-templates",
-  "/folders",
+  { href: "/prospects", label: "Pipeline" },
+  { href: "/library", label: "Templates" },
+  { href: "/sequence-builder", label: "Follow-ups" },
+  { href: "/team", label: "Team" },
 ];
 
 function isActive(pathname: string, href: string) {
@@ -27,12 +18,6 @@ function isActive(pathname: string, href: string) {
 
   if (href === "/library") {
     return ["/library", "/playbook", "/editor"].some(
-      (path) => pathname === path || pathname.startsWith(`${path}/`)
-    );
-  }
-
-  if (href === "/workspace") {
-    return workspacePaths.some(
       (path) => pathname === path || pathname.startsWith(`${path}/`)
     );
   }

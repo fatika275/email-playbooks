@@ -201,13 +201,14 @@ export default function FoldersPage() {
       <main className="main">
         <section className="container">
           <div className="glassCard emptyState">
-            <div className="badge">Pro Organization</div>
+            <div className="badge">Optional cleanup</div>
             <h1 className="pageTitle" style={{ marginTop: 14 }}>
-              Keep agency assets tidy when you need them
+              Tidy saved work only when it starts piling up
             </h1>
             <p className="muted" style={{ maxWidth: 680, marginInline: "auto" }}>
-              Free access gives you the core playbooks. Pro lets you tidy saved
-              messages and follow-up plans once they start piling up.
+              Free access gives you the core playbooks. Pro adds lightweight
+              folders for saved messages and follow-up plans, without turning
+              Thalovo into a CRM setup project.
             </p>
             <div className="toolbar" style={{ justifyContent: "center", marginTop: 20 }}>
               <Link href="/pricing" className="button buttonPrimary">
@@ -227,13 +228,14 @@ export default function FoldersPage() {
     <main className="main">
       <section className="container">
         <div className="pageHeader">
-          <div className="badge">Folders</div>
+          <div className="badge">Optional cleanup</div>
           <h1 className="pageTitle" style={{ marginTop: 14 }}>
-            Keep saved agency messages easy to find.
+            Keep saved work easy to find.
           </h1>
           <p className="muted" style={{ maxWidth: 760, lineHeight: 1.75 }}>
             Use folders lightly when they help you find the next outreach,
             follow-up, proposal, win-back message, or follow-up plan faster.
+            Skip them until saved work actually starts piling up.
           </p>
         </div>
 
@@ -350,7 +352,7 @@ export default function FoldersPage() {
 
         {totalItems === 0 ? (
           <div className="glassCard emptyState">
-            <h3 className="cardTitle">No agency assets yet</h3>
+            <h3 className="cardTitle">No saved work yet</h3>
             <p className="muted" style={{ maxWidth: 620, marginInline: "auto" }}>
               Save an email or follow-up plan first. Then return here to put
               it into a folder.

@@ -105,7 +105,7 @@ export default function CheckoutSuccessPage() {
           <div className="toolbar" style={{ marginTop: 22 }}>
             {state === "confirmed" ? (
               <Link href="/workspace" className="button buttonPrimary">
-                Open agency assets
+                Open saved work
               </Link>
             ) : null}
             <Link href="/account" className="button buttonSecondary">

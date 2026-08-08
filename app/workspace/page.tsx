@@ -18,13 +18,6 @@ const workspaceItems = [
     description:
       "Keep the chasing plans that stop warm prospects slipping after the first touch.",
   },
-  {
-    href: "/folders",
-    label: "Organise Agency Assets",
-    badge: "Pro",
-    description:
-      "Use folders only when saved messages and follow-up plans start piling up.",
-  },
 ];
 
 export default function WorkspacePage() {
@@ -34,33 +27,33 @@ export default function WorkspacePage() {
     <main className="main">
       <section className="container">
         <div className="pageHeader">
-          <div className="badge">Agency Assets</div>
+          <div className="badge">Saved work</div>
           <h1 className="pageTitle" style={{ marginTop: 14 }}>
-            Keep your best agency use-case assets ready to reuse.
+            Keep your best messages and follow-up plans ready.
           </h1>
           <p className="muted" style={{ maxWidth: 760, lineHeight: 1.75 }}>
             Find the outreach messages, follow-up plans, proposal chasers, and
-            win-back assets that help leads become booked client work.
+            win-back messages you actually reuse. No extra CRM filing system.
           </p>
         </div>
 
         <div className="workspaceHero glassCard">
           <div>
             <span className={hasProAccess ? "statusPill statusPillSuccess" : "statusPill statusPillWarning"}>
-              {hasProAccess ? "Agency assets active" : "Free asset preview"}
+              {hasProAccess ? "Saved work active" : "Free saved-work preview"}
             </span>
             <h2 className="sectionTitle" style={{ marginTop: 16 }}>
               Reuse what helps leads become booked work.
             </h2>
             <p className="muted" style={{ marginTop: 10, lineHeight: 1.75 }}>
-              Open saved outreach, follow-up, proposal, and win-back assets
+              Open saved outreach, follow-up, proposal, and win-back messages
               here, then get back to the lead you are trying to move.
             </p>
           </div>
 
           {!hasProAccess ? (
             <Link href="/pricing" className="button buttonPrimary">
-              Unlock Pro Assets
+              Unlock saved work
             </Link>
           ) : (
             <Link href="/history" className="button buttonPrimary">

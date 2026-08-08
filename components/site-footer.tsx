@@ -20,13 +20,13 @@ export default function SiteFooter() {
           <div className="footerColumn">
             <div className="footerHeading">Product</div>
             <Link href="/prospects" className="footerLink">
-              Client Pipeline
+              Pipeline
             </Link>
             <Link href="/library" className="footerLink">
-              Agency Templates
+              Templates
             </Link>
-            <Link href="/workspace" className="footerLink">
-              Agency Assets
+            <Link href="/sequence-builder" className="footerLink">
+              Follow-ups
             </Link>
             <Link href="/pricing" className="footerLink">
               Pricing

@@ -42,7 +42,7 @@ export default function ProPage() {
             <div className="toolbar" style={{ marginTop: 22 }}>
               <CheckoutButton plan="pro">Start Pro</CheckoutButton>
               <Link href="/workspace" className="button buttonSecondary">
-                View agency assets
+                View saved work
               </Link>
             </div>
           </aside>

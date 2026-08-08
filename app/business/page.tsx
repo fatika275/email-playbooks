@@ -28,7 +28,7 @@ export default function BusinessPage() {
               chasing replies. Give the team one shared pipeline, handoff notes,
               and simple ownership rules so inquiries, scoping calls,
               proposals, negotiation, and handoffs stay visible without turning
-              follow-up into an admin project.
+              follow-up into extra admin.
             </p>
 
             <ul className="featureList">

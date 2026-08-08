@@ -184,7 +184,7 @@ export default function PricingPage() {
               <li>10 teammate seats included</li>
               <li>Full Pro access for every active member</li>
               <li>Shared agency templates and follow-up plans</li>
-              <li>Owner-managed access without extra sales admin</li>
+              <li>Simple teammate access without extra sales admin</li>
             </ul>
 
             <div style={{ marginTop: 24 }}>

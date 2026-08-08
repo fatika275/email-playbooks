@@ -489,9 +489,9 @@ export default function ProspectsPage() {
       ]);
       setTasks(nextTasks);
       setActivities(nextActivities);
-      setNotice("Agency workspace switched.");
+      setNotice("Team pipeline switched.");
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : "Agency workspace could not be opened.");
+      setNotice(error instanceof Error ? error.message : "Team pipeline could not be opened.");
     } finally {
       setIsWorking(false);
     }

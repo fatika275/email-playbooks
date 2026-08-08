@@ -163,7 +163,7 @@ export default function FounderPage() {
                   View pricing
                 </Link>
                 <Link href="/workspace" className="button buttonSecondary">
-                  Open agency assets
+                  Open saved work
                 </Link>
               </div>
             )}
