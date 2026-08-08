@@ -1039,7 +1039,7 @@ export default function ProspectsPage() {
           </div>
         ) : view === "list" ? (
           <div className="prospectViewSection">
-          <div className="prospectViewHeading"><h2 className="sectionTitle">{PROSPECT_WORKFLOW_LABELS[workflowView]}</h2><p className="muted">A focused list for this part of the agency workflow, from first inquiry through scoping call, proposal, negotiation, and client handoff.</p></div>
+          <div className="prospectViewHeading"><h2 className="sectionTitle">{PROSPECT_WORKFLOW_LABELS[workflowView]}</h2><p className="muted">A focused list for this part of the agency path, from first inquiry through scoping call, proposal, negotiation, and client handoff.</p></div>
           <div className="prospectTableWrap">
             <table className="prospectTable">
               <thead><tr><th>Lead</th><th>Stage</th><th>Scope</th><th>Client work value</th><th>Follow-up</th><th>Source</th><th>Actions</th></tr></thead>

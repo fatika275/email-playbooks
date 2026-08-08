@@ -70,7 +70,7 @@ export default function HomePage() {
 
           <p className="homeHeroText">
             Thalovo is built for one job: turn outreach into booked clients.
-            It gives small agencies the focused workflow for agency template
+            It gives small agencies a focused path for agency template
             libraries, pipeline, follow-ups, team visibility, and outcome reporting. Start
             in minutes with one prospect, one message, and one follow-up, then
             keep scoping calls, proposals, negotiation, handoff, and lead ownership moving in
@@ -129,7 +129,7 @@ export default function HomePage() {
               The pipeline tracks inquiries, scoping calls, proposals,
               negotiation, and handoff. No days of setup, just the pieces small
               agencies need to turn outreach into booked clients in a
-              lightweight, readable agency workflow.
+              lightweight, readable agency path.
             </p>
           </div>
         </div>
@@ -169,7 +169,7 @@ export default function HomePage() {
               className="glassCard homeWorkflowCard"
               delay={80}
             >
-              <span className="miniBadge">Agency workflow</span>
+              <span className="miniBadge">Agency path</span>
               <h3 className="cardTitle">{item.title}</h3>
               <p className="muted">{item.text}</p>
             </ScrollReveal>

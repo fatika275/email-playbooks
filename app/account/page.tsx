@@ -416,7 +416,7 @@ export default function AccountPage() {
                       <Link href="/library" className="accountSetupStep">
                         <strong>1</strong>
                         <span>Pick an outreach message</span>
-                        <small>Use a ready message instead of building a template system first.</small>
+                        <small>Use a ready message instead of writing from scratch first.</small>
                       </Link>
                       <Link href="/prospects" className="accountSetupStep">
                         <strong>2</strong>
@@ -425,8 +425,8 @@ export default function AccountPage() {
                       </Link>
                       <Link href="/sequence-builder" className="accountSetupStep">
                         <strong>3</strong>
-                        <span>Build a follow-up plan</span>
-                        <small>Save the reminders that stop leads slipping after the first touch.</small>
+                        <span>Choose reminder dates</span>
+                        <small>Save a simple follow-up plan so leads do not slip after the first touch.</small>
                       </Link>
                       <Link href="/pricing" className="accountSetupStep">
                         <strong>4</strong>

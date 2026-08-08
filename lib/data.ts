@@ -35,7 +35,7 @@ export const playbooks: Playbook[] = [
     name: "Agency Cold Outreach Follow-up Plan",
     shortDescription: "Get clients through cold outreach.",
     description:
-      "A structured cold outreach system for small agencies to start conversations, follow up with intent, and move cold leads toward replies.",
+      "A simple cold outreach path for small agencies to start conversations, follow up with intent, and move cold leads toward replies.",
     audience: "Small agencies",
     badge: "Outreach sequence",
     salesStage: "First outreach",
@@ -816,7 +816,7 @@ Best,
         whyItWorks:
           "It makes replying easy by offering clear options without applying unnecessary pressure.",
         goal: "Get a final yes, no, or later decision.",
-        nextStep: "Close the workflow if there is still no response and revisit only when relevant.",
+        nextStep: "Close this follow-up loop if there is still no response and revisit only when relevant.",
         expectedOutcome: "A decision, a timing answer, or permission to close the opportunity.",
         psychology:
           "A respectful close-the-loop message lowers the effort and awkwardness involved in replying.",

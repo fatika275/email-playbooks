@@ -536,8 +536,8 @@ export default function EditorPage() {
         >
           <p className="muted" style={{ margin: 0, lineHeight: 1.65 }}>
             Free playbooks help you start quickly. Pro unlocks the full message
-            library, follow-up plans, and the pipeline workflow for moving
-            leads faster.
+            library, follow-up plans, and the pipeline view for moving leads
+            faster.
           </p>
         </div>
 

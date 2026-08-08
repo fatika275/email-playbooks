@@ -3,7 +3,7 @@ import { CheckoutButton } from "@/components/checkout-button";
 
 const proFeatures = [
   "Agency template libraries for outreach, follow-up, proposal chase, and win-back",
-  "Start with one prospect and a ready-made agency workflow",
+  "Start with one prospect and a simple agency path",
   "Agency pipeline stages for inquiries, scoping calls, proposals, negotiation, and handoff",
   "Follow-up reminders to stop warm leads slipping because the chase was late",
   "Outcome reporting for replies, booked calls, signed work, and lead leakage",
@@ -63,7 +63,7 @@ export default function ProPage() {
               <h2 className="cardTitle">Best for</h2>
               <p className="muted" style={{ marginTop: 10, lineHeight: 1.75 }}>
                 Solo agency owners and small service teams who have leads coming in but
-                need one clear workflow for outreach, scoping calls, proposals,
+                need one clear path for outreach, scoping calls, proposals,
                 negotiation, follow-up reminders, and booking clients without a
                 long setup project.
               </p>

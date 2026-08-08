@@ -163,7 +163,7 @@ export default function ReusableSequencesPage() {
             <h3 className="cardTitle">No follow-up plans yet</h3>
 
             <p className="muted" style={{ maxWidth: 620, marginInline: "auto" }}>
-              Build your first follow-up reminder plan, save the version you
+              Save your first follow-up reminder plan, keep the version you
               want to reuse, and it will appear here for the next lead that
               goes quiet.
             </p>

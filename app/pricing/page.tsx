@@ -100,7 +100,7 @@ export default function PricingPage() {
             </h2>
 
             <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
-              Test the core writing experience before you build a full system
+              Test the core writing experience before you add pipeline reminders
               for chasing replies and booking client work.
             </p>
 
@@ -142,7 +142,7 @@ export default function PricingPage() {
 
             <ul className="featureList">
               <li>Agency template libraries for outreach, follow-up, proposal chase, and win-back</li>
-              <li>Start with one prospect and a ready-made agency workflow</li>
+              <li>Start with one prospect and a simple agency path</li>
               <li>Agency pipeline stages for inquiries, scoping calls, proposals, negotiation, and handoff</li>
               <li>Follow-up reminders to stop warm leads slipping because the chase was late</li>
               <li>Outcome reporting for replies, booked calls, signed work, and lead leakage</li>

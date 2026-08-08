@@ -786,7 +786,7 @@ export default function ProspectDetailPage() {
 
             <section className="prospectOpsPanel proposalWorkflowPanel" hidden={detailView !== "followup"}>
               <div className="proposalWorkflowHeader">
-                <div><span className="miniBadge">Follow-up reminders</span><h2 className="cardTitle">{nextProposalTask ? "Next chase to send" : "Protect this deal from delay"}</h2><p className="small">{nextProposalTask ? "Work through the active reminders for this lead so silence does not turn into a lost deal. Opening a message loads the right template for this chase." : "Choose a saved plan, set the start date, and create reminders so the next chase is visible before the lead goes cold."}</p></div>
+                <div><span className="miniBadge">Follow-up reminders</span><h2 className="cardTitle">{nextProposalTask ? "Next chase to send" : "Protect this deal from delay"}</h2><p className="small">{nextProposalTask ? "Use the next reminder for this lead so silence does not turn into a lost deal. Opening a message loads the right template for this chase." : "Choose a saved plan and first-touch date so the next chase is visible before the lead goes cold."}</p></div>
                 {activeProposalTasks.length ? <span className="statusPill statusPillSuccess">{activeProposalTasks.length} reminder{activeProposalTasks.length === 1 ? "" : "s"} active</span> : <span className="statusPill">No plan running</span>}
               </div>
               {!nextProposalTask ? <><div className="proposalWorkflowForm">
@@ -823,16 +823,16 @@ export default function ProspectDetailPage() {
                       </div>
                     </div>
                   ) : null}
-                  <p className="small" style={{ margin: "6px 0 0" }}>{selectedScheduledSequence ? "This plan will create the reminder dates below from the first touch." : "Nothing is preselected for this lead. Pick a plan before this opportunity has time to go quiet."}</p>
+                  <p className="small" style={{ margin: "6px 0 0" }}>{selectedScheduledSequence ? "This plan will add the reminder dates below from the first touch." : "Nothing is preselected for this lead. Pick a plan before this opportunity has time to go quiet."}</p>
                 </div>
-                <div className="formGroup"><label className="label">Proposal / first message sent date</label><input className="input" type="date" value={proposalSentDate} onChange={(event) => setProposalSentDate(event.target.value)} /><p className="small" style={{ margin: "6px 0 0" }}>Reminder dates are scheduled from this client-work touch so slow follow-up does not cost the deal.</p></div>
+                <div className="formGroup"><label className="label">Proposal / first message sent date</label><input className="input" type="date" value={proposalSentDate} onChange={(event) => setProposalSentDate(event.target.value)} /><p className="small" style={{ margin: "6px 0 0" }}>Reminder dates are based on this client-work touch so slow follow-up does not cost the deal.</p></div>
                 <div className="formGroup"><label className="label">Assigned to</label>{prospect?.workspace_id ? <select className="input" value={taskAssignee} onChange={(event) => setTaskAssignee(event.target.value)}><option value="">Unassigned</option><option value={user.email ?? ""}>Me ({user.email})</option>{teamMembers.filter((member) => member.email !== user.email).map((member) => <option key={member.id} value={member.email}>{member.email}</option>)}</select> : <input className="input" type="email" value={taskAssignee} onChange={(event) => setTaskAssignee(event.target.value)} placeholder="Assignee email" />}</div>
               </div>
               <div className="proposalWorkflowActions">
                 <button className="button buttonPrimary" disabled={isStartingProposalWorkflow || !proposalSentDate || !selectedSequenceId} onClick={() => void handleStartProposalWorkflow()}>{isStartingProposalWorkflow ? "Starting..." : "Start reminders"}</button>
               </div></> : <>
                 <div className="proposalNextMessage">
-                  <div><span>{nextProposalTask.due_date ? `Due ${nextProposalTask.due_date}` : "Ready when you are"}</span><strong>{cleanFollowUpTaskTitle(nextProposalTask.title)}</strong><p>{activeProposalTasks.length > 1 ? `${activeProposalTasks.length - 1} later reminder${activeProposalTasks.length - 1 === 1 ? "" : "s"} already scheduled so the chase does not stall.` : "This is the final scheduled reminder."}</p></div>
+                  <div><span>{nextProposalTask.due_date ? `Due ${nextProposalTask.due_date}` : "Ready when you are"}</span><strong>{cleanFollowUpTaskTitle(nextProposalTask.title)}</strong><p>{activeProposalTasks.length > 1 ? `${activeProposalTasks.length - 1} later reminder${activeProposalTasks.length - 1 === 1 ? "" : "s"} already set so the chase does not stall.` : "This is the final reminder in the plan."}</p></div>
                   <div className="proposalTaskActions"><button className="button buttonPrimary" onClick={() => handleDraftProposalFollowUp(nextProposalTask)}>Open message</button><button className="button buttonSecondary" onClick={() => void handleCompleteProposalTask(nextProposalTask)}>Mark sent</button></div>
                 </div>
                 <div className="proposalWorkflowActions proposalOutcomeActions"><span>Close this schedule</span><button className="button buttonSecondary" disabled={isStartingProposalWorkflow} onClick={() => void handleProposalOutcome("replied")}>They replied</button><button className="button buttonSecondary" disabled={isStartingProposalWorkflow} onClick={() => setPendingProposalOutcome("won")}>Move to handoff</button><button className="button buttonUtility" disabled={isStartingProposalWorkflow} onClick={() => setPendingProposalOutcome("lost")}>Lost / slipped</button></div>
@@ -865,7 +865,7 @@ export default function ProspectDetailPage() {
             <div className={detailView === "overview" ? "prospectOpsGrid isHidden" : "prospectOpsGrid prospectOpsGridSingle"}>
               <section className="prospectOpsPanel" hidden={detailView !== "followup"}>
                 <div className="prospectSectionHeader"><h2 className="cardTitle">Manual reminders</h2></div>
-                <p className="small">Add one-off chases that keep this deal moving. Completed reminders are archived automatically so the list stays focused on the next move.</p>
+                <p className="small">Add one-off chases that keep this deal moving. Completed reminders move out of the way so the list stays focused on the next move.</p>
                 <div className="formGroup"><label className="label">Next action</label><input className="input" value={taskTitle} onChange={(event) => setTaskTitle(event.target.value)} placeholder="Send case study, call decision-maker..." /></div>
                 <div className="prospectTaskForm">
                   <input className="input" type="date" value={taskDueDate} onChange={(event) => setTaskDueDate(event.target.value)} aria-label="Task due date" />
