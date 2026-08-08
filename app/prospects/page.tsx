@@ -1164,7 +1164,7 @@ export default function ProspectsPage() {
               </section>
 
               <section className="prospectDailyPanel">
-                <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">Simple reporting</h3><p className="muted">Track the outcomes that show whether outreach is turning into booked work: replies, calls, proposals, wins, losses, and stage speed.</p></div>
+                <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">Practical reporting</h3><p className="muted">Track the signals that show whether outreach is turning into booked work: replies, calls, proposals, wins, losses, stage speed, and lead leakage.</p></div>
                 <div className="prospectFocusStats">
                   <div><span>Replies</span><strong>{report.outcomes.replied}</strong></div>
                   <div><span>Booked calls</span><strong>{report.outcomes.bookedCalls}</strong></div>
@@ -1174,7 +1174,7 @@ export default function ProspectsPage() {
                   <div><span>Avg time in stage</span><strong>{formatDays(report.outcomes.averageCurrentStageDays)}</strong></div>
                 </div>
                 <p className="small" style={{ margin: "10px 0 0" }}>
-                  Average time in stage uses how long each lead has been sitting in its current stage.
+                  Built for day-to-day decisions, not deep forecasting. Average time in stage shows how long each lead has been sitting in its current stage.
                 </p>
 
                 <div className="prospectDashboardSectionHeading prospectDashboardSubsection"><h3 className="cardTitle">Proposal / negotiation</h3></div>
@@ -1211,7 +1211,7 @@ export default function ProspectsPage() {
             </div>
 
             <section className="prospectDashboardSection prospectStageSnapshot">
-              <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">Average time in stage</h3><p className="muted">A simple view of where work sits and which stages are starting to stall.</p></div>
+              <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">Stage speed</h3><p className="muted">See where work sits and which stages are starting to stall before leads slip.</p></div>
               <div className="prospectWorkflowSummary">
                 {PROSPECT_WORKFLOW_VIEWS.filter((item) => item !== "all").map((item) => (
                   <button
@@ -1247,7 +1247,7 @@ export default function ProspectsPage() {
             </section>
 
             <section className="prospectDashboardSection">
-              <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">What is working</h3><p className="muted">Outcome source reporting only: enough to see where replies, calls, and signed client work are coming from early.</p></div>
+              <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">What is working</h3><p className="muted">Source reporting that is useful early: enough to see where replies, calls, and signed client work are coming from without a heavy analytics setup.</p></div>
               <div className="prospectSourceRows">
                 {report.sourceBreakdown.slice(0, 6).map((row) => (
                   <div key={row.source}>

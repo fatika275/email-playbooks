@@ -29,7 +29,8 @@ export default function PricingPage() {
             Thalovo is built for one job: turn outreach into booked clients.
             It helps small agencies send better outreach, track inquiries,
             manage scoping calls, chase proposals, handle negotiation, and see
-            replies, booked calls, signed client work, and lead leakage. Start
+            replies, booked calls, proposals, signed client work, stage speed,
+            and lead leakage. Start
             in minutes with the service-sales workflow your agency already uses.
           </p>
 
@@ -145,7 +146,7 @@ export default function PricingPage() {
               <li>Start with one prospect and a simple agency path</li>
               <li>Agency pipeline stages for inquiries, scoping calls, proposals, negotiation, and handoff</li>
               <li>Follow-up reminders to stop warm leads slipping because the chase was late</li>
-              <li>Outcome reporting for replies, booked calls, signed work, and lead leakage</li>
+              <li>Practical reporting for replies, booked calls, proposals, signed work, stage speed, and leakage</li>
               <li>Reusable saved messages and follow-up plans</li>
             </ul>
 

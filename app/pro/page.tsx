@@ -6,7 +6,7 @@ const proFeatures = [
   "Start with one prospect and a simple agency path",
   "Agency pipeline stages for inquiries, scoping calls, proposals, negotiation, and handoff",
   "Follow-up reminders to stop warm leads slipping because the chase was late",
-  "Outcome reporting for replies, booked calls, signed work, and lead leakage",
+  "Practical reporting for replies, booked calls, proposals, signed work, stage speed, and leakage",
   "Reusable saved messages and follow-up plans",
 ];
 
@@ -24,9 +24,9 @@ export default function ProPage() {
               Pro connects the simple pieces a solo agency owner needs to stop
               leads slipping because the chase was late: agency template
               libraries for outreach, follow-up, proposal chase, and win-back,
-              agency-native pipeline
-              tracking, and outcome reporting for replies, booked calls, signed
-              client work, and lead leakage.
+              agency-native pipeline tracking, and practical reporting for the
+              signals that help you chase better: replies, booked calls,
+              proposals, signed client work, stage speed, and leakage.
             </p>
           </div>
 
