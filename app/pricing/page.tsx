@@ -144,7 +144,7 @@ export default function PricingPage() {
               <li>Outreach sequences, follow-up templates, proposal reminders, and client win-back flows</li>
               <li>Start with one prospect and a ready-made agency workflow</li>
               <li>Agency pipeline stages for inquiries, scoping calls, proposals, negotiation, and handoff</li>
-              <li>Follow-up tools to stop warm leads slipping</li>
+              <li>Follow-up reminders to stop warm leads slipping because the chase was late</li>
               <li>Outcome reporting for replies, booked calls, signed work, and lead leakage</li>
               <li>Reusable saved messages and follow-up plans</li>
             </ul>

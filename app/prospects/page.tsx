@@ -347,6 +347,11 @@ export default function ProspectsPage() {
 
     return {
       followUpsDue: scheduledFollowUps.length + dueFollowUps.length,
+      delayRiskCount:
+        scheduledFollowUps.length +
+        dueFollowUps.length +
+        proposalsToChase.length +
+        coldProspects.length,
       replyNeeded,
       proposalsToChase,
       coldProspects,
@@ -1046,10 +1051,10 @@ export default function ProspectsPage() {
           </div>
         ) : view === "today" ? (
           <div className="prospectViewSection">
-          <div className="prospectViewHeading"><h2 className="sectionTitle">Today&apos;s agency pipeline actions</h2><p className="muted">Start here each day to see what needs a reply, scoping call, proposal chase, negotiation move, or handoff.</p></div>
+          <div className="prospectViewHeading"><h2 className="sectionTitle">Today&apos;s follow-up reminders</h2><p className="muted">Start here so warm leads, proposal decisions, and booked-call opportunities do not slip because the next chase was late.</p></div>
           <div className="prospectTodayGrid">
             <section className="prospectTodayPanel">
-              <div className="prospectSectionHeader"><h2 className="cardTitle">Actions due</h2></div>
+              <div className="prospectSectionHeader"><h2 className="cardTitle">Reminder tasks due</h2></div>
               <div className="prospectTodayList">
                 {todayItems.openTasks.map(({ id, task, prospect }) => (
                   <div key={id} className="prospectTodayItem">
@@ -1063,12 +1068,12 @@ export default function ProspectsPage() {
                     </div>
                   </div>
                 ))}
-                {todayItems.openTasks.length === 0 ? <p className="muted">No overdue lead actions. Nicely handled.</p> : null}
+                {todayItems.openTasks.length === 0 ? <p className="muted">No overdue reminders. Nicely handled.</p> : null}
               </div>
             </section>
 
             <section className="prospectTodayPanel">
-              <div className="prospectSectionHeader"><h2 className="cardTitle">Leads to follow up</h2></div>
+              <div className="prospectSectionHeader"><h2 className="cardTitle">Lead follow-ups due</h2></div>
               <div className="prospectTodayList">
                 {todayItems.followUps.map(({ id, prospect }) => (
                   <div key={id} className="prospectTodayItem">
@@ -1076,7 +1081,7 @@ export default function ProspectsPage() {
                     <Link href={`/prospects/${prospect.id}`} className="button buttonPrimary">Follow up</Link>
                   </div>
                 ))}
-                {todayItems.followUps.length === 0 ? <p className="muted">No lead follow-ups are due.</p> : null}
+                {todayItems.followUps.length === 0 ? <p className="muted">No lead follow-ups are due. Nothing is waiting on a chase today.</p> : null}
               </div>
             </section>
           </div>
@@ -1093,8 +1098,9 @@ export default function ProspectsPage() {
                       ? `${dailyDashboard.priorityItems.length} useful action${dailyDashboard.priorityItems.length === 1 ? "" : "s"} to handle.`
                       : "You are clear for today."}
                 </h2>
-                <p className="muted">Start with the action most likely to move a lead toward scoping call, proposal, negotiation, handoff, or booked client.</p>
+                <p className="muted">Start with the reminder most likely to stop a warm lead, proposal, or booked-call opportunity slipping because the chase was late.</p>
                 <div className="prospectFocusSummary" aria-label="Pipeline summary">
+                  <span>{dailyDashboard.delayRiskCount} delay risk{dailyDashboard.delayRiskCount === 1 ? "" : "s"}</span>
                   <span>{dailyDashboard.followUpsDue} follow-up{dailyDashboard.followUpsDue === 1 ? "" : "s"} due</span>
                   <span>{dailyDashboard.replyNeeded.length} repl{dailyDashboard.replyNeeded.length === 1 ? "y" : "ies"} waiting</span>
                   <span>{dailyDashboard.proposalsToChase.length} close action{dailyDashboard.proposalsToChase.length === 1 ? "" : "s"}</span>
@@ -1122,7 +1128,7 @@ export default function ProspectsPage() {
 
             <div className="prospectDailyLayout">
               <section className="prospectDailyPanel">
-                <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">Other agency pipeline work today</h3><p className="muted">A short backup list after the main action above: replies, scoping calls, proposal chases, negotiation moves, follow-ups, and handoffs.</p></div>
+                <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">Follow-up work to keep moving</h3><p className="muted">A short backup list after the main reminder above: replies, scoping calls, proposal chases, negotiation moves, follow-ups, and handoffs.</p></div>
                 <div className="prospectDailyActionList">
                   {dailyDashboard.supportingItems.map((item) => (
                     <Link key={item.id} href={item.href} className="prospectDailyAction">
@@ -1136,7 +1142,7 @@ export default function ProspectsPage() {
                   {dailyDashboard.supportingItems.length === 0 ? (
                     <div className="prospectDailyEmpty">
                       <strong>No extra work queued</strong>
-                      <p className="muted">Handle the main action above, or add leads and schedule follow-ups so delay does not become lead leakage.</p>
+                      <p className="muted">Handle the main reminder above, or add leads and schedule follow-ups so delay does not become lead leakage.</p>
                       <div className="prospectExampleList">
                         <span>Example: Chase proposal decision</span>
                         <span>Example: Rescue a lead after 14 quiet days</span>

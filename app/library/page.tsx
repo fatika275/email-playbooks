@@ -90,8 +90,8 @@ export default function LibraryPage() {
           </h1>
           <p className="muted">
             Start with outreach sequences, follow-up templates, proposal
-            reminders, and client win-back flows so your agency can move leads
-            forward without digging through a giant generic library.
+            reminders, and client win-back flows so your agency can chase at
+            the right time without digging through a giant generic library.
           </p>
         </div>
 

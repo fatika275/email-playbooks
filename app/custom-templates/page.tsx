@@ -153,8 +153,8 @@ export default function ReusableSequencesPage() {
             Your Follow-up Plan Library
           </h1>
           <p className="muted">
-            Keep the saved follow-ups you use when deals need another nudge,
-            more context, or a timely reminder.
+            Keep the saved follow-up reminders you use when deals need another
+            nudge, more context, or a timely chase before they go cold.
           </p>
         </div>
 
@@ -163,8 +163,9 @@ export default function ReusableSequencesPage() {
             <h3 className="cardTitle">No follow-up plans yet</h3>
 
             <p className="muted" style={{ maxWidth: 620, marginInline: "auto" }}>
-              Build your first follow-up plan, save the version you want to
-              reuse, and it will appear here for the next lead that goes quiet.
+              Build your first follow-up reminder plan, save the version you
+              want to reuse, and it will appear here for the next lead that
+              goes quiet.
             </p>
 
             <div
@@ -186,7 +187,7 @@ export default function ReusableSequencesPage() {
               <div className="glassCard" style={{ padding: 14 }}>
                 <strong>2. Save version</strong>
                 <p className="muted" style={{ margin: "6px 0 0" }}>
-                  Save the version you want to reuse later.
+                  Save the chase timing and message order you want to reuse later.
                 </p>
               </div>
 
@@ -194,7 +195,7 @@ export default function ReusableSequencesPage() {
                 <strong>3. Reuse</strong>
                 <p className="muted" style={{ margin: "6px 0 0" }}>
                   Attach it to a lead when you need the next reminder and
-                  message ready.
+                  message ready before the deal loses momentum.
                 </p>
               </div>
             </div>

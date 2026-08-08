@@ -280,12 +280,13 @@ export default function SequenceBuilderPage() {
           <div>
             <div className="badge">Follow-ups</div>
             <h1 className="pageTitle" style={{ marginTop: 14 }}>
-              Manage the follow-ups that stop warm leads slipping.
+              Build the reminders that stop warm leads slipping.
             </h1>
             <p className="muted">
               Deals are often lost by delay, not rejection. Build the saved
-              messages and reminder days you use after the first touch, then
-              attach the plan to a lead so every chase has context.
+              messages and reminder days you use after the first touch, proposal,
+              or scoping call, then attach the plan to a lead so every chase has
+              timing and context.
             </p>
           </div>
           <div className="builderHeroActions">
@@ -384,10 +385,10 @@ export default function SequenceBuilderPage() {
               </div>
               {steps.length === 0 ? (
                 <div className="builderEmptyPanel">
-                  <strong>Start with one message</strong>
+                  <strong>Start with the first chase</strong>
                   <p className="muted">
-                    Choose the first chase message. It will appear here with a
-                    reminder day you can change.
+                    Choose the first reminder message. It will appear here with
+                    a chase day you can change.
                   </p>
                 </div>
               ) : (

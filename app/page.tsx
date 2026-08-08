@@ -18,8 +18,8 @@ const workflow = [
     text: "Use shared notes and owner context when one teammate starts the deal and another continues it.",
   },
   {
-    title: "Follow-up tools",
-    text: "Use saved plans, reminders, and lead context so warm prospects do not slip after a delay.",
+    title: "Follow-up reminders",
+    text: "Use saved plans and reminder dates so warm prospects are chased before delay turns into leakage.",
   },
   {
     title: "Outcome reporting",
@@ -42,7 +42,7 @@ const agencyWorkflowDepth = [
   },
   {
     title: "Chase the proposal",
-    text: "Use proposal reminders and due dates so good-fit leads do not disappear after the quote goes out.",
+    text: "Use proposal reminders and due dates so good-fit leads do not disappear because nobody followed up in time.",
   },
   {
     title: "Close the retainer",
@@ -111,8 +111,8 @@ export default function HomePage() {
             <span>Track inquiries, scoping calls, proposals, negotiation, and next actions</span>
           </div>
           <div>
-            <strong>Follow-up tools</strong>
-            <span>Prevent warm leads slipping after the first touch</span>
+            <strong>Follow-up reminders</strong>
+            <span>Chase warm leads before delay costs the deal</span>
           </div>
         </div>
       </ScrollReveal>
@@ -123,7 +123,8 @@ export default function HomePage() {
             <h2 className="pageTitle">A simple path from first email to booked work</h2>
             <p className="muted">
               Outreach sequences start the conversation. Follow-up templates,
-              proposal reminders, and client win-back flows keep leads moving.
+              proposal reminders, and client win-back flows stop warm leads
+              being lost to slow chasing.
               The pipeline tracks inquiries, scoping calls, proposals,
               negotiation, and handoff. No days of setup, just the pieces small
               agencies need to turn outreach into booked clients in a

@@ -212,8 +212,8 @@ export default function PlaybookPage() {
             <p className="muted" style={{ maxWidth: 680, marginInline: "auto" }}>
               This is part of the Pro agency template library. Free access
               includes the core messages. Pro unlocks outreach sequences,
-              follow-up templates, proposal reminders, and client win-back
-              flows.
+              follow-up reminders, proposal chases, and client win-back flows
+              that keep warm leads moving.
             </p>
             <div className="toolbar" style={{ justifyContent: "center", marginTop: 20 }}>
               <Link href="/pricing" className="button buttonPrimary">
