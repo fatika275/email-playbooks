@@ -507,7 +507,7 @@ export default function TeamLibraryPage() {
 
         {teamView === "library" ? <>
         <div className="teamLibraryActions">
-          <div><h2 className="sectionTitle">Shared agency templates</h2><p className="muted">Keep the messages and follow-up plans that win replies available to everyone handling leads.</p></div>
+          <div><h2 className="sectionTitle">Shared agency use-case templates</h2><p className="muted">Keep outreach, follow-up, proposal, and win-back assets available to everyone handling leads.</p></div>
           <div className="toolbar">
           <button
             className="button buttonSecondary"
@@ -517,7 +517,7 @@ export default function TeamLibraryPage() {
             {isLoadingShares ? "Refreshing..." : "Refresh shares"}
           </button>
           <Link href="/history" className="button buttonSecondary">
-            Choose a saved email
+            Choose a saved message
           </Link>
           <Link href="/custom-templates" className="button buttonSecondary">
             Choose a follow-up plan
@@ -531,13 +531,13 @@ export default function TeamLibraryPage() {
             <button type="button" role="tab" aria-selected={libraryView === "outgoing"} className={libraryView === "outgoing" ? "sharedLibraryTab active" : "sharedLibraryTab"} onClick={() => { setLibraryView("outgoing"); setSharePage(1); }}>Shared by me <span>{outgoing.length}</span></button>
           </div>
           <div className="sharedLibraryFilters">
-            <input className="input" type="search" value={shareSearch} onChange={(event) => { setShareSearch(event.target.value); setSharePage(1); }} placeholder="Search title, subject, or teammate" aria-label="Search shared templates" />
+            <input className="input" type="search" value={shareSearch} onChange={(event) => { setShareSearch(event.target.value); setSharePage(1); }} placeholder="Search outreach, proposal, win-back, or teammate" aria-label="Search shared templates" />
             <select className="input" value={shareType} onChange={(event) => { setShareType(event.target.value as "all" | "email" | "sequence"); setSharePage(1); }} aria-label="Filter shared templates by type"><option value="all">All types</option><option value="email">Messages</option><option value="sequence">Follow-up plans</option></select>
           </div>
         </div>
 
         <section className="section sharedLibrarySection">
-          <div className="teamSectionHeading"><h2 className="sectionTitle">{libraryView === "incoming" ? "Shared with me" : "Shared by me"}</h2><p className="muted">{libraryView === "incoming" ? "Agency templates and follow-up plans teammates have sent to your account." : "Items you have made available so teammates can chase leads consistently."}</p></div>
+          <div className="teamSectionHeading"><h2 className="sectionTitle">{libraryView === "incoming" ? "Shared with me" : "Shared by me"}</h2><p className="muted">{libraryView === "incoming" ? "Agency use-case templates and follow-up plans teammates have sent to your account." : "Outreach, follow-up, proposal, and win-back assets you have made available so teammates can chase leads consistently."}</p></div>
           <div className="workspaceGrid" style={{ marginTop: 16 }}>
             {visibleShares.map((share) => (
               <article key={share.id} className="glassCard workspaceCard">

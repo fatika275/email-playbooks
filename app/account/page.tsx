@@ -150,8 +150,8 @@ export default function AccountPage() {
             Your Thalovo account
           </h1>
           <p className="muted" style={{ maxWidth: 720, lineHeight: 1.75 }}>
-            Sign in to keep your outreach templates, follow-up plans, pipeline,
-            and agency assets available when you come back.
+            Sign in to keep your outreach, follow-up, proposal, and win-back
+            templates, pipeline, and agency assets available when you come back.
           </p>
         </div>
 

@@ -147,7 +147,7 @@ export default function SequenceAssetPage() {
       createdAt: new Date().toISOString(),
     });
 
-    setSavedMessage("Saved to Saved Outreach.");
+    setSavedMessage("Saved to saved agency messages.");
     setTimeout(() => setSavedMessage(""), 2000);
   }
 

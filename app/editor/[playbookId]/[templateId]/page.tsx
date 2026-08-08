@@ -369,7 +369,7 @@ export default function EditorPage() {
       createdAt: new Date().toISOString(),
     });
 
-    setSavedMessage("Saved to Saved Outreach");
+    setSavedMessage("Saved to saved agency messages");
     setTimeout(() => setSavedMessage(""), 2200);
   }
 
@@ -469,7 +469,8 @@ export default function EditorPage() {
             </h1>
             <p className="muted">
               This editor step belongs to a Pro playbook. Upgrade to use the
-              full lead capture and outreach library plus advanced workflows.
+              full agency use-case library for outreach, follow-up, proposal
+              chase, and win-back workflows.
             </p>
             <div className="toolbar" style={{ justifyContent: "center" }}>
               <button
@@ -827,9 +828,9 @@ export default function EditorPage() {
                     borderBottom: "1px solid rgba(255,255,255,0.06)",
                   }}
                 >
-                  <strong>Save Email</strong>
+                  <strong>Save agency message</strong>
                   <p className="muted" style={{ margin: "6px 0 0" }}>
-                    Save this email so you can reuse it later from your Saved Outreach page.
+                    Save this use-case message so you can reuse it later from your saved messages.
                   </p>
                 </div>
 
@@ -844,9 +845,9 @@ export default function EditorPage() {
 
             {editorTab !== "write" ? null : reuseMode ? (
               <div className="glassCard" style={{ padding: 18, marginBottom: 18 }}>
-                <h4 style={{ margin: 0 }}>Reuse this email</h4>
+                <h4 style={{ margin: 0 }}>Reuse this agency message</h4>
                 <p className="muted" style={{ margin: "8px 0 0" }}>
-                  You opened a saved email to use again. You can edit it directly below.
+                  You opened a saved agency message to use again. You can edit it directly below.
                 </p>
 
                 <div className="formGroup" style={{ marginTop: 14 }}>
@@ -894,7 +895,7 @@ export default function EditorPage() {
                       setEditableBody(reuseDraft.body);
                     }}
                   >
-                    Load saved email
+                    Load saved message
                   </button>
                 ) : null}
 
@@ -1113,7 +1114,7 @@ export default function EditorPage() {
                 className="button buttonSecondary"
                 onClick={() => router.push("/history")}
               >
-                Go to Saved Outreach
+                Go to Saved Messages
               </button>
               <button
                 className="button buttonSecondary"

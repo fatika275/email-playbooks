@@ -98,7 +98,7 @@ export default function DuplicateEmailPage() {
                 className="button buttonPrimary"
                 onClick={() => router.push("/history")}
               >
-                Back to Saved Outreach
+                Back to Saved Messages
               </button>
             </div>
           </div>
@@ -111,12 +111,12 @@ export default function DuplicateEmailPage() {
     <main className="main">
       <section className="container">
         <div className="pageHeader">
-          <div className="badge">Duplicate Email</div>
+          <div className="badge">Duplicate agency message</div>
           <h1 className="pageTitle" style={{ marginTop: 14 }}>
             Duplicate and edit
           </h1>
           <p className="muted">
-            Make a new version of this saved email without changing the original.
+            Make a new version of this saved agency message without changing the original.
           </p>
         </div>
 
@@ -217,7 +217,7 @@ export default function DuplicateEmailPage() {
                 className="button buttonSecondary"
                 onClick={() => router.push("/history")}
               >
-                Back to Saved Outreach
+                Back to Saved Messages
               </button>
             </div>
           </div>

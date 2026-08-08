@@ -109,7 +109,7 @@ export default function FoldersPage() {
     const items = allItems.filter((item) => {
       const matchesType =
         typeFilter === "All" ||
-        (typeFilter === "Saved Outreach" && item.type === "email") ||
+        (typeFilter === "Saved Messages" && item.type === "email") ||
         (typeFilter === "Follow-up Plans" && item.type === "sequence");
 
       const folder =
@@ -229,11 +229,11 @@ export default function FoldersPage() {
         <div className="pageHeader">
           <div className="badge">Folders</div>
           <h1 className="pageTitle" style={{ marginTop: 14 }}>
-            Keep saved outreach easy to find.
+            Keep saved agency messages easy to find.
           </h1>
           <p className="muted" style={{ maxWidth: 760, lineHeight: 1.75 }}>
-            Use folders lightly when they help you find the next message or
-            follow-up plan faster.
+            Use folders lightly when they help you find the next outreach,
+            follow-up, proposal, win-back message, or follow-up plan faster.
           </p>
         </div>
 
@@ -257,7 +257,7 @@ export default function FoldersPage() {
                 onChange={(event) => setTypeFilter(event.target.value)}
               >
                 <option>All</option>
-                <option>Saved Outreach</option>
+                <option>Saved Messages</option>
                 <option>Follow-up Plans</option>
               </select>
             </div>

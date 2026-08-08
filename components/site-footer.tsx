@@ -23,7 +23,7 @@ export default function SiteFooter() {
               Client Pipeline
             </Link>
             <Link href="/library" className="footerLink">
-              Outreach Templates
+              Agency Templates
             </Link>
             <Link href="/workspace" className="footerLink">
               Agency Assets

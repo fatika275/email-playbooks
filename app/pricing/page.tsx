@@ -141,7 +141,7 @@ export default function PricingPage() {
             </p>
 
             <ul className="featureList">
-              <li>Outreach sequences, follow-up templates, proposal reminders, and client win-back flows</li>
+              <li>Agency template libraries for outreach, follow-up, proposal chase, and win-back</li>
               <li>Start with one prospect and a ready-made agency workflow</li>
               <li>Agency pipeline stages for inquiries, scoping calls, proposals, negotiation, and handoff</li>
               <li>Follow-up reminders to stop warm leads slipping because the chase was late</li>

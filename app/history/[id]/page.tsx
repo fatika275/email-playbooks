@@ -97,13 +97,13 @@ export default function SavedEmailViewPage() {
       <main className="main">
         <section className="container">
           <div className="glassCard emptyState">
-            <h1 className="pageTitle">Saved email not found</h1>
+            <h1 className="pageTitle">Saved message not found</h1>
             <p className="muted">
-              This saved email could not be loaded.
+              This saved agency message could not be loaded.
             </p>
             <div className="toolbar" style={{ justifyContent: "center" }}>
               <Link href="/history" className="button buttonPrimary">
-                Back to Saved Outreach
+                Back to Saved Messages
               </Link>
             </div>
           </div>
@@ -226,7 +226,7 @@ export default function SavedEmailViewPage() {
             </div>
 
             <div className="glassCard" style={{ padding: 18, marginBottom: 18 }}>
-              <h4 style={{ margin: 0 }}>Organize this saved email</h4>
+              <h4 style={{ margin: 0 }}>Organize this saved agency message</h4>
               <div style={{ display: "grid", gap: 14, marginTop: 14 }}>
                 <div className="formGroup" style={{ marginBottom: 0 }}>
                   <label className="label">Folder</label>
@@ -286,13 +286,13 @@ export default function SavedEmailViewPage() {
               </button>
 
               <Link href="/history" className="button buttonSecondary">
-                Back to Saved Outreach
+                Back to Saved Messages
               </Link>
             </div>
           </div>
 
           <div className="previewCard">
-            <div className="previewLabel">Email Preview</div>
+            <div className="previewLabel">Message Preview</div>
 
             <div className="previewBox">
               <strong>Subject: {email.subject}</strong>

@@ -6,10 +6,10 @@ import { useAccount } from "@/components/account-provider";
 const workspaceItems = [
   {
     href: "/history",
-    label: "Saved Outreach",
+    label: "Saved Use-Case Messages",
     badge: "Messages",
     description:
-      "Reuse the outreach messages that help start conversations and get replies.",
+      "Reuse outreach, follow-up, proposal, and win-back messages that help leads move.",
   },
   {
     href: "/custom-templates",
@@ -36,11 +36,11 @@ export default function WorkspacePage() {
         <div className="pageHeader">
           <div className="badge">Agency Assets</div>
           <h1 className="pageTitle" style={{ marginTop: 14 }}>
-            Keep your best outreach and follow-up assets ready to reuse.
+            Keep your best agency use-case assets ready to reuse.
           </h1>
           <p className="muted" style={{ maxWidth: 760, lineHeight: 1.75 }}>
-            Find the messages, proposal chasers, and follow-up plans that help
-            leads become booked client work.
+            Find the outreach messages, follow-up plans, proposal chasers, and
+            win-back assets that help leads become booked client work.
           </p>
         </div>
 
@@ -53,8 +53,8 @@ export default function WorkspacePage() {
               Reuse what helps leads become booked work.
             </h2>
             <p className="muted" style={{ marginTop: 10, lineHeight: 1.75 }}>
-              Open saved drafts, proposal chasers, and follow-up plans here,
-              then get back to the lead you are trying to move.
+              Open saved outreach, follow-up, proposal, and win-back assets
+              here, then get back to the lead you are trying to move.
             </p>
           </div>
 
@@ -64,7 +64,7 @@ export default function WorkspacePage() {
             </Link>
           ) : (
             <Link href="/history" className="button buttonPrimary">
-              Open Saved Outreach
+              Open Saved Messages
             </Link>
           )}
         </div>

@@ -77,24 +77,25 @@ export default function SavedEmailsPage() {
     <main className="main">
       <section className="container">
         <div className="pageHeader">
-          <div className="badge">Saved Outreach</div>
+          <div className="badge">Saved agency messages</div>
 
           <h1 className="pageTitle" style={{ marginTop: 14 }}>
-            Your Saved Outreach
+            Your saved use-case messages
           </h1>
 
           <p className="muted">
-            Open any saved email to view it, copy it, or use it again.
+            Open saved outreach, follow-up, proposal, and win-back messages to
+            copy them or use them again.
           </p>
         </div>
 
         {emails.length === 0 ? (
           <div className="glassCard emptyState">
-            <h3 className="cardTitle">No saved emails yet</h3>
+            <h3 className="cardTitle">No saved agency messages yet</h3>
 
             <p className="muted" style={{ maxWidth: 620, marginInline: "auto" }}>
-              Create your first email, save it, and come back to reuse it
-              anytime from your Saved Outreach library.
+              Create your first use-case message, save it, and come back to
+              reuse it from your saved agency messages.
             </p>
 
             <div
@@ -139,10 +140,10 @@ export default function SavedEmailsPage() {
             <div className="glassCard" style={{ padding: 18 }}>
               <div className="grid" style={{ gridTemplateColumns: "1.6fr 1fr 1fr" }}>
                 <div className="formGroup" style={{ marginBottom: 0 }}>
-                  <label className="label">Search saved emails</label>
+                  <label className="label">Search saved messages</label>
                   <input
                     className="input"
-                    placeholder="Search by subject, template, or email copy"
+                    placeholder="Search by subject, use case, or message copy"
                     value={query}
                     onChange={(event) => setQuery(event.target.value)}
                   />
@@ -203,7 +204,7 @@ export default function SavedEmailsPage() {
                 <div className="cardTop">
                   <h3 className="cardTitle">{email.templateLabel}</h3>
                   <span className="miniBadge">
-                    {email.isFavorite ? "Favorite" : "Saved Email"}
+                    {email.isFavorite ? "Favorite" : "Saved message"}
                   </span>
                 </div>
 
@@ -243,10 +244,10 @@ export default function SavedEmailsPage() {
 
             {filteredEmails.length === 0 ? (
               <div className="glassCard emptyState">
-                <h3 className="cardTitle">No saved emails match that search</h3>
+                <h3 className="cardTitle">No saved agency messages match that search</h3>
                 <p className="muted" style={{ maxWidth: 620, marginInline: "auto" }}>
                   Try a broader phrase or search by subject, template name, or
-                  a keyword from the email body.
+                  a keyword from the message body.
                 </p>
               </div>
             ) : null}

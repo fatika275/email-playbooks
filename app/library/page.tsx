@@ -10,8 +10,8 @@ import { playbooks } from "@/lib/data";
 const TEMPLATE_GROUPS = [
   {
     id: "all",
-    label: "All agency templates",
-    description: "Every saved message flow.",
+    label: "All use-case libraries",
+    description: "Outreach, follow-up, proposal, and win-back.",
     playbookIds: playbooks.map((playbook) => playbook.id),
   },
   {
@@ -22,13 +22,13 @@ const TEMPLATE_GROUPS = [
   },
   {
     id: "followup",
-    label: "Follow-up templates",
-    description: "Keep warm leads moving after the first touch.",
+    label: "Follow-up reminders",
+    description: "Chase warm leads after the first touch.",
     playbookIds: ["follow-up-frameworks", "meeting-follow-up", "no-show-recovery", "objection-handling-replies"],
   },
   {
     id: "proposal",
-    label: "Proposal reminders",
+    label: "Proposal chasers",
     description: "Chase decisions after sending scope or pricing.",
     playbookIds: ["proposal-follow-up"],
   },
@@ -84,18 +84,19 @@ export default function LibraryPage() {
     <main className="main">
       <section className="container">
         <div className="pageHeader libraryHeader">
-          <div className="badge">Agency template library</div>
+          <div className="badge">Agency use-case libraries</div>
           <h1 className="pageTitle" style={{ marginTop: 14 }}>
-            Templates that match agency work.
+            Outreach, follow-up, proposal, and win-back templates.
           </h1>
           <p className="muted">
-            Start with outreach sequences, follow-up templates, proposal
-            reminders, and client win-back flows so your agency can chase at
-            the right time without digging through a giant generic library.
+            Pick the agency use case first, then choose the message. Thalovo
+            groups templates around the work small agencies actually do:
+            starting conversations, chasing warm leads, moving proposals, and
+            winning back quiet clients.
           </p>
         </div>
 
-        <div className="libraryTemplateGroups" aria-label="Agency template type">
+        <div className="libraryTemplateGroups" aria-label="Agency template use case">
           {TEMPLATE_GROUPS.map((group) => (
             <button
               key={group.id}
@@ -112,7 +113,7 @@ export default function LibraryPage() {
         <div className="glassCard libraryFilters">
           <div className="libraryFilterGrid">
             <div className="formGroup" style={{ marginBottom: 0 }}>
-              <label className="label">Search templates</label>
+              <label className="label">Search use-case templates</label>
               <input
                 className="input"
                 placeholder="Search proposal, win-back, follow-up..."
@@ -190,7 +191,7 @@ export default function LibraryPage() {
 
         {filteredPlaybooks.length === 0 ? (
           <div className="glassCard emptyState" style={{ marginTop: 22 }}>
-            <h3 className="cardTitle">No outreach messages match that search yet</h3>
+            <h3 className="cardTitle">No agency use-case templates match that search yet</h3>
             <p className="muted" style={{ maxWidth: 620, marginInline: "auto" }}>
               Try clearing the search or using a broader term like
               follow-up, proposal, inbound, or cold outreach.

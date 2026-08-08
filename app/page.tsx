@@ -6,8 +6,8 @@ import { trackEvent } from "@/lib/analytics";
 
 const workflow = [
   {
-    title: "Email templates",
-    text: "Use outreach sequences, follow-up templates, proposal reminders, and client win-back flows.",
+    title: "Agency template libraries",
+    text: "Use outreach, follow-up, proposal, and win-back templates grouped by the agency job they support.",
   },
   {
     title: "Pipeline",
@@ -70,8 +70,8 @@ export default function HomePage() {
 
           <p className="homeHeroText">
             Thalovo is built for one job: turn outreach into booked clients.
-            It gives small agencies the focused workflow for templates,
-            pipeline, follow-ups, team visibility, and outcome reporting. Start
+            It gives small agencies the focused workflow for agency template
+            libraries, pipeline, follow-ups, team visibility, and outcome reporting. Start
             in minutes with one prospect, one message, and one follow-up, then
             keep scoping calls, proposals, negotiation, handoff, and lead ownership moving in
             one readable place.
@@ -103,8 +103,8 @@ export default function HomePage() {
             <span>Start with one prospect, one message, and one follow-up</span>
           </div>
           <div>
-            <strong>Email templates</strong>
-            <span>Outreach, follow-up, proposal, and win-back messages</span>
+            <strong>Agency templates</strong>
+            <span>Outreach, follow-up, proposal, and win-back libraries</span>
           </div>
           <div>
             <strong>Pipeline</strong>
@@ -122,9 +122,10 @@ export default function HomePage() {
           <div>
             <h2 className="pageTitle">A simple path from first email to booked work</h2>
             <p className="muted">
-              Outreach sequences start the conversation. Follow-up templates,
-              proposal reminders, and client win-back flows stop warm leads
-              being lost to slow chasing.
+              Agency template libraries start with the job: outreach,
+              follow-up, proposal chase, or win-back. That keeps messages
+              useful for the lead stage instead of buried in a generic message
+              list.
               The pipeline tracks inquiries, scoping calls, proposals,
               negotiation, and handoff. No days of setup, just the pieces small
               agencies need to turn outreach into booked clients in a
