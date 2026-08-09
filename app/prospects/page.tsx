@@ -184,6 +184,30 @@ export default function ProspectsPage() {
     });
   }, [prospects, query, workflowView]);
 
+  const allLeads = useMemo(() => {
+    const normalized = query.trim().toLowerCase();
+    return prospects.filter((prospect) => {
+      if (!normalized) return true;
+      return [
+        prospect.full_name,
+        prospect.company,
+        prospect.email,
+        prospect.role,
+        prospect.source,
+        prospect.budget_range,
+        prospect.deliverables,
+        prospect.timeline,
+        prospect.decision_maker,
+        prospect.service_type,
+        PROSPECT_STAGE_LABELS[prospect.stage],
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase()
+        .includes(normalized);
+    });
+  }, [prospects, query]);
+
   const visiblePipelineStages = useMemo(
     () => PROSPECT_WORKFLOW_STAGES[workflowView],
     [workflowView]
@@ -873,24 +897,26 @@ export default function ProspectsPage() {
             <button className={view === "reports" ? "authModeTab active" : "authModeTab"} onClick={() => setView("reports")}>Next actions</button>
             <button className={view === "pipeline" ? "authModeTab active" : "authModeTab"} onClick={() => setView("pipeline")}>Pipeline board</button>
             <button className={view === "today" ? "authModeTab active" : "authModeTab"} onClick={() => setView("today")}>Today&apos;s chase list</button>
-            <button className={view === "list" ? "authModeTab active" : "authModeTab"} onClick={() => setView("list")}>All leads</button>
+            <button className={view === "list" ? "authModeTab active" : "authModeTab"} onClick={() => setView("list")}>All leads table</button>
           </div>
           <input className="input prospectSearch" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search lead, company, email..." />
         </div>
 
-        <div className="prospectWorkflowTabs" aria-label="Agency workflow view">
-          {PROSPECT_WORKFLOW_VIEWS.map((item) => (
-            <button
-              key={item}
-              type="button"
-              className={workflowView === item ? "prospectWorkflowTab isActive" : "prospectWorkflowTab"}
-              onClick={() => setWorkflowView(item)}
-            >
-              <span>{PROSPECT_WORKFLOW_LABELS[item]}</span>
-              <strong>{workflowCounts[item]}</strong>
-            </button>
-          ))}
-        </div>
+        {view === "pipeline" ? (
+          <div className="prospectWorkflowTabs" aria-label="Agency workflow view">
+            {PROSPECT_WORKFLOW_VIEWS.map((item) => (
+              <button
+                key={item}
+                type="button"
+                className={workflowView === item ? "prospectWorkflowTab isActive" : "prospectWorkflowTab"}
+                onClick={() => setWorkflowView(item)}
+              >
+                <span>{PROSPECT_WORKFLOW_LABELS[item]}</span>
+                <strong>{workflowCounts[item]}</strong>
+              </button>
+            ))}
+          </div>
+        ) : null}
 
         {view === "pipeline" ? (
           <div className="prospectViewSection">
@@ -942,12 +968,12 @@ export default function ProspectsPage() {
           </div>
         ) : view === "list" ? (
           <div className="prospectViewSection">
-          <div className="prospectViewHeading"><h2 className="sectionTitle">{PROSPECT_WORKFLOW_LABELS[workflowView]}</h2><p className="muted">A focused list for this part of the agency path, from first inquiry through scoping call, proposal, negotiation, and client handoff.</p></div>
+          <div className="prospectViewHeading"><h2 className="sectionTitle">All leads table</h2><p className="muted">A full searchable table for checking every lead, source, scope, value, stage, and follow-up date in one place.</p></div>
           <div className="prospectTableWrap">
             <table className="prospectTable">
               <thead><tr><th>Lead</th><th>Stage</th><th>Scope</th><th>Client work value</th><th>Follow-up</th><th>Source</th><th>Actions</th></tr></thead>
               <tbody>
-                {filtered.map((prospect) => (
+                {allLeads.map((prospect) => (
                   <tr key={prospect.id}>
                     <td><Link href={`/prospects/${prospect.id}`}><strong>{prospect.full_name}</strong><span>{prospect.company}{prospect.role ? ` - ${prospect.role}` : ""}</span></Link></td>
                     <td><select className="input prospectTableStage" value={prospect.stage} onChange={(event) => void handleStageChange(prospect.id, event.target.value as ProspectStage)}>{PROSPECT_STAGES.map((stage) => <option key={stage} value={stage}>{PROSPECT_STAGE_LABELS[stage]}</option>)}</select></td>
@@ -960,7 +986,7 @@ export default function ProspectsPage() {
                 ))}
               </tbody>
             </table>
-            {filtered.length === 0 ? <div className="emptyState"><p className="muted">No leads match this view.</p></div> : null}
+            {allLeads.length === 0 ? <div className="emptyState"><p className="muted">No leads match this search.</p></div> : null}
           </div>
           </div>
         ) : view === "today" ? (
