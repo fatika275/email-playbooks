@@ -528,7 +528,7 @@ export default function EditorPage() {
               className="authModeTabs editorModeTabs"
               role="tablist"
               aria-label="Email editor section"
-              style={{ marginBottom: 22 }}
+              style={{ marginBottom: 14 }}
             >
               <button
                 type="button"
