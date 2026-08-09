@@ -8,7 +8,7 @@ const businessFeatures = [
   "Simple ownership rules for who is chasing each lead",
   "One payment for the business",
   "Full Pro access for up to 10 teammates",
-  "Shared agency templates and follow-up plans",
+  "Shared outreach messages and follow-up plans",
   "Owner-controlled invitations and removals",
   "Team visibility for scoping calls, proposals, negotiation, and handoff without duplicate chasing",
 ];

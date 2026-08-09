@@ -94,9 +94,9 @@ export default function FounderPage() {
               <li>Prospect pipeline and follow-up tracking</li>
               <li>Access for one individual account</li>
               <li>Locked Founder Pro monthly price</li>
-              <li>Full agency use-case library for outreach, follow-up, proposal chase, and win-back</li>
+              <li>Full outreach-to-deal library for follow-up, proposal chase, and win-back</li>
               <li>Full follow-up builder</li>
-              <li>Follow-up plans, folders, and saved agency messages</li>
+              <li>Follow-up plans, folders, and saved deal messages</li>
               <li>Team seats are not included</li>
             </ul>
 

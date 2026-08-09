@@ -185,13 +185,13 @@ export default function PlaybookPage() {
       <main className="main">
         <section className="container">
           <div className="glassCard emptyState">
-            <h1 className="pageTitle">Template flow not found</h1>
+            <h1 className="pageTitle">Deal message flow not found</h1>
             <p className="muted">
-              This template flow does not exist. Try going back to the agency template library.
+              This message flow does not exist. Try going back to the outreach library.
             </p>
             <div className="toolbar" style={{ justifyContent: "center" }}>
               <Link href="/library" className="button buttonPrimary">
-                Back to Agency Templates
+                Back to Outreach
               </Link>
             </div>
           </div>
@@ -205,22 +205,22 @@ export default function PlaybookPage() {
       <main className="main">
         <section className="container">
           <div className="glassCard emptyState">
-            <div className="badge">Pro template flow</div>
+            <div className="badge">Pro deal flow</div>
             <h1 className="pageTitle" style={{ marginTop: 14 }}>
               Unlock {playbook.name}
             </h1>
             <p className="muted" style={{ maxWidth: 680, marginInline: "auto" }}>
-              This is part of the Pro agency template library. Free access
-              includes the core messages. Pro unlocks outreach sequences,
-              follow-up reminders, proposal chases, and client win-back flows
-              that keep warm leads moving.
+              This is part of the Pro agency deal library. Free access includes
+              the core messages. Pro unlocks outreach sequences, follow-up
+              reminders, proposal chases, and client win-back flows that keep
+              warm leads moving.
             </p>
             <div className="toolbar" style={{ justifyContent: "center", marginTop: 20 }}>
               <Link href="/pricing" className="button buttonPrimary">
                 View Pro
               </Link>
               <Link href="/library" className="button buttonSecondary">
-                Back to Template Library
+                Back to Outreach
               </Link>
             </div>
           </div>
@@ -249,9 +249,9 @@ export default function PlaybookPage() {
               Choose the message for this sales moment
             </h2>
             <p className="muted" style={{ marginTop: 14, lineHeight: 1.8 }}>
-              Each message is grouped around a clear use case, with the goal,
+              Each message is grouped around a clear deal moment, with the goal,
               timing context, expected outcome, and next step included so you
-              can move faster without rewriting from scratch.
+              can move the lead forward without rewriting from scratch.
             </p>
             <div className="toolbar" style={{ marginTop: 18 }}>
               <Link href="/sequence-builder" className="button buttonSecondary">

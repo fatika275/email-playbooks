@@ -84,19 +84,19 @@ export default function LibraryPage() {
     <main className="main">
       <section className="container">
         <div className="pageHeader libraryHeader">
-          <div className="badge">Agency use-case libraries</div>
+          <div className="badge">Lead capture and outreach</div>
           <h1 className="pageTitle" style={{ marginTop: 14 }}>
-            Outreach, follow-up, proposal, and win-back templates.
+            Start conversations, then move leads toward booked work.
           </h1>
           <p className="muted">
-            Pick the agency use case first, then choose the message. Thalovo
-            groups templates around the work small agencies actually do:
+            Pick the agency use case first, then choose the message that helps
+            move the deal forward. These libraries support the full path:
             starting conversations, chasing warm leads, moving proposals, and
             winning back quiet clients.
           </p>
         </div>
 
-        <div className="libraryTemplateGroups" aria-label="Agency template use case">
+        <div className="libraryTemplateGroups" aria-label="Agency outreach use case">
           {TEMPLATE_GROUPS.map((group) => (
             <button
               key={group.id}
@@ -113,7 +113,7 @@ export default function LibraryPage() {
         <div className="glassCard libraryFilters">
           <div className="libraryFilterGrid">
             <div className="formGroup" style={{ marginBottom: 0 }}>
-              <label className="label">Search use-case templates</label>
+              <label className="label">Search outreach and deal messages</label>
               <input
                 className="input"
                 placeholder="Search proposal, win-back, follow-up..."
@@ -157,8 +157,8 @@ export default function LibraryPage() {
                 <p className="cardDesc">{playbook.description}</p>
 
                 <div className="cardMeta">
-                  {playbook.badge} . {playbook.audience} . {playbook.salesStage} . {playbook.templates.length}{" "}
-                  {playbook.templates.length === 1 ? "step" : "steps"}
+                  {playbook.audience} . {playbook.salesStage} . {playbook.templates.length}{" "}
+                  {playbook.templates.length === 1 ? "deal step" : "deal steps"}
                 </div>
 
                 {access.isLocked ? (
@@ -181,7 +181,7 @@ export default function LibraryPage() {
                       trackEvent("library_open_playbook", { playbookId: playbook.id })
                     }
                   >
-                    Open use-case messages
+                    Open deal messages
                   </Link>
                 )}
               </div>
@@ -191,7 +191,7 @@ export default function LibraryPage() {
 
         {filteredPlaybooks.length === 0 ? (
           <div className="glassCard emptyState" style={{ marginTop: 22 }}>
-            <h3 className="cardTitle">No agency use-case templates match that search yet</h3>
+            <h3 className="cardTitle">No outreach or deal messages match that search yet</h3>
             <p className="muted" style={{ maxWidth: 620, marginInline: "auto" }}>
               Try clearing the search or using a broader term like
               follow-up, proposal, inbound, or cold outreach.

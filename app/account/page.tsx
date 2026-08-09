@@ -150,8 +150,8 @@ export default function AccountPage() {
             Your Thalovo account
           </h1>
           <p className="muted" style={{ maxWidth: 720, lineHeight: 1.75 }}>
-            Sign in to keep your outreach, follow-up, proposal, and win-back
-            templates, pipeline, and saved work available when you come back.
+            Sign in to keep your outreach messages, follow-up plans, pipeline,
+            and saved deal context available when you come back.
           </p>
         </div>
 
@@ -415,8 +415,8 @@ export default function AccountPage() {
                     <div className="accountSetupSteps">
                       <Link href="/library" className="accountSetupStep">
                         <strong>1</strong>
-                        <span>Pick an outreach message</span>
-                        <small>Use a ready message instead of writing from scratch first.</small>
+                        <span>Start the first conversation</span>
+                        <small>Use a ready message, then move the lead into your pipeline.</small>
                       </Link>
                       <Link href="/prospects" className="accountSetupStep">
                         <strong>2</strong>

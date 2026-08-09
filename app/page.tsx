@@ -6,8 +6,8 @@ import { trackEvent } from "@/lib/analytics";
 
 const workflow = [
   {
-    title: "Agency template libraries",
-    text: "Use outreach, follow-up, proposal, and win-back templates grouped by the agency job they support.",
+    title: "Lead capture and outreach",
+    text: "Start conversations with use-case messages, then move each lead into the right next step.",
   },
   {
     title: "Pipeline",
@@ -34,7 +34,7 @@ const agencyWorkflowDepth = [
   },
   {
     title: "Start the conversation",
-    text: "Pick an outreach template by use case so the first email is faster and still sounds specific.",
+    text: "Pick an outreach message by use case so the first touch is faster, specific, and tied to a next step.",
   },
   {
     title: "Triage the reply",
@@ -70,8 +70,8 @@ export default function HomePage() {
 
           <p className="homeHeroText">
             Thalovo is built for one job: turn outreach into booked clients.
-            It gives small agencies a focused path for agency template
-            libraries, pipeline, follow-ups, team visibility, and practical reporting. Start
+            It gives small agencies a focused path for lead capture, pipeline,
+            follow-ups, team visibility, and practical reporting. Start
             in minutes with one prospect, one message, and one follow-up, then
             keep scoping calls, proposals, negotiation, handoff, and lead ownership moving in
             one readable place.
@@ -103,8 +103,8 @@ export default function HomePage() {
             <span>Start with one prospect, one message, and one follow-up</span>
           </div>
           <div>
-            <strong>Agency templates</strong>
-            <span>Outreach, follow-up, proposal, and win-back libraries</span>
+            <strong>Lead capture</strong>
+            <span>Use-case messages for outreach, follow-up, proposal, and win-back</span>
           </div>
           <div>
             <strong>Pipeline</strong>
@@ -122,10 +122,9 @@ export default function HomePage() {
           <div>
             <h2 className="pageTitle">A simple path from first email to booked work</h2>
             <p className="muted">
-              Agency template libraries start with the job: outreach,
-              follow-up, proposal chase, or win-back. That keeps messages
-              useful for the lead stage instead of buried in a generic message
-              list.
+              Outreach messages are only the start. Each use case connects to
+              the sales job: start the conversation, chase the reply, move the
+              proposal, or win back a quiet client.
               The pipeline tracks inquiries, scoping calls, proposals,
               negotiation, and handoff. No days of setup, just the pieces small
               agencies need to turn outreach into booked clients in a

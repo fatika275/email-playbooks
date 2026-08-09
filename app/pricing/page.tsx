@@ -101,13 +101,13 @@ export default function PricingPage() {
             </h2>
 
             <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
-              Test the core writing experience before you add pipeline reminders
-              for chasing replies and booking client work.
+              Test the first-message experience before you add pipeline
+              reminders for chasing replies and booking client work.
             </p>
 
             <ul className="featureList">
-              <li>Three core use-case outreach playbooks</li>
-              <li>Email drafting and variable replacement</li>
+              <li>Three core outreach and follow-up starting points</li>
+              <li>Message drafting and variable replacement</li>
               <li>Copy and TXT download</li>
               <li>Basic saved-email history</li>
               <li>No card required</li>
@@ -142,7 +142,7 @@ export default function PricingPage() {
             </p>
 
             <ul className="featureList">
-              <li>Agency template libraries for outreach, follow-up, proposal chase, and win-back</li>
+              <li>Use-case messages for outreach, follow-up, proposal chase, and win-back</li>
               <li>Start with one prospect and a simple agency path</li>
               <li>Agency pipeline stages for inquiries, scoping calls, proposals, negotiation, and handoff</li>
               <li>Follow-up reminders to stop warm leads slipping because the chase was late</li>
@@ -184,7 +184,7 @@ export default function PricingPage() {
               <li>Simple ownership rules for who is chasing each lead</li>
               <li>10 teammate seats included</li>
               <li>Full Pro access for every active member</li>
-              <li>Shared agency templates and follow-up plans</li>
+              <li>Shared outreach messages and follow-up plans</li>
               <li>Simple teammate access without extra sales admin</li>
             </ul>
 
@@ -209,8 +209,8 @@ export default function PricingPage() {
               <div className="glassCard" style={{ padding: 20 }}>
                 <h3 className="cardTitle">Free</h3>
                 <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
-                  Best for trying agency templates before moving follow-up and
-                  pipeline tracking into Thalovo.
+                  Best for trying first-touch messages before moving follow-up
+                  and pipeline tracking into Thalovo.
                 </p>
               </div>
 
@@ -225,7 +225,7 @@ export default function PricingPage() {
               <div className="glassCard" style={{ padding: 20 }}>
                 <h3 className="cardTitle">Business Pro</h3>
                 <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
-                  Best for small teams sharing pipeline, notes, templates, and
+                  Best for small teams sharing pipeline, notes, outreach, and
                   lead ownership without extra menus or sales admin overhead.
                 </p>
               </div>

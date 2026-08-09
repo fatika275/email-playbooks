@@ -2,7 +2,7 @@ import Link from "next/link";
 import { CheckoutButton } from "@/components/checkout-button";
 
 const proFeatures = [
-  "Agency template libraries for outreach, follow-up, proposal chase, and win-back",
+  "Use-case messages for outreach, follow-up, proposal chase, and win-back",
   "Start with one prospect and a simple agency path",
   "Agency pipeline stages for inquiries, scoping calls, proposals, negotiation, and handoff",
   "Follow-up reminders to stop warm leads slipping because the chase was late",
@@ -22,8 +22,8 @@ export default function ProPage() {
             </h1>
             <p className="muted" style={{ marginTop: 14, lineHeight: 1.75 }}>
               Pro connects the simple pieces a solo agency owner needs to stop
-              leads slipping because the chase was late: agency template
-              libraries for outreach, follow-up, proposal chase, and win-back,
+              leads slipping because the chase was late: use-case messages for
+              outreach, follow-up, proposal chase, and win-back,
               agency-native pipeline tracking, and practical reporting for the
               signals that help you chase better: replies, booked calls,
               proposals, signed client work, stage speed, and leakage.
