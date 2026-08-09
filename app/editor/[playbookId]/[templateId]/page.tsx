@@ -206,6 +206,11 @@ export default function EditorPage() {
     useState<ObjectionCategory>("general");
   const [objectionTone, setObjectionTone] =
     useState<ObjectionTone>("consultative");
+  const suggestedObjectionCategory = useMemo<ObjectionCategory | null>(() => {
+    if (!objection.trim()) return null;
+    const detectedCategory = detectObjectionCategory(objection);
+    return detectedCategory === objectionCategory ? null : detectedCategory;
+  }, [objection, objectionCategory]);
   const playbookId = rawPlaybookId ?? "";
   const templateId = rawTemplateId ?? "";
   const foundTemplate =
@@ -451,9 +456,6 @@ export default function EditorPage() {
 
   function handleObjectionChange(nextObjection: string) {
     setObjection(nextObjection);
-    if (nextObjection.trim()) {
-      setObjectionCategory(detectObjectionCategory(nextObjection));
-    }
   }
 
   function handleBuildObjectionReply() {
@@ -938,6 +940,37 @@ export default function EditorPage() {
                       onChange={(event) => handleObjectionChange(event.target.value)}
                       placeholder="Paste their reply if you want the draft to reference it"
                     />
+                    {suggestedObjectionCategory ? (
+                      <div
+                        className="miniCard"
+                        style={{
+                          marginTop: 10,
+                          padding: 12,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          gap: 12,
+                          flexWrap: "wrap",
+                        }}
+                      >
+                        <span className="muted">
+                          This might be{" "}
+                          {objectionCategoryLabels[
+                            suggestedObjectionCategory
+                          ].toLowerCase()}
+                          .
+                        </span>
+                        <button
+                          type="button"
+                          className="button buttonUtility"
+                          onClick={() =>
+                            setObjectionCategory(suggestedObjectionCategory)
+                          }
+                        >
+                          Use this concern
+                        </button>
+                      </div>
+                    ) : null}
                   </div>
 
                   <div className="formGroup">
