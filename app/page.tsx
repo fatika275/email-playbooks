@@ -6,51 +6,20 @@ import { trackEvent } from "@/lib/analytics";
 
 const workflow = [
   {
-    title: "Lead capture and outreach",
-    text: "Start conversations with use-case messages, then move each lead into the right next step.",
-  },
-  {
-    title: "Pipeline",
-    text: "Track inquiries, scoping calls, proposals, negotiation, client handoff, booked clients, and slipped leads.",
-  },
-  {
-    title: "Team sharing",
-    text: "Use shared notes and owner context when one teammate starts the deal and another continues it.",
-  },
-  {
-    title: "Follow-up reminders",
-    text: "Use saved plans and reminder dates so warm prospects are chased before delay turns into leakage.",
-  },
-  {
-    title: "Practical reporting",
-    text: "See replies, booked calls, proposals, signed work, stage speed, and lead leakage without enterprise reporting clutter.",
-  },
-];
-
-const agencyWorkflowDepth = [
-  {
-    title: "Research the prospect",
-    text: "Capture the company, role, source, likely need, and potential client-work value before sending.",
-  },
-  {
     title: "Start the conversation",
-    text: "Pick an outreach message by use case so the first touch is faster, specific, and tied to a next step.",
+    text: "Use agency-ready outreach and follow-up messages without staring at a blank page.",
   },
   {
-    title: "Triage the reply",
-    text: "Move warm replies into discovery, proposal, or retainer discussion without losing the next action.",
+    title: "Track the deal",
+    text: "Move leads through inquiry, scoping call, proposal, negotiation, and handoff.",
   },
   {
-    title: "Chase the proposal",
-    text: "Use proposal reminders and due dates so good-fit leads do not disappear because nobody followed up in time.",
+    title: "Chase on time",
+    text: "See the next follow-up before a warm lead goes quiet or a proposal slips.",
   },
   {
-    title: "Close the retainer",
-    text: "Track value, objections, booked calls, and retainer conversations until the deal is ready to hand off.",
-  },
-  {
-    title: "Hand off the client",
-    text: "Keep owner, scope, decision-maker, outcome reason, and next steps visible when sales turns into active client work.",
+    title: "See what is working",
+    text: "Track replies, booked calls, proposals, signed work, stage speed, and leakage.",
   },
 ];
 
@@ -69,12 +38,9 @@ export default function HomePage() {
           </h1>
 
           <p className="homeHeroText">
-            Thalovo is built for one job: turn outreach into booked clients.
-            It gives small agencies a focused path for lead capture, pipeline,
-            follow-ups, team visibility, and practical reporting. Start
-            in minutes with one prospect, one message, and one follow-up, then
-            keep scoping calls, proposals, negotiation, handoff, and lead ownership moving in
-            one readable place.
+            A lightweight outreach and pipeline tool for small agencies that
+            need to start conversations, chase warm leads, and stop good deals
+            slipping because the next move was unclear.
           </p>
 
           <div className="heroActions homeHeroActions">
@@ -83,7 +49,7 @@ export default function HomePage() {
               className="button buttonPrimary"
               onClick={() => trackEvent("homepage_explore_library")}
             >
-              Open prospect pipeline
+              Start with your first lead
             </Link>
             <Link
               href="/account"
@@ -100,19 +66,19 @@ export default function HomePage() {
         <div className="homeMetrics">
           <div>
             <strong>Fast setup</strong>
-            <span>Start with one prospect, one message, and one follow-up</span>
+            <span>One prospect, one message, one follow-up</span>
           </div>
           <div>
-            <strong>Lead capture</strong>
-            <span>Use-case messages for outreach, follow-up, proposal, and win-back</span>
+            <strong>Built for agencies</strong>
+            <span>Prospects, proposals, retainers, handoff</span>
           </div>
           <div>
-            <strong>Pipeline</strong>
-            <span>Track inquiries, scoping calls, proposals, negotiation, and next actions</span>
+            <strong>No CRM bloat</strong>
+            <span>Clear stages, notes, reminders, actions</span>
           </div>
           <div>
-            <strong>Follow-up reminders</strong>
-            <span>Chase warm leads before delay costs the deal</span>
+            <strong>Fewer slipped leads</strong>
+            <span>Know who needs chasing today</span>
           </div>
         </div>
       </ScrollReveal>
@@ -120,15 +86,11 @@ export default function HomePage() {
       <ScrollReveal as="section" className="container section" delay={100}>
         <div className="sectionHeader homeSectionHeader">
           <div>
-            <h2 className="pageTitle">A simple path from first email to booked work</h2>
+            <h2 className="pageTitle">Everything points to the next deal step</h2>
             <p className="muted">
-              Outreach messages are only the start. Each use case connects to
-              the sales job: start the conversation, chase the reply, move the
-              proposal, or win back a quiet client.
-              The pipeline tracks inquiries, scoping calls, proposals,
-              negotiation, and handoff. No days of setup, just the pieces small
-              agencies need to turn outreach into booked clients in a
-              lightweight, readable agency path.
+              Templates help you start faster, but Thalovo is really about what
+              happens after outreach: who replied, what stage they are in, what
+              needs chasing, and how close the work is to being booked.
             </p>
           </div>
         </div>
@@ -149,45 +111,16 @@ export default function HomePage() {
       </ScrollReveal>
 
       <ScrollReveal as="section" className="container section" delay={120}>
-        <div className="sectionHeader homeSectionHeader">
-          <div>
-            <h2 className="pageTitle">Built around how small agencies sell services</h2>
-            <p className="muted">
-              Thalovo follows the work your team actually does after outreach:
-              qualify the lead, book the scoping call, chase the proposal,
-              handle negotiation, and hand off the client with context still
-              intact.
-            </p>
-          </div>
-        </div>
-
-        <div className="grid homeWorkflowGrid">
-          {agencyWorkflowDepth.map((item) => (
-            <ScrollReveal
-              key={item.title}
-              className="glassCard homeWorkflowCard"
-              delay={80}
-            >
-              <span className="miniBadge">Agency path</span>
-              <h3 className="cardTitle">{item.title}</h3>
-              <p className="muted">{item.text}</p>
-            </ScrollReveal>
-          ))}
-        </div>
-      </ScrollReveal>
-
-      <ScrollReveal as="section" className="container section" delay={140}>
         <div className="homeProductBand">
           <div>
             <div className="badge">Pipeline</div>
             <h2 className="pageTitle" style={{ marginTop: 14 }}>
-              Focused enough to move fast.
+              Book more work without babysitting every lead.
             </h2>
             <p className="muted" style={{ marginTop: 12, maxWidth: 680 }}>
-              Thalovo stays intentionally narrow: start from a prospect, send
-              the right follow-up, move scoping calls and proposals forward, and
-              keep client handoff visible. Add the first lead and start using
-              it the same day.
+              Add a lead, send the right message, set the follow-up, and keep
+              every scoping call, proposal, negotiation, and handoff visible in
+              one place.
             </p>
           </div>
 
