@@ -66,11 +66,11 @@ function makeId() {
 }
 
 const fieldLabels: Record<string, string> = {
-  name: "Who are you emailing?",
-  company: "What company are they at?",
-  yourName: "What is your name?",
-  service: "What service do you offer?",
-  result: "What result do you help clients get?",
+  name: "Lead name",
+  company: "Company",
+  yourName: "Your name",
+  service: "Service / offer",
+  result: "Outcome you help them get",
   idea: "What quick idea do you want to share?",
   value: "What useful value or insight do you want to mention?",
   difference: "What makes your offer different?",
@@ -101,9 +101,9 @@ const fieldPlaceholders: Record<string, string> = {
 
 const fieldHints: Record<string, string> = {
   name: "Use their real first name if you have it.",
-  company: "Mention the actual company, not a generic industry label.",
-  service: "Keep this tied to an outcome, not just a list of tasks.",
-  result: "Focus on the business result they care about most.",
+  company: "Use the company they work at, not a target audience.",
+  service: "One plain phrase for the service or offer you want to sell.",
+  result: "The business outcome they would actually care about.",
   idea: "Make this specific to them. A useful observation works better than a pitch.",
   value: "This should feel genuinely helpful, not like disguised selling.",
   difference: "Choose one clear differentiator instead of listing everything.",
@@ -113,7 +113,7 @@ const fieldHints: Record<string, string> = {
   points: "Only include the points that matter for moving things forward.",
   nextSteps: "Be clear about what happens next and who does what.",
   offer: "Describe the offer in the simplest possible way.",
-  yourName: "Use the name you want prospects to see in the signoff.",
+  yourName: "Required for the signoff.",
 };
 
 function getLabel(variable: string) {
@@ -145,6 +145,7 @@ function Field({
     <div className="formGroup" style={{ marginBottom: 16 }}>
       <label htmlFor={variable} className="label">
         {getLabel(variable)}
+        {variable === "yourName" ? " (required)" : ""}
       </label>
 
       {shouldUseTextarea(variable) ? (
@@ -194,9 +195,6 @@ export default function EditorPage() {
   const [companyName, setCompanyName] = useState("");
   const [logoData, setLogoData] = useState<string>("");
   const [savedMessage, setSavedMessage] = useState("");
-  const [offerType, setOfferType] = useState("");
-  const [targetAudience, setTargetAudience] = useState("");
-  const [primaryGoal, setPrimaryGoal] = useState("");
   const [showOptionalInputs, setShowOptionalInputs] = useState(false);
   const [showBranding, setShowBranding] = useState(false);
   const [showMoreActions, setShowMoreActions] = useState(false);
@@ -302,13 +300,15 @@ export default function EditorPage() {
   const template = foundTemplate;
 
   const inputValues = { ...prospectValues, ...values };
+  const offerValue =
+    inputValues.service || inputValues.offer || inputValues.product || "";
+  const resultValue = inputValues.result || "";
   const mergedValues = {
     ...inputValues,
-    service: inputValues.service || offerType,
-    offer: inputValues.offer || offerType,
-    company: inputValues.company || targetAudience,
-    result: inputValues.result || primaryGoal,
-    product: inputValues.product || offerType,
+    service: inputValues.service || offerValue,
+    offer: inputValues.offer || offerValue,
+    result: resultValue,
+    product: inputValues.product || offerValue,
   };
 
   const generatedSubject = renderTemplate(template.subject, mergedValues);
@@ -317,8 +317,26 @@ export default function EditorPage() {
   const finalSubject = reuseMode ? editableSubject : generatedSubject;
   const finalBody = reuseMode ? editableBody : generatedBody;
 
-  const coreVariables = template.variables.slice(0, 3);
-  const optionalVariables = template.variables.slice(3);
+  const coreVariableOrder = [
+    "name",
+    "company",
+    "service",
+    "offer",
+    "product",
+    "result",
+    "yourName",
+  ];
+  const coreVariables = [
+    ...coreVariableOrder.filter((variable) =>
+      template.variables.includes(variable)
+    ),
+    ...template.variables
+      .filter((variable) => !coreVariableOrder.includes(variable))
+      .slice(0, 1),
+  ];
+  const optionalVariables = template.variables.filter(
+    (variable) => !coreVariables.includes(variable)
+  );
 
   function handleChange(key: string, value: string) {
     setValues((prev) => ({ ...prev, [key]: value }));
@@ -441,8 +459,8 @@ export default function EditorPage() {
       {
         objection,
         name: values.name,
-        offer: values.offer || values.service || offerType,
-        result: values.result || primaryGoal,
+        offer: values.offer || values.service || values.product,
+        result: values.result,
         senderName: values.yourName,
       },
       objectionCategory,
@@ -545,7 +563,6 @@ export default function EditorPage() {
           className="editorLayout"
           style={{
             alignItems: "start",
-            gridTemplateColumns: "minmax(0, 1fr) minmax(360px, 0.92fr)",
           }}
         >
           <div className="formCard">
@@ -579,67 +596,11 @@ export default function EditorPage() {
                 Export
               </button>
             </div>
+
             <div
-              className="glassCard"
+              className="editorComposerPanel"
               style={{
                 display: editorTab === "write" ? "block" : "none",
-                padding: 18,
-                marginBottom: 18,
-                background: "rgba(255,255,255,0.03)",
-              }}
-            >
-              <h4 style={{ margin: 0 }}>Quick onboarding</h4>
-              <p className="muted" style={{ margin: "8px 0 0" }}>
-                Add the basics first so the draft feels relevant immediately.
-              </p>
-            </div>
-
-            <div
-              style={{
-                display: editorTab === "write" ? "grid" : "none",
-                gap: 14,
-                gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-                marginBottom: 18,
-              }}
-            >
-              <div className="formGroup" style={{ marginBottom: 0 }}>
-                <label className="label">What do you sell?</label>
-                <input
-                  className="input"
-                  value={offerType}
-                  onChange={(e) => setOfferType(e.target.value)}
-                  placeholder="Example: lead generation for agencies"
-                />
-              </div>
-
-              <div className="formGroup" style={{ marginBottom: 0 }}>
-                <label className="label">Who are you targeting?</label>
-                <input
-                  className="input"
-                  value={targetAudience}
-                  onChange={(e) => setTargetAudience(e.target.value)}
-                  placeholder="Example: small agency owners"
-                />
-              </div>
-
-              <div className="formGroup" style={{ marginBottom: 0 }}>
-                <label className="label">What result are you trying to get?</label>
-                <input
-                  className="input"
-                  value={primaryGoal}
-                  onChange={(e) => setPrimaryGoal(e.target.value)}
-                  placeholder="Example: more replies"
-                />
-              </div>
-            </div>
-
-            <div
-              className="glassCard"
-              style={{
-                display: editorTab === "write" ? "block" : "none",
-                padding: 18,
-                marginBottom: 18,
-                background: "rgba(255,255,255,0.026)",
               }}
             >
               <div
@@ -652,14 +613,15 @@ export default function EditorPage() {
                 }}
               >
                 <div>
-                  <h4 style={{ margin: 0 }}>Build your email</h4>
+                  <span className="miniBadge">Core details</span>
+                  <h4 style={{ margin: "8px 0 0" }}>Build the outreach message</h4>
                   <p className="muted" style={{ margin: "6px 0 0" }}>
-                    Start with the essentials — you do not need to fill everything.
+                    Add only the details this message needs. Your name is required because it appears in the signoff.
                   </p>
                 </div>
               </div>
 
-              <div style={{ display: "grid", gap: 14, marginTop: 18 }}>
+              <div className="editorFieldGrid">
                 {coreVariables.map((variable) => (
                   <Field
                     key={variable}
@@ -683,9 +645,9 @@ export default function EditorPage() {
                   }}
                 >
                   <div>
-                    <h4 style={{ margin: 0 }}>Optional details</h4>
+                    <h4 style={{ margin: 0 }}>Extra context</h4>
                     <p className="muted" style={{ margin: "6px 0 0" }}>
-                      Add more context if you want a more tailored result.
+                      Add template-specific details only if this message needs them.
                     </p>
                   </div>
 
@@ -694,7 +656,7 @@ export default function EditorPage() {
                     className="button buttonUtility"
                     onClick={() => setShowOptionalInputs((prev) => !prev)}
                   >
-                    {showOptionalInputs ? "Hide optional details" : "Show optional details"}
+                    {showOptionalInputs ? "Hide extra context" : "Show extra context"}
                   </button>
                 </div>
 
@@ -1125,7 +1087,7 @@ export default function EditorPage() {
             </div>
           </div>
 
-          <div style={{ position: "sticky", top: 98, alignSelf: "start" }}>
+          <div className="editorPreviewRail">
             <div className="previewCard">
               <div className="previewLabel">Live Preview</div>
 
