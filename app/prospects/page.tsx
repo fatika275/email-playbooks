@@ -202,6 +202,16 @@ export default function ProspectsPage() {
     [prospects]
   );
 
+  const pipelineValue = useMemo(() => {
+    const active = prospects.filter((prospect) => ACTIVE_STAGES.includes(prospect.stage));
+    return {
+      active: active.length,
+      value: active.reduce((sum, prospect) => sum + prospect.estimated_value_gbp, 0),
+      won: prospects.filter((prospect) => prospect.stage === "won").length,
+      lost: prospects.filter((prospect) => prospect.stage === "lost").length,
+    };
+  }, [prospects]);
+
   const calculatedInputValue = Number(value) || 0;
 
   const todayItems = useMemo(() => {
@@ -1073,16 +1083,52 @@ export default function ProspectsPage() {
               </section>
 
               <section className="prospectDailyPanel">
-                <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">Pipeline snapshot</h3><p className="muted">Just enough signal to understand today&apos;s pressure without turning this page into a report.</p></div>
+                <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">Deal control snapshot</h3><p className="muted">Enough context to feel in control of client work, without turning this into a heavy report.</p></div>
                 <div className="prospectFocusStats">
-                  <div><span>Follow-ups due</span><strong>{dailyDashboard.followUpsDue}</strong></div>
-                  <div><span>Replies waiting</span><strong>{dailyDashboard.replyNeeded.length}</strong></div>
+                  <div><span>Active leads</span><strong>{pipelineValue.active}</strong></div>
+                  <div><span>Potential work</span><strong>{formatMoney(pipelineValue.value)}</strong></div>
                   <div><span>Close actions</span><strong>{dailyDashboard.proposalsToChase.length}</strong></div>
                   <div><span>Leakage risks</span><strong>{dailyDashboard.coldProspects.length}</strong></div>
                 </div>
-                <p className="small" style={{ margin: "10px 0 0" }}>
-                  Use the pipeline view for stage detail, source quality, and deeper lead context.
-                </p>
+                <div className="prospectDealSignals">
+                  <div>
+                    <span>Won</span>
+                    <strong>{pipelineValue.won}</strong>
+                  </div>
+                  <div>
+                    <span>Lost / slipped</span>
+                    <strong>{pipelineValue.lost}</strong>
+                  </div>
+                  <div>
+                    <span>Replies waiting</span>
+                    <strong>{dailyDashboard.replyNeeded.length}</strong>
+                  </div>
+                  <div>
+                    <span>Follow-ups due</span>
+                    <strong>{dailyDashboard.followUpsDue}</strong>
+                  </div>
+                </div>
+
+                <div className="prospectDashboardSectionHeading prospectDashboardSubsection"><h3 className="cardTitle">Watchlist</h3><p className="muted">The deals most likely to need attention after the main action queue.</p></div>
+                <div className="prospectMiniList">
+                  {dailyDashboard.proposalsToChase.slice(0, 2).map((item) => {
+                    const prospect = "prospect" in item ? item.prospect : undefined;
+                    const task = "task" in item ? item.task : undefined;
+                    return (
+                      <Link key={item.id ?? `${prospect?.id}-${task?.id}`} href={prospect ? `/prospects/${prospect.id}` : "/prospects"} className="prospectMiniListItem">
+                        <strong>{prospect?.full_name ?? (task ? getProspectTaskDisplayTitle(task.title) : "Proposal")}</strong>
+                        <span>{prospect ? `${prospect.company} - close step` : "Open proposal task"}</span>
+                      </Link>
+                    );
+                  })}
+                  {dailyDashboard.coldProspects.slice(0, 2).map((prospect) => (
+                    <Link key={prospect.id} href={`/prospects/${prospect.id}`} className="prospectMiniListItem">
+                      <strong>{prospect.full_name}</strong>
+                      <span>{prospect.company} - quiet for {daysSince(prospect.last_contacted_at ?? prospect.updated_at)} days</span>
+                    </Link>
+                  ))}
+                  {dailyDashboard.proposalsToChase.length === 0 && dailyDashboard.coldProspects.length === 0 ? <p className="small">No proposal or cold-lead risks need attention right now.</p> : null}
+                </div>
                 <button
                   type="button"
                   className="button buttonSecondary"

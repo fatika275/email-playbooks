@@ -3230,6 +3230,28 @@ details[open] > summary::after {
   font-size: 18px;
 }
 
+.prospectDealSignals {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-soft);
+}
+
+.prospectDealSignals > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.prospectDealSignals strong {
+  color: var(--text);
+  font-size: 13px;
+}
+
 .prospectDailyLayout {
   display: grid;
   grid-template-columns: minmax(0, 1.1fr) minmax(300px, 0.9fr);
