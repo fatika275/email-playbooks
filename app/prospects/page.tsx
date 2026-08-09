@@ -976,7 +976,7 @@ export default function ProspectsPage() {
                       <strong>{getProspectTaskDisplayTitle(task.title)}</strong>
                       <span>{prospect ? `${prospect.full_name} - ${prospect.company}` : "Lead"}{task.due_date ? ` - Due ${task.due_date}` : ""}</span>
                     </div>
-                    <div className="toolbar">
+                    <div className="prospectTodayActions">
                       {prospect ? <Link href={`/prospects/${prospect.id}`} className="button buttonSecondary">Open</Link> : null}
                       <button className="button buttonPrimary" onClick={() => void handleTaskComplete(task)}>Complete</button>
                     </div>
@@ -992,7 +992,9 @@ export default function ProspectsPage() {
                 {todayItems.followUps.map(({ id, prospect }) => (
                   <div key={id} className="prospectTodayItem">
                     <div><strong>{prospect.full_name}</strong><span>{prospect.company} - {PROSPECT_STAGE_LABELS[prospect.stage]} - Due {prospect.next_follow_up}</span></div>
-                    <Link href={`/prospects/${prospect.id}`} className="button buttonPrimary">Follow up</Link>
+                    <div className="prospectTodayActions">
+                      <Link href={`/prospects/${prospect.id}`} className="button buttonPrimary">Follow up</Link>
+                    </div>
                   </div>
                 ))}
                 {todayItems.followUps.length === 0 ? <p className="muted">No lead follow-ups are due. Nothing is waiting on a chase today.</p> : null}
