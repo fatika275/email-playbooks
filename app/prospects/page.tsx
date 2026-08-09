@@ -1027,6 +1027,29 @@ export default function ProspectsPage() {
               </div>
             </section>
 
+            <section className="prospectDashboardSection prospectNextOverview">
+              <div className="prospectDashboardSectionHeading">
+                <h3 className="sectionTitle">Pipeline overview</h3>
+                <p className="muted">A quick count of where prospects sit before you choose what to handle next.</p>
+              </div>
+              <div className="prospectWorkflowSummary">
+                {PROSPECT_WORKFLOW_VIEWS.filter((item) => item !== "all").map((item) => (
+                  <button
+                    key={item}
+                    type="button"
+                    className="prospectWorkflowSummaryItem"
+                    onClick={() => {
+                      setWorkflowView(item);
+                      setView("pipeline");
+                    }}
+                  >
+                    <span>{PROSPECT_WORKFLOW_LABELS[item]}</span>
+                    <strong>{workflowCounts[item]}</strong>
+                  </button>
+                ))}
+              </div>
+            </section>
+
             <div className="prospectDailyLayout">
               <section className="prospectDailyPanel">
                 <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">Action queue</h3><p className="muted">Handle these in order. Each item opens the lead with the context you need for the next move.</p></div>

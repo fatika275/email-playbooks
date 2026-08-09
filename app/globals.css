@@ -3249,6 +3249,14 @@ details[open] > summary::after {
   padding-left: 34px;
 }
 
+.prospectNextOverview {
+  border-bottom: 1px solid var(--border);
+}
+
+.prospectNextOverview .prospectWorkflowSummary {
+  margin: 18px 0 0;
+}
+
 .prospectDailyActionList {
   display: grid;
   gap: 10px;
