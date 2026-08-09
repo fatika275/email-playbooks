@@ -207,8 +207,12 @@ export default function EditorPage() {
   const [objectionTone, setObjectionTone] =
     useState<ObjectionTone>("consultative");
   const suggestedObjectionCategory = useMemo<ObjectionCategory | null>(() => {
-    if (!objection.trim()) return null;
-    const detectedCategory = detectObjectionCategory(objection);
+    const objectionText = objection.trim();
+    const wordCount = objectionText.split(/\s+/).filter(Boolean).length;
+
+    if (objectionText.length < 24 || wordCount < 4) return null;
+
+    const detectedCategory = detectObjectionCategory(objectionText);
     return detectedCategory === objectionCategory ? null : detectedCategory;
   }, [objection, objectionCategory]);
   const playbookId = rawPlaybookId ?? "";
