@@ -451,7 +451,9 @@ export default function EditorPage() {
 
   function handleObjectionChange(nextObjection: string) {
     setObjection(nextObjection);
-    setObjectionCategory(detectObjectionCategory(nextObjection));
+    if (nextObjection.trim()) {
+      setObjectionCategory(detectObjectionCategory(nextObjection));
+    }
   }
 
   function handleBuildObjectionReply() {
@@ -586,7 +588,7 @@ export default function EditorPage() {
                 }
                 onClick={() => setEditorTab("objection")}
               >
-                Objections
+                Reply helper
               </button>
               <button
                 type="button"
@@ -893,31 +895,17 @@ export default function EditorPage() {
                 }}
               >
                 <div>
-                  <h4 style={{ margin: 0 }}>Objection-handling assistant</h4>
+                  <h4 style={{ margin: 0 }}>Reply helper</h4>
                   <p className="muted" style={{ margin: "6px 0 0" }}>
-                    Turn a prospect&apos;s concern into a calm, useful reply.
+                    Pick the concern first. Add their exact words only if you want a more specific reply.
                   </p>
                 </div>
                 <span className="miniBadge">
-                  {objectionCategoryLabels[objectionCategory]}
+                  Reusable across templates
                 </span>
               </div>
 
               <div style={{ marginTop: 18 }}>
-                  <div className="formGroup">
-                    <label className="label" htmlFor="prospect-objection">
-                      What did the prospect say?
-                    </label>
-                    <textarea
-                      id="prospect-objection"
-                      className="input"
-                      rows={4}
-                      value={objection}
-                      onChange={(event) => handleObjectionChange(event.target.value)}
-                      placeholder="Paste their objection here"
-                    />
-                  </div>
-
                   <div className="formGroup">
                     <label className="label" htmlFor="objection-category">
                       Main concern
@@ -936,6 +924,20 @@ export default function EditorPage() {
                         </option>
                       ))}
                     </select>
+                  </div>
+
+                  <div className="formGroup">
+                    <label className="label" htmlFor="prospect-objection">
+                      Exact words from the prospect <span className="muted">(optional)</span>
+                    </label>
+                    <textarea
+                      id="prospect-objection"
+                      className="input"
+                      rows={4}
+                      value={objection}
+                      onChange={(event) => handleObjectionChange(event.target.value)}
+                      placeholder="Paste their reply if you want the draft to reference it"
+                    />
                   </div>
 
                   <div className="formGroup">
@@ -961,7 +963,6 @@ export default function EditorPage() {
                   <button
                     type="button"
                     className="button buttonPrimary"
-                    disabled={!objection.trim()}
                     onClick={handleBuildObjectionReply}
                   >
                     Draft reply
