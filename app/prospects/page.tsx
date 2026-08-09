@@ -95,6 +95,31 @@ function getFollowUpStep(task: ProspectTask) {
   return Math.min(3, Math.max(1, Number(stepMatch?.[1]) || 1));
 }
 
+function matchesLeadSearch(prospect: Prospect, query: string) {
+  const normalized = query.trim().toLowerCase();
+  if (!normalized) return true;
+  const visibleTableValues = [
+    prospect.full_name,
+    prospect.company,
+    prospect.role,
+    PROSPECT_STAGE_LABELS[prospect.stage],
+    prospect.service_type,
+    prospect.budget_range,
+    prospect.timeline,
+    formatMoney(prospect.estimated_value_gbp),
+    prospect.next_follow_up,
+    prospect.source,
+  ];
+  return visibleTableValues.some((value) => {
+    const text = String(value || "").toLowerCase();
+    if (!text) return false;
+    return text
+      .split(/[^a-z0-9]+/)
+      .filter(Boolean)
+      .some((word) => word.startsWith(normalized));
+  });
+}
+
 export default function ProspectsPage() {
   const router = useRouter();
   const { user, hasProAccess, isLoading, businessMembership } = useAccount();
@@ -165,27 +190,7 @@ export default function ProspectsPage() {
   }, [prospects, workflowView]);
 
   const allLeads = useMemo(() => {
-    const normalized = query.trim().toLowerCase();
-    return prospects.filter((prospect) => {
-      if (!normalized) return true;
-      return [
-        prospect.full_name,
-        prospect.company,
-        prospect.email,
-        prospect.role,
-        prospect.source,
-        prospect.budget_range,
-        prospect.deliverables,
-        prospect.timeline,
-        prospect.decision_maker,
-        prospect.service_type,
-        PROSPECT_STAGE_LABELS[prospect.stage],
-      ]
-        .filter(Boolean)
-        .join(" ")
-        .toLowerCase()
-        .includes(normalized);
-    });
+    return prospects.filter((prospect) => matchesLeadSearch(prospect, query));
   }, [prospects, query]);
 
   const visiblePipelineStages = useMemo(
@@ -883,6 +888,7 @@ export default function ProspectsPage() {
             <div className="formGroup prospectSearchWrap">
               <label className="label" htmlFor="prospect-search">Search all leads</label>
               <input id="prospect-search" className="input prospectSearch" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Type any letter, name, company, stage..." />
+              <p className="small" aria-live="polite">{allLeads.length} of {prospects.length} lead{prospects.length === 1 ? "" : "s"} shown</p>
             </div>
           ) : null}
         </div>
