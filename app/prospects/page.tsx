@@ -158,31 +158,11 @@ export default function ProspectsPage() {
   }, [refresh]);
 
   const filtered = useMemo(() => {
-    const normalized = query.trim().toLowerCase();
     const workflowStages = PROSPECT_WORKFLOW_STAGES[workflowView];
     return prospects.filter((prospect) => {
-      const matchesWorkflow = workflowStages.includes(prospect.stage);
-      const matchesQuery =
-        !normalized ||
-        [
-          prospect.full_name,
-          prospect.company,
-          prospect.email,
-          prospect.role,
-          prospect.source,
-          prospect.budget_range,
-          prospect.deliverables,
-          prospect.timeline,
-          prospect.decision_maker,
-          prospect.service_type,
-        ]
-          .filter(Boolean)
-          .join(" ")
-          .toLowerCase()
-          .includes(normalized);
-      return matchesWorkflow && matchesQuery;
+      return workflowStages.includes(prospect.stage);
     });
-  }, [prospects, query, workflowView]);
+  }, [prospects, workflowView]);
 
   const allLeads = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -894,12 +874,17 @@ export default function ProspectsPage() {
 
         <div className="prospectToolbar">
           <div className="authModeTabs prospectViewTabs" role="tablist" aria-label="Prospect view">
-            <button className={view === "reports" ? "authModeTab active" : "authModeTab"} onClick={() => setView("reports")}>Next actions</button>
-            <button className={view === "pipeline" ? "authModeTab active" : "authModeTab"} onClick={() => setView("pipeline")}>Pipeline board</button>
-            <button className={view === "today" ? "authModeTab active" : "authModeTab"} onClick={() => setView("today")}>Today&apos;s chase list</button>
-            <button className={view === "list" ? "authModeTab active" : "authModeTab"} onClick={() => setView("list")}>All leads table</button>
+            <button className={view === "reports" ? "authModeTab active" : "authModeTab"} onClick={() => setView("reports")}><span>Next actions</span><small>What to handle now</small></button>
+            <button className={view === "pipeline" ? "authModeTab active" : "authModeTab"} onClick={() => setView("pipeline")}><span>Pipeline board</span><small>Move leads by stage</small></button>
+            <button className={view === "today" ? "authModeTab active" : "authModeTab"} onClick={() => setView("today")}><span>Chase list</span><small>Due today</small></button>
+            <button className={view === "list" ? "authModeTab active" : "authModeTab"} onClick={() => setView("list")}><span>All leads table</span><small>Search every lead</small></button>
           </div>
-          <input className="input prospectSearch" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search lead, company, email..." />
+          {view === "list" ? (
+            <div className="formGroup prospectSearchWrap">
+              <label className="label" htmlFor="prospect-search">Search all leads</label>
+              <input id="prospect-search" className="input prospectSearch" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Type any letter, name, company, stage..." />
+            </div>
+          ) : null}
         </div>
 
         {view === "pipeline" ? (
