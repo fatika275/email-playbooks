@@ -23,14 +23,6 @@ import {
   setProspectTaskCompleted,
   updateProspect,
 } from "@/lib/prospects";
-import {
-  buildObjectionReply,
-  detectObjectionCategory,
-  objectionCategoryLabels,
-  objectionToneLabels,
-  type ObjectionCategory,
-  type ObjectionTone,
-} from "@/lib/objectionAssistant";
 import { useAccount } from "@/components/account-provider";
 import { getPlaybookAccess } from "@/lib/access";
 
@@ -198,23 +190,7 @@ export default function EditorPage() {
   const [showOptionalInputs, setShowOptionalInputs] = useState(false);
   const [showBranding, setShowBranding] = useState(false);
   const [showMoreActions, setShowMoreActions] = useState(false);
-  const [editorTab, setEditorTab] = useState<"write" | "objection" | "export">(
-    "write"
-  );
-  const [objection, setObjection] = useState("");
-  const [objectionCategory, setObjectionCategory] =
-    useState<ObjectionCategory>("general");
-  const [objectionTone, setObjectionTone] =
-    useState<ObjectionTone>("consultative");
-  const suggestedObjectionCategory = useMemo<ObjectionCategory | null>(() => {
-    const objectionText = objection.trim();
-    const wordCount = objectionText.split(/\s+/).filter(Boolean).length;
-
-    if (objectionText.length < 24 || wordCount < 4) return null;
-
-    const detectedCategory = detectObjectionCategory(objectionText);
-    return detectedCategory === objectionCategory ? null : detectedCategory;
-  }, [objection, objectionCategory]);
+  const [editorTab, setEditorTab] = useState<"write" | "export">("write");
   const playbookId = rawPlaybookId ?? "";
   const templateId = rawTemplateId ?? "";
   const foundTemplate =
@@ -458,32 +434,6 @@ export default function EditorPage() {
     void handleLogProspectEmailSent(source);
   }
 
-  function handleObjectionChange(nextObjection: string) {
-    setObjection(nextObjection);
-  }
-
-  function handleBuildObjectionReply() {
-    const reply = buildObjectionReply(
-      {
-        objection,
-        name: values.name,
-        offer: values.offer || values.service || values.product,
-        result: values.result,
-        senderName: values.yourName,
-      },
-      objectionCategory,
-      objectionTone
-    );
-
-    setReuseMode(true);
-    setEditableSubject(reply.subject);
-    setEditableBody(reply.body);
-    setEditorTab("write");
-    setSavedMessage(
-      `Drafted a ${objectionCategoryLabels[reply.category].toLowerCase()} reply. Review it before sending.`
-    );
-  }
-
   if (playbook && access?.isLocked) {
     return (
       <main className="main">
@@ -586,15 +536,6 @@ export default function EditorPage() {
                 onClick={() => setEditorTab("write")}
               >
                 Write
-              </button>
-              <button
-                type="button"
-                className={
-                  editorTab === "objection" ? "authModeTab active" : "authModeTab"
-                }
-                onClick={() => setEditorTab("objection")}
-              >
-                Reply helper
               </button>
               <button
                 type="button"
@@ -881,131 +822,6 @@ export default function EditorPage() {
                 </button>
               </div>
             )}
-
-            <div
-              style={{
-                display: editorTab === "objection" ? "block" : "none",
-                padding: 18,
-                marginBottom: 18,
-                border: "1px solid var(--border)",
-                borderRadius: 8,
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  gap: 12,
-                  flexWrap: "wrap",
-                }}
-              >
-                <div>
-                  <h4 style={{ margin: 0 }}>Reply helper</h4>
-                  <p className="muted" style={{ margin: "6px 0 0" }}>
-                    Pick the concern first. Add their exact words only if you want a more specific reply.
-                  </p>
-                </div>
-                <span className="miniBadge">
-                  Reusable across templates
-                </span>
-              </div>
-
-              <div style={{ marginTop: 18 }}>
-                  <div className="formGroup">
-                    <label className="label" htmlFor="objection-category">
-                      Main concern
-                    </label>
-                    <select
-                      id="objection-category"
-                      className="input"
-                      value={objectionCategory}
-                      onChange={(event) =>
-                        setObjectionCategory(event.target.value as ObjectionCategory)
-                      }
-                    >
-                      {Object.entries(objectionCategoryLabels).map(([value, label]) => (
-                        <option key={value} value={value}>
-                          {label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="formGroup">
-                    <label className="label" htmlFor="prospect-objection">
-                      Exact words from the prospect <span className="muted">(optional)</span>
-                    </label>
-                    <textarea
-                      id="prospect-objection"
-                      className="input"
-                      rows={4}
-                      value={objection}
-                      onChange={(event) => handleObjectionChange(event.target.value)}
-                      placeholder="Paste their reply if you want the draft to reference it"
-                    />
-                    {suggestedObjectionCategory ? (
-                      <div
-                        className="miniCard"
-                        style={{
-                          marginTop: 10,
-                          padding: 12,
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          gap: 12,
-                          flexWrap: "wrap",
-                        }}
-                      >
-                        <span className="muted">
-                          This might be{" "}
-                          {objectionCategoryLabels[
-                            suggestedObjectionCategory
-                          ].toLowerCase()}
-                          .
-                        </span>
-                        <button
-                          type="button"
-                          className="button buttonUtility"
-                          onClick={() =>
-                            setObjectionCategory(suggestedObjectionCategory)
-                          }
-                        >
-                          Use this concern
-                        </button>
-                      </div>
-                    ) : null}
-                  </div>
-
-                  <div className="formGroup">
-                    <label className="label" htmlFor="objection-tone">
-                      Reply style
-                    </label>
-                    <select
-                      id="objection-tone"
-                      className="input"
-                      value={objectionTone}
-                      onChange={(event) =>
-                        setObjectionTone(event.target.value as ObjectionTone)
-                      }
-                    >
-                      {Object.entries(objectionToneLabels).map(([value, label]) => (
-                        <option key={value} value={value}>
-                          {label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <button
-                    type="button"
-                    className="button buttonPrimary"
-                    onClick={handleBuildObjectionReply}
-                  >
-                    Draft reply
-                  </button>
-              </div>
-            </div>
 
             <div
               className="glassCard"

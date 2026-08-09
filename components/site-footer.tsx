@@ -25,6 +25,9 @@ export default function SiteFooter() {
             <Link href="/library" className="footerLink">
               Templates
             </Link>
+            <Link href="/reply-helper" className="footerLink">
+              Replies
+            </Link>
             <Link href="/sequence-builder" className="footerLink">
               Follow-ups
             </Link>
