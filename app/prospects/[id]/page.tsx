@@ -125,6 +125,71 @@ function contextValue(value: string | null | undefined, fallback: string) {
   return value?.trim() || fallback;
 }
 
+const PROSPECT_FILES_KEY = "thalovo_prospect_files_v1";
+
+type ProspectFileKind =
+  | "sent-message"
+  | "proposal"
+  | "brief"
+  | "folder"
+  | "contract"
+  | "asset";
+
+type ProspectFileRecord = {
+  id: string;
+  prospectId: string;
+  title: string;
+  kind: ProspectFileKind;
+  url: string;
+  folder: string;
+  note: string;
+  createdAt: string;
+};
+
+const fileKindLabels: Record<ProspectFileKind, string> = {
+  "sent-message": "Sent message",
+  proposal: "Proposal",
+  brief: "Brief",
+  folder: "Client folder",
+  contract: "Contract",
+  asset: "Asset / file",
+};
+
+function makeLocalFileId() {
+  return typeof crypto !== "undefined" && "randomUUID" in crypto
+    ? crypto.randomUUID()
+    : `client-file-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+function readStoredProspectFiles() {
+  if (typeof window === "undefined") return [];
+  try {
+    const parsed = JSON.parse(
+      window.localStorage.getItem(PROSPECT_FILES_KEY) || "[]"
+    );
+    return Array.isArray(parsed) ? (parsed as ProspectFileRecord[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+function getStoredProspectFiles(prospectId: string) {
+  return readStoredProspectFiles()
+    .filter((file) => file.prospectId === prospectId)
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}
+
+function writeStoredProspectFiles(prospectId: string, files: ProspectFileRecord[]) {
+  if (typeof window === "undefined") return;
+  const otherFiles = readStoredProspectFiles().filter(
+    (file) => file.prospectId !== prospectId
+  );
+  window.localStorage.setItem(
+    PROSPECT_FILES_KEY,
+    JSON.stringify([...otherFiles, ...files])
+  );
+}
+
 export default function ProspectDetailPage() {
   const params = useParams();
   const router = useRouter();
@@ -170,11 +235,17 @@ export default function ProspectDetailPage() {
   const [sequenceSearch, setSequenceSearch] = useState("");
   const [isSequencePickerOpen, setIsSequencePickerOpen] = useState(false);
   const [isStartingProposalWorkflow, setIsStartingProposalWorkflow] = useState(false);
-  const [detailView, setDetailView] = useState<"overview" | "followup" | "activity">("overview");
+  const [detailView, setDetailView] = useState<"overview" | "followup" | "files" | "activity">("overview");
   const [activityFilter, setActivityFilter] = useState<"useful" | "outreach" | "notes" | "all">("useful");
   const [showAllActivity, setShowAllActivity] = useState(false);
   const [pendingProposalOutcome, setPendingProposalOutcome] = useState<"won" | "lost" | null>(null);
   const [proposalOutcomeReason, setProposalOutcomeReason] = useState("");
+  const [prospectFiles, setProspectFiles] = useState<ProspectFileRecord[]>([]);
+  const [fileTitle, setFileTitle] = useState("");
+  const [fileKind, setFileKind] = useState<ProspectFileKind>("proposal");
+  const [fileUrl, setFileUrl] = useState("");
+  const [fileFolder, setFileFolder] = useState("");
+  const [fileNote, setFileNote] = useState("");
 
   const scheduledSequences = useMemo<ScheduledSequence[]>(() => {
     const builtIn = builtInScheduledSequences.map((playbook) => ({
@@ -241,6 +312,9 @@ export default function ProspectDetailPage() {
     return ["email", "call", "meeting", "status"].includes(activity.activity_type);
   }), [activities, activityFilter]);
   const visibleActivities = showAllActivity ? filteredActivities : filteredActivities.slice(0, 8);
+  const sentMessageActivities = activities.filter(
+    (activity) => activity.activity_type === "email"
+  );
   const latestSharedNote = comments[0];
   const latestSharedNotePreview = latestSharedNote
     ? latestSharedNote.body.length > 220
@@ -270,6 +344,11 @@ export default function ProspectDetailPage() {
       setIsSequencePickerOpen(true);
     }
   }, [activeProposalTasks.length, nextProposalTask, searchParams]);
+
+  useEffect(() => {
+    if (!id) return;
+    setProspectFiles(getStoredProspectFiles(id));
+  }, [id]);
 
   useEffect(() => {
     if (!id || !user || !hasProAccess) return;
@@ -413,6 +492,42 @@ export default function ProspectDetailPage() {
     } catch (error) {
       setNotice(error instanceof Error ? error.message : "Activity could not be logged.");
     }
+  }
+
+  function handleAddProspectFile() {
+    if (!id || !fileTitle.trim()) {
+      setNotice("Add a file, folder, or message name first.");
+      return;
+    }
+
+    const nextFiles = [
+      {
+        id: makeLocalFileId(),
+        prospectId: id,
+        title: fileTitle.trim(),
+        kind: fileKind,
+        url: fileUrl.trim(),
+        folder: fileFolder.trim() || "Client files",
+        note: fileNote.trim(),
+        createdAt: new Date().toISOString(),
+      },
+      ...prospectFiles,
+    ];
+
+    setProspectFiles(nextFiles);
+    writeStoredProspectFiles(id, nextFiles);
+    setFileTitle("");
+    setFileUrl("");
+    setFileNote("");
+    setNotice("Client file context saved.");
+  }
+
+  function handleRemoveProspectFile(fileId: string) {
+    if (!id) return;
+    const nextFiles = prospectFiles.filter((file) => file.id !== fileId);
+    setProspectFiles(nextFiles);
+    writeStoredProspectFiles(id, nextFiles);
+    setNotice("Client file removed.");
   }
 
   async function handleAddTask() {
@@ -715,6 +830,7 @@ export default function ProspectDetailPage() {
         <div className="prospectDetailTabs" role="tablist" aria-label="Lead details">
           <button type="button" role="tab" aria-selected={detailView === "overview"} className={detailView === "overview" ? "active" : ""} onClick={() => setDetailView("overview")}>Overview</button>
           <button type="button" role="tab" aria-selected={detailView === "followup"} className={detailView === "followup" ? "active" : ""} onClick={() => setDetailView("followup")}>Next steps{activeProposalTasks.length + openManualTasks.length ? ` (${activeProposalTasks.length + openManualTasks.length})` : ""}</button>
+          <button type="button" role="tab" aria-selected={detailView === "files"} className={detailView === "files" ? "active" : ""} onClick={() => setDetailView("files")}>Files{prospectFiles.length + sentMessageActivities.length ? ` (${prospectFiles.length + sentMessageActivities.length})` : ""}</button>
           <button type="button" role="tab" aria-selected={detailView === "activity"} className={detailView === "activity" ? "active" : ""} onClick={() => setDetailView("activity")}>Activity</button>
         </div>
 
@@ -862,7 +978,135 @@ export default function ProspectDetailPage() {
               </>}
             </section>
 
-            <div className={detailView === "overview" ? "prospectOpsGrid isHidden" : "prospectOpsGrid prospectOpsGridSingle"}>
+            <section className="prospectOpsPanel prospectFilesPanel" hidden={detailView !== "files"}>
+              <div className="prospectActivityHeading">
+                <div>
+                  <h2 className="cardTitle">Client files and sent context</h2>
+                  <p className="small">Keep proposal links, client folders, briefs, and key sent messages attached to this lead so the next person knows what has already gone out.</p>
+                </div>
+                <span className="miniBadge">{prospectFiles.length} saved</span>
+              </div>
+
+              <div className="prospectFileForm">
+                <div className="formGroup">
+                  <label className="label">File, folder, or message name</label>
+                  <input
+                    className="input"
+                    value={fileTitle}
+                    onChange={(event) => setFileTitle(event.target.value)}
+                    placeholder="Proposal v2, Drive folder, signed brief..."
+                  />
+                </div>
+                <div className="formGroup">
+                  <label className="label">Type</label>
+                  <select
+                    className="input"
+                    value={fileKind}
+                    onChange={(event) => setFileKind(event.target.value as ProspectFileKind)}
+                  >
+                    {Object.entries(fileKindLabels).map(([value, label]) => (
+                      <option key={value} value={value}>{label}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="formGroup">
+                  <label className="label">Folder</label>
+                  <input
+                    className="input"
+                    value={fileFolder}
+                    onChange={(event) => setFileFolder(event.target.value)}
+                    placeholder="Proposal docs, Outreach sent, Client handoff..."
+                  />
+                </div>
+                <div className="formGroup">
+                  <label className="label">Link</label>
+                  <input
+                    className="input"
+                    type="url"
+                    value={fileUrl}
+                    onChange={(event) => setFileUrl(event.target.value)}
+                    placeholder="Google Drive, Dropbox, Notion, proposal URL..."
+                  />
+                </div>
+                <div className="formGroup prospectFileNote">
+                  <label className="label">Context</label>
+                  <textarea
+                    className="input"
+                    rows={3}
+                    value={fileNote}
+                    onChange={(event) => setFileNote(event.target.value)}
+                    placeholder="What is this, when was it sent, and what should the team know?"
+                  />
+                </div>
+                <button
+                  type="button"
+                  className="button buttonPrimary"
+                  disabled={!fileTitle.trim()}
+                  onClick={handleAddProspectFile}
+                >
+                  Add to client files
+                </button>
+              </div>
+
+              <div className="prospectFileList">
+                {prospectFiles.map((file) => (
+                  <div key={file.id} className="prospectFileCard">
+                    <div>
+                      <span className="miniBadge">{fileKindLabels[file.kind]}</span>
+                      <h3>{file.title}</h3>
+                      <p className="small">{file.folder} - added {new Date(file.createdAt).toLocaleDateString()}</p>
+                      {file.note ? <p className="muted">{file.note}</p> : null}
+                    </div>
+                    <div className="prospectFileActions">
+                      {file.url ? (
+                        <a className="button buttonSecondary" href={file.url} target="_blank" rel="noreferrer">
+                          Open
+                        </a>
+                      ) : null}
+                      <button
+                        type="button"
+                        className="button buttonUtility"
+                        onClick={() => handleRemoveProspectFile(file.id)}
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                ))}
+                {prospectFiles.length === 0 ? (
+                  <div className="builderEmptyPanel">
+                    <strong>No client files saved yet</strong>
+                    <p className="muted">Add the proposal, folder, brief, or sent-message link the team needs before continuing this deal.</p>
+                  </div>
+                ) : null}
+              </div>
+
+              <div className="prospectSectionHeader prospectFilesSentHeader">
+                <h2 className="cardTitle">Sent messages logged on this lead</h2>
+              </div>
+              <div className="prospectTimeline">
+                {sentMessageActivities.map((activity) => (
+                  <div key={activity.id} className="prospectTimelineItem">
+                    <span className="miniBadge">Sent</span>
+                    <div>
+                      <strong>{activity.summary}</strong>
+                      <p className="small">{activity.actor_email || "Teammate"} - {new Date(activity.created_at).toLocaleString()}</p>
+                    </div>
+                  </div>
+                ))}
+                {sentMessageActivities.length === 0 ? (
+                  <p className="small">No sent messages have been logged for this lead yet.</p>
+                ) : null}
+              </div>
+            </section>
+
+            <div
+              className={
+                detailView === "overview" || detailView === "files"
+                  ? "prospectOpsGrid isHidden"
+                  : "prospectOpsGrid prospectOpsGridSingle"
+              }
+            >
               <section className="prospectOpsPanel" hidden={detailView !== "followup"}>
                 <div className="prospectSectionHeader"><h2 className="cardTitle">Manual reminders</h2></div>
                 <p className="small">Add one-off chases that keep this deal moving. Completed reminders move out of the way so the list stays focused on the next move.</p>
