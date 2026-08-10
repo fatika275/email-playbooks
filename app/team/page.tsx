@@ -507,21 +507,28 @@ export default function TeamLibraryPage() {
 
         {teamView === "library" ? <>
         <div className="teamLibraryActions">
-          <div><h2 className="sectionTitle">Shared agency use-case templates</h2><p className="muted">Keep outreach, follow-up, proposal, and win-back assets available to everyone handling leads.</p></div>
-          <div className="toolbar">
-          <button
-            className="button buttonSecondary"
-            disabled={isLoadingShares}
-            onClick={() => void refreshShares()}
-          >
-            {isLoadingShares ? "Refreshing..." : "Refresh shares"}
-          </button>
-          <Link href="/history" className="button buttonSecondary">
-            Choose a saved message
-          </Link>
-          <Link href="/custom-templates" className="button buttonSecondary">
-            Choose a follow-up plan
-          </Link>
+          <div className="teamLibraryHeadingRow">
+            <div>
+              <h2 className="sectionTitle">Shared agency use-case templates</h2>
+              <p className="muted">Keep proven messages and follow-up plans available to everyone handling leads.</p>
+            </div>
+            <button
+              className="button buttonUtility"
+              disabled={isLoadingShares}
+              onClick={() => void refreshShares()}
+            >
+              {isLoadingShares ? "Refreshing..." : "Refresh"}
+            </button>
+          </div>
+          <div className="teamLibraryShareActions" aria-label="Share saved work with the team">
+            <Link href="/history" className="teamLibraryShareAction">
+              <span>Share a saved message</span>
+              <small>Outreach, proposal chase, win-back, or reply templates</small>
+            </Link>
+            <Link href="/custom-templates" className="teamLibraryShareAction">
+              <span>Share a follow-up plan</span>
+              <small>Give the team a reusable chase sequence for live leads</small>
+            </Link>
           </div>
         </div>
 

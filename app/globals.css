@@ -1769,14 +1769,54 @@ details[open] > summary::after {
 }
 
 .teamLibraryActions {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 24px;
   margin: 8px 0 26px;
   padding: 28px 0;
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
+}
+
+.teamLibraryHeadingRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.teamLibraryShareActions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.teamLibraryShareAction {
+  min-width: 0;
+  padding: 14px 16px;
+  display: grid;
+  gap: 4px;
+  color: var(--text);
+  text-decoration: none;
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  background: #0d0d0d;
+  transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+}
+
+.teamLibraryShareAction:hover {
+  border-color: var(--border);
+  background: #121212;
+  transform: translateY(-1px);
+}
+
+.teamLibraryShareAction span {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.teamLibraryShareAction small {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
 }
 
 .sharedLibraryControls {
@@ -4423,6 +4463,7 @@ details[open] > summary::after {
   .teamMemberRow,
   .teamWorkspaceSettings > summary,
   .teamPeopleHeading,
+  .teamLibraryHeadingRow,
   .teamActivityControls {
     align-items: flex-start;
     flex-direction: column;
@@ -4451,8 +4492,13 @@ details[open] > summary::after {
   .teamMemberRow .toolbar,
   .teamMemberRow .teamRoleSelect,
   .teamMemberManage,
+  .teamLibraryHeadingRow .button,
   .teamActivityControls select {
     width: 100%;
+  }
+
+  .teamLibraryShareActions {
+    grid-template-columns: 1fr;
   }
 
   .teamMemberManage > summary {
