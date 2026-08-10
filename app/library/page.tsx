@@ -144,27 +144,32 @@ export default function LibraryPage() {
                 key={playbook.id}
                 className={`playbookCard glassCard ${access.isLocked ? "lockedCard" : ""}`}
               >
-                <div className="cardTop">
-                  <h3 className="cardTitle">{playbook.name}</h3>
+                <div className="playbookCardBody">
                   <div className="playbookBadges">
                     <span className="miniBadge">{playbook.badge}</span>
                     <span className={access.isFree ? "miniBadge" : "miniBadge proBadge"}>
                       {access.label}
                     </span>
                   </div>
-                </div>
 
-                <p className="cardDesc">{playbook.description}</p>
+                  <h3 className="cardTitle">{playbook.name}</h3>
 
-                <div className="cardMeta">
-                  {playbook.audience} . {playbook.salesStage} . {playbook.templates.length}{" "}
-                  {playbook.templates.length === 1 ? "deal step" : "deal steps"}
+                  <p className="cardDesc">{playbook.description}</p>
+
+                  <div className="playbookMetaPills" aria-label="Template details">
+                    <span>{playbook.audience}</span>
+                    <span>{playbook.salesStage}</span>
+                    <span>
+                      {playbook.templates.length}{" "}
+                      {playbook.templates.length === 1 ? "deal step" : "deal steps"}
+                    </span>
+                  </div>
                 </div>
 
                 {access.isLocked ? (
                   <Link
                     href="/pricing"
-                    className="button buttonSecondary"
+                    className="button buttonSecondary playbookCardAction"
                     onClick={() =>
                       trackEvent("library_upgrade_from_locked_playbook", {
                         playbookId: playbook.id,
@@ -176,7 +181,7 @@ export default function LibraryPage() {
                 ) : (
                   <Link
                     href={`/playbook/${playbook.id}`}
-                    className="button buttonPrimary"
+                    className="button buttonPrimary playbookCardAction"
                     onClick={() =>
                       trackEvent("library_open_playbook", { playbookId: playbook.id })
                     }
