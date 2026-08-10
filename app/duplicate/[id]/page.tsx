@@ -96,9 +96,9 @@ export default function DuplicateEmailPage() {
             <div className="toolbar" style={{ justifyContent: "center" }}>
               <button
                 className="button buttonPrimary"
-                onClick={() => router.push("/history")}
+                onClick={() => router.push("/workspace")}
               >
-                Back to Saved Messages
+                Back to Saved
               </button>
             </div>
           </div>
@@ -215,9 +215,9 @@ export default function DuplicateEmailPage() {
             <div className="toolbar" style={{ marginTop: 12 }}>
               <button
                 className="button buttonSecondary"
-                onClick={() => router.push("/history")}
+                onClick={() => router.push("/workspace")}
               >
-                Back to Saved Messages
+                Back to Saved
               </button>
             </div>
           </div>

@@ -32,7 +32,7 @@ export default function SiteFooter() {
               Follow-ups
             </Link>
             <Link href="/workspace" className="footerLink">
-              Saved Library
+              Saved
             </Link>
             <Link href="/pricing" className="footerLink">
               Pricing

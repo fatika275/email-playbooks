@@ -202,7 +202,7 @@ export default function SequenceAssetPage() {
     }
 
     await deleteCustomTemplateRecord(template.id);
-    router.push("/folders");
+    router.push("/workspace");
   }
 
   if (!hasProAccess) {
@@ -249,9 +249,9 @@ export default function SequenceAssetPage() {
             <div className="toolbar" style={{ justifyContent: "center" }}>
               <button
                 className="button buttonPrimary"
-                onClick={() => router.push("/custom-templates")}
+                onClick={() => router.push("/workspace")}
               >
-                Back to Follow-up Plans
+                Back to Saved
               </button>
             </div>
           </div>
@@ -547,9 +547,9 @@ export default function SequenceAssetPage() {
             <div className="toolbar">
               <button
                 className="button buttonSecondary"
-                onClick={() => router.push("/custom-templates")}
+                onClick={() => router.push("/workspace")}
               >
-                Back to Follow-up Plans
+                Back to Saved
               </button>
 
               <button

@@ -581,11 +581,11 @@ export default function PlaybookPage() {
                       </Link>
                     ) : (
                       <Link
-                        href="/custom-templates"
+                        href="/workspace"
                         className="button buttonSecondary"
                         onClick={() => setToastMessage("Opening follow-up plans...")}
                       >
-                        View Follow-up Plans
+                        View Saved
                       </Link>
                     )}
                   </div>

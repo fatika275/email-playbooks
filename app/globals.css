@@ -2589,6 +2589,93 @@ details[open] > summary::after {
   min-height: 190px;
 }
 
+.savedSimpleHeader {
+  margin-bottom: 18px;
+}
+
+.savedToolbar,
+.savedMoveBar {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.savedToolbar {
+  grid-template-columns: minmax(0, 1fr) 170px 150px;
+}
+
+.savedMoveBar {
+  grid-template-columns: minmax(0, 1.2fr) minmax(180px, 0.8fr) auto;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.savedFolderStack {
+  display: grid;
+  gap: 22px;
+  margin-top: 22px;
+}
+
+.savedFolder {
+  display: grid;
+  gap: 12px;
+}
+
+.savedFolderHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.savedFolderHeader h2 {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.2;
+}
+
+.savedFolderHeader span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.savedItemGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.savedItemCard {
+  min-width: 0;
+  padding: 16px;
+  display: grid;
+  gap: 14px;
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  background: #0d0d0d;
+}
+
+.savedItemMain {
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+}
+
+.savedItemMain .muted {
+  margin: 10px 0 0;
+  line-height: 1.6;
+}
+
+.savedItemActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .prospectHeader {
   display: flex;
   align-items: flex-end;
@@ -4492,6 +4579,11 @@ details[open] > summary::after {
   }
 
   .folderOrganizerGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .savedToolbar,
+  .savedMoveBar {
     grid-template-columns: 1fr;
   }
 

@@ -103,7 +103,7 @@ export default function SavedEmailViewPage() {
     }
 
     await deleteEmailRecord(email.id);
-    router.push("/folders");
+    router.push("/workspace");
   }
 
   if (!email) {
@@ -116,8 +116,8 @@ export default function SavedEmailViewPage() {
               This saved agency message could not be loaded.
             </p>
             <div className="toolbar" style={{ justifyContent: "center" }}>
-              <Link href="/history" className="button buttonPrimary">
-                Back to Saved Messages
+              <Link href="/workspace" className="button buttonPrimary">
+                Back to Saved
               </Link>
             </div>
           </div>
@@ -299,8 +299,8 @@ export default function SavedEmailViewPage() {
                 Use Again
               </button>
 
-              <Link href="/history" className="button buttonSecondary">
-                Back to Saved Messages
+              <Link href="/workspace" className="button buttonSecondary">
+                Back to Saved
               </Link>
 
               <button className="button buttonUtility" onClick={() => void handleDelete()}>

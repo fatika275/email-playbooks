@@ -521,11 +521,11 @@ export default function TeamLibraryPage() {
             </button>
           </div>
           <div className="teamLibraryShareActions" aria-label="Share saved work with the team">
-            <Link href="/history" className="teamLibraryShareAction">
+            <Link href="/workspace" className="teamLibraryShareAction">
               <span>Share a saved message</span>
               <small>Outreach, proposal chase, win-back, or reply templates</small>
             </Link>
-            <Link href="/custom-templates" className="teamLibraryShareAction">
+            <Link href="/workspace" className="teamLibraryShareAction">
               <span>Share a follow-up plan</span>
               <small>Give the team a reusable chase sequence for live leads</small>
             </Link>

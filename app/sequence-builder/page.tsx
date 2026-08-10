@@ -316,8 +316,8 @@ export default function SequenceBuilderPage() {
             </p>
           </div>
           <div className="builderHeroActions">
-            <Link href="/custom-templates" className="button buttonSecondary">
-              View Saved Plans
+            <Link href="/workspace" className="button buttonSecondary">
+              View Saved
             </Link>
           </div>
         </div>
@@ -566,8 +566,8 @@ export default function SequenceBuilderPage() {
                 >
                   Save Follow-up Plan
                 </button>
-                <Link href="/custom-templates" className="button buttonSecondary">
-                  View Saved Plans
+                <Link href="/workspace" className="button buttonSecondary">
+                  View Saved
                 </Link>
               </div>
 

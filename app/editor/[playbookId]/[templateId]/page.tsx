@@ -928,13 +928,13 @@ export default function EditorPage() {
             >
               <button
                 className="button buttonSecondary"
-                onClick={() => router.push("/history")}
+                onClick={() => router.push("/workspace")}
               >
-                Go to Saved Messages
+                Go to Saved
               </button>
               <button
                 className="button buttonSecondary"
-                onClick={() => router.push("/custom-templates")}
+                onClick={() => router.push("/workspace")}
               >
                 Go to Follow-up Plans
               </button>
