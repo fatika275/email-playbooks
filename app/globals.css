@@ -2604,10 +2604,42 @@ details[open] > summary::after {
   grid-template-columns: minmax(0, 1fr) 170px 150px;
 }
 
+.savedToolbarSingle {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 .savedMoveBar {
   grid-template-columns: minmax(0, 1.2fr) minmax(180px, 0.8fr) auto;
   padding-bottom: 16px;
   border-bottom: 1px solid var(--border);
+}
+
+.savedViewTabs {
+  display: inline-flex;
+  gap: 6px;
+  margin: 0 0 18px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #0a0a0a;
+}
+
+.savedViewTabs button {
+  min-height: 36px;
+  padding: 0 14px;
+  color: var(--muted);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 750;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.savedViewTabs button.active {
+  color: var(--text);
+  background: #171717;
 }
 
 .savedFolderStack {
@@ -2674,6 +2706,126 @@ details[open] > summary::after {
   justify-content: flex-end;
   gap: 8px;
   flex-wrap: wrap;
+}
+
+.clientFolderGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 14px;
+}
+
+.clientFolderCard {
+  min-width: 0;
+  padding: 16px;
+  display: grid;
+  gap: 14px;
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  background: #0d0d0d;
+}
+
+.clientFolderTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.clientFolderTop h2 {
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.25;
+}
+
+.clientFolderTop p {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.clientFolderStats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border: 1px solid var(--border-soft);
+}
+
+.clientFolderStats div {
+  padding: 10px;
+  border-right: 1px solid var(--border-soft);
+}
+
+.clientFolderStats div:last-child {
+  border-right: 0;
+}
+
+.clientFolderStats strong,
+.clientFolderStats span {
+  display: block;
+}
+
+.clientFolderStats strong {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.clientFolderStats span {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.clientFolderList {
+  display: grid;
+  gap: 7px;
+}
+
+.clientFolderList p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.clientFolderList strong {
+  color: var(--text);
+}
+
+.clientFolderAccessList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.clientFolderAccessList span {
+  min-height: 28px;
+  padding: 0 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--muted);
+  font-size: 11px;
+  border: 1px solid var(--border-soft);
+  border-radius: 999px;
+  background: #111111;
+}
+
+.clientFolderAccessList button {
+  color: var(--text);
+  font: inherit;
+  font-size: 11px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.clientFolderShareForm {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 130px auto;
+  gap: 8px;
 }
 
 .prospectHeader {
@@ -4583,7 +4735,8 @@ details[open] > summary::after {
   }
 
   .savedToolbar,
-  .savedMoveBar {
+  .savedMoveBar,
+  .clientFolderShareForm {
     grid-template-columns: 1fr;
   }
 
