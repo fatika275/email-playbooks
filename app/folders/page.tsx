@@ -9,7 +9,12 @@ import {
   useCustomTemplates,
   useEmails,
 } from "@/lib/storage";
-import { saveCustomTemplateRecord, saveEmailRecord } from "@/lib/cloud";
+import {
+  deleteCustomTemplateRecord,
+  deleteEmailRecord,
+  saveCustomTemplateRecord,
+  saveEmailRecord,
+} from "@/lib/cloud";
 
 type FolderItem =
   | {
@@ -223,6 +228,30 @@ export default function FoldersPage() {
     } catch (error) {
       setFolderNotice(
         error instanceof Error ? error.message : "Could not update the folder."
+      );
+    }
+  }
+
+  async function handleDeleteItem(item: FolderItem) {
+    if (
+      !window.confirm(
+        `Delete "${item.title}" from your saved library? This cannot be undone.`
+      )
+    ) {
+      return;
+    }
+
+    try {
+      if (item.type === "email") {
+        await deleteEmailRecord(item.id);
+      } else {
+        await deleteCustomTemplateRecord(item.id);
+      }
+
+      setFolderNotice(`Deleted "${item.title}" from your saved library.`);
+    } catch (error) {
+      setFolderNotice(
+        error instanceof Error ? error.message : "Could not delete this item."
       );
     }
   }
@@ -449,40 +478,50 @@ export default function FoldersPage() {
 
                 <div className="folderItemGrid">
                   {folder.items.map((item) => (
-                    <Link
+                    <article
                       key={`${item.type}-${item.id}`}
-                      href={item.href}
-                      className="glassCard clickable folderItemCard"
+                      className="glassCard folderItemCard"
                     >
-                      <div className="cardTop">
-                        <h3 className="cardTitle">{item.title}</h3>
-                        <span className="miniBadge">
-                          {item.isFavorite
-                            ? "Favorite"
-                            : item.type === "email"
-                              ? "Saved Email"
-                              : "Plan"}
-                        </span>
-                      </div>
-
-                      <p className="templateMeta">Subject: {item.subject}</p>
-
-                      {item.tags.length > 0 ? (
-                        <div className="tagRow" style={{ marginTop: 10 }}>
-                          {item.tags.map((tag) => (
-                            <span key={tag} className="tagChip">
-                              {tag}
-                            </span>
-                          ))}
+                      <Link href={item.href} className="folderItemCardLink">
+                        <div className="cardTop">
+                          <h3 className="cardTitle">{item.title}</h3>
+                          <span className="miniBadge">
+                            {item.isFavorite
+                              ? "Favorite"
+                              : item.type === "email"
+                                ? "Saved Email"
+                                : "Plan"}
+                          </span>
                         </div>
-                      ) : null}
 
-                      <p className="muted" style={{ marginTop: 10, lineHeight: 1.6 }}>
-                        {getPreview(
-                          item.type === "email" ? item.item.body : item.item.body
-                        )}
-                      </p>
-                    </Link>
+                        <p className="templateMeta">Subject: {item.subject}</p>
+
+                        {item.tags.length > 0 ? (
+                          <div className="tagRow" style={{ marginTop: 10 }}>
+                            {item.tags.map((tag) => (
+                              <span key={tag} className="tagChip">
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+                        ) : null}
+
+                        <p className="muted" style={{ marginTop: 10, lineHeight: 1.6 }}>
+                          {getPreview(
+                            item.type === "email" ? item.item.body : item.item.body
+                          )}
+                        </p>
+                      </Link>
+                      <div className="folderItemActions">
+                        <button
+                          type="button"
+                          className="button buttonUtility"
+                          onClick={() => void handleDeleteItem(item)}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </article>
                   ))}
                 </div>
               </section>

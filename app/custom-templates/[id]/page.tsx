@@ -7,7 +7,11 @@ import {
   type CustomTemplate,
   useCustomTemplates,
 } from "@/lib/storage";
-import { saveCustomTemplateRecord, saveEmailRecord } from "@/lib/cloud";
+import {
+  deleteCustomTemplateRecord,
+  saveCustomTemplateRecord,
+  saveEmailRecord,
+} from "@/lib/cloud";
 import { ShareWithTeam } from "@/components/share-with-team";
 import { downloadHtmlFile } from "@/lib/exportHtml";
 import { playbooks } from "@/lib/data";
@@ -185,6 +189,20 @@ export default function SequenceAssetPage() {
       template.isFavorite ? "Removed from favorites." : "Added to favorites."
     );
     setTimeout(() => setSavedMessage(""), 2000);
+  }
+
+  async function handleDelete() {
+    if (!template) return;
+    if (
+      !window.confirm(
+        `Delete "${template.title}" from your follow-up plans? This cannot be undone.`
+      )
+    ) {
+      return;
+    }
+
+    await deleteCustomTemplateRecord(template.id);
+    router.push("/folders");
   }
 
   if (!hasProAccess) {
@@ -532,6 +550,13 @@ export default function SequenceAssetPage() {
                 onClick={() => router.push("/custom-templates")}
               >
                 Back to Follow-up Plans
+              </button>
+
+              <button
+                className="button buttonUtility"
+                onClick={() => void handleDelete()}
+              >
+                Delete
               </button>
             </div>
           </div>

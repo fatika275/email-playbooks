@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { type SavedEmail, useEmails } from "@/lib/storage";
-import { saveEmailRecord } from "@/lib/cloud";
+import { deleteEmailRecord, saveEmailRecord } from "@/lib/cloud";
 import { ShareWithTeam } from "@/components/share-with-team";
 
 const REUSE_EMAIL_KEY = "thalovo_reuse_email";
@@ -90,6 +90,20 @@ export default function SavedEmailViewPage() {
     setOptimisticEmail(updatedEmail);
     await saveEmailRecord(updatedEmail);
     setSavedNotice(email.isFavorite ? "Removed from favorites." : "Added to favorites.");
+  }
+
+  async function handleDelete() {
+    if (!email) return;
+    if (
+      !window.confirm(
+        `Delete "${email.templateLabel}" from your saved messages? This cannot be undone.`
+      )
+    ) {
+      return;
+    }
+
+    await deleteEmailRecord(email.id);
+    router.push("/folders");
   }
 
   if (!email) {
@@ -288,6 +302,10 @@ export default function SavedEmailViewPage() {
               <Link href="/history" className="button buttonSecondary">
                 Back to Saved Messages
               </Link>
+
+              <button className="button buttonUtility" onClick={() => void handleDelete()}>
+                Delete
+              </button>
             </div>
           </div>
 

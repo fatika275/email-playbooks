@@ -171,6 +171,15 @@ export function updateEmail(id: string, updates: Partial<SavedEmail>) {
   notifyStorageChange();
 }
 
+export function deleteEmail(id: string) {
+  const emails = getEmails();
+  localStorage.setItem(
+    EMAILS_KEY,
+    JSON.stringify(emails.filter((email) => email.id !== id))
+  );
+  notifyStorageChange();
+}
+
 export function useEmails() {
   return useSyncExternalStore(
     subscribeToStorageChange,
@@ -234,6 +243,15 @@ export function updateCustomTemplate(
       : template
   );
   localStorage.setItem(TEMPLATES_KEY, JSON.stringify(updated));
+  notifyStorageChange();
+}
+
+export function deleteCustomTemplate(id: string) {
+  const templates = getCustomTemplates();
+  localStorage.setItem(
+    TEMPLATES_KEY,
+    JSON.stringify(templates.filter((template) => template.id !== id))
+  );
   notifyStorageChange();
 }
 

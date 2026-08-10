@@ -2,6 +2,8 @@ import type { User } from "@supabase/supabase-js";
 import {
   getCustomTemplates,
   getEmails,
+  deleteCustomTemplate,
+  deleteEmail,
   replaceCustomTemplates,
   replaceEmails,
   saveCustomTemplate,
@@ -692,6 +694,38 @@ export async function saveCustomTemplateRecord(template: CustomTemplate) {
   if (!user) return;
 
   await upsertTemplates(user.id, [template]);
+}
+
+export async function deleteEmailRecord(id: string) {
+  deleteEmail(id);
+
+  const client = getSupabaseBrowserClient();
+  const user = await getSignedInUser();
+  if (!client || !user) return;
+
+  const { error } = await client
+    .from("saved_emails")
+    .delete()
+    .eq("id", id)
+    .eq("user_id", user.id);
+
+  if (error) throw normalizeCloudError(error);
+}
+
+export async function deleteCustomTemplateRecord(id: string) {
+  deleteCustomTemplate(id);
+
+  const client = getSupabaseBrowserClient();
+  const user = await getSignedInUser();
+  if (!client || !user) return;
+
+  const { error } = await client
+    .from("custom_templates")
+    .delete()
+    .eq("id", id)
+    .eq("user_id", user.id);
+
+  if (error) throw normalizeCloudError(error);
 }
 
 export async function shareAssetWithTeammate(options: {

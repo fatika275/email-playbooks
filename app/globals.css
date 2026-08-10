@@ -2128,9 +2128,20 @@ details[open] > summary::after {
 }
 
 .folderItemCard {
-  display: block;
+  display: grid;
+  gap: 14px;
   padding: 18px;
+}
+
+.folderItemCardLink {
+  display: block;
+  color: inherit;
   text-decoration: none;
+}
+
+.folderItemActions {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .builderHero {
