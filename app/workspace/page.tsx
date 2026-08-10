@@ -10,13 +10,19 @@ import {
   useEmails,
 } from "@/lib/storage";
 import {
+  listClientFolderShares,
   deleteCustomTemplateRecord,
   deleteEmailRecord,
+  removeClientFolderShare,
   saveCustomTemplateRecord,
   saveEmailRecord,
+  shareClientFolderWithTeammate,
+  type ClientFolderShare,
+  type ClientFolderShareAccess,
 } from "@/lib/cloud";
 import {
   PROSPECT_STAGE_LABELS,
+  getProspect,
   listProspectActivitiesForProspects,
   listProspects,
   type Prospect,
@@ -24,11 +30,9 @@ import {
 } from "@/lib/prospects";
 
 const PROSPECT_FILES_KEY = "thalovo_prospect_files_v1";
-const CLIENT_FOLDER_ACCESS_KEY = "thalovo_client_folder_access_v1";
 
 type SavedView = "clients" | "followups";
 type FollowUpKind = "email" | "sequence";
-type FolderAccess = "view" | "edit";
 
 type ProspectFileRecord = {
   id: string;
@@ -38,14 +42,6 @@ type ProspectFileRecord = {
   url: string;
   folder: string;
   note: string;
-  createdAt: string;
-};
-
-type ClientFolderShare = {
-  id: string;
-  prospectId: string;
-  email: string;
-  access: FolderAccess;
   createdAt: string;
 };
 
@@ -75,12 +71,6 @@ type FollowUpItem =
       item: CustomTemplate;
     };
 
-function makeLocalId(prefix: string) {
-  return typeof crypto !== "undefined" && "randomUUID" in crypto
-    ? crypto.randomUUID()
-    : `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
-}
-
 function getPreview(text: string, maxLength = 120) {
   const clean = text.replace(/\s+/g, " ").trim();
   if (clean.length <= maxLength) return clean;
@@ -99,23 +89,6 @@ function readProspectFiles() {
   }
 }
 
-function readClientFolderShares() {
-  if (typeof window === "undefined") return [];
-  try {
-    const parsed = JSON.parse(
-      window.localStorage.getItem(CLIENT_FOLDER_ACCESS_KEY) || "[]"
-    );
-    return Array.isArray(parsed) ? (parsed as ClientFolderShare[]) : [];
-  } catch {
-    return [];
-  }
-}
-
-function writeClientFolderShares(shares: ClientFolderShare[]) {
-  if (typeof window === "undefined") return;
-  window.localStorage.setItem(CLIENT_FOLDER_ACCESS_KEY, JSON.stringify(shares));
-}
-
 export default function WorkspacePage() {
   const { user, businessMembership, syncVersion } = useAccount();
   const emails = useEmails();
@@ -129,12 +102,10 @@ export default function WorkspacePage() {
   const [prospects, setProspects] = useState<Prospect[]>([]);
   const [activities, setActivities] = useState<ProspectActivity[]>([]);
   const [files] = useState<ProspectFileRecord[]>(() => readProspectFiles());
-  const [shares, setShares] = useState<ClientFolderShare[]>(() =>
-    readClientFolderShares()
-  );
+  const [shares, setShares] = useState<ClientFolderShare[]>([]);
   const [shareProspectId, setShareProspectId] = useState("");
   const [shareEmail, setShareEmail] = useState("");
-  const [shareAccess, setShareAccess] = useState<FolderAccess>("view");
+  const [shareAccess, setShareAccess] = useState<ClientFolderShareAccess>("view");
   const [notice, setNotice] = useState("");
 
   const followUpItems = useMemo<FollowUpItem[]>(
@@ -209,8 +180,8 @@ export default function WorkspacePage() {
   const sharesByProspect = useMemo(() => {
     const groups = new Map<string, ClientFolderShare[]>();
     for (const share of shares) {
-      groups.set(share.prospectId, [
-        ...(groups.get(share.prospectId) ?? []),
+      groups.set(share.prospect_id, [
+        ...(groups.get(share.prospect_id) ?? []),
         share,
       ]);
     }
@@ -248,11 +219,30 @@ export default function WorkspacePage() {
 
     async function loadClientFolders() {
       try {
-        const nextProspects = await listProspects({
-          userId: user!.id,
-          workspaceId,
-        });
+        const [ownedProspects, nextShares] = await Promise.all([
+          listProspects({
+            userId: user!.id,
+            workspaceId,
+          }),
+          listClientFolderShares(),
+        ]);
+        const sharedProspectIds = nextShares
+          .filter((share) => share.owner_id !== user!.id)
+          .map((share) => share.prospect_id);
+        const sharedProspects = (
+          await Promise.all(
+            sharedProspectIds.map((prospectId) => getProspect(prospectId))
+          )
+        ).filter((prospect): prospect is Prospect => Boolean(prospect));
+        const prospectById = new Map(
+          [...ownedProspects, ...sharedProspects].map((prospect) => [
+            prospect.id,
+            prospect,
+          ])
+        );
+        const nextProspects = Array.from(prospectById.values());
         if (!isMounted) return;
+        setShares(nextShares);
         setProspects(nextProspects);
         const nextActivities = await listProspectActivitiesForProspects(
           nextProspects.map((prospect) => prospect.id)
@@ -272,6 +262,18 @@ export default function WorkspacePage() {
       isMounted = false;
     };
   }, [businessMembership?.access_active, businessMembership?.workspace_id, syncVersion, user]);
+
+  async function refreshClientFolderShares() {
+    if (!user) return;
+    try {
+      const nextShares = await listClientFolderShares();
+      setShares(nextShares);
+    } catch (error) {
+      setNotice(
+        error instanceof Error ? error.message : "Folder sharing could not refresh."
+      );
+    }
+  }
 
   async function handleDeleteFollowUp(item: FollowUpItem) {
     if (!window.confirm(`Delete "${item.title}" from follow-up saved work?`)) {
@@ -319,38 +321,41 @@ export default function WorkspacePage() {
     }
   }
 
-  function handleShareClientFolder(prospect: Prospect) {
+  async function handleShareClientFolder(prospect: Prospect) {
     const email = shareEmail.trim().toLowerCase();
     if (!email) {
       setNotice("Enter a teammate email before sharing the folder.");
       return;
     }
 
-    const nextShares = [
-      {
-        id: makeLocalId("folder-share"),
+    try {
+      await shareClientFolderWithTeammate({
         prospectId: prospect.id,
-        email,
+        recipientEmail: email,
         access: shareAccess,
-        createdAt: new Date().toISOString(),
-      },
-      ...shares.filter(
-        (share) => !(share.prospectId === prospect.id && share.email === email)
-      ),
-    ];
-    setShares(nextShares);
-    writeClientFolderShares(nextShares);
-    setShareEmail("");
-    setShareProspectId("");
-    setShareAccess("view");
-    setNotice(`Shared ${prospect.company || prospect.full_name} folder with ${email}.`);
+      });
+      await refreshClientFolderShares();
+      setShareEmail("");
+      setShareProspectId("");
+      setShareAccess("view");
+      setNotice(`Shared ${prospect.company || prospect.full_name} folder with ${email}.`);
+    } catch (error) {
+      setNotice(
+        error instanceof Error ? error.message : "Could not share this folder."
+      );
+    }
   }
 
-  function handleRemoveFolderAccess(shareId: string) {
-    const nextShares = shares.filter((share) => share.id !== shareId);
-    setShares(nextShares);
-    writeClientFolderShares(nextShares);
-    setNotice("Folder access removed.");
+  async function handleRemoveFolderAccess(shareId: string) {
+    try {
+      await removeClientFolderShare(shareId);
+      await refreshClientFolderShares();
+      setNotice("Folder access removed.");
+    } catch (error) {
+      setNotice(
+        error instanceof Error ? error.message : "Could not remove folder access."
+      );
+    }
   }
 
   return (
@@ -463,10 +468,10 @@ export default function WorkspacePage() {
                         <div className="clientFolderAccessList">
                           {prospectShares.map((share) => (
                             <span key={share.id}>
-                              {share.email} - {share.access}
+                              {share.recipient_email} - {share.access}
                               <button
                                 type="button"
-                                onClick={() => handleRemoveFolderAccess(share.id)}
+                                onClick={() => void handleRemoveFolderAccess(share.id)}
                               >
                                 remove
                               </button>
@@ -489,7 +494,7 @@ export default function WorkspacePage() {
                             className="input"
                             value={shareAccess}
                             onChange={(event) =>
-                              setShareAccess(event.target.value as FolderAccess)
+                              setShareAccess(event.target.value as ClientFolderShareAccess)
                             }
                             aria-label="Folder access"
                           >
@@ -499,7 +504,7 @@ export default function WorkspacePage() {
                           <button
                             type="button"
                             className="button buttonSecondary"
-                            onClick={() => handleShareClientFolder(prospect)}
+                            onClick={() => void handleShareClientFolder(prospect)}
                           >
                             Send folder
                           </button>

@@ -80,6 +80,18 @@ export type TeamShare = {
   created_at: string;
 };
 
+export type ClientFolderShareAccess = "view" | "edit";
+
+export type ClientFolderShare = {
+  id: string;
+  prospect_id: string;
+  owner_id: string;
+  owner_email: string;
+  recipient_email: string;
+  access: ClientFolderShareAccess;
+  created_at: string;
+};
+
 export type BusinessWorkspace = {
   id: string;
   owner_id: string;
@@ -781,6 +793,77 @@ export async function removeTeamShare(id: string) {
   if (!client) throw new Error("Team sharing is temporarily unavailable.");
 
   const { error } = await client.from("team_shares").delete().eq("id", id);
+  if (error) throw normalizeCloudError(error);
+}
+
+function isMissingClientFolderSharingSchema(error: { code?: string; message?: string } | null) {
+  return Boolean(
+    error &&
+      (error.code === "42P01" ||
+        error.code === "42703" ||
+        error.code === "PGRST205" ||
+        error.message?.toLowerCase().includes("client_folder_shares"))
+  );
+}
+
+export async function listClientFolderShares() {
+  const client = getSupabaseBrowserClient();
+  const user = await getSignedInUser();
+  if (!client || !user) return [];
+
+  const { data, error } = await client
+    .from("client_folder_shares")
+    .select(
+      "id, prospect_id, owner_id, owner_email, recipient_email, access, created_at"
+    )
+    .order("created_at", { ascending: false });
+
+  if (isMissingClientFolderSharingSchema(error)) return [];
+  if (error) throw normalizeCloudError(error);
+  return (data ?? []) as ClientFolderShare[];
+}
+
+export async function shareClientFolderWithTeammate(options: {
+  prospectId: string;
+  recipientEmail: string;
+  access: ClientFolderShareAccess;
+}) {
+  const client = getSupabaseBrowserClient();
+  const user = await getSignedInUser();
+  if (!client || !user?.email) {
+    throw new Error("Sign in before sharing a client folder.");
+  }
+
+  const recipientEmail = options.recipientEmail.trim().toLowerCase();
+  if (!recipientEmail || recipientEmail === user.email.toLowerCase()) {
+    throw new Error("Enter a teammate's email address, not your own.");
+  }
+
+  const { error } = await client.from("client_folder_shares").upsert(
+    {
+      prospect_id: options.prospectId,
+      owner_id: user.id,
+      owner_email: user.email.toLowerCase(),
+      recipient_email: recipientEmail,
+      access: options.access,
+    },
+    { onConflict: "prospect_id,recipient_email" }
+  );
+
+  if (isMissingClientFolderSharingSchema(error)) {
+    throw new Error(
+      "Run supabase/client-folder-sharing.sql in Supabase before sharing client folders."
+    );
+  }
+  if (error) throw normalizeCloudError(error);
+}
+
+export async function removeClientFolderShare(id: string) {
+  const client = getSupabaseBrowserClient();
+  if (!client) throw new Error("Client folder sharing is unavailable.");
+
+  const { error } = await client.from("client_folder_shares").delete().eq("id", id);
+  if (isMissingClientFolderSharingSchema(error)) return;
   if (error) throw normalizeCloudError(error);
 }
 
