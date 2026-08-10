@@ -512,7 +512,7 @@ export default function WorkspacePage() {
                       ) : null}
 
                       <div className="savedItemActions">
-                        <Link href={`/prospects/${prospect.id}`} className="button buttonSecondary">
+                        <Link href={`/client-folders/${prospect.id}`} className="button buttonSecondary">
                           Open folder
                         </Link>
                         <button
