@@ -19,9 +19,7 @@ import {
 function ReplyHelperContent() {
   const searchParams = useSearchParams();
   const [leadName, setLeadName] = useState(searchParams.get("name") ?? "");
-  const [leadEmail, setLeadEmail] = useState(searchParams.get("email") ?? "");
   const [offer, setOffer] = useState(searchParams.get("offer") ?? "");
-  const [result, setResult] = useState(searchParams.get("result") ?? "");
   const [senderName, setSenderName] = useState("");
   const [objection, setObjection] = useState("");
   const [objectionCategory, setObjectionCategory] =
@@ -47,13 +45,12 @@ function ReplyHelperContent() {
           objection,
           name: leadName,
           offer,
-          result,
           senderName,
         },
         objectionCategory,
         objectionTone
       ),
-    [leadName, objection, objectionCategory, objectionTone, offer, result, senderName]
+    [leadName, objection, objectionCategory, objectionTone, offer, senderName]
   );
 
   async function handleCopyReply() {
@@ -75,9 +72,9 @@ function ReplyHelperContent() {
           </div>
         </div>
 
-        <div className="editorLayout" style={{ alignItems: "start" }}>
-          <div className="formCard">
-            <div className="editorComposerPanel">
+        <div className="objectionHelperLayout">
+          <div className="formCard objectionHelperForm">
+            <div className="objectionHelperIntro">
               <div>
                 <span className="miniBadge">Live objection reply</span>
                 <h4 style={{ margin: "8px 0 0" }}>What concern do you need to handle?</h4>
@@ -101,19 +98,6 @@ function ReplyHelperContent() {
                 </div>
 
                 <div className="formGroup">
-                  <label className="label" htmlFor="reply-lead-email">
-                    Lead email <span className="muted">(optional)</span>
-                  </label>
-                  <input
-                    id="reply-lead-email"
-                    className="input"
-                    value={leadEmail}
-                    onChange={(event) => setLeadEmail(event.target.value)}
-                    placeholder="sam@example.com"
-                  />
-                </div>
-
-                <div className="formGroup">
                   <label className="label" htmlFor="reply-offer">
                     Service / offer
                   </label>
@@ -123,19 +107,6 @@ function ReplyHelperContent() {
                     value={offer}
                     onChange={(event) => setOffer(event.target.value)}
                     placeholder="Website redesign, lead-gen retainer, paid ads audit..."
-                  />
-                </div>
-
-                <div className="formGroup">
-                  <label className="label" htmlFor="reply-result">
-                    Outcome you help them get
-                  </label>
-                  <input
-                    id="reply-result"
-                    className="input"
-                    value={result}
-                    onChange={(event) => setResult(event.target.value)}
-                    placeholder="More booked calls, clearer pipeline, faster launch..."
                   />
                 </div>
 
@@ -179,7 +150,7 @@ function ReplyHelperContent() {
                   </select>
                 </div>
 
-                <div className="formGroup">
+                <div className="formGroup objectionFullWidth">
                   <label className="label" htmlFor="reply-objection">
                     Exact words from the prospect <span className="muted">(optional)</span>
                   </label>
@@ -240,8 +211,8 @@ function ReplyHelperContent() {
             </div>
           </div>
 
-          <aside className="editorPreviewRail">
-            <div className="previewCard">
+          <aside className="objectionPreviewRail">
+            <div className="previewCard objectionPreviewCard">
               <div className="previewHeader">
                 <div>
                   <span className="miniBadge">
@@ -270,19 +241,19 @@ function ReplyHelperContent() {
                 </button>
                 <button
                   className="button buttonUtility"
-                  onClick={() => openGmailDraft(reply.subject, reply.body, leadEmail)}
+                  onClick={() => openGmailDraft(reply.subject, reply.body)}
                 >
                   Gmail
                 </button>
                 <button
                   className="button buttonUtility"
-                  onClick={() => openOutlookDraft(reply.subject, reply.body, leadEmail)}
+                  onClick={() => openOutlookDraft(reply.subject, reply.body)}
                 >
                   Outlook
                 </button>
                 <button
                   className="button buttonUtility"
-                  onClick={() => openMailtoDraft(reply.subject, reply.body, leadEmail)}
+                  onClick={() => openMailtoDraft(reply.subject, reply.body)}
                 >
                   Mail app
                 </button>

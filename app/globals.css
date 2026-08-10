@@ -1061,6 +1061,77 @@ textarea {
   background: #090909;
 }
 
+.objectionHelperLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 0.82fr);
+  gap: 26px;
+  align-items: start;
+}
+
+.objectionHelperForm {
+  padding: 24px;
+}
+
+.objectionHelperIntro {
+  display: grid;
+  gap: 22px;
+}
+
+.objectionHelperForm .editorFieldGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 0;
+}
+
+.objectionFullWidth {
+  grid-column: 1 / -1;
+}
+
+.objectionPreviewRail {
+  position: sticky;
+  top: 98px;
+  align-self: start;
+  min-width: 0;
+}
+
+.objectionPreviewCard {
+  min-width: 0;
+  padding: 24px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.014)),
+    #090909;
+}
+
+.emailPreview {
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px;
+  background: #050505;
+  overflow: hidden;
+}
+
+.emailSubject {
+  margin: 0 0 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  color: #ffffff;
+  font-weight: 750;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.emailPreview pre {
+  max-width: 100%;
+  margin: 0;
+  color: #e4e4e7;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.65;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
 .formCard,
 .previewCard {
   padding: 28px;
@@ -4068,6 +4139,7 @@ details[open] > summary::after {
   .hero,
   .accountHero,
   .editorLayout,
+  .objectionHelperLayout,
   .builderLayout,
   .grid,
   .featureGrid,
@@ -4083,6 +4155,14 @@ details[open] > summary::after {
 
   .editorPreviewRail {
     position: static;
+  }
+
+  .objectionPreviewRail {
+    position: static;
+  }
+
+  .objectionHelperForm .editorFieldGrid {
+    grid-template-columns: 1fr;
   }
 
   .homeMetrics {

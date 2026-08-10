@@ -170,7 +170,7 @@ export function buildObjectionReply(
   const category = selectedCategory || detectObjectionCategory(context.objection);
   const greeting = context.name ? `Hi ${context.name},` : "Hi,";
   const offer = context.offer || "what we discussed";
-  const result = context.result || "the outcome you are working toward";
+  const result = context.result || "the right next step";
   const signoff = context.senderName
     ? `Best,\n${context.senderName}`
     : "Best,";
