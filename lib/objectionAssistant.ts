@@ -94,7 +94,7 @@ function getSpecificGuidance(
   if (category === "timing") {
     if (/not now|later|busy|too busy|bad time|timing/.test(text)) {
       return {
-        reframe: `That makes sense. I do not want to force ${offer} into a busy period if it will not get proper attention.`,
+        reframe: "That makes sense. I do not want to force this into a busy period if it will not get proper attention.",
         question: "When would be a better time for me to check back without being a nuisance?",
         exit: "No pressure. I can step back until the timing is genuinely better.",
       };
@@ -194,7 +194,7 @@ export function buildObjectionReply(
       exit: "If the budget is not there, I completely understand and I will leave it with you.",
     },
     timing: {
-      reframe: `I do not want to force ${offer} before it is relevant.`,
+      reframe: "I do not want to force this before it is relevant.",
       question: "Is there a specific time that would be better for me to check back?",
       exit: "No pressure from me. I am happy to leave this until the timing is genuinely better.",
     },

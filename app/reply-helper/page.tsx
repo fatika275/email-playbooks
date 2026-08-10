@@ -16,6 +16,13 @@ import {
   openOutlookDraft,
 } from "@/lib/exportEmail";
 
+const OFFER_CONTEXT_CATEGORIES: ObjectionCategory[] = [
+  "price",
+  "existing",
+  "information",
+  "general",
+];
+
 function ReplyHelperContent() {
   const searchParams = useSearchParams();
   const [leadName, setLeadName] = useState(searchParams.get("name") ?? "");
@@ -27,6 +34,7 @@ function ReplyHelperContent() {
   const [objectionTone, setObjectionTone] =
     useState<ObjectionTone>("consultative");
   const [notice, setNotice] = useState("");
+  const shouldShowOfferField = OFFER_CONTEXT_CATEGORIES.includes(objectionCategory);
 
   const suggestedObjectionCategory = useMemo<ObjectionCategory | null>(() => {
     const objectionText = objection.trim();
@@ -44,13 +52,21 @@ function ReplyHelperContent() {
         {
           objection,
           name: leadName,
-          offer,
+          offer: shouldShowOfferField ? offer : undefined,
           senderName,
         },
         objectionCategory,
         objectionTone
       ),
-    [leadName, objection, objectionCategory, objectionTone, offer, senderName]
+    [
+      leadName,
+      objection,
+      objectionCategory,
+      objectionTone,
+      offer,
+      senderName,
+      shouldShowOfferField,
+    ]
   );
 
   async function handleCopyReply() {
@@ -98,19 +114,6 @@ function ReplyHelperContent() {
                 </div>
 
                 <div className="formGroup">
-                  <label className="label" htmlFor="reply-offer">
-                    Service / offer
-                  </label>
-                  <input
-                    id="reply-offer"
-                    className="input"
-                    value={offer}
-                    onChange={(event) => setOffer(event.target.value)}
-                    placeholder="Website redesign, lead-gen retainer, paid ads audit..."
-                  />
-                </div>
-
-                <div className="formGroup">
                   <label className="label" htmlFor="reply-category">
                     Main concern
                   </label>
@@ -129,6 +132,21 @@ function ReplyHelperContent() {
                     ))}
                   </select>
                 </div>
+
+                {shouldShowOfferField ? (
+                  <div className="formGroup">
+                    <label className="label" htmlFor="reply-offer">
+                      Service / offer
+                    </label>
+                    <input
+                      id="reply-offer"
+                      className="input"
+                      value={offer}
+                      onChange={(event) => setOffer(event.target.value)}
+                      placeholder="Website redesign, lead-gen retainer, paid ads audit..."
+                    />
+                  </div>
+                ) : null}
 
                 <div className="formGroup">
                   <label className="label" htmlFor="reply-tone">
