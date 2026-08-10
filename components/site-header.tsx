@@ -9,6 +9,7 @@ const navItems = [
   { href: "/library", label: "Outreach" },
   { href: "/reply-helper", label: "Objections" },
   { href: "/sequence-builder", label: "Follow-ups" },
+  { href: "/workspace", label: "Saved" },
   { href: "/team", label: "Team" },
 ];
 
@@ -19,6 +20,12 @@ function isActive(pathname: string, href: string) {
 
   if (href === "/library") {
     return ["/library", "/playbook", "/editor"].some(
+      (path) => pathname === path || pathname.startsWith(`${path}/`)
+    );
+  }
+
+  if (href === "/workspace") {
+    return ["/workspace", "/folders", "/history", "/custom-templates"].some(
       (path) => pathname === path || pathname.startsWith(`${path}/`)
     );
   }

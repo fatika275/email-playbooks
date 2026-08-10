@@ -2,62 +2,80 @@
 
 import Link from "next/link";
 import { useAccount } from "@/components/account-provider";
+import { useCustomTemplates, useEmails } from "@/lib/storage";
 
 const workspaceItems = [
   {
+    href: "/folders",
+    label: "Saved Library",
+    badge: "Folders",
+    description:
+      "Browse saved messages and follow-up plans together, organized by client, campaign, use case, or team folder.",
+  },
+  {
     href: "/history",
-    label: "Saved Use-Case Messages",
+    label: "Saved Messages",
     badge: "Messages",
     description:
-      "Reuse outreach, follow-up, proposal, and win-back messages that help leads move.",
+      "Open individual outreach, proposal, win-back, and reply messages you reuse.",
   },
   {
     href: "/custom-templates",
-    label: "Saved Follow-up Plans",
-    badge: "Pro",
+    label: "Follow-up Plans",
+    badge: "Plans",
     description:
-      "Keep the chasing plans that stop warm prospects slipping after the first touch.",
+      "Reuse the chase sequences that stop warm prospects slipping after the first touch.",
   },
 ];
 
 export default function WorkspacePage() {
   const { hasProAccess } = useAccount();
+  const emails = useEmails();
+  const templates = useCustomTemplates();
+  const totalSaved = emails.length + templates.length;
+  const folderCount = new Set(
+    [...emails, ...templates]
+      .map((item) => item.folder?.trim())
+      .filter((folder): folder is string => Boolean(folder))
+  ).size;
 
   return (
     <main className="main">
       <section className="container">
         <div className="pageHeader">
-          <div className="badge">Saved work</div>
+          <div className="badge">Saved library</div>
           <h1 className="pageTitle" style={{ marginTop: 14 }}>
-            Keep your best messages and follow-up plans ready.
+            Keep every reusable agency asset easy to find.
           </h1>
           <p className="muted" style={{ maxWidth: 760, lineHeight: 1.75 }}>
-            Find the outreach messages, follow-up plans, proposal chasers, and
-            win-back messages you actually reuse. No extra CRM filing system.
+            Put saved outreach, proposal chasers, win-back messages, and
+            follow-up plans in one organized library, then open the right asset
+            when a lead needs the next move.
           </p>
         </div>
 
         <div className="workspaceHero glassCard">
           <div>
             <span className={hasProAccess ? "statusPill statusPillSuccess" : "statusPill statusPillWarning"}>
-              {hasProAccess ? "Saved work active" : "Free saved-work preview"}
+              {hasProAccess ? `${totalSaved} saved asset${totalSaved === 1 ? "" : "s"}` : "Free saved-library preview"}
             </span>
             <h2 className="sectionTitle" style={{ marginTop: 16 }}>
-              Reuse what helps leads become booked work.
+              Work from folders when saved work starts piling up.
             </h2>
             <p className="muted" style={{ marginTop: 10, lineHeight: 1.75 }}>
-              Open saved outreach, follow-up, proposal, and win-back messages
-              here, then get back to the lead you are trying to move.
+              {folderCount
+                ? `${folderCount} folder${folderCount === 1 ? "" : "s"} already help separate campaigns, client types, and reusable chase plans.`
+                : "Start with simple folders like Outreach, Proposal chase, Win-back, or Client handoff."}
             </p>
           </div>
 
           {!hasProAccess ? (
             <Link href="/pricing" className="button buttonPrimary">
-              Unlock saved work
+              Unlock saved library
             </Link>
           ) : (
-            <Link href="/history" className="button buttonPrimary">
-              Open Saved Messages
+            <Link href="/folders" className="button buttonPrimary">
+              Open Saved Library
             </Link>
           )}
         </div>

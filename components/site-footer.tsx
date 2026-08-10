@@ -31,6 +31,9 @@ export default function SiteFooter() {
             <Link href="/sequence-builder" className="footerLink">
               Follow-ups
             </Link>
+            <Link href="/workspace" className="footerLink">
+              Saved Library
+            </Link>
             <Link href="/pricing" className="footerLink">
               Pricing
             </Link>

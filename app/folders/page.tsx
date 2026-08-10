@@ -40,6 +40,34 @@ type FolderGroup = {
   items: FolderItem[];
 };
 
+const libraryShortcuts = [
+  {
+    label: "Outreach",
+    query: "outreach",
+    description: "First-touch and lead capture messages",
+  },
+  {
+    label: "Follow-up",
+    query: "follow-up",
+    description: "Saved chase messages and reminder plans",
+  },
+  {
+    label: "Proposal",
+    query: "proposal",
+    description: "Scope, pricing, and decision chasers",
+  },
+  {
+    label: "Win-back",
+    query: "win-back",
+    description: "Revive old leads and quiet opportunities",
+  },
+  {
+    label: "Team-shared",
+    query: "team-shared",
+    description: "Assets shared by teammates",
+  },
+];
+
 function getFolderName(folder: string | null) {
   return folder?.trim() || "Unfiled";
 }
@@ -167,6 +195,9 @@ export default function FoldersPage() {
   }, [allItems, query, typeFilter, sortBy]);
 
   const totalItems = emails.length + templates.length;
+  const savedMessageCount = emails.length;
+  const followUpPlanCount = templates.length;
+  const folderCount = existingFolders.length;
 
   async function handleAssignFolder() {
     const item = allItems.find(
@@ -201,9 +232,9 @@ export default function FoldersPage() {
       <main className="main">
         <section className="container">
           <div className="glassCard emptyState">
-            <div className="badge">Optional cleanup</div>
+            <div className="badge">Saved library</div>
             <h1 className="pageTitle" style={{ marginTop: 14 }}>
-              Tidy saved work only when it starts piling up
+              Organize saved work when it starts piling up
             </h1>
             <p className="muted" style={{ maxWidth: 680, marginInline: "auto" }}>
               Free access gives you the core playbooks. Pro adds lightweight
@@ -228,21 +259,57 @@ export default function FoldersPage() {
     <main className="main">
       <section className="container">
         <div className="pageHeader">
-          <div className="badge">Optional cleanup</div>
+          <div className="badge">Saved library</div>
           <h1 className="pageTitle" style={{ marginTop: 14 }}>
-            Keep saved work easy to find.
+            Saved messages and follow-up plans, organized.
           </h1>
           <p className="muted" style={{ maxWidth: 760, lineHeight: 1.75 }}>
-            Use folders lightly when they help you find the next outreach,
-            follow-up, proposal, win-back message, or follow-up plan faster.
-            Skip them until saved work actually starts piling up.
+            Keep the assets that help you book client work in folders by use
+            case, campaign, client type, or teammate. No digging through old
+            drafts when a lead needs the next message.
           </p>
+        </div>
+
+        <div className="librarySummaryGrid">
+          <div>
+            <strong>{totalItems}</strong>
+            <span>Saved assets</span>
+          </div>
+          <div>
+            <strong>{savedMessageCount}</strong>
+            <span>Messages</span>
+          </div>
+          <div>
+            <strong>{followUpPlanCount}</strong>
+            <span>Follow-up plans</span>
+          </div>
+          <div>
+            <strong>{folderCount}</strong>
+            <span>Folders</span>
+          </div>
+        </div>
+
+        <div className="libraryShortcutGrid">
+          {libraryShortcuts.map((shortcut) => (
+            <button
+              key={shortcut.label}
+              type="button"
+              className="libraryShortcut"
+              onClick={() => {
+                setQuery(shortcut.query);
+                setTypeFilter("All");
+              }}
+            >
+              <span>{shortcut.label}</span>
+              <small>{shortcut.description}</small>
+            </button>
+          ))}
         </div>
 
         <div className="glassCard" style={{ padding: 18, marginBottom: 22 }}>
           <div className="grid" style={{ gridTemplateColumns: "1.6fr 1fr 1fr" }}>
             <div className="formGroup" style={{ marginBottom: 0 }}>
-              <label className="label">Search folders</label>
+              <label className="label">Search saved library</label>
               <input
                 className="input"
                 value={query}
@@ -252,7 +319,7 @@ export default function FoldersPage() {
             </div>
 
             <div className="formGroup" style={{ marginBottom: 0 }}>
-              <label className="label">Type</label>
+              <label className="label">Asset type</label>
               <select
                 className="input"
                 value={typeFilter}
@@ -284,10 +351,10 @@ export default function FoldersPage() {
           <div className="glassCard" style={{ padding: 22, marginBottom: 22 }}>
             <div className="cardTop">
               <div>
-                <h2 className="cardTitle">Add an item to a folder</h2>
+                <h2 className="cardTitle">Put saved work in a folder</h2>
                 <p className="muted" style={{ margin: "8px 0 0" }}>
-                  Choose an outreach asset, then give it a simple label you will
-                  remember when chasing the next lead.
+                  Choose a message or follow-up plan, then file it under a name
+                  your team will recognize when chasing the next lead.
                 </p>
               </div>
             </div>
