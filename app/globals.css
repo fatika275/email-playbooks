@@ -2840,6 +2840,14 @@ details[open] > summary::after {
   margin: 8px 0 0;
 }
 
+.clientFolderHeaderActions,
+.clientFolderFormActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
 .clientFolderDetailGrid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2851,6 +2859,10 @@ details[open] > summary::after {
   padding: 18px;
   border: 1px solid var(--border);
   background: #0a0a0a;
+}
+
+.clientFolderAddPanel {
+  max-width: 760px;
 }
 
 .clientFolderDetailPanelHeader {
@@ -2893,12 +2905,12 @@ details[open] > summary::after {
 }
 
 .clientFolderSaveNote,
-.clientFolderSaveForm > .button {
+.clientFolderFormActions {
   grid-column: 1 / -1;
 }
 
-.clientFolderSaveForm > .button {
-  justify-self: start;
+.clientFolderFormActions {
+  justify-content: flex-start;
 }
 
 .clientFolderDetailList {

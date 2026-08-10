@@ -34,12 +34,6 @@ const fileKindLabels: Record<string, string> = {
   asset: "Asset / file",
 };
 
-function makeLocalFileId() {
-  return typeof crypto !== "undefined" && "randomUUID" in crypto
-    ? crypto.randomUUID()
-    : `client-file-${Date.now()}-${Math.random().toString(16).slice(2)}`;
-}
-
 function readProspectFiles(prospectId: string) {
   if (typeof window === "undefined") return [];
   try {
@@ -101,11 +95,7 @@ export default function ClientFolderPage() {
   const [files, setFiles] = useState<ProspectFileRecord[]>([]);
   const [messageSearch, setMessageSearch] = useState("");
   const [fileSearch, setFileSearch] = useState("");
-  const [fileTitle, setFileTitle] = useState("");
-  const [fileKind, setFileKind] = useState("proposal");
-  const [fileUrl, setFileUrl] = useState("");
-  const [fileFolder, setFileFolder] = useState("");
-  const [fileNote, setFileNote] = useState("");
+  const [isFolderLoading, setIsFolderLoading] = useState(true);
   const [notice, setNotice] = useState("");
 
   const sentMessages = useMemo(() => {
@@ -132,35 +122,6 @@ export default function ClientFolderPage() {
         .includes(normalized)
     );
   }, [files, fileSearch]);
-
-  function handleSaveFile() {
-    if (!id || !fileTitle.trim()) {
-      setNotice("Add a name for the file or link first.");
-      return;
-    }
-
-    const nextFiles = [
-      {
-        id: makeLocalFileId(),
-        prospectId: id,
-        title: fileTitle.trim(),
-        kind: fileKind,
-        url: fileUrl.trim(),
-        folder: fileFolder.trim() || "Client files",
-        note: fileNote.trim(),
-        createdAt: new Date().toISOString(),
-      },
-      ...files,
-    ];
-
-    setFiles(nextFiles);
-    writeProspectFiles(id, nextFiles);
-    setFileTitle("");
-    setFileUrl("");
-    setFileFolder("");
-    setFileNote("");
-    setNotice("Saved to this client folder.");
-  }
 
   function handleRemoveFile(fileId: string) {
     if (!id) return;
@@ -189,6 +150,8 @@ export default function ClientFolderPage() {
         setNotice(
           error instanceof Error ? error.message : "Client folder could not load."
         );
+      } finally {
+        if (isMounted) setIsFolderLoading(false);
       }
     }
 
@@ -198,7 +161,7 @@ export default function ClientFolderPage() {
     };
   }, [id, user]);
 
-  if (isLoading) {
+  if (isLoading || (user && isFolderLoading)) {
     return (
       <main className="main">
         <section className="container">
@@ -225,7 +188,7 @@ export default function ClientFolderPage() {
     );
   }
 
-  if (notice || !prospect) {
+  if (!prospect) {
     return (
       <main className="main">
         <section className="container">
@@ -254,10 +217,17 @@ export default function ClientFolderPage() {
               {prospect.full_name} - {PROSPECT_STAGE_LABELS[prospect.stage]}
             </p>
           </div>
-          <Link href={`/prospects/${prospect.id}`} className="button buttonSecondary">
-            Open pipeline record
-          </Link>
+          <div className="clientFolderHeaderActions">
+            <Link href={`/client-folders/${prospect.id}/add`} className="button buttonPrimary">
+              Add file or link
+            </Link>
+            <Link href={`/prospects/${prospect.id}`} className="button buttonSecondary">
+              Open pipeline record
+            </Link>
+          </div>
         </div>
+
+        {notice ? <p className="notice">{notice}</p> : null}
 
         <div className="clientFolderDetailGrid">
           <section className="clientFolderDetailPanel">
@@ -289,68 +259,6 @@ export default function ClientFolderPage() {
             <div className="clientFolderDetailPanelHeader">
               <h2>Files and links</h2>
               <span>{files.length}</span>
-            </div>
-            <div className="clientFolderSaveForm">
-              <div className="formGroup">
-                <label className="label">Name</label>
-                <input
-                  className="input"
-                  value={fileTitle}
-                  onChange={(event) => setFileTitle(event.target.value)}
-                  placeholder="Proposal v2, Drive folder, signed brief..."
-                />
-              </div>
-              <div className="formGroup">
-                <label className="label">Type</label>
-                <select
-                  className="input"
-                  value={fileKind}
-                  onChange={(event) => setFileKind(event.target.value)}
-                >
-                  {Object.entries(fileKindLabels)
-                    .filter(([value]) => value !== "sent-message")
-                    .map(([value, label]) => (
-                      <option key={value} value={value}>{label}</option>
-                    ))}
-                </select>
-              </div>
-              <div className="formGroup">
-                <label className="label">Link</label>
-                <input
-                  className="input"
-                  type="url"
-                  value={fileUrl}
-                  onChange={(event) => setFileUrl(event.target.value)}
-                  placeholder="Google Drive, Dropbox, Notion, proposal URL..."
-                />
-              </div>
-              <div className="formGroup">
-                <label className="label">Folder</label>
-                <input
-                  className="input"
-                  value={fileFolder}
-                  onChange={(event) => setFileFolder(event.target.value)}
-                  placeholder="Proposal docs, briefs, handoff..."
-                />
-              </div>
-              <div className="formGroup clientFolderSaveNote">
-                <label className="label">Context</label>
-                <textarea
-                  className="input"
-                  rows={3}
-                  value={fileNote}
-                  onChange={(event) => setFileNote(event.target.value)}
-                  placeholder="What is this and what should the team know?"
-                />
-              </div>
-              <button
-                className="button buttonPrimary"
-                type="button"
-                disabled={!fileTitle.trim()}
-                onClick={handleSaveFile}
-              >
-                Save file or link
-              </button>
             </div>
             <input
               className="input clientFolderSearch"
