@@ -15,23 +15,20 @@ export default function PricingPage() {
           <div className="badge">Pricing</div>
 
           <h1 className="pageTitle" style={{ marginTop: 14 }}>
-            Simple pricing for agencies turning outreach into booked work
+            Pick the plan that keeps agency leads moving
           </h1>
 
           <p
             className="muted"
             style={{
-              maxWidth: 700,
+              maxWidth: 620,
               margin: "10px auto",
-              lineHeight: 1.75,
+              lineHeight: 1.65,
             }}
           >
-            Thalovo is built for one job: turn outreach into booked clients.
-            It helps small agencies send better outreach, track inquiries,
-            manage scoping calls, chase proposals, handle negotiation, and see
-            replies, booked calls, proposals, signed client work, stage speed,
-            and lead leakage. Start
-            in minutes with the service-sales workflow your agency already uses.
+            Start free with outreach messages. Upgrade when you want the
+            pipeline, follow-up reminders, and team handoff tools that stop
+            client work slipping through the cracks.
           </p>
 
           <p
@@ -45,7 +42,7 @@ export default function PricingPage() {
           >
             {founderEligible
               ? "Founder checkout is unlocked on this account. Complete payment to lock in your early supporter price."
-              : "Start free, upgrade to Pro when you are ready to track real leads, or choose Business Pro when the team needs shared pipeline access."}
+              : "Most solo agencies start with Pro. Teams that share leads should choose Business Pro."}
           </p>
         </div>
 
@@ -57,10 +54,9 @@ export default function PricingPage() {
               <span className="muted">/month locked</span>
             </h2>
             <p className="muted" style={{ marginTop: 10, lineHeight: 1.75 }}>
-              Founder Pro is the early supporter price for selected users: full
-              Pro access for one individual account, locked while your account
-              stays active. It is invite-only and does not include Business Pro
-              team seats.
+              Invite-only early supporter pricing for one individual account.
+              It includes full Pro access and stays locked while your account is
+              active.
             </p>
           </div>
 
@@ -101,15 +97,13 @@ export default function PricingPage() {
             </h2>
 
             <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
-              Test the first-message experience before you add pipeline
-              reminders for chasing replies and booking client work.
+              Try the message workflow before moving live leads into Thalovo.
             </p>
 
             <ul className="featureList">
-              <li>Three core outreach and follow-up starting points</li>
-              <li>Message drafting and variable replacement</li>
-              <li>Copy and TXT download</li>
-              <li>Basic saved-email history</li>
+              <li>Core outreach message templates</li>
+              <li>Draft, copy, and download messages</li>
+              <li>Basic saved-message history</li>
               <li>No card required</li>
             </ul>
 
@@ -137,17 +131,15 @@ export default function PricingPage() {
             </h2>
 
             <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
-              For solo agency owners who want to turn outreach into booked
-              client work with one clear path from first touch to handoff.
+              For solo agency owners who need a clear path from outreach to
+              booked calls and active deals.
             </p>
 
             <ul className="featureList">
-              <li>Use-case messages for outreach, follow-up, proposal chase, and win-back</li>
-              <li>Start with one prospect and a simple agency path</li>
-              <li>Agency pipeline stages for inquiries, scoping calls, proposals, negotiation, and handoff</li>
-              <li>Follow-up reminders to stop warm leads slipping because the chase was late</li>
-              <li>Practical reporting for replies, booked calls, proposals, signed work, stage speed, and leakage</li>
-              <li>Reusable saved messages and follow-up plans</li>
+              <li>Agency pipeline for prospects, calls, proposals, and handoff</li>
+              <li>Follow-up reminders so warm leads do not go quiet</li>
+              <li>Reusable outreach, proposal, and win-back templates</li>
+              <li>Simple reporting on replies, booked calls, won work, and leakage</li>
             </ul>
 
             <div style={{ marginTop: 24 }}>
@@ -179,13 +171,10 @@ export default function PricingPage() {
 
             <ul className="featureList">
               <li>Everything in Pro</li>
-              <li>Shared pipeline for inquiries, scoping calls, proposals, negotiation, and handoff</li>
-              <li>Shared notes and handoff context for lead owner changes</li>
-              <li>Simple ownership rules for who is chasing each lead</li>
+              <li>Shared pipeline, notes, and client handoff context</li>
+              <li>Simple ownership rules for who chases each lead</li>
               <li>10 teammate seats included</li>
-              <li>Full Pro access for every active member</li>
               <li>Shared outreach messages and follow-up plans</li>
-              <li>Simple teammate access without extra sales admin</li>
             </ul>
 
             <div style={{ marginTop: 24 }}>
@@ -196,44 +185,6 @@ export default function PricingPage() {
           </div>
 
         </div>
-
-        <section className="section">
-          <div className="glassCard" style={{ padding: 28 }}>
-            <div className="badge">What changes across plans</div>
-
-            <h2 className="pageTitle" style={{ marginTop: 14 }}>
-              One job: turn outreach into booked clients
-            </h2>
-
-            <div className="grid" style={{ marginTop: 20 }}>
-              <div className="glassCard" style={{ padding: 20 }}>
-                <h3 className="cardTitle">Free</h3>
-                <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
-                  Best for trying first-touch messages before moving follow-up
-                  and pipeline tracking into Thalovo.
-                </p>
-              </div>
-
-              <div className="glassCard" style={{ padding: 20 }}>
-                <h3 className="cardTitle">Pro</h3>
-                <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
-                  Best for solo agency owners turning outreach into booked
-                  client work.
-                </p>
-              </div>
-
-              <div className="glassCard" style={{ padding: 20 }}>
-                <h3 className="cardTitle">Business Pro</h3>
-                <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
-                  Best for small teams sharing pipeline, notes, outreach, and
-                  lead ownership without extra menus or sales admin overhead.
-                </p>
-              </div>
-
-            </div>
-
-          </div>
-        </section>
       </section>
     </main>
   );
