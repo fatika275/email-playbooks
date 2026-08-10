@@ -23,6 +23,44 @@ type TemplateOption = {
   template: Template;
 };
 
+const FOLLOW_UP_SITUATIONS = [
+  {
+    id: "warm-lead",
+    label: "Warm lead",
+    description: "They replied or showed interest, but have not booked yet.",
+    playbookIds: [
+      "follow-up-frameworks",
+      "meeting-follow-up",
+      "demo-booking-sequence",
+    ],
+  },
+  {
+    id: "proposal",
+    label: "Proposal sent",
+    description: "You sent scope or pricing and need a decision.",
+    playbookIds: ["proposal-follow-up"],
+  },
+  {
+    id: "quiet-lead",
+    label: "Gone quiet",
+    description: "A prospect or past client has stopped responding.",
+    playbookIds: ["no-show-recovery", "re-engagement-emails", "client-renewal-upsell"],
+  },
+  {
+    id: "all",
+    label: "All follow-ups",
+    description: "Browse every chase message and follow-up flow.",
+    playbookIds: playbooks.map((playbook) => playbook.id),
+  },
+] satisfies {
+  id: string;
+  label: string;
+  description: string;
+  playbookIds: string[];
+}[];
+
+type FollowUpSituationId = (typeof FOLLOW_UP_SITUATIONS)[number]["id"];
+
 function makeId(prefix = "sequence") {
   return typeof crypto !== "undefined" && "randomUUID" in crypto
     ? crypto.randomUUID()
@@ -76,16 +114,12 @@ function getFilledVariableCount(variables: string[], values: Record<string, stri
 
 export default function SequenceBuilderPage() {
   const { hasProAccess } = useAccount();
-  const [selectedPlaybookId, setSelectedPlaybookId] = useState(
-    playbooks[0]?.id ?? ""
-  );
+  const [selectedSituationId, setSelectedSituationId] =
+    useState<FollowUpSituationId>("warm-lead");
   const [templateQuery, setTemplateQuery] = useState("");
   const [steps, setSteps] = useState<BuilderStep[]>([]);
   const [values, setValues] = useState<Record<string, string>>({});
   const [sequenceTitle, setSequenceTitle] = useState("");
-  const [sequenceSubject, setSequenceSubject] = useState("");
-  const [folder, setFolder] = useState("Follow-up Plans");
-  const [tags, setTags] = useState("follow-up, outbound");
   const [notice, setNotice] = useState("");
 
   const templateOptions = useMemo<TemplateOption[]>(
@@ -104,10 +138,12 @@ export default function SequenceBuilderPage() {
 
   const filteredTemplateOptions = useMemo(() => {
     const normalizedQuery = templateQuery.trim().toLowerCase();
+    const selectedSituation =
+      FOLLOW_UP_SITUATIONS.find((situation) => situation.id === selectedSituationId) ??
+      FOLLOW_UP_SITUATIONS[0];
 
     return templateOptions.filter((option) => {
-      const matchesPlaybook =
-        selectedPlaybookId === "all" || option.playbookId === selectedPlaybookId;
+      const matchesSituation = selectedSituation.playbookIds.includes(option.playbookId);
       const matchesQuery =
         normalizedQuery.length === 0 ||
         [
@@ -122,9 +158,9 @@ export default function SequenceBuilderPage() {
           .toLowerCase()
           .includes(normalizedQuery);
 
-      return matchesPlaybook && matchesQuery;
+      return matchesSituation && matchesQuery;
     });
-  }, [selectedPlaybookId, templateOptions, templateQuery]);
+  }, [selectedSituationId, templateOptions, templateQuery]);
 
   const variables = useMemo(() => getUniqueVariables(steps), [steps]);
   const sequenceSpan = getSequenceSpan(steps);
@@ -148,10 +184,7 @@ export default function SequenceBuilderPage() {
       ? `${steps[0].playbookName} - Follow-up Plan`
       : "Custom Follow-up Plan");
 
-  const finalSubject =
-    sequenceSubject.trim() ||
-    renderedSteps[0]?.subject ||
-    "Custom follow-up plan";
+  const finalSubject = renderedSteps[0]?.subject || "Custom follow-up plan";
 
   const finalBody =
     renderedSteps.length > 0
@@ -244,11 +277,6 @@ export default function SequenceBuilderPage() {
     }
 
     const firstStep = steps[0];
-    const parsedTags = tags
-      .split(",")
-      .map((tag) => tag.trim())
-      .filter(Boolean);
-
     await saveCustomTemplateRecord({
       id: makeId("built-sequence"),
       title: finalTitle,
@@ -263,8 +291,8 @@ export default function SequenceBuilderPage() {
         templateLabel: getStepLabel(step.template.label),
         dayOffset: step.dayOffset,
       })),
-      tags: parsedTags,
-      folder: folder.trim() || "Follow-up Plans",
+      tags: ["follow-up", "pipeline"],
+      folder: "Follow-up Plans",
       isFavorite: false,
       createdAt: new Date().toISOString(),
     });
@@ -276,17 +304,15 @@ export default function SequenceBuilderPage() {
   return (
     <main className="main">
       <section className="container">
-        <div className="builderHero builderHeroSimple">
+        <div className="builderHero builderHeroSimple followUpHero">
           <div>
             <div className="badge">Follow-ups</div>
             <h1 className="pageTitle" style={{ marginTop: 14 }}>
-              Save the reminders that stop warm leads slipping.
+              Build a simple chase plan for leads that might slip.
             </h1>
             <p className="muted">
-              Deals are often lost by delay, not rejection. Pick the messages
-              and reminder days you use after the first touch, proposal, or
-              scoping call, then attach the plan to a lead so the next chase is
-              easy to see.
+              Choose the situation, pick the next messages, then save the plan.
+              No heavy automation, just clear follow-up steps for booking more client work.
             </p>
           </div>
           <div className="builderHeroActions">
@@ -296,49 +322,77 @@ export default function SequenceBuilderPage() {
           </div>
         </div>
 
+        <div className="followUpGuide" aria-label="Follow-up builder steps">
+          <div className="followUpGuideStep isActive">
+            <span>1</span>
+            <strong>Choose the chase</strong>
+          </div>
+          <div className={steps.length > 0 ? "followUpGuideStep isActive" : "followUpGuideStep"}>
+            <span>2</span>
+            <strong>Add messages</strong>
+          </div>
+          <div className={isReadyToSave ? "followUpGuideStep isActive" : "followUpGuideStep"}>
+            <span>3</span>
+            <strong>Save the plan</strong>
+          </div>
+        </div>
+
         <div className="builderLayout">
           <div className="builderLibrary glassCard">
             <div className="builderPanelHeader">
               <div>
-                <span className="miniBadge">Follow-up messages</span>
-                <h2 className="cardTitle">Pick the reminder messages</h2>
+                <span className="miniBadge">Step 1</span>
+                <h2 className="cardTitle">What are you chasing?</h2>
+              </div>
+            </div>
+
+            <div className="followUpSituationGrid">
+              {FOLLOW_UP_SITUATIONS.map((situation) => (
+                <button
+                  key={situation.id}
+                  type="button"
+                  className={
+                    selectedSituationId === situation.id
+                      ? "followUpSituation isSelected"
+                      : "followUpSituation"
+                  }
+                  onClick={() => {
+                    setSelectedSituationId(situation.id);
+                    setTemplateQuery("");
+                  }}
+                >
+                  <strong>{situation.label}</strong>
+                  <span>{situation.description}</span>
+                </button>
+              ))}
+            </div>
+
+            <div className="builderPanelHeader followUpMessageHeader">
+              <div>
+                <span className="miniBadge">Step 2</span>
+                <h2 className="cardTitle">Pick the messages</h2>
               </div>
               <span className="small">{filteredTemplateOptions.length} available</span>
             </div>
 
-            <div className="builderLibraryControls">
-              <div className="formGroup" style={{ marginBottom: 0 }}>
-                <label className="label">Find a message</label>
-                <input
-                  className="input"
-                  value={templateQuery}
-                  onChange={(event) => setTemplateQuery(event.target.value)}
-                  placeholder="Search by goal or use case"
-                />
-              </div>
-
-              <div className="formGroup" style={{ marginBottom: 0 }}>
-                <label className="label">Source</label>
-                <select
-                  className="input"
-                  value={selectedPlaybookId}
-                  onChange={(event) => setSelectedPlaybookId(event.target.value)}
-                >
-                  <option value="all">All playbooks</option>
-                  {playbooks.map((playbook) => (
-                    <option key={playbook.id} value={playbook.id}>
-                      {playbook.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+            <div className="builderLibraryControls followUpSearch">
+              <label className="label" htmlFor="follow-up-search">
+                Search these messages
+              </label>
+              <input
+                id="follow-up-search"
+                className="input"
+                value={templateQuery}
+                onChange={(event) => setTemplateQuery(event.target.value)}
+                placeholder="Search by goal or use case"
+              />
             </div>
 
             <div className="builderStepPicker">
               {filteredTemplateOptions.length === 0 ? (
                 <div className="builderEmptyPanel">
                   <strong>No matching messages</strong>
-                  <p className="muted">Try a broader search or choose another source.</p>
+                  <p className="muted">Try a broader search or choose another chase type.</p>
                 </div>
               ) : (
                 filteredTemplateOptions.map((option) => (
@@ -487,12 +541,12 @@ export default function SequenceBuilderPage() {
             <div className="glassCard builderPanel">
               <div className="builderPanelHeader">
                 <div>
-                  <span className="miniBadge">Save</span>
+                  <span className="miniBadge">Step 3</span>
                   <h2 className="cardTitle">Save the plan</h2>
                 </div>
               </div>
 
-              <div className="builderFieldGrid" style={{ marginTop: 16 }}>
+              <div className="builderFieldGrid followUpSaveGrid" style={{ marginTop: 16 }}>
                 <div className="formGroup" style={{ marginBottom: 0 }}>
                   <label className="label">Plan name</label>
                   <input
@@ -500,36 +554,6 @@ export default function SequenceBuilderPage() {
                     value={sequenceTitle}
                     onChange={(event) => setSequenceTitle(event.target.value)}
                     placeholder={finalTitle}
-                  />
-                </div>
-
-                <div className="formGroup" style={{ marginBottom: 0 }}>
-                  <label className="label">Folder</label>
-                  <input
-                    className="input"
-                    value={folder}
-                    onChange={(event) => setFolder(event.target.value)}
-                    placeholder="Example: Client acquisition"
-                  />
-                </div>
-
-                <div className="formGroup" style={{ marginBottom: 0 }}>
-                  <label className="label">Tags</label>
-                  <input
-                    className="input"
-                    value={tags}
-                    onChange={(event) => setTags(event.target.value)}
-                    placeholder="Example: outbound, follow-up"
-                  />
-                </div>
-
-                <div className="formGroup" style={{ marginBottom: 0 }}>
-                  <label className="label">First email subject</label>
-                  <input
-                    className="input"
-                    value={sequenceSubject}
-                    onChange={(event) => setSequenceSubject(event.target.value)}
-                    placeholder={finalSubject}
                   />
                 </div>
               </div>

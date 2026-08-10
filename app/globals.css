@@ -2041,6 +2041,10 @@ details[open] > summary::after {
   align-items: center;
 }
 
+.followUpHero {
+  margin-bottom: 16px;
+}
+
 .builderHeroActions {
   display: flex;
   justify-content: flex-end;
@@ -2050,6 +2054,56 @@ details[open] > summary::after {
   max-width: 700px;
   margin: 12px 0 0;
   line-height: 1.75;
+}
+
+.followUpGuide {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.followUpGuideStep {
+  min-width: 0;
+  min-height: 48px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #080808;
+  color: var(--muted);
+}
+
+.followUpGuideStep span {
+  width: 26px;
+  height: 26px;
+  flex: 0 0 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: #141414;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.followUpGuideStep strong {
+  min-width: 0;
+  font-size: 13px;
+  line-height: 1.25;
+}
+
+.followUpGuideStep.isActive {
+  color: #ffffff;
+  border-color: #343434;
+  background: #101010;
+}
+
+.followUpGuideStep.isActive span {
+  background: #ffffff;
+  color: #050505;
 }
 
 .builderHeroStats {
@@ -2132,6 +2186,56 @@ details[open] > summary::after {
   padding-bottom: 16px;
   margin-bottom: 16px;
   border-bottom: 1px solid var(--border-soft);
+}
+
+.followUpSituationGrid {
+  display: grid;
+  gap: 8px;
+  padding-bottom: 18px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.followUpSituation {
+  min-width: 0;
+  padding: 13px;
+  display: grid;
+  gap: 5px;
+  text-align: left;
+  color: var(--muted);
+  background: #090909;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease;
+}
+
+.followUpSituation:hover,
+.followUpSituation.isSelected {
+  color: #ffffff;
+  background: #121212;
+  border-color: #343434;
+}
+
+.followUpSituation strong {
+  color: inherit;
+  font-size: 14px;
+  line-height: 1.25;
+}
+
+.followUpSituation span {
+  font-size: 12px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.followUpMessageHeader {
+  margin-bottom: 12px;
+}
+
+.followUpSearch {
+  padding-bottom: 12px;
+  margin-bottom: 12px;
 }
 
 .builderStepPicker,
@@ -2254,6 +2358,10 @@ details[open] > summary::after {
 
 .builderSaveActions {
   justify-content: space-between;
+}
+
+.followUpSaveGrid {
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .builderEmptyPanel {
@@ -4602,6 +4710,10 @@ details[open] > summary::after {
   }
 
   .builderHeroStats {
+    grid-template-columns: 1fr;
+  }
+
+  .followUpGuide {
     grid-template-columns: 1fr;
   }
 
