@@ -7,7 +7,7 @@ import { useAccount } from "@/components/account-provider";
 const navItems = [
   { href: "/prospects", label: "Pipeline" },
   { href: "/library", label: "Outreach" },
-  { href: "/reply-helper", label: "Replies" },
+  { href: "/reply-helper", label: "Objections" },
   { href: "/sequence-builder", label: "Follow-ups" },
   { href: "/team", label: "Team" },
 ];

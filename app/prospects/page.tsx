@@ -77,17 +77,6 @@ function daysSince(date: string | null) {
   return Math.floor((today.getTime() - then.getTime()) / 86_400_000);
 }
 
-function getReplyHelperHref(prospect: Prospect) {
-  const params = new URLSearchParams({
-    name: prospect.full_name,
-  });
-
-  if (prospect.email) params.set("email", prospect.email);
-  if (prospect.service_type) params.set("offer", prospect.service_type);
-
-  return `/reply-helper?${params.toString()}`;
-}
-
 function isScheduledTask(task: ProspectTask) {
   const title = getProspectTaskDisplayTitle(task.title).toLowerCase();
   return title.includes("follow-up") || title.includes("follow up");
@@ -302,7 +291,7 @@ export default function ProspectsPage() {
         label: "Reply",
         title: prospect.full_name,
         meta: `${prospect.company} - keep the conversation moving`,
-        href: getReplyHelperHref(prospect),
+        href: `/prospects/${prospect.id}`,
         prospect,
       })),
     ].slice(0, 5);
@@ -330,7 +319,7 @@ export default function ProspectsPage() {
         label: "Needs reply",
         title: prospect.full_name,
         meta: prospect.company,
-        href: getReplyHelperHref(prospect),
+        href: `/prospects/${prospect.id}`,
       })),
       ...coldProspects.slice(0, 3).map((prospect) => ({
         id: `cold-${prospect.id}`,
@@ -1130,7 +1119,7 @@ export default function ProspectsPage() {
                     <strong>{pipelineValue.lost}</strong>
                   </div>
                   <div>
-                    <span>Replies waiting</span>
+                    <span>Leads waiting</span>
                     <strong>{dailyDashboard.replyNeeded.length}</strong>
                   </div>
                   <div>

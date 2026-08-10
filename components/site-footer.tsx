@@ -26,7 +26,7 @@ export default function SiteFooter() {
               Templates
             </Link>
             <Link href="/reply-helper" className="footerLink">
-              Replies
+              Objections
             </Link>
             <Link href="/sequence-builder" className="footerLink">
               Follow-ups

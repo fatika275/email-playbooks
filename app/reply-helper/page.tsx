@@ -58,7 +58,7 @@ function ReplyHelperContent() {
 
   async function handleCopyReply() {
     await navigator.clipboard.writeText(`Subject: ${reply.subject}\n\n${reply.body}`);
-    setNotice("Reply copied. Review it before sending.");
+    setNotice("Objection reply copied. Review it before sending.");
     setTimeout(() => setNotice(""), 2600);
   }
 
@@ -67,10 +67,10 @@ function ReplyHelperContent() {
       <section className="container">
         <div className="pageHeader">
           <div>
-            <div className="badge">Reply helper</div>
-            <h1 className="pageTitle">Handle replies without going back to a template.</h1>
+            <div className="badge">Objection helper</div>
+            <h1 className="pageTitle">Handle objections without going back to a template.</h1>
             <p className="pageSubtitle">
-              Use this when a lead pushes back, asks for more information, or needs a calm next step toward booked work.
+              Use this when a lead pushes back on price, timing, trust, approval, or fit and you need a calm next step toward booked work.
             </p>
           </div>
         </div>
@@ -79,8 +79,8 @@ function ReplyHelperContent() {
           <div className="formCard">
             <div className="editorComposerPanel">
               <div>
-                <span className="miniBadge">Live lead reply</span>
-                <h4 style={{ margin: "8px 0 0" }}>What do they need answered?</h4>
+                <span className="miniBadge">Live objection reply</span>
+                <h4 style={{ margin: "8px 0 0" }}>What concern do you need to handle?</h4>
                 <p className="muted" style={{ margin: "6px 0 0" }}>
                   Pick the concern first. Paste their wording only when it gives useful context.
                 </p>
@@ -189,7 +189,7 @@ function ReplyHelperContent() {
                     rows={5}
                     value={objection}
                     onChange={(event) => setObjection(event.target.value)}
-                    placeholder="Paste the reply or concern you need to answer"
+                    placeholder="Paste the objection or concern you need to answer"
                   />
                   {suggestedObjectionCategory ? (
                     <div
@@ -248,7 +248,7 @@ function ReplyHelperContent() {
                     {objectionCategoryLabels[reply.category]}
                   </span>
                   <h3 className="sectionTitle" style={{ marginTop: 10 }}>
-                    Suggested reply
+                    Suggested objection reply
                   </h3>
                 </div>
               </div>
