@@ -2874,6 +2874,33 @@ details[open] > summary::after {
   font-weight: 800;
 }
 
+.clientFolderSearch {
+  margin-top: 14px;
+}
+
+.clientFolderSaveForm {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(150px, 0.45fr);
+  gap: 12px;
+  margin-top: 14px;
+  padding: 14px;
+  border: 1px solid var(--border-soft);
+  background: #080808;
+}
+
+.clientFolderSaveForm .formGroup {
+  margin-bottom: 0;
+}
+
+.clientFolderSaveNote,
+.clientFolderSaveForm > .button {
+  grid-column: 1 / -1;
+}
+
+.clientFolderSaveForm > .button {
+  justify-self: start;
+}
+
 .clientFolderDetailList {
   display: grid;
   gap: 10px;
@@ -2904,6 +2931,13 @@ details[open] > summary::after {
 .clientFolderDetailList .button {
   justify-self: start;
   margin-top: 4px;
+}
+
+.clientFolderFileActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
 }
 
 .prospectHeader {
@@ -4754,6 +4788,7 @@ details[open] > summary::after {
   .savedToolbar,
   .savedMoveBar,
   .clientFolderShareForm,
+  .clientFolderSaveForm,
   .clientFolderDetailGrid {
     grid-template-columns: 1fr;
   }

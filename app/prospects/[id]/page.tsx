@@ -576,7 +576,7 @@ export default function ProspectDetailPage() {
       await createProspectActivity({
         prospectId: id,
         userId: user.id,
-        activityType: "email",
+        activityType: "status",
         summary: `Follow-up plan started from ${proposalSentDate}: ${selectedSequence.name} with ${selectedSequence.steps.length} message${selectedSequence.steps.length === 1 ? "" : "s"}.`,
       });
       const firstFollowUp = addDays(proposalSentDate, selectedSequence.steps[0]?.dayOffset ?? 0);
