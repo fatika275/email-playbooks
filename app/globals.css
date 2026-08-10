@@ -2890,6 +2890,13 @@ details[open] > summary::after {
   margin-top: 14px;
 }
 
+.clientFolderFilters {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(150px, 0.4fr);
+  gap: 10px;
+  margin-top: 14px;
+}
+
 .clientFolderSaveForm {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(150px, 0.45fr);
@@ -4801,6 +4808,7 @@ details[open] > summary::after {
   .savedMoveBar,
   .clientFolderShareForm,
   .clientFolderSaveForm,
+  .clientFolderFilters,
   .clientFolderDetailGrid {
     grid-template-columns: 1fr;
   }

@@ -34,6 +34,10 @@ const fileKindLabels: Record<string, string> = {
   asset: "Asset / file",
 };
 
+const fileKindFilterOptions = Object.entries(fileKindLabels).filter(
+  ([value]) => value !== "sent-message"
+);
+
 function readProspectFiles(prospectId: string) {
   if (typeof window === "undefined") return [];
   try {
@@ -95,6 +99,7 @@ export default function ClientFolderPage() {
   const [files, setFiles] = useState<ProspectFileRecord[]>([]);
   const [messageSearch, setMessageSearch] = useState("");
   const [fileSearch, setFileSearch] = useState("");
+  const [fileTypeFilter, setFileTypeFilter] = useState("all");
   const [isFolderLoading, setIsFolderLoading] = useState(true);
   const [notice, setNotice] = useState("");
 
@@ -114,14 +119,16 @@ export default function ClientFolderPage() {
 
   const filteredFiles = useMemo(() => {
     const normalized = fileSearch.trim().toLowerCase();
-    if (!normalized) return files;
     return files.filter((file) =>
-      [file.title, file.kind, file.folder, file.note, file.url]
-        .join(" ")
-        .toLowerCase()
-        .includes(normalized)
+      (fileTypeFilter === "all" || file.kind === fileTypeFilter) &&
+      (normalized
+        ? [file.title, file.kind, file.folder, file.note, file.url]
+            .join(" ")
+            .toLowerCase()
+            .includes(normalized)
+        : true)
     );
-  }, [files, fileSearch]);
+  }, [files, fileSearch, fileTypeFilter]);
 
   function handleRemoveFile(fileId: string) {
     if (!id) return;
@@ -260,13 +267,26 @@ export default function ClientFolderPage() {
               <h2>Files and links</h2>
               <span>{files.length}</span>
             </div>
-            <input
-              className="input clientFolderSearch"
-              value={fileSearch}
-              onChange={(event) => setFileSearch(event.target.value)}
-              placeholder="Search files and links"
-              aria-label="Search files and links"
-            />
+            <div className="clientFolderFilters">
+              <input
+                className="input"
+                value={fileSearch}
+                onChange={(event) => setFileSearch(event.target.value)}
+                placeholder="Search files and links"
+                aria-label="Search files and links"
+              />
+              <select
+                className="input"
+                value={fileTypeFilter}
+                onChange={(event) => setFileTypeFilter(event.target.value)}
+                aria-label="Filter files and links by type"
+              >
+                <option value="all">All types</option>
+                {fileKindFilterOptions.map(([value, label]) => (
+                  <option key={value} value={value}>{label}</option>
+                ))}
+              </select>
+            </div>
             <div className="clientFolderDetailList">
               {filteredFiles.map((file) => (
                 <article key={file.id}>
@@ -291,7 +311,7 @@ export default function ClientFolderPage() {
                 </article>
               ))}
               {filteredFiles.length === 0 ? (
-                <p className="muted">{fileSearch.trim() ? "No files or links match that search." : "No files or links have been saved for this client yet."}</p>
+                <p className="muted">{fileSearch.trim() || fileTypeFilter !== "all" ? "No files or links match those filters." : "No files or links have been saved for this client yet."}</p>
               ) : null}
             </div>
           </section>
