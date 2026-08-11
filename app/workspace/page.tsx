@@ -518,12 +518,12 @@ export default function WorkspacePage() {
                       ) : null}
 
                       <div className="savedItemActions">
-                        <Link href={`/client-folders/${prospect.id}`} className="button buttonSecondary">
+                        <Link href={`/client-folders/${prospect.id}`} className="clientFolderOpenAction">
                           Open folder
                         </Link>
                         <button
                           type="button"
-                          className="button buttonSecondary"
+                          className={isSharing ? "clientFolderShareToggle isOpen" : "clientFolderShareToggle"}
                           onClick={() => {
                             setShareProspectId(isSharing ? "" : prospect.id);
                             setShareEmail("");

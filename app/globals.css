@@ -2708,6 +2708,39 @@ details[open] > summary::after {
   flex-wrap: wrap;
 }
 
+.clientFolderOpenAction,
+.clientFolderShareToggle {
+  min-height: 38px;
+  padding: 0 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.clientFolderOpenAction {
+  color: #050505;
+  border: 1px solid #ffffff;
+  background: #ffffff;
+}
+
+.clientFolderShareToggle {
+  color: var(--text);
+  border: 1px solid var(--border-soft);
+  background: transparent;
+}
+
+.clientFolderShareToggle.isOpen {
+  color: #f4f4f5;
+  border-color: #3a3a3a;
+  background: #171717;
+}
+
 .clientFolderGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
