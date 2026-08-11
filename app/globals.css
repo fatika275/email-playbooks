@@ -3836,17 +3836,23 @@ details[open] > summary::after {
 }
 
 .proposalNextMessage {
+  display: grid;
+  gap: 14px;
+  margin-top: 20px;
+  padding: 16px;
+  border-top: 1px solid var(--border-soft);
+  border-bottom: 1px solid var(--border-soft);
+  background: #0a0a0a;
+}
+
+.proposalNextMessageMain {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 24px;
-  margin-top: 20px;
-  padding: 20px 0;
-  border-top: 1px solid var(--border-soft);
-  border-bottom: 1px solid var(--border-soft);
 }
 
-.proposalNextMessage > div:first-child {
+.proposalNextMessageMain > div:first-child {
   display: grid;
   gap: 6px;
 }
@@ -3862,8 +3868,26 @@ details[open] > summary::after {
   margin: 0;
 }
 
+.proposalInlineNotice {
+  margin: 0;
+  padding: 10px 12px;
+  color: var(--foreground);
+  font-size: 12px;
+  line-height: 1.5;
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  background: #101010;
+}
+
+.proposalInlineNoticeStandalone {
+  margin-top: 14px;
+}
+
 .proposalOutcomeActions {
   align-items: center;
+  margin-top: 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-soft);
 }
 
 .proposalWorkflowSchedule {
@@ -3913,7 +3937,7 @@ details[open] > summary::after {
     grid-template-columns: 1fr;
   }
 
-  .proposalNextMessage {
+  .proposalNextMessageMain {
     align-items: flex-start;
     flex-direction: column;
   }

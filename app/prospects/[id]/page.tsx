@@ -176,6 +176,7 @@ export default function ProspectDetailPage() {
   const [showAllActivity, setShowAllActivity] = useState(false);
   const [pendingProposalOutcome, setPendingProposalOutcome] = useState<"won" | "lost" | null>(null);
   const [proposalOutcomeReason, setProposalOutcomeReason] = useState("");
+  const [proposalNotice, setProposalNotice] = useState("");
 
   const scheduledSequences = useMemo<ScheduledSequence[]>(() => {
     const builtIn = builtInScheduledSequences.map((playbook) => ({
@@ -548,9 +549,9 @@ export default function ProspectDetailPage() {
       setNextFollowUp(nextDate);
       setLastContactedAt(updated.last_contacted_at);
       await refreshOperations();
-      setNotice(nextTask ? "Follow-up completed. The next reminder is scheduled." : "Final follow-up completed. Record the outcome when they respond.");
+      setProposalNotice(nextTask ? "Follow-up completed. The next reminder is scheduled." : "Final follow-up completed. Record the outcome when they respond.");
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : "Follow-up could not be completed.");
+      setProposalNotice(error instanceof Error ? error.message : "Follow-up could not be completed.");
     }
   }
 
@@ -603,9 +604,9 @@ export default function ProspectDetailPage() {
       setNextFollowUp(firstFollowUp);
       setLastContactedAt(updated.last_contacted_at);
       await refreshOperations();
-      setNotice(`${selectedSequence.name} started from the proposal/client-work sent date. Your reminders are ready.`);
+      setProposalNotice(`${selectedSequence.name} started. Your reminders are ready.`);
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : "Scheduled follow-up could not be started.");
+      setProposalNotice(error instanceof Error ? error.message : "Scheduled follow-up could not be started.");
     } finally {
       setIsStartingProposalWorkflow(false);
     }
@@ -654,9 +655,9 @@ export default function ProspectDetailPage() {
       setPendingProposalOutcome(null);
       setProposalOutcomeReason("");
       await refreshOperations();
-      setNotice(`Scheduled follow-up closed as ${PROSPECT_STAGE_LABELS[outcome].toLowerCase()}.`);
+      setProposalNotice(`Scheduled follow-up closed as ${PROSPECT_STAGE_LABELS[outcome].toLowerCase()}.`);
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : "Scheduled follow-up could not be closed.");
+      setProposalNotice(error instanceof Error ? error.message : "Scheduled follow-up could not be closed.");
     } finally {
       setIsStartingProposalWorkflow(false);
     }
@@ -844,10 +845,13 @@ export default function ProspectDetailPage() {
                 <button className="button buttonPrimary" disabled={isStartingProposalWorkflow || !proposalSentDate || !selectedSequenceId} onClick={() => void handleStartProposalWorkflow()}>{isStartingProposalWorkflow ? "Starting..." : "Start reminders"}</button>
               </div></> : <>
                 <div className="proposalNextMessage">
-                  <div><span>{nextProposalTask.due_date ? `Due ${nextProposalTask.due_date}` : "Ready when you are"}</span><strong>{cleanFollowUpTaskTitle(nextProposalTask.title)}</strong><p>{activeProposalTasks.length > 1 ? `${activeProposalTasks.length - 1} later reminder${activeProposalTasks.length - 1 === 1 ? "" : "s"} already set so the chase does not stall.` : "This is the final reminder in the plan."}</p></div>
-                  <div className="proposalTaskActions"><button className="button buttonPrimary" onClick={() => handleDraftProposalFollowUp(nextProposalTask)}>Open message</button><button className="button buttonSecondary" onClick={() => void handleCompleteProposalTask(nextProposalTask)}>Mark sent</button></div>
+                  {proposalNotice ? <p className="proposalInlineNotice">{proposalNotice}</p> : null}
+                  <div className="proposalNextMessageMain">
+                    <div><span>{nextProposalTask.due_date ? `Due ${nextProposalTask.due_date}` : "Ready when you are"}</span><strong>{cleanFollowUpTaskTitle(nextProposalTask.title)}</strong><p>{activeProposalTasks.length > 1 ? `${activeProposalTasks.length - 1} later reminder${activeProposalTasks.length - 1 === 1 ? "" : "s"} already set so the chase does not stall.` : "This is the final reminder in the plan."}</p></div>
+                    <div className="proposalTaskActions"><button className="button buttonPrimary" onClick={() => handleDraftProposalFollowUp(nextProposalTask)}>Open message</button><button className="button buttonSecondary" onClick={() => void handleCompleteProposalTask(nextProposalTask)}>Mark sent</button></div>
+                  </div>
+                  <div className="proposalWorkflowActions proposalOutcomeActions"><span>Close this schedule</span><button className="button buttonSecondary" disabled={isStartingProposalWorkflow} onClick={() => void handleProposalOutcome("replied")}>They replied</button><button className="button buttonSecondary" disabled={isStartingProposalWorkflow} onClick={() => setPendingProposalOutcome("won")}>Move to handoff</button><button className="button buttonUtility" disabled={isStartingProposalWorkflow} onClick={() => setPendingProposalOutcome("lost")}>Lost / slipped</button></div>
                 </div>
-                <div className="proposalWorkflowActions proposalOutcomeActions"><span>Close this schedule</span><button className="button buttonSecondary" disabled={isStartingProposalWorkflow} onClick={() => void handleProposalOutcome("replied")}>They replied</button><button className="button buttonSecondary" disabled={isStartingProposalWorkflow} onClick={() => setPendingProposalOutcome("won")}>Move to handoff</button><button className="button buttonUtility" disabled={isStartingProposalWorkflow} onClick={() => setPendingProposalOutcome("lost")}>Lost / slipped</button></div>
                 {pendingProposalOutcome ? (
                   <div className="prospectOutcomePanel">
                     <div>
@@ -872,6 +876,7 @@ export default function ProspectDetailPage() {
                   </div>
                 ) : null}
               </>}
+              {!nextProposalTask && proposalNotice ? <p className="proposalInlineNotice proposalInlineNoticeStandalone">{proposalNotice}</p> : null}
             </section>
 
             <div
