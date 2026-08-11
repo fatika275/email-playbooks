@@ -4027,6 +4027,15 @@ details[open] > summary::after {
   align-items: center;
 }
 
+.prospectActivityForm {
+  grid-template-columns: minmax(132px, 160px) minmax(0, 1fr) minmax(92px, 110px);
+  gap: 14px;
+  padding: 12px;
+  margin-top: 16px;
+  border: 1px solid var(--border-soft);
+  background: #070707;
+}
+
 .prospectTaskForm > *,
 .prospectActivityForm > * {
   min-width: 0;
@@ -4037,6 +4046,11 @@ details[open] > summary::after {
 .prospectActivityForm > .button {
   grid-column: 1 / -1;
   white-space: normal;
+}
+
+.prospectActivityForm > .button {
+  grid-column: auto;
+  justify-content: center;
 }
 
 .prospectTaskList,
@@ -5438,6 +5452,10 @@ details[open] > summary::after {
   .prospectActivityForm,
   .prospectReportSummary {
     grid-template-columns: 1fr;
+  }
+
+  .prospectActivityForm > .button {
+    grid-column: 1 / -1;
   }
 
   .prospectReportSummary div {
