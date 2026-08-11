@@ -3646,6 +3646,43 @@ details[open] > summary::after {
   white-space: pre-wrap;
 }
 
+.prospectContextCompact {
+  gap: 12px;
+}
+
+.prospectContextCompact strong {
+  margin-bottom: 0;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.prospectSnapshotHead {
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.prospectSnapshotHead strong {
+  font-size: 14px;
+}
+
+.prospectSnapshotGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.prospectSnapshotGrid div,
+.prospectSnapshotLine {
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid var(--border-soft);
+  background: #050505;
+}
+
+.prospectSnapshotLine {
+  display: grid;
+  gap: 6px;
+}
+
 .prospectOpsGrid,
 .prospectTodayGrid {
   display: grid;

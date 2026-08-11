@@ -122,10 +122,6 @@ function addDays(date: string, days: number) {
   return result.toISOString().slice(0, 10);
 }
 
-function contextValue(value: string | null | undefined, fallback: string) {
-  return value?.trim() || fallback;
-}
-
 export default function ProspectDetailPage() {
   const params = useParams();
   const router = useRouter();
@@ -243,21 +239,7 @@ export default function ProspectDetailPage() {
     return ["email", "call", "meeting", "status"].includes(activity.activity_type);
   }), [activities, activityFilter]);
   const visibleActivities = showAllActivity ? filteredActivities : filteredActivities.slice(0, 8);
-  const latestSharedNote = comments[0];
-  const latestSharedNotePreview = latestSharedNote
-    ? latestSharedNote.body.length > 220
-      ? `${latestSharedNote.body.slice(0, 220)}...`
-      : latestSharedNote.body
-    : "No handoff note yet";
-  const handoffSummary = [
-    { label: "Owner now", value: prospect?.assigned_email || "Unassigned" },
-    { label: "Agency stage", value: PROSPECT_STAGE_LABELS[stage] },
-    { label: "Next follow-up", value: nextFollowUp || "Not scheduled" },
-    { label: "Service type", value: contextValue(serviceType, "Not scoped") },
-    { label: "Budget", value: contextValue(budgetRange, "Not captured") },
-    { label: "Timeline", value: contextValue(timeline, "Not captured") },
-    { label: "Decision-maker", value: contextValue(decisionMaker, "Not captured") },
-  ];
+  const scopeSnapshot = [serviceType, budgetRange].map((value) => value?.trim()).filter(Boolean).join(" / ");
   const showOnboardingGuide =
     searchParams.get("onboarding") === "1" ||
     Boolean(prospect && !lastContactedAt && !nextFollowUp && tasks.length === 0);
@@ -961,14 +943,25 @@ export default function ProspectDetailPage() {
               {email ? <a className="button buttonSecondary" href={`mailto:${encodeURIComponent(email)}`}>Email {fullName || "lead"}</a> : null}
               {linkedinUrl ? <a className="button buttonSecondary" href={linkedinUrl} target="_blank" rel="noreferrer">Open LinkedIn</a> : null}
             </div>
-            <div className="prospectContextBlock">
-              <span>Handoff snapshot</span><strong>For the next teammate</strong>
-              {handoffSummary.map((item) => (
-                <div key={item.label}>
-                  <span>{item.label}</span><strong>{item.value}</strong>
+            <div className="prospectContextBlock prospectContextCompact">
+              <div className="prospectSnapshotHead">
+                <span>Lead snapshot</span>
+                <strong>{PROSPECT_STAGE_LABELS[stage]}</strong>
+              </div>
+              <div className="prospectSnapshotGrid">
+                <div>
+                  <span>Next follow-up</span>
+                  <strong>{nextFollowUp || "Not scheduled"}</strong>
                 </div>
-              ))}
-              <span>Latest shared note</span><strong>{latestSharedNotePreview}</strong>
+                <div>
+                  <span>Owner</span>
+                  <strong>{prospect?.assigned_email || "Unassigned"}</strong>
+                </div>
+              </div>
+              <div className="prospectSnapshotLine">
+                <span>Scope</span>
+                <strong>{scopeSnapshot || "Not scoped yet"}</strong>
+              </div>
             </div>
           </aside>
         </div>
