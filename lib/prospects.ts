@@ -179,13 +179,19 @@ export type OverdueWorkspaceTask = ProspectTask & {
 };
 
 function prospectError(error: { code?: string; message?: string } | null) {
+  const message = error?.message?.toLowerCase() ?? "";
   if (
     error?.code === "42P01" ||
+    error?.code === "42703" ||
+    error?.code === "42883" ||
     error?.code === "PGRST205" ||
-    error?.message?.toLowerCase().includes("prospects")
+    message.includes("prospects") ||
+    message.includes("prospect_") ||
+    message.includes("forecast_settings") ||
+    message.includes("workspace_notifications")
   ) {
     return new Error(
-      "Client Work Pipeline needs its one-time Supabase setup before it can save leads."
+      "Client Work Pipeline needs its Supabase SQL setup before it can save leads. In Supabase SQL Editor, run: business-workspaces.sql, lead-management.sql, lead-operations.sql, team-workspace-operations.sql, team-collaboration.sql, forecast-settings.sql, then client-folder-sharing.sql."
     );
   }
   return new Error(error?.message || "Client work tracking is temporarily unavailable.");
