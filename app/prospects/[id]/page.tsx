@@ -800,16 +800,15 @@ export default function ProspectDetailPage() {
 
             <section className="prospectOpsPanel proposalWorkflowPanel" hidden={detailView !== "followup"}>
               <div className="proposalWorkflowHeader">
-                <div><span className="miniBadge">Follow-up reminders</span><h2 className="cardTitle">{nextProposalTask ? "Next chase to send" : "Protect this deal from delay"}</h2><p className="small">{nextProposalTask ? "Use the next reminder for this lead so silence does not turn into a lost deal. Opening a message loads the right template for this chase." : "Choose a saved plan and first-touch date so the next chase is visible before the lead goes cold."}</p></div>
+                <div><h2 className="cardTitle">{nextProposalTask ? "Next chase to send" : "Set follow-up reminders"}</h2><p className="small">{nextProposalTask ? "Open the next message, send it, then mark it sent." : "Choose the plan and date. Thalovo will create the chase reminders."}</p></div>
                 {activeProposalTasks.length ? <span className="statusPill statusPillSuccess">{activeProposalTasks.length} reminder{activeProposalTasks.length === 1 ? "" : "s"} active</span> : <span className="statusPill">No plan running</span>}
               </div>
               {!nextProposalTask ? <><div className="proposalWorkflowForm">
                 <div className="formGroup proposalSequencePicker"><label className="label">Follow-up plan</label>
                   <div className="proposalSelectedSequence">
                     <div>
-                      <span className="miniBadge">{selectedScheduledSequence?.sourceLabel ?? "Not selected"}</span>
                       <strong>{selectedScheduledSequence?.name ?? "Choose a follow-up plan"}</strong>
-                      <p>{selectedScheduledSequence ? `${selectedScheduledSequence.steps.length} message${selectedScheduledSequence.steps.length === 1 ? "" : "s"}` : "Pick the plan that fits this lead and the client work you want to win."}</p>
+                      <p>{selectedScheduledSequence ? `${selectedScheduledSequence.steps.length} message${selectedScheduledSequence.steps.length === 1 ? "" : "s"}` : "Proposal chase, meeting follow-up, win-back, or your saved plan."}</p>
                     </div>
                     <button type="button" className="button buttonSecondary" onClick={() => setIsSequencePickerOpen((current) => !current)}>
                       {selectedScheduledSequence ? "Change" : "Choose"}
@@ -837,9 +836,8 @@ export default function ProspectDetailPage() {
                       </div>
                     </div>
                   ) : null}
-                  <p className="small" style={{ margin: "6px 0 0" }}>{selectedScheduledSequence ? "This plan will add the reminder dates below from the first touch." : "Nothing is preselected for this lead. Pick a plan before this opportunity has time to go quiet."}</p>
                 </div>
-                <div className="formGroup"><label className="label">Proposal / first message sent date</label><input className="input" type="date" value={proposalSentDate} onChange={(event) => setProposalSentDate(event.target.value)} /><p className="small" style={{ margin: "6px 0 0" }}>Reminder dates are based on this client-work touch so slow follow-up does not cost the deal.</p></div>
+                <div className="formGroup"><label className="label">First sent date</label><input className="input" type="date" value={proposalSentDate} onChange={(event) => setProposalSentDate(event.target.value)} /></div>
                 <div className="formGroup"><label className="label">Assigned to</label>{prospect?.workspace_id ? <select className="input" value={taskAssignee} onChange={(event) => setTaskAssignee(event.target.value)}><option value="">Unassigned</option><option value={user.email ?? ""}>Me ({user.email})</option>{teamMembers.filter((member) => member.email !== user.email).map((member) => <option key={member.id} value={member.email}>{member.email}</option>)}</select> : <input className="input" type="email" value={taskAssignee} onChange={(event) => setTaskAssignee(event.target.value)} placeholder="Assignee email" />}</div>
               </div>
               <div className="proposalWorkflowActions">
