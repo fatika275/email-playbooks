@@ -4047,6 +4047,12 @@ details[open] > summary::after {
   margin-top: 16px;
 }
 
+.prospectTimelineScrollable {
+  max-height: 360px;
+  padding-right: 6px;
+  overflow-y: auto;
+}
+
 .prospectTask {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
@@ -4133,6 +4139,10 @@ details[open] > summary::after {
 
 .prospectTimelineItem .small {
   margin: 3px 0 0;
+}
+
+.prospectActivityMore {
+  margin-top: 12px;
 }
 
 .prospectTodayGrid {

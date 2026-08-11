@@ -46,6 +46,7 @@ const SEQUENCE_TIMING: Record<string, number[]> = {
 };
 
 const builtInScheduledSequences = playbooks.filter((playbook) => SEQUENCE_TIMING[playbook.id]);
+const ACTIVITY_PREVIEW_LIMIT = 5;
 
 type ScheduledSequence = {
   id: string;
@@ -238,7 +239,8 @@ export default function ProspectDetailPage() {
     if (activityFilter === "notes") return activity.activity_type === "note";
     return ["email", "call", "meeting", "status"].includes(activity.activity_type);
   }), [activities, activityFilter]);
-  const visibleActivities = showAllActivity ? filteredActivities : filteredActivities.slice(0, 8);
+  const visibleActivities = showAllActivity ? filteredActivities : filteredActivities.slice(0, ACTIVITY_PREVIEW_LIMIT);
+  const hiddenActivityCount = Math.max(filteredActivities.length - ACTIVITY_PREVIEW_LIMIT, 0);
   const scopeSnapshot = [serviceType, budgetRange].map((value) => value?.trim()).filter(Boolean).join(" / ");
   const showOnboardingGuide =
     searchParams.get("onboarding") === "1" ||
@@ -890,7 +892,7 @@ export default function ProspectDetailPage() {
               </section>
 
               <section className="prospectOpsPanel" hidden={detailView !== "activity"}>
-                <div className="prospectActivityHeading"><div><h2 className="cardTitle">Activity timeline</h2><p className="small">Useful shows outreach and client-work outcomes. Routine edits stay hidden unless you choose All activity.</p></div><select className="input" value={activityFilter} onChange={(event) => { setActivityFilter(event.target.value as "useful" | "outreach" | "notes" | "all"); setShowAllActivity(false); }} aria-label="Filter lead activity"><option value="useful">Useful activity</option><option value="outreach">Outreach only</option><option value="notes">Notes only</option><option value="all">All activity</option></select></div>
+                <div className="prospectActivityHeading"><div><h2 className="cardTitle">Recent activity</h2><p className="small">Keep the latest client-work context visible without turning the page into a long log.</p></div><select className="input" value={activityFilter} onChange={(event) => { setActivityFilter(event.target.value as "useful" | "outreach" | "notes" | "all"); setShowAllActivity(false); }} aria-label="Filter lead activity"><option value="useful">Useful activity</option><option value="outreach">Outreach only</option><option value="notes">Notes only</option><option value="all">All activity</option></select></div>
                 <div className="prospectActivityForm">
                   <select className="input" value={activityType} onChange={(event) => setActivityType(event.target.value as ProspectActivityType)} aria-label="Activity type">
                     <option value="note">Note</option><option value="email">Email</option><option value="call">Call</option><option value="meeting">Meeting</option>
@@ -898,7 +900,7 @@ export default function ProspectDetailPage() {
                   <input className="input" value={activitySummary} onChange={(event) => setActivitySummary(event.target.value)} placeholder="What happened?" />
                   <button className="button buttonPrimary" disabled={!activitySummary.trim()} onClick={() => void handleAddActivity()}>Log</button>
                 </div>
-                <div className="prospectTimeline">
+                <div className={showAllActivity ? "prospectTimeline prospectTimelineScrollable" : "prospectTimeline"}>
                   {visibleActivities.map((activity) => (
                     <div key={activity.id} className="prospectTimelineItem">
                       <span className="miniBadge">{activity.activity_type}</span>
@@ -907,7 +909,7 @@ export default function ProspectDetailPage() {
                   ))}
                   {filteredActivities.length === 0 ? <p className="small">No activity matches this view.</p> : null}
                 </div>
-                {filteredActivities.length > 8 ? <button className="button buttonSecondary prospectActivityMore" onClick={() => setShowAllActivity((current) => !current)}>{showAllActivity ? "Show recent only" : `Show ${filteredActivities.length - 8} more`}</button> : null}
+                {hiddenActivityCount > 0 ? <button className="button buttonSecondary prospectActivityMore" onClick={() => setShowAllActivity((current) => !current)}>{showAllActivity ? "Show recent only" : `View ${hiddenActivityCount} older ${hiddenActivityCount === 1 ? "item" : "items"}`}</button> : null}
               </section>
             </div>
 
