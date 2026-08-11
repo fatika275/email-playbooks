@@ -106,6 +106,7 @@ export default function WorkspacePage() {
   const [shareProspectId, setShareProspectId] = useState("");
   const [shareEmail, setShareEmail] = useState("");
   const [shareAccess, setShareAccess] = useState<ClientFolderShareAccess>("view");
+  const [shareNotice, setShareNotice] = useState("");
   const [notice, setNotice] = useState("");
 
   const followUpItems = useMemo<FollowUpItem[]>(
@@ -324,7 +325,7 @@ export default function WorkspacePage() {
   async function handleShareClientFolder(prospect: Prospect) {
     const email = shareEmail.trim().toLowerCase();
     if (!email) {
-      setNotice("Enter a teammate email before sharing the folder.");
+      setShareNotice("Enter a teammate email before sharing the folder.");
       return;
     }
 
@@ -336,11 +337,10 @@ export default function WorkspacePage() {
       });
       await refreshClientFolderShares();
       setShareEmail("");
-      setShareProspectId("");
       setShareAccess("view");
-      setNotice(`Shared ${prospect.company || prospect.full_name} folder with ${email}.`);
+      setShareNotice(`Shared ${prospect.company || prospect.full_name} folder with ${email}.`);
     } catch (error) {
-      setNotice(
+      setShareNotice(
         error instanceof Error ? error.message : "Could not share this folder."
       );
     }
@@ -486,7 +486,10 @@ export default function WorkspacePage() {
                             className="input"
                             type="email"
                             value={shareEmail}
-                            onChange={(event) => setShareEmail(event.target.value)}
+                            onChange={(event) => {
+                              setShareEmail(event.target.value);
+                              setShareNotice("");
+                            }}
                             placeholder="teammate@agency.com"
                             aria-label="Teammate email"
                           />
@@ -508,6 +511,9 @@ export default function WorkspacePage() {
                           >
                             Send folder
                           </button>
+                          {shareNotice ? (
+                            <p className="clientFolderShareNotice">{shareNotice}</p>
+                          ) : null}
                         </div>
                       ) : null}
 
@@ -522,6 +528,7 @@ export default function WorkspacePage() {
                             setShareProspectId(isSharing ? "" : prospect.id);
                             setShareEmail("");
                             setShareAccess("view");
+                            setShareNotice("");
                           }}
                         >
                           {isSharing ? "Close sharing" : "Share folder"}

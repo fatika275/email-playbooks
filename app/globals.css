@@ -2828,6 +2828,14 @@ details[open] > summary::after {
   gap: 8px;
 }
 
+.clientFolderShareNotice {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
 .clientFolderDetailHeader {
   display: flex;
   align-items: flex-end;
