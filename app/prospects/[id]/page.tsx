@@ -47,6 +47,7 @@ const SEQUENCE_TIMING: Record<string, number[]> = {
 
 const builtInScheduledSequences = playbooks.filter((playbook) => SEQUENCE_TIMING[playbook.id]);
 const ACTIVITY_PREVIEW_LIMIT = 5;
+const SHARED_NOTES_PREVIEW_LIMIT = 4;
 
 type ScheduledSequence = {
   id: string;
@@ -171,6 +172,7 @@ export default function ProspectDetailPage() {
   const [detailView, setDetailView] = useState<"overview" | "followup" | "activity">("overview");
   const [activityFilter, setActivityFilter] = useState<"useful" | "outreach" | "notes" | "all">("useful");
   const [showAllActivity, setShowAllActivity] = useState(false);
+  const [showAllSharedNotes, setShowAllSharedNotes] = useState(false);
   const [pendingProposalOutcome, setPendingProposalOutcome] = useState<"won" | "lost" | null>(null);
   const [proposalOutcomeReason, setProposalOutcomeReason] = useState("");
   const [proposalNotice, setProposalNotice] = useState("");
@@ -241,6 +243,8 @@ export default function ProspectDetailPage() {
   }), [activities, activityFilter]);
   const visibleActivities = showAllActivity ? filteredActivities : filteredActivities.slice(0, ACTIVITY_PREVIEW_LIMIT);
   const hiddenActivityCount = Math.max(filteredActivities.length - ACTIVITY_PREVIEW_LIMIT, 0);
+  const visibleSharedNotes = showAllSharedNotes ? comments : comments.slice(0, SHARED_NOTES_PREVIEW_LIMIT);
+  const hiddenSharedNoteCount = Math.max(comments.length - SHARED_NOTES_PREVIEW_LIMIT, 0);
   const scopeSnapshot = [serviceType, budgetRange].map((value) => value?.trim()).filter(Boolean).join(" / ");
   const showOnboardingGuide =
     searchParams.get("onboarding") === "1" ||
@@ -918,10 +922,11 @@ export default function ProspectDetailPage() {
               <p className="small">Leave the context the next teammate needs: what was promised, who decides, what to send next, and anything that could stop the deal moving.</p>
               <textarea className="input" rows={3} value={commentBody} onChange={(event) => setCommentBody(event.target.value)} placeholder={`Handoff note: ${fullName || "this lead"} cares about..., next step is..., watch out for...`} />
               <button className="button buttonPrimary" disabled={!commentBody.trim()} onClick={() => void handleAddComment()}>Add shared note</button>
-              <div className="prospectTimeline">
-                {comments.slice(0, 8).map((comment) => <div key={comment.id} className="prospectTimelineItem"><span className="miniBadge">Shared note</span><div><strong>{comment.author_email || "Teammate"}</strong><p className="muted" style={{ whiteSpace: "pre-wrap", margin: "4px 0" }}>{comment.body}</p><p className="small">{new Date(comment.created_at).toLocaleString()}</p></div></div>)}
+              <div className={showAllSharedNotes ? "prospectTimeline prospectTimelineScrollable" : "prospectTimeline"}>
+                {visibleSharedNotes.map((comment) => <div key={comment.id} className="prospectTimelineItem"><span className="miniBadge">Shared note</span><div><strong>{comment.author_email || "Teammate"}</strong><p className="muted" style={{ whiteSpace: "pre-wrap", margin: "4px 0" }}>{comment.body}</p><p className="small">{new Date(comment.created_at).toLocaleString()}</p></div></div>)}
                 {comments.length === 0 ? <p className="small">No shared handoff notes yet.</p> : null}
               </div>
+              {hiddenSharedNoteCount > 0 ? <button className="button buttonSecondary prospectActivityMore" onClick={() => setShowAllSharedNotes((current) => !current)}>{showAllSharedNotes ? "Show recent notes only" : `View ${hiddenSharedNoteCount} older ${hiddenSharedNoteCount === 1 ? "note" : "notes"}`}</button> : null}
             </section> : null}
 
             <div className="toolbar prospectSaveActions" hidden={detailView !== "overview"}>
