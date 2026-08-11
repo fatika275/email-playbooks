@@ -3551,6 +3551,69 @@ details[open] > summary::after {
   margin-top: 22px;
 }
 
+.prospectOverviewSection {
+  border-bottom: 1px solid var(--border);
+}
+
+.prospectOverviewSection:first-child {
+  border-top: 1px solid var(--border);
+}
+
+.prospectOverviewSection summary {
+  min-height: 62px;
+  padding: 14px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  color: var(--foreground);
+  cursor: pointer;
+  list-style: none;
+}
+
+.prospectOverviewSection summary::-webkit-details-marker {
+  display: none;
+}
+
+.prospectOverviewSection summary::after {
+  content: "+";
+  width: 26px;
+  height: 26px;
+  flex: 0 0 26px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--border-soft);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1;
+}
+
+.prospectOverviewSection[open] summary::after {
+  content: "-";
+}
+
+.prospectOverviewSection summary span {
+  display: block;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.prospectOverviewSection summary small {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.prospectOverviewSection .prospectFormGrid,
+.prospectOverviewSection > .formGroup {
+  padding-bottom: 4px;
+}
+
 .prospectContextBlock {
   display: grid;
   gap: 6px;
