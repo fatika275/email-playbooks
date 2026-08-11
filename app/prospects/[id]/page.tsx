@@ -765,7 +765,7 @@ export default function ProspectDetailPage() {
               </div>
             </details>
 
-            <details className="prospectOverviewSection" open>
+            <details className="prospectOverviewSection">
               <summary><span>Stage, value, and next action</span><small>Keep the deal moving without needing every detail yet.</small></summary>
               <div className="prospectFormGrid">
                 <div className="formGroup"><label className="label">Agency stage</label><select className="input" value={stage} onChange={(event) => setStage(event.target.value as ProspectStage)}>{PROSPECT_STAGES.map((option) => <option key={option} value={option}>{PROSPECT_STAGE_LABELS[option]}</option>)}</select></div>
