@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Papa from "papaparse";
 import { useAccount } from "@/components/account-provider";
+import PageLoadingState from "@/components/page-loading-state";
 import {
   listAccessibleBusinessWorkspaces,
   type BusinessWorkspaceAccess,
@@ -721,7 +722,13 @@ export default function ProspectsPage() {
   }
 
   if (isLoading) {
-    return <main className="main"><section className="container"><div className="glassCard emptyState">Loading client work...</div></section></main>;
+    return (
+      <PageLoadingState
+        eyebrow="Pipeline"
+        title="Loading client work"
+        detail="Opening your agency pipeline and next actions."
+      />
+    );
   }
 
   if (!user || !hasProAccess) {

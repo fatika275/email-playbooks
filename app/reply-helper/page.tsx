@@ -2,6 +2,7 @@
 
 import { Suspense, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import PageLoadingState from "@/components/page-loading-state";
 import {
   buildObjectionReply,
   detectObjectionCategory,
@@ -288,11 +289,11 @@ export default function ReplyHelperPage() {
   return (
     <Suspense
       fallback={
-        <main className="main">
-          <section className="container">
-            <div className="glassCard emptyState">Loading reply helper...</div>
-          </section>
-        </main>
+        <PageLoadingState
+          eyebrow="Replies"
+          title="Loading reply helper"
+          detail="Preparing the objection context and email draft workspace."
+        />
       }
     >
       <ReplyHelperContent />

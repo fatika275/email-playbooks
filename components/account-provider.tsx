@@ -109,7 +109,6 @@ export function AccountProvider({ children }: { children: ReactNode }) {
       if (!isMounted) return;
 
       setUser(currentUser);
-      setIsLoading(false);
 
       if (currentUser) {
         setIsSyncing(true);
@@ -122,6 +121,7 @@ export function AccountProvider({ children }: { children: ReactNode }) {
         } finally {
           if (isMounted) {
             setIsSyncing(false);
+            setIsLoading(false);
           }
         }
       } else {
@@ -130,6 +130,7 @@ export function AccountProvider({ children }: { children: ReactNode }) {
         setBusinessMembership(null);
         setSyncErrorMessage("");
         setStatusMessage("You are browsing without an account.");
+        setIsLoading(false);
       }
     }
 

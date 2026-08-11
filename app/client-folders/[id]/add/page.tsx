@@ -4,6 +4,7 @@ import Link from "next/link";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAccount } from "@/components/account-provider";
+import PageLoadingState from "@/components/page-loading-state";
 import {
   getProspect,
   PROSPECT_STAGE_LABELS,
@@ -140,13 +141,11 @@ export default function AddClientFolderFilePage() {
 
   if (isLoading || (user && isFolderLoading)) {
     return (
-      <main className="main">
-        <section className="container">
-          <div className="glassCard emptyState">
-            <h1 className="pageTitle">Loading folder...</h1>
-          </div>
-        </section>
-      </main>
+      <PageLoadingState
+        eyebrow="Saved"
+        title="Loading client folder"
+        detail="Preparing the folder before saving a file or link."
+      />
     );
   }
 

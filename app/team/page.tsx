@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useAccount } from "@/components/account-provider";
+import PageLoadingState from "@/components/page-loading-state";
 import {
   deleteBusinessWorkspace,
   inviteBusinessMember,
@@ -291,11 +292,11 @@ export default function TeamLibraryPage() {
 
   if (isLoading) {
     return (
-      <main className="main">
-        <section className="container">
-          <div className="glassCard emptyState">Loading team deal room...</div>
-        </section>
-      </main>
+      <PageLoadingState
+        eyebrow="Team"
+        title="Loading team deal room"
+        detail="Preparing shared leads, handoffs, and team activity."
+      />
     );
   }
 

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import { useAccount } from "@/components/account-provider";
+import PageLoadingState from "@/components/page-loading-state";
 import {
   getProspect,
   listProspectActivities,
@@ -170,13 +171,11 @@ export default function ClientFolderPage() {
 
   if (isLoading || (user && isFolderLoading)) {
     return (
-      <main className="main">
-        <section className="container">
-          <div className="glassCard emptyState">
-            <h1 className="pageTitle">Loading folder...</h1>
-          </div>
-        </section>
-      </main>
+      <PageLoadingState
+        eyebrow="Saved"
+        title="Loading client folder"
+        detail="Opening saved messages, files, links, and folder access."
+      />
     );
   }
 

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useAccount } from "@/components/account-provider";
+import PageLoadingState from "@/components/page-loading-state";
 import { listBusinessMembers, type BusinessMember } from "@/lib/cloud";
 import {
   createProspectActivity,
@@ -678,7 +679,13 @@ export default function ProspectDetailPage() {
   }
 
   if (isLoading) {
-    return <main className="main"><section className="container"><div className="glassCard emptyState">Loading lead...</div></section></main>;
+    return (
+      <PageLoadingState
+        eyebrow="Pipeline"
+        title="Loading lead"
+        detail="Opening the lead context, next actions, and client-work notes."
+      />
+    );
   }
 
   if (!user || !hasProAccess) {
