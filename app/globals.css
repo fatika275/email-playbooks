@@ -3541,6 +3541,12 @@ details[open] > summary::after {
   font-weight: 600;
 }
 
+.prospectSaveActions {
+  padding-top: 20px;
+  margin-top: 24px;
+  border-top: 1px solid var(--border-soft);
+}
+
 .prospectSectionHeader {
   padding-bottom: 11px;
   margin-bottom: 16px;

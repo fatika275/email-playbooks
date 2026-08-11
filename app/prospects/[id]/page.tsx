@@ -922,7 +922,7 @@ export default function ProspectDetailPage() {
               </div>
             </section> : null}
 
-            <div className="toolbar" hidden={detailView !== "overview"}>
+            <div className="toolbar prospectSaveActions" hidden={detailView !== "overview"}>
               <button className="button buttonPrimary" disabled={isWorking} onClick={() => void save()} title="Save changes to this lead without recording a new contact">{isWorking ? "Saving..." : "Save lead"}</button>
               <button className="button buttonSecondary" disabled={isWorking} onClick={() => void save({ markContacted: true })} title="Save changes and record that you contacted this lead now">Log contact now</button>
               <button className="button buttonUtility" disabled={isWorking} onClick={() => void handleDelete()}>Delete lead</button>
