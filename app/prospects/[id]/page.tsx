@@ -755,33 +755,33 @@ export default function ProspectDetailPage() {
             <div hidden={detailView !== "overview"}>
             <div className="prospectSectionHeader"><h2 className="cardTitle">Lead and company</h2></div>
             <div className="prospectFormGrid">
-              <div className="formGroup"><label className="label">Name</label><input className="input" value={fullName} onChange={(event) => setFullName(event.target.value)} /></div>
-              <div className="formGroup"><label className="label">Company</label><input className="input" value={company} onChange={(event) => setCompany(event.target.value)} /></div>
-              <div className="formGroup"><label className="label">Work email</label><input className="input" type="email" value={email} onChange={(event) => setEmail(event.target.value)} /></div>
-              <div className="formGroup"><label className="label">Role</label><input className="input" value={role} onChange={(event) => setRole(event.target.value)} /></div>
-              <div className="formGroup"><label className="label">LinkedIn URL</label><input className="input" type="url" value={linkedinUrl} onChange={(event) => setLinkedinUrl(event.target.value)} placeholder="https://linkedin.com/in/..." /></div>
-              <div className="formGroup"><label className="label">Lead source</label><input className="input" value={source} onChange={(event) => setSource(event.target.value)} placeholder="Referral, LinkedIn, event..." /></div>
+              <div className="formGroup"><label className="label">Name <span>Required</span></label><input className="input" value={fullName} onChange={(event) => setFullName(event.target.value)} /></div>
+              <div className="formGroup"><label className="label">Company <span>Required</span></label><input className="input" value={company} onChange={(event) => setCompany(event.target.value)} /></div>
+              <div className="formGroup"><label className="label">Work email <span>Optional</span></label><input className="input" type="email" value={email} onChange={(event) => setEmail(event.target.value)} /></div>
+              <div className="formGroup"><label className="label">Role <span>Optional</span></label><input className="input" value={role} onChange={(event) => setRole(event.target.value)} /></div>
+              <div className="formGroup"><label className="label">LinkedIn URL <span>Optional</span></label><input className="input" type="url" value={linkedinUrl} onChange={(event) => setLinkedinUrl(event.target.value)} placeholder="https://linkedin.com/in/..." /></div>
+              <div className="formGroup"><label className="label">Lead source <span>Optional</span></label><input className="input" value={source} onChange={(event) => setSource(event.target.value)} placeholder="Referral, LinkedIn, event..." /></div>
             </div>
 
             <div className="prospectSectionHeader"><h2 className="cardTitle">Stage, value, and next action</h2></div>
             <div className="prospectFormGrid">
               <div className="formGroup"><label className="label">Agency stage</label><select className="input" value={stage} onChange={(event) => setStage(event.target.value as ProspectStage)}>{PROSPECT_STAGES.map((option) => <option key={option} value={option}>{PROSPECT_STAGE_LABELS[option]}</option>)}</select></div>
-              <div className="formGroup"><label className="label">Potential client work value (GBP)</label><input className="input" type="number" min="0" value={value} onChange={(event) => setValue(event.target.value)} /><p className="small" style={{ margin: "6px 0 0" }}>Use the likely value of the project, retainer, or client work this lead could become.</p></div>
-              <div className="formGroup"><label className="label">Next follow-up</label><input className="input" type="date" value={nextFollowUp} onChange={(event) => setNextFollowUp(event.target.value)} /></div>
+              <div className="formGroup"><label className="label">Potential client work value (GBP) <span>Optional</span></label><input className="input" type="number" min="0" value={value} onChange={(event) => setValue(event.target.value)} /><p className="small" style={{ margin: "6px 0 0" }}>Use the likely value of the project, retainer, or client work this lead could become.</p></div>
+              <div className="formGroup"><label className="label">Next follow-up <span>Optional</span></label><input className="input" type="date" value={nextFollowUp} onChange={(event) => setNextFollowUp(event.target.value)} /></div>
               <div className="formGroup"><label className="label">Last contacted</label><input className="input" value={lastContactedAt ? new Date(lastContactedAt).toLocaleString() : "Not contacted yet"} disabled /></div>
               {prospect?.workspace_id ? <div className="formGroup"><label className="label">Lead owner</label><select className="input" value={teamMembers.find((member) => member.user_id === prospect.assigned_user_id || member.email === prospect.assigned_email)?.id ?? (prospect.assigned_user_id === user.id ? "self" : "")} onChange={(event) => void handleProspectAssignment(event.target.value)}><option value="">Unassigned</option><option value="self">Me ({user.email})</option>{teamMembers.filter((member) => member.user_id !== user.id && member.email !== user.email).map((member) => <option key={member.id} value={member.id}>{member.email} - {member.role}</option>)}</select><p className="small" style={{ margin: "6px 0 0" }}>Changing owner creates a shared handoff note with stage, scope, decision-maker, and next follow-up.</p></div> : null}
             </div>
 
-            <div className="prospectSectionHeader"><h2 className="cardTitle">Scope and qualification</h2></div>
+            <div className="prospectSectionHeader"><h2 className="cardTitle">Scope and qualification</h2><p className="small">Optional while the lead is early. Fill these in as the opportunity becomes real.</p></div>
             <div className="prospectFormGrid">
-              <div className="formGroup"><label className="label">Service type</label><input className="input" value={serviceType} onChange={(event) => setServiceType(event.target.value)} placeholder="Paid ads, SEO, web design..." /></div>
-              <div className="formGroup"><label className="label">Budget range</label><input className="input" value={budgetRange} onChange={(event) => setBudgetRange(event.target.value)} placeholder="GBP 2k-5k, 5k+/month..." /></div>
-              <div className="formGroup"><label className="label">Timeline</label><input className="input" value={timeline} onChange={(event) => setTimeline(event.target.value)} placeholder="ASAP, this quarter, after funding..." /></div>
-              <div className="formGroup"><label className="label">Decision-maker</label><input className="input" value={decisionMaker} onChange={(event) => setDecisionMaker(event.target.value)} placeholder="Founder, CMO, budget holder..." /></div>
-              <div className="formGroup"><label className="label">Deliverables</label><textarea className="input" rows={4} value={deliverables} onChange={(event) => setDeliverables(event.target.value)} placeholder="Landing page, email sequence, monthly reporting..." /></div>
+              <div className="formGroup"><label className="label">Service type <span>Optional</span></label><input className="input" value={serviceType} onChange={(event) => setServiceType(event.target.value)} placeholder="Paid ads, SEO, web design..." /></div>
+              <div className="formGroup"><label className="label">Budget range <span>Optional</span></label><input className="input" value={budgetRange} onChange={(event) => setBudgetRange(event.target.value)} placeholder="GBP 2k-5k, 5k+/month..." /></div>
+              <div className="formGroup"><label className="label">Timeline <span>Optional</span></label><input className="input" value={timeline} onChange={(event) => setTimeline(event.target.value)} placeholder="ASAP, this quarter, after funding..." /></div>
+              <div className="formGroup"><label className="label">Decision-maker <span>Optional</span></label><input className="input" value={decisionMaker} onChange={(event) => setDecisionMaker(event.target.value)} placeholder="Founder, CMO, budget holder..." /></div>
+              <div className="formGroup"><label className="label">Deliverables <span>Optional</span></label><textarea className="input" rows={4} value={deliverables} onChange={(event) => setDeliverables(event.target.value)} placeholder="Landing page, email sequence, monthly reporting..." /></div>
             </div>
 
-            <div className="formGroup"><label className="label">Internal lead notes</label><textarea className="input" rows={9} value={notes} onChange={(event) => setNotes(event.target.value)} placeholder="Decision criteria, pain points, client-work context, objections, and next steps..." /></div>
+            <div className="formGroup"><label className="label">Internal lead notes <span>Optional</span></label><textarea className="input" rows={9} value={notes} onChange={(event) => setNotes(event.target.value)} placeholder="Decision criteria, pain points, client-work context, objections, and next steps..." /></div>
             </div>
 
             <section className="prospectOpsPanel proposalWorkflowPanel" hidden={detailView !== "followup"}>

@@ -803,19 +803,20 @@ export default function ProspectsPage() {
 
         {showAdd ? (
           <section className="prospectAddPanel">
+            <p className="small prospectFormHint">Start with what you know. Only name and company are needed now; the rest can be filled in once the lead becomes clearer.</p>
             <div className="prospectFormGrid">
-              <div className="formGroup"><label className="label">Name</label><input className="input" value={fullName} onChange={(event) => setFullName(event.target.value)} placeholder="Alex Morgan" /></div>
-              <div className="formGroup"><label className="label">Company</label><input className="input" value={company} onChange={(event) => setCompany(event.target.value)} placeholder="Northstar Labs" /></div>
-              <div className="formGroup"><label className="label">Work email</label><input className="input" type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="alex@company.com" /></div>
-              <div className="formGroup"><label className="label">Role</label><input className="input" value={role} onChange={(event) => setRole(event.target.value)} placeholder="Head of Growth" /></div>
-              <div className="formGroup"><label className="label">Source</label><input className="input" value={source} onChange={(event) => setSource(event.target.value)} placeholder="LinkedIn, referral, event" /></div>
-              <div className="formGroup"><label className="label">Service type</label><input className="input" value={serviceType} onChange={(event) => setServiceType(event.target.value)} placeholder="Paid ads, SEO, web design..." /></div>
-              <div className="formGroup"><label className="label">Budget range</label><input className="input" value={budgetRange} onChange={(event) => setBudgetRange(event.target.value)} placeholder="GBP 2k-5k, 5k+/month..." /></div>
-              <div className="formGroup"><label className="label">Timeline</label><input className="input" value={timeline} onChange={(event) => setTimeline(event.target.value)} placeholder="ASAP, this quarter, after funding..." /></div>
-              <div className="formGroup"><label className="label">Decision-maker</label><input className="input" value={decisionMaker} onChange={(event) => setDecisionMaker(event.target.value)} placeholder="Founder, CMO, budget holder..." /></div>
-              <div className="formGroup"><label className="label">Potential work value (GBP)</label><input className="input" type="number" min="0" value={value} onChange={(event) => setValue(event.target.value)} placeholder="2500" /></div>
-              <div className="formGroup"><label className="label">Next follow-up</label><input className="input" type="date" value={nextFollowUp} onChange={(event) => setNextFollowUp(event.target.value)} /></div>
-              <div className="formGroup"><label className="label">Deliverables</label><input className="input" value={deliverables} onChange={(event) => setDeliverables(event.target.value)} placeholder="Landing page, 3-email sequence, monthly reporting..." /></div>
+              <div className="formGroup"><label className="label">Name <span>Required</span></label><input className="input" value={fullName} onChange={(event) => setFullName(event.target.value)} placeholder="Alex Morgan" /></div>
+              <div className="formGroup"><label className="label">Company <span>Required</span></label><input className="input" value={company} onChange={(event) => setCompany(event.target.value)} placeholder="Northstar Labs" /></div>
+              <div className="formGroup"><label className="label">Work email <span>Optional</span></label><input className="input" type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="alex@company.com" /></div>
+              <div className="formGroup"><label className="label">Role <span>Optional</span></label><input className="input" value={role} onChange={(event) => setRole(event.target.value)} placeholder="Head of Growth" /></div>
+              <div className="formGroup"><label className="label">Source <span>Optional</span></label><input className="input" value={source} onChange={(event) => setSource(event.target.value)} placeholder="LinkedIn, referral, event" /></div>
+              <div className="formGroup"><label className="label">Service type <span>Optional</span></label><input className="input" value={serviceType} onChange={(event) => setServiceType(event.target.value)} placeholder="Paid ads, SEO, web design..." /></div>
+              <div className="formGroup"><label className="label">Budget range <span>Optional</span></label><input className="input" value={budgetRange} onChange={(event) => setBudgetRange(event.target.value)} placeholder="GBP 2k-5k, 5k+/month..." /></div>
+              <div className="formGroup"><label className="label">Timeline <span>Optional</span></label><input className="input" value={timeline} onChange={(event) => setTimeline(event.target.value)} placeholder="ASAP, this quarter, after funding..." /></div>
+              <div className="formGroup"><label className="label">Decision-maker <span>Optional</span></label><input className="input" value={decisionMaker} onChange={(event) => setDecisionMaker(event.target.value)} placeholder="Founder, CMO, budget holder..." /></div>
+              <div className="formGroup"><label className="label">Potential work value (GBP) <span>Optional</span></label><input className="input" type="number" min="0" value={value} onChange={(event) => setValue(event.target.value)} placeholder="2500" /></div>
+              <div className="formGroup"><label className="label">Next follow-up <span>Optional</span></label><input className="input" type="date" value={nextFollowUp} onChange={(event) => setNextFollowUp(event.target.value)} /></div>
+              <div className="formGroup"><label className="label">Deliverables <span>Optional</span></label><input className="input" value={deliverables} onChange={(event) => setDeliverables(event.target.value)} placeholder="Landing page, 3-email sequence, monthly reporting..." /></div>
             </div>
             <button className="button buttonPrimary" disabled={isWorking} onClick={() => void handleCreate()}>{isWorking ? "Adding..." : "Add lead"}</button>
           </section>
