@@ -3551,6 +3551,10 @@ details[open] > summary::after {
   margin-top: 22px;
 }
 
+.prospectLeadCompanyGrid {
+  margin-bottom: 8px;
+}
+
 .prospectOverviewSection {
   border-bottom: 1px solid var(--border);
 }

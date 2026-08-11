@@ -753,17 +753,15 @@ export default function ProspectDetailPage() {
         <div className="prospectDetailLayout">
           <section className="prospectDetailMain">
             <div hidden={detailView !== "overview"}>
-            <details className="prospectOverviewSection" open>
-              <summary><span>Lead and company</span><small>Name and company are the only required details.</small></summary>
-              <div className="prospectFormGrid">
-                <div className="formGroup"><label className="label">Name <span>Required</span></label><input className="input" value={fullName} onChange={(event) => setFullName(event.target.value)} /></div>
-                <div className="formGroup"><label className="label">Company <span>Required</span></label><input className="input" value={company} onChange={(event) => setCompany(event.target.value)} /></div>
-                <div className="formGroup"><label className="label">Work email <span>Optional</span></label><input className="input" type="email" value={email} onChange={(event) => setEmail(event.target.value)} /></div>
-                <div className="formGroup"><label className="label">Role <span>Optional</span></label><input className="input" value={role} onChange={(event) => setRole(event.target.value)} /></div>
-                <div className="formGroup"><label className="label">LinkedIn URL <span>Optional</span></label><input className="input" type="url" value={linkedinUrl} onChange={(event) => setLinkedinUrl(event.target.value)} placeholder="https://linkedin.com/in/..." /></div>
-                <div className="formGroup"><label className="label">Lead source <span>Optional</span></label><input className="input" value={source} onChange={(event) => setSource(event.target.value)} placeholder="Referral, LinkedIn, event..." /></div>
-              </div>
-            </details>
+            <div className="prospectSectionHeader"><h2 className="cardTitle">Lead and company</h2><p className="small">Name and company are the only required details.</p></div>
+            <div className="prospectFormGrid prospectLeadCompanyGrid">
+              <div className="formGroup"><label className="label">Name <span>Required</span></label><input className="input" value={fullName} onChange={(event) => setFullName(event.target.value)} /></div>
+              <div className="formGroup"><label className="label">Company <span>Required</span></label><input className="input" value={company} onChange={(event) => setCompany(event.target.value)} /></div>
+              <div className="formGroup"><label className="label">Work email <span>Optional</span></label><input className="input" type="email" value={email} onChange={(event) => setEmail(event.target.value)} /></div>
+              <div className="formGroup"><label className="label">Role <span>Optional</span></label><input className="input" value={role} onChange={(event) => setRole(event.target.value)} /></div>
+              <div className="formGroup"><label className="label">LinkedIn URL <span>Optional</span></label><input className="input" type="url" value={linkedinUrl} onChange={(event) => setLinkedinUrl(event.target.value)} placeholder="https://linkedin.com/in/..." /></div>
+              <div className="formGroup"><label className="label">Lead source <span>Optional</span></label><input className="input" value={source} onChange={(event) => setSource(event.target.value)} placeholder="Referral, LinkedIn, event..." /></div>
+            </div>
 
             <details className="prospectOverviewSection">
               <summary><span>Stage, value, and next action</span><small>Keep the deal moving without needing every detail yet.</small></summary>
