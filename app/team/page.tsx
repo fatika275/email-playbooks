@@ -96,7 +96,7 @@ export default function TeamLibraryPage() {
     ]);
     setMembers(nextMembers);
     setActivity(nextActivity);
-    setNotifications(nextNotifications);
+    setNotifications(nextNotifications.filter((item) => !item.read_at));
     setOverdueTasks(nextOverdueTasks);
   }, [user]);
 
@@ -147,10 +147,34 @@ export default function TeamLibraryPage() {
     );
   }), [activity, activityFilter]);
   const visibleActivity = showAllActivity ? filteredActivity : filteredActivity.slice(0, 8);
+  const unreadNotifications = notifications.filter((item) => !item.read_at);
+  const attentionCount = unreadNotifications.length + overdueTasks.length;
   const activeWorkspaceAccess = workspaces.find((item) => item.id === workspace?.id);
   const canExportWorkspace =
     activeWorkspaceAccess?.access_role === "owner" ||
     activeWorkspaceAccess?.access_role === "admin";
+
+  async function handleNotificationSeen(id: string) {
+    setNotifications((current) => current.filter((item) => item.id !== id));
+    try {
+      await markWorkspaceNotificationRead(id);
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Update could not be marked seen.");
+      void refreshBusinessTeam().catch(() => undefined);
+    }
+  }
+
+  async function handleAllNotificationsSeen() {
+    const unreadIds = unreadNotifications.map((item) => item.id);
+    if (!unreadIds.length) return;
+    setNotifications((current) => current.filter((item) => !unreadIds.includes(item.id)));
+    try {
+      await Promise.all(unreadIds.map((id) => markWorkspaceNotificationRead(id)));
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Updates could not be marked seen.");
+      void refreshBusinessTeam().catch(() => undefined);
+    }
+  }
 
   async function handleSaveToWorkspace(share: TeamShare) {
     try {
@@ -373,9 +397,18 @@ export default function TeamLibraryPage() {
           </button>
         </div>
 
-        {teamView === "workspace" && (notifications.length || overdueTasks.length) ? <section className="teamAttentionPanel">
-          <div className="cardTop"><div><h2 className="sectionTitle">Needs attention</h2><p className="muted">Overdue follow-ups and unread lead updates.</p></div><span className="statusPill">{notifications.filter((item) => !item.read_at).length + overdueTasks.length}</span></div>
-          <div className="prospectTimeline">{overdueTasks.map((task) => <div key={`overdue-${task.id}`} className="prospectTimelineItem"><span className="miniBadge">Overdue</span><div><Link href={`/prospects/${task.prospects.id}`}><strong>{getProspectTaskDisplayTitle(task.title)}</strong></Link><p className="small">{task.prospects.full_name} · Due {task.due_date}</p></div></div>)}{notifications.slice(0, 8).map((item) => <div key={item.id} className="prospectTimelineItem"><span className="miniBadge">{item.kind}</span><div><Link href={item.href || "/team"} onClick={() => void markWorkspaceNotificationRead(item.id)}><strong>{item.title}</strong></Link><p className="small">{item.body || "Agency update"} · {new Date(item.created_at).toLocaleString()}</p></div></div>)}</div>
+        {teamView === "workspace" && attentionCount ? <section className="teamAttentionPanel">
+          <div className="cardTop">
+            <div>
+              <h2 className="sectionTitle">Needs attention</h2>
+              <p className="muted">Overdue follow-ups stay until done. Lead updates clear once seen.</p>
+            </div>
+            <div className="teamAttentionActions">
+              <span className="statusPill">{attentionCount}</span>
+              {unreadNotifications.length ? <button type="button" className="button buttonSecondary" onClick={() => void handleAllNotificationsSeen()}>Mark updates seen</button> : null}
+            </div>
+          </div>
+          <div className="prospectTimeline">{overdueTasks.map((task) => <div key={`overdue-${task.id}`} className="prospectTimelineItem"><span className="miniBadge">Overdue</span><div><Link href={`/prospects/${task.prospects.id}`}><strong>{getProspectTaskDisplayTitle(task.title)}</strong></Link><p className="small">{task.prospects.full_name} · Due {task.due_date}</p></div></div>)}{unreadNotifications.slice(0, 8).map((item) => <div key={item.id} className="prospectTimelineItem"><span className="miniBadge">{item.kind}</span><div><Link href={item.href || "/team"} onClick={() => void handleNotificationSeen(item.id)}><strong>{item.title}</strong></Link><p className="small">{item.body || "Agency update"} · {new Date(item.created_at).toLocaleString()}</p></div></div>)}</div>
         </section> : null}
 
         {teamView === "workspace" ? (workspace ? (

@@ -1666,6 +1666,14 @@ details[open] > summary::after {
   margin: 6px 0 0;
 }
 
+.teamAttentionActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
 .teamWorkspaceOverview {
   margin-bottom: 34px;
 }
