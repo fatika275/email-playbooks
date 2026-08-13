@@ -4155,6 +4155,10 @@ details[open] > summary::after {
   margin-top: 10px;
 }
 
+.prospectListLimitNote {
+  margin: 12px 0 0;
+}
+
 .prospectTimelineItem:last-child {
   border-bottom: 0;
 }

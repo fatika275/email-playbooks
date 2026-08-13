@@ -922,6 +922,7 @@ export default function ProspectDetailPage() {
               <p className="small">Leave the context the next teammate needs: what was promised, who decides, what to send next, and anything that could stop the deal moving.</p>
               <textarea className="input" rows={3} value={commentBody} onChange={(event) => setCommentBody(event.target.value)} placeholder={`Handoff note: ${fullName || "this lead"} cares about..., next step is..., watch out for...`} />
               <button className="button buttonPrimary" disabled={!commentBody.trim()} onClick={() => void handleAddComment()}>Add shared note</button>
+              {comments.length ? <p className="small prospectListLimitNote">{showAllSharedNotes ? `Showing all ${comments.length} shared notes.` : `Showing the latest ${Math.min(comments.length, SHARED_NOTES_PREVIEW_LIMIT)} of ${comments.length} shared notes.`}</p> : null}
               <div className={showAllSharedNotes ? "prospectTimeline prospectTimelineScrollable" : "prospectTimeline"}>
                 {visibleSharedNotes.map((comment) => <div key={comment.id} className="prospectTimelineItem"><span className="miniBadge">Shared note</span><div><strong>{comment.author_email || "Teammate"}</strong><p className="muted" style={{ whiteSpace: "pre-wrap", margin: "4px 0" }}>{comment.body}</p><p className="small">{new Date(comment.created_at).toLocaleString()}</p></div></div>)}
                 {comments.length === 0 ? <p className="small">No shared handoff notes yet.</p> : null}

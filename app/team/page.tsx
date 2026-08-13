@@ -41,6 +41,10 @@ function makeSharedId(prefix: string) {
     : `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
+function getActivitySeenKey(workspaceId: string) {
+  return `thalovo_team_activity_seen_${workspaceId}`;
+}
+
 export default function TeamLibraryPage() {
   const { user, hasProAccess, isLoading, businessMembership } = useAccount();
   const [shares, setShares] = useState<TeamShare[]>([]);
@@ -55,6 +59,7 @@ export default function TeamLibraryPage() {
   const [showInvite, setShowInvite] = useState(false);
   const [activityFilter, setActivityFilter] = useState<"key" | "outreach" | "tasks" | "all">("key");
   const [showAllActivity, setShowAllActivity] = useState(false);
+  const [activitySeenAt, setActivitySeenAt] = useState("");
   const [teamView, setTeamView] = useState<"workspace" | "library">("workspace");
   const [libraryView, setLibraryView] = useState<"incoming" | "outgoing">("incoming");
   const [shareSearch, setShareSearch] = useState("");
@@ -88,6 +93,7 @@ export default function TeamLibraryPage() {
       return;
     }
     window.localStorage.setItem("thalovo_active_workspace_id", selected.id);
+    setActivitySeenAt(window.localStorage.getItem(getActivitySeenKey(selected.id)) ?? "");
     const [nextMembers, nextActivity, nextNotifications, nextOverdueTasks] = await Promise.all([
       listBusinessMembers(selected.id),
       listWorkspaceProspectActivities(selected.id),
@@ -147,6 +153,9 @@ export default function TeamLibraryPage() {
     );
   }), [activity, activityFilter]);
   const visibleActivity = showAllActivity ? filteredActivity : filteredActivity.slice(0, 8);
+  const newActivityCount = activitySeenAt
+    ? filteredActivity.filter((item) => new Date(item.created_at).getTime() > new Date(activitySeenAt).getTime()).length
+    : filteredActivity.length;
   const unreadNotifications = notifications.filter((item) => !item.read_at);
   const attentionCount = unreadNotifications.length + overdueTasks.length;
   const activeWorkspaceAccess = workspaces.find((item) => item.id === workspace?.id);
@@ -174,6 +183,13 @@ export default function TeamLibraryPage() {
       setNotice(error instanceof Error ? error.message : "Updates could not be marked seen.");
       void refreshBusinessTeam().catch(() => undefined);
     }
+  }
+
+  function handleActivityDisclosureToggle(isOpen: boolean) {
+    if (!isOpen || !workspace) return;
+    const seenAt = new Date().toISOString();
+    window.localStorage.setItem(getActivitySeenKey(workspace.id), seenAt);
+    setActivitySeenAt(seenAt);
   }
 
   async function handleSaveToWorkspace(share: TeamShare) {
@@ -492,8 +508,8 @@ export default function TeamLibraryPage() {
             </div>
             </section>
 
-            <details className="teamActivitySection teamActivityDisclosure">
-              <summary><strong>Agency activity</strong><span>{filteredActivity.length} useful updates</span></summary>
+            <details className="teamActivitySection teamActivityDisclosure" onToggle={(event) => handleActivityDisclosureToggle(event.currentTarget.open)}>
+              <summary><strong>Agency activity</strong><span>{newActivityCount ? `${newActivityCount} new ${newActivityCount === 1 ? "update" : "updates"}` : "Seen"}</span></summary>
               <div className="teamActivityControls"><div><h3 className="cardTitle">Recent activity</h3><p className="small">See who started it, who owns it now, and the latest context before anyone continues the deal.</p></div><select className="input" value={activityFilter} onChange={(event) => { setActivityFilter(event.target.value as "key" | "outreach" | "tasks" | "all"); setShowAllActivity(false); }} aria-label="Filter agency activity"><option value="key">Key updates</option><option value="outreach">Outreach only</option><option value="tasks">Tasks only</option><option value="all">All changes</option></select></div>
               <div className="prospectTimeline">
                 {visibleActivity.map((item) => (
