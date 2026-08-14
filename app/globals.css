@@ -3772,6 +3772,23 @@ details[open] > summary::after {
   flex: 0 0 170px;
 }
 
+.prospectSeenStatus,
+.prospectNotesHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.prospectSeenStatus {
+  flex: 0 0 auto;
+}
+
+.prospectSeenStatus .statusPill,
+.prospectNotesHeader .statusPill {
+  white-space: nowrap;
+}
+
 .prospectActivityMore {
   margin-top: 14px;
 }
@@ -4010,6 +4027,16 @@ details[open] > summary::after {
 
   .prospectActivityHeading {
     flex-direction: column;
+  }
+
+  .prospectSeenStatus,
+  .prospectNotesHeader {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .prospectSeenStatus {
+    width: 100%;
   }
 
   .prospectActivityHeading select {

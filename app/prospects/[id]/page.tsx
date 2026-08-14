@@ -73,6 +73,10 @@ function cleanTemplateLabel(label: string) {
   return label.replace(/\s*\(Day\s+\d+\)/i, "").trim();
 }
 
+function getProspectSeenKey(prospectId: string, kind: "activity" | "notes") {
+  return `thalovo_prospect_${kind}_seen_${prospectId}`;
+}
+
 function getLegacyCustomSequenceSteps(template: CustomTemplate): ScheduledSequence["steps"] {
   if (template.sequenceSteps?.length) {
     return template.sequenceSteps.map((step, index) => ({
@@ -173,6 +177,8 @@ export default function ProspectDetailPage() {
   const [activityFilter, setActivityFilter] = useState<"useful" | "outreach" | "notes" | "all">("useful");
   const [showAllActivity, setShowAllActivity] = useState(false);
   const [showAllSharedNotes, setShowAllSharedNotes] = useState(false);
+  const [activitySeenAt, setActivitySeenAt] = useState("");
+  const [sharedNotesSeenAt, setSharedNotesSeenAt] = useState("");
   const [pendingProposalOutcome, setPendingProposalOutcome] = useState<"won" | "lost" | null>(null);
   const [proposalOutcomeReason, setProposalOutcomeReason] = useState("");
   const [proposalNotice, setProposalNotice] = useState("");
@@ -245,6 +251,12 @@ export default function ProspectDetailPage() {
   const hiddenActivityCount = Math.max(filteredActivities.length - ACTIVITY_PREVIEW_LIMIT, 0);
   const visibleSharedNotes = showAllSharedNotes ? comments : comments.slice(0, SHARED_NOTES_PREVIEW_LIMIT);
   const hiddenSharedNoteCount = Math.max(comments.length - SHARED_NOTES_PREVIEW_LIMIT, 0);
+  const newActivityCount = activitySeenAt
+    ? filteredActivities.filter((item) => new Date(item.created_at).getTime() > new Date(activitySeenAt).getTime()).length
+    : filteredActivities.length;
+  const newSharedNoteCount = sharedNotesSeenAt
+    ? comments.filter((item) => new Date(item.created_at).getTime() > new Date(sharedNotesSeenAt).getTime()).length
+    : comments.length;
   const scopeSnapshot = [serviceType, budgetRange].map((value) => value?.trim()).filter(Boolean).join(" / ");
   const showOnboardingGuide =
     searchParams.get("onboarding") === "1" ||
@@ -286,6 +298,8 @@ export default function ProspectDetailPage() {
         setNextFollowUp(record.next_follow_up ?? "");
         setLastContactedAt(record.last_contacted_at);
         setNotes(record.notes ?? "");
+        setActivitySeenAt(window.localStorage.getItem(getProspectSeenKey(record.id, "activity")) ?? "");
+        setSharedNotesSeenAt(window.localStorage.getItem(getProspectSeenKey(record.id, "notes")) ?? "");
         return Promise.all([
           listProspectActivities(record.id),
           listProspectTasks([record.id]),
@@ -667,6 +681,16 @@ export default function ProspectDetailPage() {
     router.push("/library");
   }
 
+  function handleDetailViewChange(view: "overview" | "followup" | "activity") {
+    setDetailView(view);
+    if (view !== "activity" || !prospect?.id) return;
+    const seenAt = new Date().toISOString();
+    window.localStorage.setItem(getProspectSeenKey(prospect.id, "activity"), seenAt);
+    window.localStorage.setItem(getProspectSeenKey(prospect.id, "notes"), seenAt);
+    setActivitySeenAt(seenAt);
+    setSharedNotesSeenAt(seenAt);
+  }
+
   if (isLoading) {
     return (
       <PageLoadingState
@@ -709,9 +733,9 @@ export default function ProspectDetailPage() {
         {notice ? <p className="notice">{notice}</p> : null}
 
         <div className="prospectDetailTabs" role="tablist" aria-label="Lead details">
-          <button type="button" role="tab" aria-selected={detailView === "overview"} className={detailView === "overview" ? "active" : ""} onClick={() => setDetailView("overview")}>Overview</button>
-          <button type="button" role="tab" aria-selected={detailView === "followup"} className={detailView === "followup" ? "active" : ""} onClick={() => setDetailView("followup")}>Next steps{activeProposalTasks.length + openManualTasks.length ? ` (${activeProposalTasks.length + openManualTasks.length})` : ""}</button>
-          <button type="button" role="tab" aria-selected={detailView === "activity"} className={detailView === "activity" ? "active" : ""} onClick={() => setDetailView("activity")}>Activity</button>
+          <button type="button" role="tab" aria-selected={detailView === "overview"} className={detailView === "overview" ? "active" : ""} onClick={() => handleDetailViewChange("overview")}>Overview</button>
+          <button type="button" role="tab" aria-selected={detailView === "followup"} className={detailView === "followup" ? "active" : ""} onClick={() => handleDetailViewChange("followup")}>Next steps{activeProposalTasks.length + openManualTasks.length ? ` (${activeProposalTasks.length + openManualTasks.length})` : ""}</button>
+          <button type="button" role="tab" aria-selected={detailView === "activity"} className={detailView === "activity" ? "active" : ""} onClick={() => handleDetailViewChange("activity")}>Activity{newActivityCount + newSharedNoteCount ? ` (${newActivityCount + newSharedNoteCount})` : ""}</button>
         </div>
 
         {showOnboardingGuide ? (
@@ -896,7 +920,7 @@ export default function ProspectDetailPage() {
               </section>
 
               <section className="prospectOpsPanel" hidden={detailView !== "activity"}>
-                <div className="prospectActivityHeading"><div><h2 className="cardTitle">Recent activity</h2><p className="small">Keep the latest client-work context visible without turning the page into a long log.</p></div><select className="input" value={activityFilter} onChange={(event) => { setActivityFilter(event.target.value as "useful" | "outreach" | "notes" | "all"); setShowAllActivity(false); }} aria-label="Filter lead activity"><option value="useful">Useful activity</option><option value="outreach">Outreach only</option><option value="notes">Notes only</option><option value="all">All activity</option></select></div>
+                <div className="prospectActivityHeading"><div><h2 className="cardTitle">Recent activity</h2><p className="small">Keep the latest client-work context visible without turning the page into a long log.</p></div><div className="prospectSeenStatus"><span className={newActivityCount ? "statusPill statusPillSuccess" : "statusPill"}>{newActivityCount ? `${newActivityCount} new` : "Seen"}</span><select className="input" value={activityFilter} onChange={(event) => { setActivityFilter(event.target.value as "useful" | "outreach" | "notes" | "all"); setShowAllActivity(false); }} aria-label="Filter lead activity"><option value="useful">Useful activity</option><option value="outreach">Outreach only</option><option value="notes">Notes only</option><option value="all">All activity</option></select></div></div>
                 <div className="prospectActivityForm">
                   <select className="input" value={activityType} onChange={(event) => setActivityType(event.target.value as ProspectActivityType)} aria-label="Activity type">
                     <option value="note">Note</option><option value="email">Email</option><option value="call">Call</option><option value="meeting">Meeting</option>
@@ -918,7 +942,7 @@ export default function ProspectDetailPage() {
             </div>
 
             {prospect?.workspace_id ? <section className="prospectOpsPanel prospectCommentsPanel" hidden={detailView !== "activity"}>
-              <div className="prospectSectionHeader"><h2 className="cardTitle">Shared notes and handoff context</h2></div>
+              <div className="prospectSectionHeader prospectNotesHeader"><div><h2 className="cardTitle">Shared notes and handoff context</h2></div><span className={newSharedNoteCount ? "statusPill statusPillSuccess" : "statusPill"}>{newSharedNoteCount ? `${newSharedNoteCount} new` : "Seen"}</span></div>
               <p className="small">Leave the context the next teammate needs: what was promised, who decides, what to send next, and anything that could stop the deal moving.</p>
               <textarea className="input" rows={3} value={commentBody} onChange={(event) => setCommentBody(event.target.value)} placeholder={`Handoff note: ${fullName || "this lead"} cares about..., next step is..., watch out for...`} />
               <button className="button buttonPrimary" disabled={!commentBody.trim()} onClick={() => void handleAddComment()}>Add shared note</button>
