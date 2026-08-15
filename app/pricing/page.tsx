@@ -3,6 +3,57 @@
 import Link from "next/link";
 import { useAccount } from "@/components/account-provider";
 
+const plans = [
+  {
+    name: "Free",
+    badge: "Start here",
+    price: "GBP 0",
+    cadence: "/month",
+    description: "Try the outreach workflow before moving live leads into Thalovo.",
+    bestFor: "Testing message quality",
+    href: "/library",
+    cta: "Start free",
+    featured: false,
+    features: [
+      "Core outreach message templates",
+      "Draft, copy, and download messages",
+      "Basic saved-message history",
+    ],
+  },
+  {
+    name: "Pro",
+    badge: "Most solo agencies",
+    price: "GBP 19",
+    cadence: "/month",
+    description: "For solo agency owners turning outreach into booked calls and active deals.",
+    bestFor: "One person chasing client work",
+    href: "/pro",
+    cta: "View Pro",
+    featured: true,
+    features: [
+      "Agency pipeline for prospects, calls, proposals, and handoff",
+      "Follow-up reminders so warm leads do not go quiet",
+      "Reporting on replies, booked calls, won work, and leakage",
+    ],
+  },
+  {
+    name: "Business Pro",
+    badge: "Small teams",
+    price: "GBP 29",
+    cadence: "/month",
+    description: "For teams that need shared lead ownership, notes, and handoff context.",
+    bestFor: "Teams sharing leads",
+    href: "/business",
+    cta: "View Business Pro",
+    featured: false,
+    features: [
+      "Everything in Pro",
+      "Shared pipeline, notes, and client handoff context",
+      "10 teammate seats and shared follow-up plans",
+    ],
+  },
+];
+
 export default function PricingPage() {
   const { founderEligible, founderPriceGbp } = useAccount();
   const founderPriceLabel =
@@ -11,52 +62,44 @@ export default function PricingPage() {
   return (
     <main className="main">
       <section className="container">
-        <div className="pageHeader" style={{ textAlign: "center" }}>
-          <div className="badge">Pricing</div>
+        <div className="pricingHero">
+          <div>
+            <div className="badge">Pricing</div>
+            <h1 className="pageTitle">
+              Pick the plan that keeps agency leads moving
+            </h1>
+            <p className="muted">
+              Start with outreach messages. Upgrade when you want the pipeline,
+              follow-up reminders, and team handoff tools that stop client work
+              slipping through the cracks.
+            </p>
+          </div>
 
-          <h1 className="pageTitle" style={{ marginTop: 14 }}>
-            Pick the plan that keeps agency leads moving
-          </h1>
-
-          <p
-            className="muted"
-            style={{
-              maxWidth: 620,
-              margin: "10px auto",
-              lineHeight: 1.65,
-            }}
-          >
-            Start free with outreach messages. Upgrade when you want the
-            pipeline, follow-up reminders, and team handoff tools that stop
-            client work slipping through the cracks.
-          </p>
-
-          <p
-            className="notice"
-            style={{
-              textAlign: "center",
-              marginTop: 14,
-              maxWidth: 720,
-              marginInline: "auto",
-            }}
-          >
-            {founderEligible
-              ? "Founder checkout is unlocked on this account. Complete payment to lock in your early supporter price."
-              : "Most solo agencies start with Pro. Teams that share leads should choose Business Pro."}
-          </p>
+          <div className="pricingHeroNote">
+            <span className="miniBadge">Simple choice</span>
+            <strong>
+              {founderEligible
+                ? "Founder pricing is unlocked on this account."
+                : "Most solo agencies start with Pro."}
+            </strong>
+            <p>
+              {founderEligible
+                ? "Complete payment to lock in your early supporter price."
+                : "Choose Business Pro when teammates share leads and handoffs."}
+            </p>
+          </div>
         </div>
 
-        <div className="founderPriceBand glassCard">
+        <div className="founderPriceBand pricingFounderBand">
           <div>
             <div className="badge">Founder Pro</div>
-            <h2 className="pageTitle" style={{ marginTop: 14 }}>
+            <h2 className="pageTitle">
               {founderPriceLabel}
               <span className="muted">/month locked</span>
             </h2>
-            <p className="muted" style={{ marginTop: 10, lineHeight: 1.75 }}>
-              Invite-only early supporter pricing for one individual account.
-              It includes full Pro access and stays locked while your account is
-              active.
+            <p className="muted">
+              Invite-only early supporter pricing for one individual account,
+              with full Pro access while your account is active.
             </p>
           </div>
 
@@ -80,110 +123,48 @@ export default function PricingPage() {
           </div>
         </div>
 
-        <div className="grid" style={{ marginTop: 28 }}>
-          <div
-            className="glassCard"
-            style={{
-              padding: 28,
-              display: "flex",
-              flexDirection: "column",
-              minHeight: "100%",
-            }}
-          >
-            <div className="badge">Free</div>
+        <div className="pricingGrid">
+          {plans.map((plan) => (
+            <article
+              key={plan.name}
+              className={plan.featured ? "pricingCard pricingCardFeatured" : "pricingCard"}
+            >
+              <div className="pricingCardTop">
+                <span className="miniBadge">{plan.badge}</span>
+                <h2>{plan.name}</h2>
+                <p>{plan.description}</p>
+              </div>
 
-            <h2 className="pageTitle" style={{ marginTop: 14 }}>
-              GBP 0<span className="muted">/month</span>
-            </h2>
+              <div className="pricingAmount">
+                <strong>{plan.price}</strong>
+                <span>{plan.cadence}</span>
+              </div>
 
-            <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
-              Try the message workflow before moving live leads into Thalovo.
-            </p>
+              <div className="pricingBestFor">
+                <span>Best for</span>
+                <strong>{plan.bestFor}</strong>
+              </div>
 
-            <ul className="featureList">
-              <li>Core outreach message templates</li>
-              <li>Draft, copy, and download messages</li>
-              <li>Basic saved-message history</li>
-              <li>No card required</li>
-            </ul>
+              <ul className="pricingFeatureList">
+                {plan.features.map((feature) => (
+                  <li key={feature}>{feature}</li>
+                ))}
+              </ul>
 
-            <div style={{ marginTop: 24 }}>
-              <Link href="/library" className="button buttonSecondary">
-                Start free
+              <Link
+                href={plan.href}
+                className={plan.featured ? "button buttonPrimary" : "button buttonSecondary"}
+              >
+                {plan.cta}
               </Link>
-            </div>
-          </div>
+            </article>
+          ))}
+        </div>
 
-          <div
-            className="glassCard"
-            style={{
-              padding: 28,
-              display: "flex",
-              flexDirection: "column",
-              minHeight: "100%",
-              borderColor: "rgba(201, 166, 72, 0.22)",
-            }}
-          >
-            <div className="badge">Pro</div>
-
-            <h2 className="pageTitle" style={{ marginTop: 14 }}>
-              GBP 19<span className="muted">/month</span>
-            </h2>
-
-            <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
-              For solo agency owners who need a clear path from outreach to
-              booked calls and active deals.
-            </p>
-
-            <ul className="featureList">
-              <li>Agency pipeline for prospects, calls, proposals, and handoff</li>
-              <li>Follow-up reminders so warm leads do not go quiet</li>
-              <li>Reusable outreach, proposal, and win-back templates</li>
-              <li>Simple reporting on replies, booked calls, won work, and leakage</li>
-            </ul>
-
-            <div style={{ marginTop: 24 }}>
-              <Link href="/pro" className="button buttonPrimary">
-                View Pro
-              </Link>
-            </div>
-          </div>
-
-          <div
-            className="glassCard"
-            style={{
-              padding: 28,
-              display: "flex",
-              flexDirection: "column",
-              minHeight: "100%",
-            }}
-          >
-            <div className="badge">Business Pro</div>
-
-            <h2 className="pageTitle" style={{ marginTop: 14 }}>
-              GBP 29<span className="muted">/month</span>
-            </h2>
-
-            <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
-              For small agency teams that need a shared pipeline, handoff notes,
-              and simple lead ownership.
-            </p>
-
-            <ul className="featureList">
-              <li>Everything in Pro</li>
-              <li>Shared pipeline, notes, and client handoff context</li>
-              <li>Simple ownership rules for who chases each lead</li>
-              <li>10 teammate seats included</li>
-              <li>Shared outreach messages and follow-up plans</li>
-            </ul>
-
-            <div style={{ marginTop: 24 }}>
-              <Link href="/business" className="button buttonPrimary">
-                View Business Pro
-              </Link>
-            </div>
-          </div>
-
+        <div className="pricingOutcomeStrip">
+          <div><strong>Outreach</strong><span>Start better conversations</span></div>
+          <div><strong>Pipeline</strong><span>Track calls, proposals, and handoff</span></div>
+          <div><strong>Follow-up</strong><span>Stop warm leads going cold</span></div>
         </div>
       </section>
     </main>

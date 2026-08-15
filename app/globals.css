@@ -4841,6 +4841,179 @@ details[open] > summary::after {
   min-width: 260px;
 }
 
+.pricingHero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.45fr);
+  gap: 28px;
+  align-items: end;
+  padding: 18px 0 10px;
+}
+
+.pricingHero .pageTitle {
+  max-width: 720px;
+  margin-top: 14px;
+}
+
+.pricingHero .muted {
+  max-width: 660px;
+  margin: 12px 0 0;
+  line-height: 1.7;
+}
+
+.pricingHeroNote {
+  padding: 18px;
+  border: 1px solid var(--border-soft);
+  background: #080808;
+}
+
+.pricingHeroNote strong {
+  display: block;
+  margin-top: 12px;
+  line-height: 1.35;
+}
+
+.pricingHeroNote p {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.pricingFounderBand {
+  margin-top: 24px;
+}
+
+.pricingFounderBand .pageTitle {
+  margin-top: 12px;
+}
+
+.pricingFounderBand .muted {
+  margin-top: 8px;
+  line-height: 1.65;
+}
+
+.pricingGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.pricingCard {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 24px;
+  border: 1px solid var(--border);
+  background: #090909;
+}
+
+.pricingCardFeatured {
+  border-color: #4a4a4a;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015)),
+    #0b0b0b;
+}
+
+.pricingCardTop h2 {
+  margin: 14px 0 0;
+  font-size: 22px;
+}
+
+.pricingCardTop p {
+  min-height: 68px;
+  margin: 10px 0 0;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.pricingAmount {
+  padding: 16px 0;
+  border-top: 1px solid var(--border-soft);
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.pricingAmount strong {
+  font-size: 34px;
+  line-height: 1;
+}
+
+.pricingAmount span {
+  color: var(--muted);
+}
+
+.pricingBestFor {
+  display: grid;
+  gap: 5px;
+  padding: 12px;
+  border: 1px solid var(--border-soft);
+  background: #050505;
+}
+
+.pricingBestFor span {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.pricingFeatureList {
+  display: grid;
+  gap: 11px;
+  padding: 0;
+  margin: 0 0 4px;
+  list-style: none;
+}
+
+.pricingFeatureList li {
+  position: relative;
+  padding-left: 18px;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.pricingFeatureList li::before {
+  content: "";
+  position: absolute;
+  top: 0.72em;
+  left: 0;
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #ffffff;
+}
+
+.pricingCard .button {
+  width: 100%;
+  justify-content: center;
+  margin-top: auto;
+}
+
+.pricingOutcomeStrip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 18px;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.pricingOutcomeStrip div {
+  display: grid;
+  gap: 5px;
+  padding: 16px;
+  border-right: 1px solid var(--border-soft);
+}
+
+.pricingOutcomeStrip div:last-child {
+  border-right: 0;
+}
+
+.pricingOutcomeStrip span {
+  color: var(--muted);
+  font-size: 13px;
+}
+
 .founderPageLayout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(320px, 0.82fr);
@@ -5497,6 +5670,25 @@ details[open] > summary::after {
   .founderPriceBand {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .pricingHero,
+  .pricingGrid,
+  .pricingOutcomeStrip {
+    grid-template-columns: 1fr;
+  }
+
+  .pricingCardTop p {
+    min-height: 0;
+  }
+
+  .pricingOutcomeStrip div {
+    border-right: 0;
+    border-bottom: 1px solid var(--border-soft);
+  }
+
+  .pricingOutcomeStrip div:last-child {
+    border-bottom: 0;
   }
 
   .prospectHeader {
