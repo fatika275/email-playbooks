@@ -262,11 +262,9 @@ export default function ProspectDetailPage() {
   }), [activities, activityFilter]);
   const unreadActivities = filteredActivities.filter((item) => !readActivityIds.includes(item.id));
   const unreadSharedNotes = comments.filter((item) => !readSharedNoteIds.includes(item.id));
-  const visibleActivities = showAllActivity ? filteredActivities : unreadActivities.slice(0, ACTIVITY_PREVIEW_LIMIT);
-  const hiddenActivityCount = Math.max(unreadActivities.length - ACTIVITY_PREVIEW_LIMIT, 0);
+  const visibleActivities = showAllActivity ? filteredActivities : unreadActivities;
   const readActivityCount = filteredActivities.length - unreadActivities.length;
-  const visibleSharedNotes = showAllSharedNotes ? comments : unreadSharedNotes.slice(0, SHARED_NOTES_PREVIEW_LIMIT);
-  const hiddenSharedNoteCount = Math.max(unreadSharedNotes.length - SHARED_NOTES_PREVIEW_LIMIT, 0);
+  const visibleSharedNotes = showAllSharedNotes ? comments : unreadSharedNotes;
   const readSharedNoteCount = comments.length - unreadSharedNotes.length;
   const newActivityCount = unreadActivities.length;
   const newSharedNoteCount = unreadSharedNotes.length;
@@ -949,7 +947,7 @@ export default function ProspectDetailPage() {
                   <input className="input" value={activitySummary} onChange={(event) => setActivitySummary(event.target.value)} placeholder="What happened?" />
                   <button className="button buttonPrimary" disabled={!activitySummary.trim()} onClick={() => void handleAddActivity()}>Log</button>
                 </div>
-                <div className={showAllActivity ? "prospectTimeline prospectTimelineScrollable" : "prospectTimeline"}>
+                <div className={visibleActivities.length > ACTIVITY_PREVIEW_LIMIT ? "prospectTimeline prospectTimelineScrollable" : "prospectTimeline"}>
                   {visibleActivities.map((activity) => (
                     <button key={activity.id} type="button" className={readActivityIds.includes(activity.id) ? "prospectTimelineItem prospectTimelineButton" : "prospectTimelineItem prospectTimelineButton isUnread"} onClick={() => handleActivityItemRead(activity.id)}>
                       <span className="miniBadge">{readActivityIds.includes(activity.id) ? activity.activity_type : "New"}</span>
@@ -959,7 +957,7 @@ export default function ProspectDetailPage() {
                   {filteredActivities.length === 0 ? <p className="small">No activity matches this view.</p> : null}
                   {!showAllActivity && filteredActivities.length > 0 && visibleActivities.length === 0 ? <p className="small">No new activity. Read history is still available.</p> : null}
                 </div>
-                {hiddenActivityCount > 0 || readActivityCount > 0 ? <button className="button buttonSecondary prospectActivityMore" onClick={() => setShowAllActivity((current) => !current)}>{showAllActivity ? "Hide read history" : readActivityCount > 0 ? `View ${readActivityCount} read ${readActivityCount === 1 ? "item" : "items"}` : `View ${hiddenActivityCount} more new ${hiddenActivityCount === 1 ? "item" : "items"}`}</button> : null}
+                {readActivityCount > 0 ? <button className="button buttonSecondary prospectActivityMore" onClick={() => setShowAllActivity((current) => !current)}>{showAllActivity ? "Hide past activity" : `View past activity (${readActivityCount})`}</button> : null}
               </section>
             </div>
 
@@ -968,13 +966,13 @@ export default function ProspectDetailPage() {
               <p className="small">Leave the context the next teammate needs: what was promised, who decides, what to send next, and anything that could stop the deal moving.</p>
               <textarea className="input" rows={3} value={commentBody} onChange={(event) => setCommentBody(event.target.value)} placeholder={`Handoff note: ${fullName || "this lead"} cares about..., next step is..., watch out for...`} />
               <button className="button buttonPrimary" disabled={!commentBody.trim()} onClick={() => void handleAddComment()}>Add shared note</button>
-              {comments.length ? <p className="small prospectListLimitNote">{showAllSharedNotes ? `Showing all ${comments.length} shared notes.` : newSharedNoteCount ? `Showing ${Math.min(newSharedNoteCount, SHARED_NOTES_PREVIEW_LIMIT)} new shared ${newSharedNoteCount === 1 ? "note" : "notes"}.` : "No new shared notes."}</p> : null}
-              <div className={showAllSharedNotes ? "prospectTimeline prospectTimelineScrollable" : "prospectTimeline"}>
+              {comments.length ? <p className="small prospectListLimitNote">{showAllSharedNotes ? `Showing all ${comments.length} shared notes.` : newSharedNoteCount ? `Showing ${newSharedNoteCount} new shared ${newSharedNoteCount === 1 ? "note" : "notes"}.` : "No new shared notes."}</p> : null}
+              <div className={visibleSharedNotes.length > SHARED_NOTES_PREVIEW_LIMIT ? "prospectTimeline prospectTimelineScrollable" : "prospectTimeline"}>
                 {visibleSharedNotes.map((comment) => <button key={comment.id} type="button" className={readSharedNoteIds.includes(comment.id) ? "prospectTimelineItem prospectTimelineButton" : "prospectTimelineItem prospectTimelineButton isUnread"} onClick={() => handleSharedNoteRead(comment.id)}><span className="miniBadge">{readSharedNoteIds.includes(comment.id) ? "Shared note" : "New"}</span><div><strong>{comment.author_email || "Teammate"}</strong><p className="muted" style={{ whiteSpace: "pre-wrap", margin: "4px 0" }}>{comment.body}</p><p className="small">{new Date(comment.created_at).toLocaleString()}</p></div></button>)}
                 {comments.length === 0 ? <p className="small">No shared handoff notes yet.</p> : null}
                 {!showAllSharedNotes && comments.length > 0 && visibleSharedNotes.length === 0 ? <p className="small">No new shared notes. Read history is still available.</p> : null}
               </div>
-              {hiddenSharedNoteCount > 0 || readSharedNoteCount > 0 ? <button className="button buttonSecondary prospectActivityMore" onClick={() => setShowAllSharedNotes((current) => !current)}>{showAllSharedNotes ? "Hide read notes" : readSharedNoteCount > 0 ? `View ${readSharedNoteCount} read ${readSharedNoteCount === 1 ? "note" : "notes"}` : `View ${hiddenSharedNoteCount} more new ${hiddenSharedNoteCount === 1 ? "note" : "notes"}`}</button> : null}
+              {readSharedNoteCount > 0 ? <button className="button buttonSecondary prospectActivityMore" onClick={() => setShowAllSharedNotes((current) => !current)}>{showAllSharedNotes ? "Hide past notes" : `View past notes (${readSharedNoteCount})`}</button> : null}
             </section> : null}
 
             <div className="toolbar prospectSaveActions" hidden={detailView !== "overview"}>
