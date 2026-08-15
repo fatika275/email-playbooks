@@ -76,16 +76,18 @@ export default function PricingPage() {
           </div>
 
           <div className="pricingHeroNote">
-            <span className="miniBadge">Simple choice</span>
+            <span className="miniBadge">
+              {founderEligible ? "Founder access" : "Recommended"}
+            </span>
             <strong>
               {founderEligible
-                ? "Founder pricing is unlocked on this account."
-                : "Most solo agencies start with Pro."}
+                ? "Founder Pro is unlocked for this account."
+                : "Start with Pro if you are working leads yourself."}
             </strong>
             <p>
               {founderEligible
-                ? "Complete payment to lock in your early supporter price."
-                : "Choose Business Pro when teammates share leads and handoffs."}
+                ? `You can lock in ${founderPriceLabel}/month for full Pro access.`
+                : "Move to Business Pro when teammates need shared ownership and handoff notes."}
             </p>
           </div>
         </div>
@@ -159,12 +161,6 @@ export default function PricingPage() {
               </Link>
             </article>
           ))}
-        </div>
-
-        <div className="pricingOutcomeStrip">
-          <div><strong>Outreach</strong><span>Start better conversations</span></div>
-          <div><strong>Pipeline</strong><span>Track calls, proposals, and handoff</span></div>
-          <div><strong>Follow-up</strong><span>Stop warm leads going cold</span></div>
         </div>
       </section>
     </main>

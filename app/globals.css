@@ -5049,30 +5049,6 @@ details[open] > summary::after {
   margin-top: auto;
 }
 
-.pricingOutcomeStrip {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  margin-top: 18px;
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-}
-
-.pricingOutcomeStrip div {
-  display: grid;
-  gap: 5px;
-  padding: 16px;
-  border-right: 1px solid var(--border-soft);
-}
-
-.pricingOutcomeStrip div:last-child {
-  border-right: 0;
-}
-
-.pricingOutcomeStrip span {
-  color: var(--muted);
-  font-size: 13px;
-}
-
 .founderPageLayout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(320px, 0.82fr);
@@ -5732,22 +5708,12 @@ details[open] > summary::after {
   }
 
   .pricingHero,
-  .pricingGrid,
-  .pricingOutcomeStrip {
+  .pricingGrid {
     grid-template-columns: 1fr;
   }
 
   .pricingCardTop p {
     min-height: 0;
-  }
-
-  .pricingOutcomeStrip div {
-    border-right: 0;
-    border-bottom: 1px solid var(--border-soft);
-  }
-
-  .pricingOutcomeStrip div:last-child {
-    border-bottom: 0;
   }
 
   .prospectHeader {
