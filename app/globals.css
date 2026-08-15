@@ -4161,6 +4161,7 @@ details[open] > summary::after {
 }
 
 .prospectTimelineItem {
+  position: relative;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   align-items: start;
@@ -4187,9 +4188,21 @@ details[open] > summary::after {
 
 .prospectTimelineButton.isUnread {
   padding-right: 11px;
-  padding-left: 11px;
+  padding-left: 28px;
   border: 1px solid var(--border-soft);
   background: #0f0f0f;
+}
+
+.prospectTimelineButton.isUnread::before {
+  content: "";
+  position: absolute;
+  top: 18px;
+  left: 11px;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #5eead4;
+  box-shadow: 0 0 0 3px rgba(94, 234, 212, 0.12);
 }
 
 .prospectTimelineButton.isUnread strong {
