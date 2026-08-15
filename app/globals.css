@@ -2501,13 +2501,24 @@ details[open] > summary::after {
 }
 
 .savedPlanActions {
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-start;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
   gap: 12px;
   padding: 14px;
   border: 1px solid var(--border-soft);
   background: #070707;
+}
+
+.savedPlanActions > .button,
+.savedPlanActions > .savedPlanMoreActions,
+.savedPlanActions > .savedPlanMoreActions > summary {
+  width: 100%;
+}
+
+.savedPlanActions > .button,
+.savedPlanActions > .savedPlanMoreActions > summary {
+  justify-content: center;
 }
 
 .savedPlanDisclosure {
@@ -2519,17 +2530,27 @@ details[open] > summary::after {
 
 .savedPlanDisclosure > summary {
   min-height: 48px;
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(86px, auto);
   align-items: center;
-  justify-content: space-between;
   gap: 12px;
-  padding: 0 14px;
+  padding: 0 38px 0 14px;
   cursor: pointer;
   list-style: none;
 }
 
+.savedPlanDisclosure > summary::after {
+  right: 14px;
+}
+
 .savedPlanDisclosure > summary::-webkit-details-marker {
   display: none;
+}
+
+.savedPlanDisclosure > summary strong,
+.savedPlanDisclosure > summary span {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .savedPlanDisclosure > summary span {
@@ -2601,14 +2622,6 @@ details[open] > summary::after {
 .savedPlanMoreActions .button {
   width: 100%;
   justify-content: flex-start;
-}
-
-.savedPlanExportOptions {
-  display: grid;
-  gap: 8px;
-  padding-bottom: 10px;
-  margin-bottom: 2px;
-  border-bottom: 1px solid var(--border-soft);
 }
 
 .builderEmptyPanel {
@@ -5898,7 +5911,7 @@ details[open] > summary::after {
   }
 
   .savedPlanActions {
-    flex-direction: column;
+    grid-template-columns: 1fr;
   }
 
   .savedPlanActions > .button,

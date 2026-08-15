@@ -468,52 +468,66 @@ export default function SequenceAssetPage() {
               />
             </div>
 
+            <details className="savedPlanDisclosure">
+              <summary><strong>HTML export settings</strong><span>Company and logo</span></summary>
+              <div className="savedPlanDisclosureBody">
+                <div className="formGroup" style={{ marginBottom: 0 }}>
+                  <label className="label">Company name</label>
+                  <input
+                    className="input"
+                    value={companyName}
+                    onChange={(event) => setCompanyName(event.target.value)}
+                    placeholder="Company name for export"
+                  />
+                </div>
+
+                <div className="formGroup" style={{ marginBottom: 0 }}>
+                  <label className="label">Logo</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="input"
+                    onChange={(event) => {
+                      const file = event.target.files?.[0];
+                      if (!file) return;
+
+                      const reader = new FileReader();
+                      reader.onload = () => {
+                        setLogoData(reader.result as string);
+                      };
+                      reader.readAsDataURL(file);
+                    }}
+                  />
+
+                  {logoData ? (
+                    <Image
+                      src={logoData}
+                      alt="Logo preview"
+                      unoptimized
+                      width={160}
+                      height={50}
+                      style={{ marginTop: 10, maxHeight: 50, width: "auto" }}
+                    />
+                  ) : null}
+                </div>
+              </div>
+            </details>
+
             <div className="savedPlanActions">
               <button className="button buttonPrimary" onClick={handleCopy}>
                 Copy Plan
               </button>
 
+              <button
+                className="button buttonUtility"
+                onClick={() => void handleDelete()}
+              >
+                Delete
+              </button>
+
               <details className="savedPlanMoreActions">
                 <summary>More actions</summary>
                 <div>
-                  <div className="savedPlanExportOptions">
-                    <label className="label">Company for HTML export</label>
-                    <input
-                      className="input"
-                      value={companyName}
-                      onChange={(event) => setCompanyName(event.target.value)}
-                      placeholder="Company name"
-                    />
-
-                    <label className="label">Logo for HTML export</label>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="input"
-                      onChange={(event) => {
-                        const file = event.target.files?.[0];
-                        if (!file) return;
-
-                        const reader = new FileReader();
-                        reader.onload = () => {
-                          setLogoData(reader.result as string);
-                        };
-                        reader.readAsDataURL(file);
-                      }}
-                    />
-
-                    {logoData ? (
-                      <Image
-                        src={logoData}
-                        alt="Logo preview"
-                        unoptimized
-                        width={160}
-                        height={50}
-                        style={{ maxHeight: 50, width: "auto" }}
-                      />
-                    ) : null}
-                  </div>
-
                   <button
                     className="button buttonSecondary"
                     onClick={handleDownloadText}
@@ -553,13 +567,6 @@ export default function SequenceAssetPage() {
                 onClick={() => router.push("/workspace")}
               >
                 Back to Saved
-              </button>
-
-              <button
-                className="button buttonUtility"
-                onClick={() => void handleDelete()}
-              >
-                Delete
               </button>
             </div>
           </div>
