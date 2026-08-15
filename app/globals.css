@@ -2503,7 +2503,7 @@ details[open] > summary::after {
 .savedPlanActions {
   display: flex;
   align-items: flex-start;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 12px;
   padding: 14px;
   border: 1px solid var(--border-soft);
@@ -2516,9 +2516,10 @@ details[open] > summary::after {
 
 .savedPlanMoreActions > summary {
   min-height: 40px;
-  padding: 0 14px;
+  padding: 0 34px 0 14px;
   display: inline-flex;
   align-items: center;
+  position: relative;
   color: var(--text);
   font-size: 13px;
   font-weight: 650;
@@ -2527,6 +2528,22 @@ details[open] > summary::after {
   background: #111111;
   cursor: pointer;
   list-style: none;
+}
+
+.savedPlanMoreActions > summary::after {
+  content: "";
+  position: absolute;
+  right: 13px;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  border-right: 1px solid currentColor;
+  border-bottom: 1px solid currentColor;
+  transform: translateY(-65%) rotate(45deg);
+}
+
+.savedPlanMoreActions[open] > summary::after {
+  transform: translateY(-35%) rotate(225deg);
 }
 
 .savedPlanMoreActions > summary::-webkit-details-marker {
