@@ -277,9 +277,9 @@ export default function SequenceAssetPage() {
 
         <div className="editorLayout">
           <div className="formCard">
-            <div className="glassCard" style={{ padding: 18, marginBottom: 18 }}>
-              <h4 style={{ margin: 0 }}>Plan Details</h4>
-              <div style={{ display: "grid", gap: 14, marginTop: 14 }}>
+            <details className="savedPlanDisclosure">
+              <summary><strong>Plan details</strong><span>{template.folder ?? "No folder yet"}</span></summary>
+              <div className="savedPlanDisclosureBody">
                 <div>
                   <p
                     className="muted"
@@ -386,11 +386,11 @@ export default function SequenceAssetPage() {
                   </div>
                 </div>
               </div>
-            </div>
+            </details>
 
-            <div className="glassCard" style={{ padding: 18, marginBottom: 18 }}>
-              <h4 style={{ margin: 0 }}>Organize this plan</h4>
-              <div style={{ display: "grid", gap: 14, marginTop: 14 }}>
+            <details className="savedPlanDisclosure">
+              <summary><strong>Organize this plan</strong><span>Folder, tags, favorite</span></summary>
+              <div className="savedPlanDisclosureBody">
                 <div className="formGroup" style={{ marginBottom: 0 }}>
                   <label className="label">Folder</label>
                   <input
@@ -427,7 +427,7 @@ export default function SequenceAssetPage() {
                   </button>
                 </div>
               </div>
-            </div>
+            </details>
 
             <ShareWithTeam
               assetType="sequence"
@@ -468,46 +468,6 @@ export default function SequenceAssetPage() {
               />
             </div>
 
-            <div className="formGroup">
-              <label className="label">Company Name</label>
-              <input
-                className="input"
-                value={companyName}
-                onChange={(event) => setCompanyName(event.target.value)}
-                placeholder="Enter company name for export"
-              />
-            </div>
-
-            <div className="formGroup">
-              <label className="label">Upload Logo</label>
-              <input
-                type="file"
-                accept="image/*"
-                className="input"
-                onChange={(event) => {
-                  const file = event.target.files?.[0];
-                  if (!file) return;
-
-                  const reader = new FileReader();
-                  reader.onload = () => {
-                    setLogoData(reader.result as string);
-                  };
-                  reader.readAsDataURL(file);
-                }}
-              />
-
-              {logoData ? (
-                <Image
-                  src={logoData}
-                  alt="Logo preview"
-                  unoptimized
-                  width={160}
-                  height={50}
-                  style={{ marginTop: 10, maxHeight: 50, width: "auto" }}
-                />
-              ) : null}
-            </div>
-
             <div className="savedPlanActions">
               <button className="button buttonPrimary" onClick={handleCopy}>
                 Copy Plan
@@ -516,6 +476,44 @@ export default function SequenceAssetPage() {
               <details className="savedPlanMoreActions">
                 <summary>More actions</summary>
                 <div>
+                  <div className="savedPlanExportOptions">
+                    <label className="label">Company for HTML export</label>
+                    <input
+                      className="input"
+                      value={companyName}
+                      onChange={(event) => setCompanyName(event.target.value)}
+                      placeholder="Company name"
+                    />
+
+                    <label className="label">Logo for HTML export</label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="input"
+                      onChange={(event) => {
+                        const file = event.target.files?.[0];
+                        if (!file) return;
+
+                        const reader = new FileReader();
+                        reader.onload = () => {
+                          setLogoData(reader.result as string);
+                        };
+                        reader.readAsDataURL(file);
+                      }}
+                    />
+
+                    {logoData ? (
+                      <Image
+                        src={logoData}
+                        alt="Logo preview"
+                        unoptimized
+                        width={160}
+                        height={50}
+                        style={{ maxHeight: 50, width: "auto" }}
+                      />
+                    ) : null}
+                  </div>
+
                   <button
                     className="button buttonSecondary"
                     onClick={handleDownloadText}

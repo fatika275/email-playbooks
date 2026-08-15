@@ -2510,6 +2510,40 @@ details[open] > summary::after {
   background: #070707;
 }
 
+.savedPlanDisclosure {
+  padding: 0;
+  margin-bottom: 12px;
+  border: 1px solid var(--border-soft);
+  background: #070707;
+}
+
+.savedPlanDisclosure > summary {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 14px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.savedPlanDisclosure > summary::-webkit-details-marker {
+  display: none;
+}
+
+.savedPlanDisclosure > summary span {
+  color: var(--muted);
+  font-size: 12px;
+  text-align: right;
+}
+
+.savedPlanDisclosureBody {
+  display: grid;
+  gap: 14px;
+  padding: 0 14px 14px;
+}
+
 .savedPlanMoreActions {
   position: relative;
 }
@@ -2554,7 +2588,7 @@ details[open] > summary::after {
   position: absolute;
   right: 0;
   z-index: 5;
-  min-width: 220px;
+  min-width: 260px;
   display: grid;
   gap: 8px;
   padding: 10px;
@@ -2567,6 +2601,14 @@ details[open] > summary::after {
 .savedPlanMoreActions .button {
   width: 100%;
   justify-content: flex-start;
+}
+
+.savedPlanExportOptions {
+  display: grid;
+  gap: 8px;
+  padding-bottom: 10px;
+  margin-bottom: 2px;
+  border-bottom: 1px solid var(--border-soft);
 }
 
 .builderEmptyPanel {
