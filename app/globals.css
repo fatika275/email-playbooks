@@ -4169,6 +4169,33 @@ details[open] > summary::after {
   border-bottom: 1px solid var(--border-soft);
 }
 
+.prospectTimelineButton {
+  width: 100%;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  border-top: 0;
+  border-right: 0;
+  border-left: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.prospectTimelineButton:hover {
+  background: #0c0c0c;
+}
+
+.prospectTimelineButton.isUnread {
+  padding-right: 11px;
+  padding-left: 11px;
+  border: 1px solid var(--border-soft);
+  background: #0f0f0f;
+}
+
+.prospectTimelineButton.isUnread strong {
+  color: var(--foreground);
+}
+
 .prospectTimelineItem > .miniBadge {
   max-width: 100%;
   overflow-wrap: anywhere;

@@ -73,8 +73,21 @@ function cleanTemplateLabel(label: string) {
   return label.replace(/\s*\(Day\s+\d+\)/i, "").trim();
 }
 
-function getProspectSeenKey(prospectId: string, kind: "activity" | "notes") {
-  return `thalovo_prospect_${kind}_seen_${prospectId}`;
+function getProspectReadKey(prospectId: string, kind: "activity" | "notes") {
+  return `thalovo_prospect_${kind}_read_${prospectId}`;
+}
+
+function readStoredIds(key: string) {
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(key) ?? "[]");
+    return Array.isArray(parsed) ? parsed.filter((item): item is string => typeof item === "string") : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeStoredIds(key: string, ids: string[]) {
+  window.localStorage.setItem(key, JSON.stringify(Array.from(new Set(ids))));
 }
 
 function getLegacyCustomSequenceSteps(template: CustomTemplate): ScheduledSequence["steps"] {
@@ -177,8 +190,8 @@ export default function ProspectDetailPage() {
   const [activityFilter, setActivityFilter] = useState<"useful" | "outreach" | "notes" | "all">("useful");
   const [showAllActivity, setShowAllActivity] = useState(false);
   const [showAllSharedNotes, setShowAllSharedNotes] = useState(false);
-  const [activitySeenAt, setActivitySeenAt] = useState("");
-  const [sharedNotesSeenAt, setSharedNotesSeenAt] = useState("");
+  const [readActivityIds, setReadActivityIds] = useState<string[]>([]);
+  const [readSharedNoteIds, setReadSharedNoteIds] = useState<string[]>([]);
   const [pendingProposalOutcome, setPendingProposalOutcome] = useState<"won" | "lost" | null>(null);
   const [proposalOutcomeReason, setProposalOutcomeReason] = useState("");
   const [proposalNotice, setProposalNotice] = useState("");
@@ -251,12 +264,8 @@ export default function ProspectDetailPage() {
   const hiddenActivityCount = Math.max(filteredActivities.length - ACTIVITY_PREVIEW_LIMIT, 0);
   const visibleSharedNotes = showAllSharedNotes ? comments : comments.slice(0, SHARED_NOTES_PREVIEW_LIMIT);
   const hiddenSharedNoteCount = Math.max(comments.length - SHARED_NOTES_PREVIEW_LIMIT, 0);
-  const newActivityCount = activitySeenAt
-    ? filteredActivities.filter((item) => new Date(item.created_at).getTime() > new Date(activitySeenAt).getTime()).length
-    : filteredActivities.length;
-  const newSharedNoteCount = sharedNotesSeenAt
-    ? comments.filter((item) => new Date(item.created_at).getTime() > new Date(sharedNotesSeenAt).getTime()).length
-    : comments.length;
+  const newActivityCount = filteredActivities.filter((item) => !readActivityIds.includes(item.id)).length;
+  const newSharedNoteCount = comments.filter((item) => !readSharedNoteIds.includes(item.id)).length;
   const scopeSnapshot = [serviceType, budgetRange].map((value) => value?.trim()).filter(Boolean).join(" / ");
   const showOnboardingGuide =
     searchParams.get("onboarding") === "1" ||
@@ -298,8 +307,8 @@ export default function ProspectDetailPage() {
         setNextFollowUp(record.next_follow_up ?? "");
         setLastContactedAt(record.last_contacted_at);
         setNotes(record.notes ?? "");
-        setActivitySeenAt(window.localStorage.getItem(getProspectSeenKey(record.id, "activity")) ?? "");
-        setSharedNotesSeenAt(window.localStorage.getItem(getProspectSeenKey(record.id, "notes")) ?? "");
+        setReadActivityIds(readStoredIds(getProspectReadKey(record.id, "activity")));
+        setReadSharedNoteIds(readStoredIds(getProspectReadKey(record.id, "notes")));
         return Promise.all([
           listProspectActivities(record.id),
           listProspectTasks([record.id]),
@@ -683,12 +692,20 @@ export default function ProspectDetailPage() {
 
   function handleDetailViewChange(view: "overview" | "followup" | "activity") {
     setDetailView(view);
-    if (view !== "activity" || !prospect?.id) return;
-    const seenAt = new Date().toISOString();
-    window.localStorage.setItem(getProspectSeenKey(prospect.id, "activity"), seenAt);
-    window.localStorage.setItem(getProspectSeenKey(prospect.id, "notes"), seenAt);
-    setActivitySeenAt(seenAt);
-    setSharedNotesSeenAt(seenAt);
+  }
+
+  function handleActivityItemRead(activityId: string) {
+    if (!prospect?.id || readActivityIds.includes(activityId)) return;
+    const nextIds = [...readActivityIds, activityId];
+    setReadActivityIds(nextIds);
+    writeStoredIds(getProspectReadKey(prospect.id, "activity"), nextIds);
+  }
+
+  function handleSharedNoteRead(commentId: string) {
+    if (!prospect?.id || readSharedNoteIds.includes(commentId)) return;
+    const nextIds = [...readSharedNoteIds, commentId];
+    setReadSharedNoteIds(nextIds);
+    writeStoredIds(getProspectReadKey(prospect.id, "notes"), nextIds);
   }
 
   if (isLoading) {
@@ -930,10 +947,10 @@ export default function ProspectDetailPage() {
                 </div>
                 <div className={showAllActivity ? "prospectTimeline prospectTimelineScrollable" : "prospectTimeline"}>
                   {visibleActivities.map((activity) => (
-                    <div key={activity.id} className="prospectTimelineItem">
-                      <span className="miniBadge">{activity.activity_type}</span>
+                    <button key={activity.id} type="button" className={readActivityIds.includes(activity.id) ? "prospectTimelineItem prospectTimelineButton" : "prospectTimelineItem prospectTimelineButton isUnread"} onClick={() => handleActivityItemRead(activity.id)}>
+                      <span className="miniBadge">{readActivityIds.includes(activity.id) ? activity.activity_type : "New"}</span>
                       <div><strong>{activity.summary}</strong><p className="small">{activity.actor_email || "Teammate"} · {new Date(activity.created_at).toLocaleString()}</p></div>
-                    </div>
+                    </button>
                   ))}
                   {filteredActivities.length === 0 ? <p className="small">No activity matches this view.</p> : null}
                 </div>
@@ -948,7 +965,7 @@ export default function ProspectDetailPage() {
               <button className="button buttonPrimary" disabled={!commentBody.trim()} onClick={() => void handleAddComment()}>Add shared note</button>
               {comments.length ? <p className="small prospectListLimitNote">{showAllSharedNotes ? `Showing all ${comments.length} shared notes.` : `Showing the latest ${Math.min(comments.length, SHARED_NOTES_PREVIEW_LIMIT)} of ${comments.length} shared notes.`}</p> : null}
               <div className={showAllSharedNotes ? "prospectTimeline prospectTimelineScrollable" : "prospectTimeline"}>
-                {visibleSharedNotes.map((comment) => <div key={comment.id} className="prospectTimelineItem"><span className="miniBadge">Shared note</span><div><strong>{comment.author_email || "Teammate"}</strong><p className="muted" style={{ whiteSpace: "pre-wrap", margin: "4px 0" }}>{comment.body}</p><p className="small">{new Date(comment.created_at).toLocaleString()}</p></div></div>)}
+                {visibleSharedNotes.map((comment) => <button key={comment.id} type="button" className={readSharedNoteIds.includes(comment.id) ? "prospectTimelineItem prospectTimelineButton" : "prospectTimelineItem prospectTimelineButton isUnread"} onClick={() => handleSharedNoteRead(comment.id)}><span className="miniBadge">{readSharedNoteIds.includes(comment.id) ? "Shared note" : "New"}</span><div><strong>{comment.author_email || "Teammate"}</strong><p className="muted" style={{ whiteSpace: "pre-wrap", margin: "4px 0" }}>{comment.body}</p><p className="small">{new Date(comment.created_at).toLocaleString()}</p></div></button>)}
                 {comments.length === 0 ? <p className="small">No shared handoff notes yet.</p> : null}
               </div>
               {hiddenSharedNoteCount > 0 ? <button className="button buttonSecondary prospectActivityMore" onClick={() => setShowAllSharedNotes((current) => !current)}>{showAllSharedNotes ? "Show recent notes only" : `View ${hiddenSharedNoteCount} older ${hiddenSharedNoteCount === 1 ? "note" : "notes"}`}</button> : null}
