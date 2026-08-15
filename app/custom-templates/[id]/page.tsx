@@ -508,38 +508,43 @@ export default function SequenceAssetPage() {
               ) : null}
             </div>
 
-            <div className="toolbar">
+            <div className="savedPlanActions">
               <button className="button buttonPrimary" onClick={handleCopy}>
                 Copy Plan
               </button>
 
-              <button
-                className="button buttonSecondary"
-                onClick={handleDownloadText}
-              >
-                Download TXT
-              </button>
+              <details className="savedPlanMoreActions">
+                <summary>More actions</summary>
+                <div>
+                  <button
+                    className="button buttonSecondary"
+                    onClick={handleDownloadText}
+                  >
+                    Download TXT
+                  </button>
 
-              <button
-                className="button buttonSecondary"
-                onClick={handleDownloadHtml}
-              >
-                Export HTML
-              </button>
+                  <button
+                    className="button buttonSecondary"
+                    onClick={handleDownloadHtml}
+                  >
+                    Export HTML
+                  </button>
 
-              <button
-                className="button buttonSecondary"
-                onClick={() => void handleSaveVersion()}
-              >
-                Save New Version
-              </button>
+                  <button
+                    className="button buttonSecondary"
+                    onClick={() => void handleSaveVersion()}
+                  >
+                    Save New Version
+                  </button>
 
-              <button
-                className="button buttonSecondary"
-                onClick={() => void handleSaveAsEmail()}
-              >
-                Save as Email
-              </button>
+                  <button
+                    className="button buttonSecondary"
+                    onClick={() => void handleSaveAsEmail()}
+                  >
+                    Save as Email
+                  </button>
+                </div>
+              </details>
             </div>
 
             {savedMessage ? <p className="notice">{savedMessage}</p> : null}
