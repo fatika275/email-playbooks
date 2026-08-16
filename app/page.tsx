@@ -115,7 +115,7 @@ export default function HomePage() {
           <div>
             <div className="badge">Pipeline</div>
             <h2 className="pageTitle" style={{ marginTop: 14 }}>
-              Book more work without babysitting every lead.
+              Book more work without losing leads in the cracks.
             </h2>
             <p className="muted" style={{ marginTop: 12, maxWidth: 680 }}>
               Add a lead, send the right message, set the follow-up, and keep
