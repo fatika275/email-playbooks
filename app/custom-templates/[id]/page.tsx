@@ -561,7 +561,7 @@ export default function SequenceAssetPage() {
 
             {savedMessage ? <p className="notice">{savedMessage}</p> : null}
 
-            <div className="toolbar">
+            <div className="savedPlanBackRow">
               <button
                 className="button buttonSecondary"
                 onClick={() => router.push("/workspace")}

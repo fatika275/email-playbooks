@@ -2521,6 +2521,14 @@ details[open] > summary::after {
   justify-content: center;
 }
 
+.savedPlanBackRow {
+  display: flex;
+  justify-content: flex-start;
+  padding-top: 18px;
+  margin-top: 20px;
+  border-top: 1px solid var(--border-soft);
+}
+
 .savedPlanDisclosure {
   padding: 0;
   margin-bottom: 12px;
