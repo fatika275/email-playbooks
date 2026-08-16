@@ -144,37 +144,47 @@ export default function AccountPage() {
   return (
     <main className="main">
       <section className="container">
-        <div className="pageHeader">
-          <div className="badge">Account</div>
-          <h1 className="pageTitle" style={{ marginTop: 14 }}>
-            Your Thalovo account
-          </h1>
-          <p className="muted" style={{ maxWidth: 720, lineHeight: 1.75 }}>
-            Sign in to keep your outreach messages, follow-up plans, pipeline,
-            and saved deal context available when you come back.
-          </p>
+        <div className="accountPageHero">
+          <div>
+            <div className="badge">Account</div>
+            <h1 className="pageTitle">
+              Keep your outreach, follow-ups, and client work in one place
+            </h1>
+            <p className="muted">
+              Sign in to save messages, follow-up plans, pipeline updates, and
+              handoff context so leads do not slip when you come back.
+            </p>
+          </div>
+          <div className="accountHeroSignal">
+            <span className="miniBadge">{user ? "Workspace ready" : "Free to start"}</span>
+            <strong>{user ? "Jump back into active leads." : "Browse first, save when ready."}</strong>
+            <p>{user ? "Your account keeps your agency work connected across sessions." : "Create an account when you want saved work and pipeline context kept together."}</p>
+          </div>
         </div>
 
         <div className="accountHero accountHeroSimple">
-          <section className="glassCard accountStatusCard">
-            <span
-              className={
-                user
-                  ? "statusPill statusPillSuccess"
-                  : "statusPill statusPillNeutral"
-              }
-            >
-              {user ? "Signed in" : "Not signed in"}
-            </span>
+          <section className="accountStatusCard">
+            <div className="accountStatusTop">
+              <span
+                className={
+                  user
+                    ? "statusPill statusPillSuccess"
+                    : "statusPill statusPillNeutral"
+                }
+              >
+                {user ? "Signed in" : "Not signed in"}
+              </span>
+              <span className="accountPlanChip">{planLabel}</span>
+            </div>
 
-            <h2 className="sectionTitle" style={{ marginTop: 16 }}>
-              {user ? "You are ready to work" : "Sign in when you want to save"}
+            <h2 className="sectionTitle">
+              {user ? "Ready to move leads forward" : "Save the work that wins clients"}
             </h2>
 
-            <p className="muted" style={{ marginTop: 10, lineHeight: 1.75 }}>
+            <p className="muted">
               {user
-                ? "Your saved work is connected to this account."
-                : "You can browse the free library without an account. Sign in when you want your work kept in one place."}
+                ? "Your saved messages, follow-up plans, and pipeline context are connected to this account."
+                : "You can browse the library without an account. Sign in when you want your outreach and lead context kept in one place."}
             </p>
 
             <div className="accountSummaryGrid">
@@ -208,7 +218,7 @@ export default function AccountPage() {
             </div>
 
             {user ? (
-              <div className="toolbar" style={{ marginTop: 20 }}>
+              <div className="accountPrimaryActions">
                 <button
                   className="button buttonPrimary"
                   disabled={isSyncing}
@@ -243,7 +253,7 @@ export default function AccountPage() {
             ) : null}
           </section>
 
-          <section className="glassCard accountAccessCard">
+          <section className="accountAccessCard">
             <h2 className="cardTitle">
               {user ? "Quick links" : "Access your account"}
             </h2>
@@ -252,9 +262,9 @@ export default function AccountPage() {
 
             {!user ? (
               <>
-                <p className="muted" style={{ marginTop: 10, lineHeight: 1.75 }}>
-                  Sign in with your email and password. Account sessions are
-                  securely handled by Supabase Auth.
+                <p className="muted accountAccessIntro">
+                  Sign in with email and password to keep client-work context
+                  saved between sessions.
                 </p>
 
                 <div className="authModeTabs" role="tablist" aria-label="Account mode">
@@ -326,24 +336,25 @@ export default function AccountPage() {
                     ) : null}
                   </div>
 
-                  <button
-                    className="button buttonPrimary"
-                    disabled={!isConfigured || isLoading || !email.trim() || !password}
-                    type="submit"
-                  >
-                    {authMode === "signup" ? "Create account" : "Log in"}
-                  </button>
-
-                  {authMode === "login" ? (
+                  <div className="accountAuthActions">
                     <button
-                      className="button buttonUtility"
-                      type="button"
-                      onClick={() => void handlePasswordResetRequest()}
-                      style={{ marginLeft: 10 }}
+                      className="button buttonPrimary"
+                      disabled={!isConfigured || isLoading || !email.trim() || !password}
+                      type="submit"
                     >
-                      Forgot password?
+                      {authMode === "signup" ? "Create account" : "Log in"}
                     </button>
-                  ) : null}
+
+                    {authMode === "login" ? (
+                      <button
+                        className="button buttonUtility"
+                        type="button"
+                        onClick={() => void handlePasswordResetRequest()}
+                      >
+                        Forgot password?
+                      </button>
+                    ) : null}
+                  </div>
                 </form>
 
                 {showVerification ? (

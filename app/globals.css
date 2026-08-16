@@ -1244,6 +1244,44 @@ details[open] > summary::after {
   align-items: stretch;
 }
 
+.accountPageHero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.42fr);
+  gap: 28px;
+  align-items: end;
+  margin-bottom: 24px;
+}
+
+.accountPageHero .pageTitle {
+  max-width: 780px;
+  margin-top: 14px;
+}
+
+.accountPageHero .muted {
+  max-width: 690px;
+  margin: 12px 0 0;
+  line-height: 1.7;
+}
+
+.accountHeroSignal {
+  padding: 18px;
+  border: 1px solid var(--border-soft);
+  background: #080808;
+}
+
+.accountHeroSignal strong {
+  display: block;
+  margin-top: 12px;
+  line-height: 1.35;
+}
+
+.accountHeroSignal p {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
 .accountHeroSimple {
   grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
 }
@@ -1251,6 +1289,61 @@ details[open] > summary::after {
 .accountStatusCard,
 .accountAccessCard {
   padding: 30px;
+  border: 1px solid var(--border);
+  background: #090909;
+}
+
+.accountStatusTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.accountStatusCard .sectionTitle {
+  max-width: 520px;
+}
+
+.accountStatusCard > .muted {
+  margin-top: 10px;
+  line-height: 1.75;
+}
+
+.accountPlanChip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 12px;
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid var(--border-soft);
+  background: #050505;
+}
+
+.accountPrimaryActions,
+.accountAuthActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.accountPrimaryActions {
+  padding-top: 20px;
+  margin-top: 22px;
+  border-top: 1px solid var(--border-soft);
+}
+
+.accountAccessIntro {
+  margin-top: 10px;
+  line-height: 1.75;
+}
+
+.accountAuthActions {
+  margin-top: 4px;
 }
 
 .accountMetaGrid {
@@ -5429,6 +5522,7 @@ details[open] > summary::after {
 
 @media (max-width: 1080px) {
   .hero,
+  .accountPageHero,
   .accountHero,
   .editorLayout,
   .objectionHelperLayout,
@@ -5756,6 +5850,12 @@ details[open] > summary::after {
 
   .accountSetupSteps {
     grid-template-columns: 1fr;
+  }
+
+  .accountPrimaryActions .button,
+  .accountAuthActions .button {
+    width: 100%;
+    justify-content: center;
   }
 
   .workspaceHero {
