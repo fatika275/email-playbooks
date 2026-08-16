@@ -4940,6 +4940,22 @@ details[open] > summary::after {
   line-height: 1.7;
 }
 
+.pricingHeroSignals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.pricingHeroSignals span {
+  padding: 8px 10px;
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 650;
+  border: 1px solid var(--border-soft);
+  background: #080808;
+}
+
 .pricingHeroNote {
   padding: 18px;
   border: 1px solid var(--border-soft);
@@ -4972,6 +4988,32 @@ details[open] > summary::after {
   line-height: 1.65;
 }
 
+.pricingValueRow {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  margin-top: 18px;
+  border: 1px solid var(--border-soft);
+  background: #070707;
+}
+
+.pricingValueRow div {
+  display: grid;
+  gap: 6px;
+  padding: 16px;
+  border-right: 1px solid var(--border-soft);
+}
+
+.pricingValueRow div:last-child {
+  border-right: 0;
+}
+
+.pricingValueRow span {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
 .pricingGrid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -4990,10 +5032,24 @@ details[open] > summary::after {
 }
 
 .pricingCardFeatured {
-  border-color: #4a4a4a;
+  position: relative;
+  border-color: #ffffff;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.018)),
     #0b0b0b;
+  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.32);
+}
+
+.pricingCardFeatured::before {
+  content: "Best place to start";
+  position: absolute;
+  top: -13px;
+  right: 18px;
+  padding: 6px 10px;
+  color: #050505;
+  font-size: 11px;
+  font-weight: 800;
+  background: #ffffff;
 }
 
 .pricingCardTop h2 {
@@ -5015,7 +5071,7 @@ details[open] > summary::after {
 }
 
 .pricingAmount strong {
-  font-size: 34px;
+  font-size: 38px;
   line-height: 1;
 }
 
@@ -5028,7 +5084,7 @@ details[open] > summary::after {
   gap: 5px;
   padding: 12px;
   border: 1px solid var(--border-soft);
-  background: #050505;
+  background: #0f0f0f;
 }
 
 .pricingBestFor span {
@@ -5729,12 +5785,22 @@ details[open] > summary::after {
   }
 
   .pricingHero,
-  .pricingGrid {
+  .pricingGrid,
+  .pricingValueRow {
     grid-template-columns: 1fr;
   }
 
   .pricingCardTop p {
     min-height: 0;
+  }
+
+  .pricingValueRow div {
+    border-right: 0;
+    border-bottom: 1px solid var(--border-soft);
+  }
+
+  .pricingValueRow div:last-child {
+    border-bottom: 0;
   }
 
   .prospectHeader {

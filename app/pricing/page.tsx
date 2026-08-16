@@ -9,7 +9,7 @@ const plans = [
     badge: "Start here",
     price: "GBP 0",
     cadence: "/month",
-    description: "Try the outreach workflow before moving live leads into Thalovo.",
+    description: "Build better outreach messages before you start tracking live client work.",
     bestFor: "Testing message quality",
     href: "/library",
     cta: "Start free",
@@ -18,6 +18,7 @@ const plans = [
       "Core outreach message templates",
       "Draft, copy, and download messages",
       "Basic saved-message history",
+      "No card required",
     ],
   },
   {
@@ -25,7 +26,7 @@ const plans = [
     badge: "Most solo agencies",
     price: "GBP 19",
     cadence: "/month",
-    description: "For solo agency owners turning outreach into booked calls and active deals.",
+    description: "Run the full outreach-to-deal workflow without a messy spreadsheet.",
     bestFor: "One person chasing client work",
     href: "/pro",
     cta: "View Pro",
@@ -33,6 +34,7 @@ const plans = [
     features: [
       "Agency pipeline for prospects, calls, proposals, and handoff",
       "Follow-up reminders so warm leads do not go quiet",
+      "Reusable outreach, proposal, and win-back templates",
       "Reporting on replies, booked calls, won work, and leakage",
     ],
   },
@@ -41,7 +43,7 @@ const plans = [
     badge: "Small teams",
     price: "GBP 29",
     cadence: "/month",
-    description: "For teams that need shared lead ownership, notes, and handoff context.",
+    description: "Keep everyone aligned when more than one person handles leads.",
     bestFor: "Teams sharing leads",
     href: "/business",
     cta: "View Business Pro",
@@ -49,6 +51,7 @@ const plans = [
     features: [
       "Everything in Pro",
       "Shared pipeline, notes, and client handoff context",
+      "Simple ownership rules for who chases each lead",
       "10 teammate seats and shared follow-up plans",
     ],
   },
@@ -66,13 +69,18 @@ export default function PricingPage() {
           <div>
             <div className="badge">Pricing</div>
             <h1 className="pageTitle">
-              Pick the plan that keeps agency leads moving
+              Turn outreach into booked client work without losing leads
             </h1>
             <p className="muted">
-              Start with outreach messages. Upgrade when you want the pipeline,
-              follow-up reminders, and team handoff tools that stop client work
-              slipping through the cracks.
+              Thalovo is built for small agencies that need one clear place to
+              start conversations, chase replies, track proposals, and hand work
+              over when a lead becomes real.
             </p>
+            <div className="pricingHeroSignals" aria-label="What Thalovo helps with">
+              <span>More booked calls</span>
+              <span>Fewer missed follow-ups</span>
+              <span>Cleaner handoff</span>
+            </div>
           </div>
 
           <div className="pricingHeroNote">
@@ -122,6 +130,21 @@ export default function PricingPage() {
             >
               {founderEligible ? "Start Founder" : "Register interest"}
             </Link>
+          </div>
+        </div>
+
+        <div className="pricingValueRow">
+          <div>
+            <strong>Start fast</strong>
+            <span>No heavy CRM setup before you can chase work.</span>
+          </div>
+          <div>
+            <strong>Stay focused</strong>
+            <span>Built around prospects, proposals, retainers, and handoff.</span>
+          </div>
+          <div>
+            <strong>Prove value</strong>
+            <span>Track replies, booked calls, won work, and lead leakage.</span>
           </div>
         </div>
 
