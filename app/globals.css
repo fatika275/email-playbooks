@@ -5016,19 +5016,19 @@ details[open] > summary::after {
 
 .pricingHero {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.45fr);
-  gap: 28px;
-  align-items: end;
-  padding: 18px 0 10px;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 0.42fr);
+  gap: 34px;
+  align-items: stretch;
+  padding: 22px 0 30px;
 }
 
 .pricingHero .pageTitle {
-  max-width: 720px;
+  max-width: 760px;
   margin-top: 14px;
 }
 
 .pricingHero .muted {
-  max-width: 660px;
+  max-width: 680px;
   margin: 12px 0 0;
   line-height: 1.7;
 }
@@ -5036,28 +5036,34 @@ details[open] > summary::after {
 .pricingHeroSignals {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 18px;
+  gap: 10px;
+  margin-top: 22px;
 }
 
 .pricingHeroSignals span {
-  padding: 8px 10px;
+  padding: 8px 0;
   color: var(--text);
   font-size: 12px;
   font-weight: 650;
-  border: 1px solid var(--border-soft);
-  background: #080808;
+  border-bottom: 1px solid var(--border);
 }
 
 .pricingHeroNote {
-  padding: 18px;
-  border: 1px solid var(--border-soft);
-  background: #080808;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 24px;
+  border-left: 1px solid var(--border);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.015) 54%),
+    #090909;
 }
 
 .pricingHeroNote strong {
   display: block;
-  margin-top: 12px;
+  margin-top: 14px;
+  font-size: 24px;
   line-height: 1.35;
 }
 
@@ -5068,155 +5074,169 @@ details[open] > summary::after {
   line-height: 1.6;
 }
 
-.pricingFounderBand {
-  margin-top: 24px;
+.pricingHeroNote .button {
+  width: 100%;
+  justify-content: center;
+  margin-top: auto;
 }
 
-.pricingFounderBand .pageTitle {
-  margin-top: 12px;
-}
-
-.pricingFounderBand .muted {
-  margin-top: 8px;
-  line-height: 1.65;
-}
-
-.pricingValueRow {
+.pricingDecision {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0;
-  margin-top: 18px;
-  border: 1px solid var(--border-soft);
-  background: #070707;
+  grid-template-columns: minmax(0, 1.3fr) minmax(320px, 0.7fr);
+  gap: 24px;
+  align-items: start;
+  margin-top: 6px;
 }
 
-.pricingValueRow div {
+.pricingPlanStrip {
   display: grid;
-  gap: 6px;
-  padding: 16px;
-  border-right: 1px solid var(--border-soft);
+  gap: 12px;
 }
 
-.pricingValueRow div:last-child {
-  border-right: 0;
-}
-
-.pricingValueRow span {
-  color: var(--muted);
-  font-size: 13px;
-  line-height: 1.5;
-}
-
-.pricingGrid {
+.pricingPlanRow {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr) minmax(120px, 0.28fr) minmax(160px, 0.34fr) auto;
   gap: 16px;
-  margin-top: 24px;
+  align-items: center;
+  padding: 22px 0;
+  border-top: 1px solid var(--border-soft);
 }
 
-.pricingCard {
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  padding: 24px;
-  border: 1px solid var(--border);
-  background: #090909;
+.pricingPlanRow:last-child {
+  border-bottom: 1px solid var(--border-soft);
 }
 
-.pricingCardFeatured {
+.pricingPlanRowFeatured {
   position: relative;
-  border-color: #ffffff;
+  margin: 0 -18px;
+  padding: 24px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.32);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.018)),
-    #0b0b0b;
-  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.32);
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.13), transparent 36%),
+    linear-gradient(135deg, #111111, #070707);
+  box-shadow: 0 26px 90px rgba(0, 0, 0, 0.34);
 }
 
-.pricingCardFeatured::before {
-  content: "Best place to start";
+.pricingPlanRowFeatured::before {
+  content: "Recommended";
   position: absolute;
-  top: -13px;
+  top: 14px;
   right: 18px;
-  padding: 6px 10px;
   color: #050505;
   font-size: 11px;
   font-weight: 800;
+  line-height: 1;
+  padding: 6px 9px;
   background: #ffffff;
 }
 
-.pricingCardTop h2 {
-  margin: 14px 0 0;
-  font-size: 22px;
+.pricingPlanIntro span,
+.pricingPlanUse span {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 760;
+  text-transform: uppercase;
+  letter-spacing: 0;
 }
 
-.pricingCardTop p {
-  min-height: 68px;
+.pricingPlanIntro h2 {
+  margin: 7px 0 0;
+  font-size: 24px;
+}
+
+.pricingPlanIntro p {
+  max-width: 520px;
+  margin: 8px 0 0;
+  color: var(--muted);
+  line-height: 1.58;
+}
+
+.pricingPlanPrice {
+  white-space: nowrap;
+}
+
+.pricingPlanPrice strong {
+  display: block;
+  font-size: 27px;
+  line-height: 1;
+}
+
+.pricingPlanPrice span {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.pricingPlanUse {
+  display: grid;
+  gap: 6px;
+}
+
+.pricingPlanUse strong {
+  max-width: 190px;
+  line-height: 1.35;
+}
+
+.pricingPlanRow .button {
+  min-width: 145px;
+  justify-content: center;
+}
+
+.pricingIncludedPanel {
+  position: sticky;
+  top: 90px;
+  display: grid;
+  gap: 22px;
+  padding: 26px;
+  border: 1px solid var(--border);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.055), transparent 42%),
+    #080808;
+}
+
+.pricingIncludedPanel h2 {
+  margin: 14px 0 0;
+  font-size: 28px;
+  line-height: 1.12;
+}
+
+.pricingIncludedPanel p {
   margin: 10px 0 0;
   color: var(--muted);
   line-height: 1.65;
 }
 
-.pricingAmount {
-  padding: 16px 0;
+.pricingIncludedList {
+  display: grid;
+  gap: 0;
   border-top: 1px solid var(--border-soft);
   border-bottom: 1px solid var(--border-soft);
 }
 
-.pricingAmount strong {
-  font-size: 38px;
-  line-height: 1;
+.pricingIncludedList div {
+  padding: 15px 0;
+  border-bottom: 1px solid var(--border-soft);
 }
 
-.pricingAmount span {
+.pricingIncludedList div:last-child {
+  border-bottom: 0;
+}
+
+.pricingIncludedList strong,
+.pricingIncludedList span {
+  display: block;
+}
+
+.pricingIncludedList span {
+  margin-top: 5px;
   color: var(--muted);
-}
-
-.pricingBestFor {
-  display: grid;
-  gap: 5px;
-  padding: 12px;
-  border: 1px solid var(--border-soft);
-  background: #0f0f0f;
-}
-
-.pricingBestFor span {
-  color: var(--muted);
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
-.pricingFeatureList {
-  display: grid;
-  gap: 11px;
-  padding: 0;
-  margin: 0 0 4px;
-  list-style: none;
-}
-
-.pricingFeatureList li {
-  position: relative;
-  padding-left: 18px;
-  color: var(--muted);
+  font-size: 13px;
   line-height: 1.55;
 }
 
-.pricingFeatureList li::before {
-  content: "";
-  position: absolute;
-  top: 0.72em;
-  left: 0;
-  width: 7px;
-  height: 7px;
-  border-radius: 999px;
-  background: #ffffff;
-}
-
-.pricingCard .button {
-  width: 100%;
-  justify-content: center;
-  margin-top: auto;
+.pricingFounderInline {
+  display: grid;
+  gap: 8px;
+  padding-top: 2px;
 }
 
 .founderPageLayout {
@@ -5885,22 +5905,37 @@ details[open] > summary::after {
   }
 
   .pricingHero,
-  .pricingGrid,
-  .pricingValueRow {
+  .pricingDecision {
     grid-template-columns: 1fr;
   }
 
-  .pricingCardTop p {
-    min-height: 0;
+  .pricingIncludedPanel {
+    position: static;
   }
 
-  .pricingValueRow div {
-    border-right: 0;
-    border-bottom: 1px solid var(--border-soft);
+  .pricingPlanRow,
+  .pricingPlanRowFeatured {
+    grid-template-columns: 1fr;
+    margin: 0;
+    padding: 22px 0;
   }
 
-  .pricingValueRow div:last-child {
-    border-bottom: 0;
+  .pricingPlanRowFeatured {
+    padding: 24px 18px;
+  }
+
+  .pricingPlanRowFeatured::before {
+    position: static;
+    width: fit-content;
+    margin-bottom: 4px;
+  }
+
+  .pricingPlanUse strong {
+    max-width: none;
+  }
+
+  .pricingPlanRow .button {
+    width: 100%;
   }
 
   .prospectHeader {

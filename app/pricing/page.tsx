@@ -6,54 +6,33 @@ import { useAccount } from "@/components/account-provider";
 const plans = [
   {
     name: "Free",
-    badge: "Start here",
+    eyebrow: "Try the workflow",
     price: "GBP 0",
     cadence: "/month",
-    description: "Build better outreach messages before you start tracking live client work.",
-    bestFor: "Testing message quality",
+    description: "Use the message library before you are ready to track live client work.",
+    bestFor: "Writing better outreach",
     href: "/library",
     cta: "Start free",
-    featured: false,
-    features: [
-      "Core outreach message templates",
-      "Draft, copy, and download messages",
-      "Basic saved-message history",
-      "No card required",
-    ],
   },
   {
     name: "Pro",
-    badge: "Most solo agencies",
+    eyebrow: "Most small agencies",
     price: "GBP 19",
     cadence: "/month",
-    description: "Run the full outreach-to-deal workflow without a messy spreadsheet.",
-    bestFor: "One person chasing client work",
+    description: "Run outreach, follow-ups, proposals, and lead tracking in one focused workspace.",
+    bestFor: "Turning replies into booked work",
     href: "/pro",
-    cta: "View Pro",
-    featured: true,
-    features: [
-      "Agency pipeline for prospects, calls, proposals, and handoff",
-      "Follow-up reminders so warm leads do not go quiet",
-      "Reusable outreach, proposal, and win-back templates",
-      "Reporting on replies, booked calls, won work, and leakage",
-    ],
+    cta: "Start Pro",
   },
   {
     name: "Business Pro",
-    badge: "Small teams",
+    eyebrow: "When a team is involved",
     price: "GBP 29",
     cadence: "/month",
-    description: "Keep everyone aligned when more than one person handles leads.",
-    bestFor: "Teams sharing leads",
+    description: "Add shared ownership and handoff context when more than one person handles leads.",
+    bestFor: "Keeping a small team aligned",
     href: "/business",
-    cta: "View Business Pro",
-    featured: false,
-    features: [
-      "Everything in Pro",
-      "Shared pipeline, notes, and client handoff context",
-      "Simple ownership rules for who chases each lead",
-      "10 teammate seats and shared follow-up plans",
-    ],
+    cta: "Start Business Pro",
   },
 ];
 
@@ -69,122 +48,133 @@ export default function PricingPage() {
           <div>
             <div className="badge">Pricing</div>
             <h1 className="pageTitle">
-              Turn outreach into booked client work without losing leads
+              Simple pricing for agencies that need booked work, not CRM admin
             </h1>
             <p className="muted">
-              Thalovo is built for small agencies that need one clear place to
-              start conversations, chase replies, track proposals, and hand work
-              over when a lead becomes real.
+              Choose the stage you are at now. Thalovo keeps the workflow tight:
+              start better conversations, chase the right leads, track proposals,
+              and hand over client work without losing context.
             </p>
             <div className="pricingHeroSignals" aria-label="What Thalovo helps with">
-              <span>More booked calls</span>
-              <span>Fewer missed follow-ups</span>
-              <span>Cleaner handoff</span>
+              <span>Outreach</span>
+              <span>Pipeline</span>
+              <span>Follow-up</span>
+              <span>Handoff</span>
             </div>
           </div>
 
           <div className="pricingHeroNote">
             <span className="miniBadge">
-              {founderEligible ? "Founder access" : "Recommended"}
+              {founderEligible ? "Founder access unlocked" : "Best place to start"}
             </span>
             <strong>
               {founderEligible
-                ? "Founder Pro is unlocked for this account."
-                : "Start with Pro if you are working leads yourself."}
+                ? `${founderPriceLabel}/month for full Pro.`
+                : "Most agencies should start with Pro."}
             </strong>
             <p>
               {founderEligible
-                ? `You can lock in ${founderPriceLabel}/month for full Pro access.`
-                : "Move to Business Pro when teammates need shared ownership and handoff notes."}
+                ? "Founder pricing is locked while your account stays active."
+                : "It gives you the full outreach-to-deal workflow without paying for team seats too early."}
             </p>
-          </div>
-        </div>
-
-        <div className="founderPriceBand pricingFounderBand">
-          <div>
-            <div className="badge">Founder Pro</div>
-            <h2 className="pageTitle">
-              {founderPriceLabel}
-              <span className="muted">/month locked</span>
-            </h2>
-            <p className="muted">
-              Invite-only early supporter pricing for one individual account,
-              with full Pro access while your account is active.
-            </p>
-          </div>
-
-          <div className="founderPriceActions">
-            <span
-              className={
-                founderEligible
-                  ? "statusPill statusPillSuccess"
-                  : "statusPill statusPillWarning"
-              }
-            >
-              {founderEligible ? "Unlocked on this account" : "Invite-only"}
-            </span>
-
             <Link
-              href="/founder"
-              className={founderEligible ? "button buttonPrimary" : "button buttonSecondary"}
+              href={founderEligible ? "/founder" : "/pro"}
+              className="button buttonPrimary"
             >
-              {founderEligible ? "Start Founder" : "Register interest"}
+              {founderEligible ? "Start Founder Pro" : "Start with Pro"}
             </Link>
           </div>
         </div>
 
-        <div className="pricingValueRow">
-          <div>
-            <strong>Start fast</strong>
-            <span>No heavy CRM setup before you can chase work.</span>
-          </div>
-          <div>
-            <strong>Stay focused</strong>
-            <span>Built around prospects, proposals, retainers, and handoff.</span>
-          </div>
-          <div>
-            <strong>Prove value</strong>
-            <span>Track replies, booked calls, won work, and lead leakage.</span>
-          </div>
-        </div>
-
-        <div className="pricingGrid">
-          {plans.map((plan) => (
-            <article
-              key={plan.name}
-              className={plan.featured ? "pricingCard pricingCardFeatured" : "pricingCard"}
-            >
-              <div className="pricingCardTop">
-                <span className="miniBadge">{plan.badge}</span>
-                <h2>{plan.name}</h2>
-                <p>{plan.description}</p>
-              </div>
-
-              <div className="pricingAmount">
-                <strong>{plan.price}</strong>
-                <span>{plan.cadence}</span>
-              </div>
-
-              <div className="pricingBestFor">
-                <span>Best for</span>
-                <strong>{plan.bestFor}</strong>
-              </div>
-
-              <ul className="pricingFeatureList">
-                {plan.features.map((feature) => (
-                  <li key={feature}>{feature}</li>
-                ))}
-              </ul>
-
-              <Link
-                href={plan.href}
-                className={plan.featured ? "button buttonPrimary" : "button buttonSecondary"}
+        <section className="pricingDecision" aria-label="Choose a Thalovo plan">
+          <div className="pricingPlanStrip">
+            {plans.map((plan) => (
+              <article
+                key={plan.name}
+                className={
+                  plan.name === "Pro"
+                    ? "pricingPlanRow pricingPlanRowFeatured"
+                    : "pricingPlanRow"
+                }
               >
-                {plan.cta}
-              </Link>
-            </article>
-          ))}
-        </div>
+                <div className="pricingPlanIntro">
+                  <span>{plan.eyebrow}</span>
+                  <h2>{plan.name}</h2>
+                  <p>{plan.description}</p>
+                </div>
+
+                <div className="pricingPlanPrice">
+                  <strong>{plan.price}</strong>
+                  <span>{plan.cadence}</span>
+                </div>
+
+                <div className="pricingPlanUse">
+                  <span>Best for</span>
+                  <strong>{plan.bestFor}</strong>
+                </div>
+
+                <Link
+                  href={plan.href}
+                  className={
+                    plan.name === "Pro" ? "button buttonPrimary" : "button buttonSecondary"
+                  }
+                >
+                  {plan.cta}
+                </Link>
+              </article>
+            ))}
+          </div>
+
+          <aside className="pricingIncludedPanel">
+            <div>
+              <span className="miniBadge">What you are paying for</span>
+              <h2>One workflow from first email to booked client</h2>
+              <p>
+                Thalovo is priced around the agency sales job itself, not a long
+                menu of generic CRM features.
+              </p>
+            </div>
+
+            <div className="pricingIncludedList">
+              <div>
+                <strong>Start conversations</strong>
+                <span>
+                  Agency-specific templates for outreach, follow-up, proposals,
+                  and win-back.
+                </span>
+              </div>
+              <div>
+                <strong>Protect warm leads</strong>
+                <span>
+                  Next actions and reminders keep prospects from sitting forgotten.
+                </span>
+              </div>
+              <div>
+                <strong>Track real client work</strong>
+                <span>
+                  See replies, calls, proposals, won deals, and where leads leak.
+                </span>
+              </div>
+            </div>
+
+            <div className="pricingFounderInline">
+              <span
+                className={
+                  founderEligible
+                    ? "statusPill statusPillSuccess"
+                    : "statusPill statusPillWarning"
+                }
+              >
+                {founderEligible ? "Founder unlocked" : "Founder invite-only"}
+              </span>
+              <p>
+                {founderEligible
+                  ? `${founderPriceLabel}/month is available for your account.`
+                  : "Founder Pro stays separate so normal pricing remains clear."}
+              </p>
+            </div>
+          </aside>
+        </section>
       </section>
     </main>
   );
