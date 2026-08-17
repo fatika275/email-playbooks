@@ -13,14 +13,10 @@ export default function AccountSettingsPage() {
     founderEligible,
     founderPriceGbp,
     planLabel,
-    isSyncing,
     requestPasswordReset,
-    signOut,
-    syncNow,
   } = useAccount();
   const [billingMessage, setBillingMessage] = useState("");
   const [passwordMessage, setPasswordMessage] = useState("");
-  const [syncMessage, setSyncMessage] = useState("");
   const [isOpeningBilling, setIsOpeningBilling] = useState(false);
 
   const supportEmailHref = `mailto:${encodeURIComponent(
@@ -90,19 +86,6 @@ export default function AccountSettingsPage() {
       );
     } finally {
       setIsOpeningBilling(false);
-    }
-  }
-
-  async function handleSyncNow() {
-    setSyncMessage("");
-
-    try {
-      await syncNow();
-      trackEvent("account_sync_success");
-      setSyncMessage("Your saved work is up to date.");
-    } catch {
-      trackEvent("account_sync_failed");
-      setSyncMessage("Sync could not finish right now. Please try again.");
     }
   }
 
@@ -216,37 +199,6 @@ export default function AccountSettingsPage() {
                 </a>
               </div>
 
-              <div className="accountSettingsItem">
-                <div>
-                  <strong>Sync saved work</strong>
-                  <span>Refresh saved messages, folders, and pipeline context.</span>
-                  {syncMessage ? (
-                    <p className="accountSettingsInlineNotice">{syncMessage}</p>
-                  ) : null}
-                </div>
-                <button
-                  className="button buttonUtility"
-                  type="button"
-                  disabled={isSyncing}
-                  onClick={() => void handleSyncNow()}
-                >
-                  {isSyncing ? "Syncing..." : "Sync"}
-                </button>
-              </div>
-
-              <div className="accountSettingsItem">
-                <div>
-                  <strong>Sign out</strong>
-                  <span>Leave this account on the current device.</span>
-                </div>
-                <button
-                  className="button buttonUtility"
-                  type="button"
-                  onClick={() => void signOut()}
-                >
-                  Sign out
-                </button>
-              </div>
             </div>
           </section>
         )}

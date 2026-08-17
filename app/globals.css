@@ -1544,7 +1544,12 @@ details[open] > summary::after {
   line-height: 1.35;
 }
 
-.accountCommandRail .button {
+.accountRailActions {
+  display: grid;
+  gap: 10px;
+}
+
+.accountRailActions .button {
   width: 100%;
   justify-content: center;
 }

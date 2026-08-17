@@ -10,11 +10,14 @@ export default function AccountPage() {
     user,
     isConfigured,
     isLoading,
+    isSyncing,
     syncErrorMessage,
     signInWithPassword: signIn,
     signUpWithPassword: signUp,
     resendSignupVerification,
     requestPasswordReset,
+    signOut,
+    syncNow,
     verifySignupCode,
   } = useAccount();
   const [email, setEmail] = useState("");
@@ -125,6 +128,19 @@ export default function AccountPage() {
     }
   }
 
+  async function handleSyncNow() {
+    setNotice("");
+
+    try {
+      await syncNow();
+      trackEvent("account_sync_success");
+      setNotice("Your saved work is up to date.");
+    } catch {
+      trackEvent("account_sync_failed");
+      setNotice("Sync could not finish right now. Please try again.");
+    }
+  }
+
   return (
     <main className="main">
       <section className="container">
@@ -145,9 +161,26 @@ export default function AccountPage() {
                 <strong>{user.email ?? "Signed in"}</strong>
               </div>
 
-              <Link href="/account/settings" className="button buttonSecondary">
-                Account settings
-              </Link>
+              <div className="accountRailActions">
+                <button
+                  className="button buttonSecondary"
+                  type="button"
+                  disabled={isSyncing}
+                  onClick={() => void handleSyncNow()}
+                >
+                  {isSyncing ? "Syncing..." : "Sync work"}
+                </button>
+                <button
+                  className="button buttonUtility"
+                  type="button"
+                  onClick={() => void signOut()}
+                >
+                  Sign out
+                </button>
+                <Link href="/account/settings" className="button buttonUtility">
+                  Account settings
+                </Link>
+              </div>
             </aside>
 
             <div className="accountCommandMain">
