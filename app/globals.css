@@ -6092,6 +6092,276 @@ details[open] > summary::after {
   display: contents;
 }
 
+.proSignupHero {
+  min-height: 500px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 0.42fr);
+  gap: 22px;
+  align-items: stretch;
+  overflow: hidden;
+  border: 1px solid #2a2a2a;
+  border-radius: 14px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.11), transparent 38%),
+    linear-gradient(180deg, #101010, #050505);
+  box-shadow: var(--shadow-xl);
+}
+
+.proSignupCopy {
+  padding: clamp(32px, 6vw, 62px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.proSignupBadge {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #3a3a3a;
+  border-radius: 999px;
+  padding: 7px 11px;
+  color: #f4f4f5;
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.proSignupBadge::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  margin-right: 8px;
+  border-radius: 999px;
+  background: #ffffff;
+}
+
+.proSignupHero h1 {
+  max-width: 840px;
+  margin: 22px 0 0;
+  font-size: clamp(42px, 6vw, 78px);
+  line-height: 0.96;
+  letter-spacing: 0;
+  font-weight: 850;
+  text-wrap: balance;
+}
+
+.proSignupCopy > p {
+  max-width: 680px;
+  margin: 24px 0 0;
+  color: #d4d4d8;
+  font-size: 18px;
+  line-height: 1.8;
+}
+
+.proSignupActions {
+  margin-top: 34px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.proSignupActions > div {
+  display: contents;
+}
+
+.proSignupButton {
+  min-height: 48px;
+  padding: 0 18px;
+}
+
+.proSignupPriceCard {
+  margin: 18px;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  border: 1px solid #333333;
+  border-radius: 12px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.03)),
+    #0b0b0b;
+}
+
+.proSignupPriceCard span {
+  color: #a1a1aa;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.proSignupPriceCard strong {
+  margin-top: 12px;
+  font-size: clamp(46px, 6vw, 72px);
+  line-height: 0.95;
+  letter-spacing: 0;
+}
+
+.proSignupPriceCard small {
+  margin-top: 10px;
+  color: #e4e4e7;
+  font-weight: 750;
+}
+
+.proSignupDivider {
+  height: 1px;
+  margin: 24px 0;
+  background: #333333;
+}
+
+.proSignupPriceCard p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.proOutcomeGrid {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.proOutcomeGrid article {
+  padding: 24px;
+  border-right: 1px solid var(--border);
+}
+
+.proOutcomeGrid article:last-child {
+  border-right: 0;
+}
+
+.proOutcomeGrid strong {
+  color: var(--muted-soft);
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.proOutcomeGrid h2 {
+  margin: 12px 0 0;
+  font-size: 20px;
+  line-height: 1.15;
+  letter-spacing: 0;
+}
+
+.proOutcomeGrid p {
+  margin: 10px 0 0;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.proSignupBody {
+  margin-top: 22px;
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(330px, 0.58fr);
+  gap: 22px;
+  align-items: stretch;
+}
+
+.proIncludedPanel,
+.proWorkflowPanel {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.012)),
+    var(--panel);
+  box-shadow: var(--shadow-lg);
+}
+
+.proIncludedPanel {
+  padding: 28px;
+}
+
+.proIncludedPanel h2,
+.proWorkflowPanel h2 {
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.1;
+  letter-spacing: 0;
+}
+
+.proIncludedList {
+  margin-top: 20px;
+  display: grid;
+  gap: 12px;
+}
+
+.proIncludedList span {
+  min-height: 54px;
+  display: flex;
+  align-items: center;
+  padding: 14px 16px;
+  border: 1px solid var(--border-soft);
+  border-radius: 10px;
+  color: #e4e4e7;
+  background: #0d0d0d;
+  line-height: 1.45;
+}
+
+.proIncludedList span::before {
+  content: "";
+  flex: 0 0 auto;
+  width: 8px;
+  height: 8px;
+  margin-right: 12px;
+  border-radius: 999px;
+  background: #ffffff;
+}
+
+.proWorkflowPanel {
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.proWorkflowPanel > p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.proWorkflowSteps {
+  display: grid;
+  gap: 10px;
+}
+
+.proWorkflowSteps div {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid var(--border-soft);
+  border-radius: 10px;
+  background: #0d0d0d;
+}
+
+.proWorkflowSteps strong {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #050505;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.proWorkflowSteps span {
+  color: #e4e4e7;
+  line-height: 1.4;
+}
+
+.proSignupActionsCompact {
+  margin-top: auto;
+}
+
 .planHero {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(320px, 0.62fr);
@@ -6954,39 +7224,48 @@ details[open] > summary::after {
   }
 
   .founderHero,
-  .founderDecisionWrap {
+  .founderDecisionWrap,
+  .proSignupHero,
+  .proSignupBody {
     grid-template-columns: 1fr;
   }
 
-  .founderHero {
+  .founderHero,
+  .proSignupHero {
     min-height: 0;
   }
 
-  .founderPricePanel {
+  .founderPricePanel,
+  .proSignupPriceCard {
     margin-top: 0;
   }
 
-  .founderBenefitGrid {
+  .founderBenefitGrid,
+  .proOutcomeGrid {
     grid-template-columns: 1fr;
   }
 
-  .founderBenefitGrid article {
+  .founderBenefitGrid article,
+  .proOutcomeGrid article {
     border-right: 0;
     border-bottom: 1px solid var(--border);
   }
 
-  .founderBenefitGrid article:last-child {
+  .founderBenefitGrid article:last-child,
+  .proOutcomeGrid article:last-child {
     border-bottom: 0;
   }
 
   .founderHeroActions,
-  .founderSignupActions {
+  .founderSignupActions,
+  .proSignupActions {
     align-items: stretch;
     flex-direction: column;
   }
 
   .founderHeroActions .button,
-  .founderSignupActions .button {
+  .founderSignupActions .button,
+  .proSignupActions .button {
     width: 100%;
   }
 
