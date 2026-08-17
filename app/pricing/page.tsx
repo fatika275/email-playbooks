@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { CheckoutButton } from "@/components/checkout-button";
 import { useAccount } from "@/components/account-provider";
 
 const plans = [
@@ -24,7 +25,6 @@ const plans = [
     price: "GBP 19",
     cadence: "/month",
     cta: "Start Pro",
-    href: "/pro",
     popular: true,
     note: "Best place to start",
     features: [
@@ -40,7 +40,6 @@ const plans = [
     price: "GBP 29",
     cadence: "/month",
     cta: "Start Business Pro",
-    href: "/business",
     features: [
       "Everything in Pro",
       "Shared pipeline and client handoff notes",
@@ -106,12 +105,18 @@ export default function PricingPage() {
             >
               {founderEligible ? "Unlocked on this account" : "Invite-only"}
             </span>
-            <Link
-              href="/founder"
-              className={founderEligible ? "button buttonPrimary" : "button buttonSecondary"}
-            >
-              {founderEligible ? "Start Founder Pro" : "Register interest"}
-            </Link>
+            {founderEligible ? (
+              <CheckoutButton
+                plan="founder"
+                className="button buttonPrimary"
+              >
+                Start Founder Pro
+              </CheckoutButton>
+            ) : (
+              <Link href="/founder" className="button buttonSecondary">
+                Register interest
+              </Link>
+            )}
           </div>
         </div>
 
@@ -140,12 +145,25 @@ export default function PricingPage() {
 
               {plan.note ? <p className="pricingSupabaseNote">{plan.note}</p> : null}
 
-              <Link
-                href={plan.href}
-                className={plan.popular ? "button buttonPrimary" : "button buttonSecondary"}
-              >
-                {plan.cta}
-              </Link>
+              {plan.name === "Pro" ? (
+                <CheckoutButton
+                  plan="pro"
+                  className="button buttonPrimary"
+                >
+                  Start Pro
+                </CheckoutButton>
+              ) : plan.name === "Business Pro" ? (
+                <CheckoutButton
+                  plan="business"
+                  className="button buttonSecondary"
+                >
+                  Start Business Pro
+                </CheckoutButton>
+              ) : (
+                <Link href="/library" className="button buttonSecondary">
+                  {plan.cta}
+                </Link>
+              )}
 
               <div className="pricingSupabaseDivider" />
 

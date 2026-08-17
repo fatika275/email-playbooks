@@ -197,7 +197,6 @@ export default function FounderPage() {
               </form>
             ) : (
               <div className="founderSignupActions">
-                <CheckoutButton plan="founder">Start Founder Pro</CheckoutButton>
                 <Link href="/workspace" className="button buttonSecondary">
                   Open saved work
                 </Link>

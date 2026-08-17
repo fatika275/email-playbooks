@@ -113,7 +113,6 @@ export default function ProPage() {
             </div>
 
             <div className="proSignupActions proSignupActionsCompact">
-              <CheckoutButton plan="pro">Start Pro</CheckoutButton>
               <Link href="/workspace" className="button buttonSecondary">
                 View saved work
               </Link>

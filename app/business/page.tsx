@@ -115,7 +115,6 @@ export default function BusinessPage() {
             </div>
 
             <div className="businessSignupActions businessSignupActionsCompact">
-              <CheckoutButton plan="business">Start Business Pro</CheckoutButton>
               <Link href="/team" className="button buttonSecondary">
                 View team area
               </Link>
