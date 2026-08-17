@@ -129,7 +129,7 @@ export default function FounderPage() {
 
         {!founderEligible ? (
           <section className="founderRequestPanel" id="founder-request">
-            <h2>Request Founder access</h2>
+            <h2>Use your signed-in email</h2>
             <p>
               {user
                 ? "Send the request from your signed-in account. If approved, the Founder checkout unlocks for this email."
