@@ -1380,12 +1380,71 @@ details[open] > summary::after {
   margin-top: 22px;
 }
 
+.accountSettingsTeaser {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+  padding: 18px;
+  border: 1px solid var(--border-soft);
+  background: #0b0b0b;
+}
+
+.accountSettingsTeaser h3 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.accountSettingsTeaser p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.accountSettingsTeaser .button {
+  width: 100%;
+  justify-content: center;
+}
+
+.accountSettingsHero {
+  max-width: 820px;
+  padding: 30px 0 28px;
+}
+
+.accountSettingsHero .badge {
+  margin-top: 22px;
+}
+
+.accountSettingsHero .pageTitle {
+  margin-top: 14px;
+}
+
+.accountSettingsHero .muted {
+  max-width: 640px;
+  margin: 12px 0 0;
+  line-height: 1.7;
+}
+
+.accountSettingsPagePanel {
+  max-width: 920px;
+  padding: 26px;
+  border: 1px solid var(--border);
+  background: #080808;
+}
+
+.accountSettingsPagePanel > .button {
+  margin-top: 18px;
+}
+
 .accountSettingsList {
   display: grid;
   gap: 0;
   margin-top: 18px;
   border-top: 1px solid var(--border-soft);
   border-bottom: 1px solid var(--border-soft);
+}
+
+.accountSettingsListStandalone {
+  margin-top: 0;
 }
 
 .accountSettingsItem {
@@ -1415,6 +1474,13 @@ details[open] > summary::after {
   color: var(--muted);
   line-height: 1.45;
   overflow-wrap: anywhere;
+}
+
+.accountSettingsInlineNotice {
+  margin: 4px 0 0;
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.45;
 }
 
 .accountSettingsItem .button {

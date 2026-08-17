@@ -4,25 +4,17 @@ import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { useAccount } from "@/components/account-provider";
 import { trackEvent } from "@/lib/analytics";
-import { siteConfig } from "@/lib/site-config";
-import { getSupabaseBrowserClient } from "@/lib/supabase";
 
 export default function AccountPage() {
   const {
     user,
-    founderEligible,
-    founderPriceGbp,
-    planLabel,
     isConfigured,
     isLoading,
-    isSyncing,
     syncErrorMessage,
     signInWithPassword: signIn,
     signUpWithPassword: signUp,
     resendSignupVerification,
     requestPasswordReset,
-    signOut,
-    syncNow,
     verifySignupCode,
   } = useAccount();
   const [email, setEmail] = useState("");
@@ -30,7 +22,6 @@ export default function AccountPage() {
   const [code, setCode] = useState("");
   const [authMode, setAuthMode] = useState<"login" | "signup">("login");
   const [needsVerification, setNeedsVerification] = useState(false);
-  const [isOpeningBilling, setIsOpeningBilling] = useState(false);
   const [isSetupGuideDismissed, setIsSetupGuideDismissed] = useState(() =>
     typeof window !== "undefined"
       ? window.localStorage.getItem("thalovo_setup_guide_dismissed") === "1"
@@ -53,12 +44,6 @@ export default function AccountPage() {
           : !/[0-9]/.test(password)
             ? "Add at least one number to your password."
             : "Password looks good.";
-  const supportEmailHref = `mailto:${encodeURIComponent(
-    siteConfig.supportEmail
-  )}?subject=${encodeURIComponent("Thalovo account help")}`;
-  const refundEmailHref = `mailto:${encodeURIComponent(
-    siteConfig.supportEmail
-  )}?subject=${encodeURIComponent("Thalovo refund request")}`;
 
   function dismissSetupGuide() {
     window.localStorage.setItem("thalovo_setup_guide_dismissed", "1");
@@ -147,67 +132,6 @@ export default function AccountPage() {
           ? error.message
           : "Password reset could not be requested right now."
       );
-    }
-  }
-
-  async function handleSignedInPasswordResetRequest() {
-    if (!user?.email) {
-      setNotice("We could not find an email address for this account.");
-      return;
-    }
-
-    try {
-      await requestPasswordReset(user.email);
-      trackEvent("account_password_reset_requested");
-      setNotice("Password reset email sent to your account email.");
-    } catch (error) {
-      setNotice(
-        error instanceof Error
-          ? error.message
-          : "Password reset could not be requested right now."
-      );
-    }
-  }
-
-  async function handleOpenBillingPortal() {
-    setNotice("");
-
-    const client = getSupabaseBrowserClient();
-    const refreshed = await client?.auth.refreshSession();
-    const accessToken = refreshed?.data.session?.access_token;
-
-    if (refreshed?.error || !accessToken) {
-      setNotice("Please sign in again before managing your subscription.");
-      return;
-    }
-
-    setIsOpeningBilling(true);
-
-    try {
-      const response = await fetch("/api/billing/portal", {
-        method: "POST",
-        headers: {
-          authorization: `Bearer ${accessToken}`,
-        },
-      });
-      const payload = (await response.json()) as {
-        url?: string;
-        error?: string;
-      };
-
-      if (!response.ok || !payload.url) {
-        throw new Error(payload.error || "Billing portal could not be opened.");
-      }
-
-      window.location.href = payload.url;
-    } catch (error) {
-      setNotice(
-        error instanceof Error
-          ? error.message
-          : "Billing portal could not be opened."
-      );
-    } finally {
-      setIsOpeningBilling(false);
     }
   }
 
@@ -443,79 +367,16 @@ export default function AccountPage() {
               </>
             ) : (
               <>
-                <div className="accountSettingsList" aria-label="Account settings">
-                  <div className="accountSettingsItem">
-                    <div>
-                      <strong>Email</strong>
-                      <span>{user.email ?? "No email connected"}</span>
-                    </div>
-                    <a className="button buttonUtility" href={supportEmailHref}>
-                      Change
-                    </a>
-                  </div>
-
-                  <div className="accountSettingsItem">
-                    <div>
-                      <strong>Plan</strong>
-                      <span>
-                        {founderEligible && founderPriceGbp
-                          ? `${planLabel} - Founder GBP ${founderPriceGbp}/month`
-                          : planLabel}
-                      </span>
-                    </div>
-                    <Link className="button buttonSecondary" href="/pricing">
-                      Manage
-                    </Link>
-                  </div>
-
-                  <div className="accountSettingsItem accountSettingsItemImportant">
-                    <div>
-                      <strong>Cancel subscription</strong>
-                      <span>Open Stripe billing to cancel future renewals or manage your payment method.</span>
-                    </div>
-                    <button
-                      className="button buttonSecondary"
-                      type="button"
-                      disabled={isOpeningBilling}
-                      onClick={() => void handleOpenBillingPortal()}
-                    >
-                      {isOpeningBilling ? "Opening..." : "Cancel"}
-                    </button>
-                  </div>
-
-                  <div className="accountSettingsItem">
-                    <div>
-                      <strong>Password</strong>
-                      <span>Send a secure reset email to your account address.</span>
-                    </div>
-                    <button
-                      className="button buttonUtility"
-                      type="button"
-                      onClick={() => void handleSignedInPasswordResetRequest()}
-                    >
-                      Reset
-                    </button>
-                  </div>
-
-                  <div className="accountSettingsItem">
-                    <div>
-                      <strong>Refunds</strong>
-                      <span>Read the policy or contact support about a charge.</span>
-                    </div>
-                    <Link className="button buttonUtility" href="/refunds">
-                      Policy
-                    </Link>
-                  </div>
-
-                  <div className="accountSettingsItem">
-                    <div>
-                      <strong>Support</strong>
-                      <span>Ask about billing, refunds, or account changes.</span>
-                    </div>
-                    <a className="button buttonUtility" href={refundEmailHref}>
-                      Email
-                    </a>
-                  </div>
+                <div className="accountSettingsTeaser">
+                  <span className="miniBadge">Settings</span>
+                  <h3>Manage account and billing</h3>
+                  <p>
+                    Change account details, reset your password, manage billing,
+                    cancel a subscription, or read the refund policy.
+                  </p>
+                  <Link className="button buttonSecondary" href="/account/settings">
+                    Open settings
+                  </Link>
                 </div>
 
                 {!isSetupGuideDismissed ? (
@@ -554,31 +415,6 @@ export default function AccountPage() {
                   </section>
                 ) : null}
 
-                <div className="accountUtilityRow">
-                  <button
-                    className="button buttonSecondary"
-                    disabled={isSyncing}
-                    onClick={async () => {
-                      try {
-                        await syncNow();
-                        trackEvent("account_sync_success");
-                        setNotice("Your saved work is up to date.");
-                      } catch {
-                        trackEvent("account_sync_failed");
-                        setNotice("Sync could not finish right now. Please try again.");
-                      }
-                    }}
-                  >
-                    {isSyncing ? "Syncing..." : "Sync work"}
-                  </button>
-
-                  <button
-                    className="button buttonUtility"
-                    onClick={() => void signOut()}
-                  >
-                    Sign out
-                  </button>
-                </div>
               </>
             )}
           </section>
