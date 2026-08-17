@@ -56,7 +56,7 @@ export default function ProPage() {
               >
                 Start Pro
               </CheckoutButton>
-              <Link href="/pricing" className="button buttonSecondary proSignupButton">
+              <Link href="/pricing#compare-plans" className="button buttonSecondary proSignupButton">
                 Compare plans
               </Link>
             </div>

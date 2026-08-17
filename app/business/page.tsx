@@ -56,7 +56,7 @@ export default function BusinessPage() {
               >
                 Start Business Pro
               </CheckoutButton>
-              <Link href="/pricing" className="button buttonSecondary businessSignupButton">
+              <Link href="/pricing#compare-plans" className="button buttonSecondary businessSignupButton">
                 Compare plans
               </Link>
             </div>

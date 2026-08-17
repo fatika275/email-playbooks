@@ -177,7 +177,7 @@ export default function PricingPage() {
           ))}
         </div>
 
-        <section className="pricingCompare" aria-label="Plan comparison">
+        <section className="pricingCompare" id="compare-plans" aria-label="Plan comparison">
           <div className="pricingCompareHeader">
             <div>
               <h2>Compare plans</h2>
