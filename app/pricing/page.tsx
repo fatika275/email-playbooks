@@ -82,6 +82,39 @@ export default function PricingPage() {
           </div>
         </div>
 
+        <div className="pricingFounderSpotlight">
+          <div className="pricingFounderSpotlightCopy">
+            <span className="miniBadge">Founder Pro</span>
+            <h2>
+              {founderPriceLabel}
+              <span>/month for full Pro access</span>
+            </h2>
+            <p>
+              {founderEligible
+                ? "Your early supporter price is unlocked. Use it to run the full outreach-to-booked-work workflow for less."
+                : "Invite-only early supporter pricing for agencies that want the full Pro workflow at a lower monthly price."}
+            </p>
+          </div>
+
+          <div className="pricingFounderSpotlightActions">
+            <span
+              className={
+                founderEligible
+                  ? "statusPill statusPillSuccess"
+                  : "statusPill statusPillWarning"
+              }
+            >
+              {founderEligible ? "Unlocked on this account" : "Invite-only"}
+            </span>
+            <Link
+              href="/founder"
+              className={founderEligible ? "button buttonPrimary" : "button buttonSecondary"}
+            >
+              {founderEligible ? "Start Founder Pro" : "Register interest"}
+            </Link>
+          </div>
+        </div>
+
         <div className="pricingSupabaseGrid">
           {plans.map((plan) => (
             <article
@@ -124,23 +157,6 @@ export default function PricingPage() {
               </ul>
             </article>
           ))}
-        </div>
-
-        <div className="pricingFounderCallout">
-          <div>
-            <strong>Founder Pro</strong>
-            <span>
-              {founderEligible
-                ? `${founderPriceLabel}/month is unlocked for your account.`
-                : "Invite-only early supporter pricing stays separate from normal plans."}
-            </span>
-          </div>
-          <Link
-            href="/founder"
-            className={founderEligible ? "button buttonPrimary" : "button buttonSecondary"}
-          >
-            {founderEligible ? "Start Founder Pro" : "Register interest"}
-          </Link>
         </div>
 
         <section className="pricingCompare" aria-label="Plan comparison">

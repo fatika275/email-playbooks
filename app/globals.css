@@ -5062,6 +5062,53 @@ details[open] > summary::after {
   align-items: stretch;
 }
 
+.pricingFounderSpotlight {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 24px;
+  align-items: center;
+  padding: 24px;
+  margin-bottom: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.105), rgba(255, 255, 255, 0.018) 58%),
+    #090909;
+  box-shadow: 0 20px 68px rgba(0, 0, 0, 0.28);
+}
+
+.pricingFounderSpotlightCopy h2 {
+  margin: 14px 0 0;
+  font-size: 42px;
+  line-height: 1;
+}
+
+.pricingFounderSpotlightCopy h2 span {
+  display: inline-block;
+  margin-left: 8px;
+  color: var(--muted);
+  font-size: 16px;
+  font-weight: 650;
+}
+
+.pricingFounderSpotlightCopy p {
+  max-width: 720px;
+  margin: 12px 0 0;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.pricingFounderSpotlightActions {
+  min-width: 220px;
+  display: grid;
+  justify-items: end;
+  gap: 12px;
+}
+
+.pricingFounderSpotlightActions .button {
+  width: 100%;
+  justify-content: center;
+}
+
 .pricingSupabaseCard {
   min-height: 100%;
   display: flex;
@@ -5170,27 +5217,6 @@ details[open] > summary::after {
   width: 7px;
   height: 7px;
   background: #ffffff;
-}
-
-.pricingFounderCallout {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 18px;
-  padding: 18px 0;
-  margin-top: 24px;
-  border-top: 1px solid var(--border-soft);
-  border-bottom: 1px solid var(--border-soft);
-}
-
-.pricingFounderCallout div {
-  display: grid;
-  gap: 5px;
-}
-
-.pricingFounderCallout span {
-  color: var(--muted);
-  line-height: 1.5;
 }
 
 .pricingCompare {
@@ -5914,13 +5940,22 @@ details[open] > summary::after {
     grid-template-columns: 1fr;
   }
 
-  .pricingSupabaseCardHead {
-    min-height: 0;
+  .pricingFounderSpotlight {
+    grid-template-columns: 1fr;
   }
 
-  .pricingFounderCallout {
-    align-items: flex-start;
-    flex-direction: column;
+  .pricingFounderSpotlightCopy h2 span {
+    display: block;
+    margin: 8px 0 0;
+  }
+
+  .pricingFounderSpotlightActions {
+    width: 100%;
+    justify-items: stretch;
+  }
+
+  .pricingSupabaseCardHead {
+    min-height: 0;
   }
 
   .pricingCompareTable {
