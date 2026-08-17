@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Admin access required." }, { status: 403 });
     }
 
-    const resendApiKey = process.env.RESEND_API_KEY;
+    const resendApiKey = process.env.RESEND_API_KEY || process.env.RESEND_KEY;
     const fromEmail =
       process.env.RESEND_FROM_EMAIL || "Thalovo <accounts@thalovo.com>";
 
