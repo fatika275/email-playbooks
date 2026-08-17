@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useAccount } from "@/components/account-provider";
 import { trackEvent } from "@/lib/analytics";
 import { siteConfig } from "@/lib/site-config";
+import { getSupabaseBrowserClient } from "@/lib/supabase";
 
 export default function AccountPage() {
   const {
@@ -29,6 +30,7 @@ export default function AccountPage() {
   const [code, setCode] = useState("");
   const [authMode, setAuthMode] = useState<"login" | "signup">("login");
   const [needsVerification, setNeedsVerification] = useState(false);
+  const [isOpeningBilling, setIsOpeningBilling] = useState(false);
   const [isSetupGuideDismissed, setIsSetupGuideDismissed] = useState(() =>
     typeof window !== "undefined"
       ? window.localStorage.getItem("thalovo_setup_guide_dismissed") === "1"
@@ -164,6 +166,48 @@ export default function AccountPage() {
           ? error.message
           : "Password reset could not be requested right now."
       );
+    }
+  }
+
+  async function handleOpenBillingPortal() {
+    setNotice("");
+
+    const client = getSupabaseBrowserClient();
+    const refreshed = await client?.auth.refreshSession();
+    const accessToken = refreshed?.data.session?.access_token;
+
+    if (refreshed?.error || !accessToken) {
+      setNotice("Please sign in again before managing your subscription.");
+      return;
+    }
+
+    setIsOpeningBilling(true);
+
+    try {
+      const response = await fetch("/api/billing/portal", {
+        method: "POST",
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+      });
+      const payload = (await response.json()) as {
+        url?: string;
+        error?: string;
+      };
+
+      if (!response.ok || !payload.url) {
+        throw new Error(payload.error || "Billing portal could not be opened.");
+      }
+
+      window.location.href = payload.url;
+    } catch (error) {
+      setNotice(
+        error instanceof Error
+          ? error.message
+          : "Billing portal could not be opened."
+      );
+    } finally {
+      setIsOpeningBilling(false);
     }
   }
 
@@ -422,6 +466,21 @@ export default function AccountPage() {
                     <Link className="button buttonSecondary" href="/pricing">
                       Manage
                     </Link>
+                  </div>
+
+                  <div className="accountSettingsItem accountSettingsItemImportant">
+                    <div>
+                      <strong>Cancel subscription</strong>
+                      <span>Open Stripe billing to cancel future renewals or manage your payment method.</span>
+                    </div>
+                    <button
+                      className="button buttonSecondary"
+                      type="button"
+                      disabled={isOpeningBilling}
+                      onClick={() => void handleOpenBillingPortal()}
+                    >
+                      {isOpeningBilling ? "Opening..." : "Cancel"}
+                    </button>
                   </div>
 
                   <div className="accountSettingsItem">
