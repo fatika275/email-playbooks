@@ -22,11 +22,6 @@ export default function AccountPage() {
   const [code, setCode] = useState("");
   const [authMode, setAuthMode] = useState<"login" | "signup">("login");
   const [needsVerification, setNeedsVerification] = useState(false);
-  const [isSetupGuideDismissed, setIsSetupGuideDismissed] = useState(() =>
-    typeof window !== "undefined"
-      ? window.localStorage.getItem("thalovo_setup_guide_dismissed") === "1"
-      : true
-  );
   const [notice, setNotice] = useState("");
 
   const showVerification = !user && needsVerification;
@@ -44,11 +39,6 @@ export default function AccountPage() {
           : !/[0-9]/.test(password)
             ? "Add at least one number to your password."
             : "Password looks good.";
-
-  function dismissSetupGuide() {
-    window.localStorage.setItem("thalovo_setup_guide_dismissed", "1");
-    setIsSetupGuideDismissed(true);
-  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -138,15 +128,15 @@ export default function AccountPage() {
   return (
     <main className="main">
       <section className="container">
-        <div className="accountLaunchHero">
+        <div className="accountCleanHero">
           <div className="badge">Account</div>
           <h1 className="pageTitle">
-            Pick up every lead where you left it
+            {user ? "Pick up your agency work" : "Save your outreach workspace"}
           </h1>
           <p className="muted">
-            Your account keeps the outreach, follow-up plans, pipeline notes,
-            and handoff context that help small agencies turn replies into
-            booked work.
+            {user
+              ? "Jump straight back into the messages, leads, folders, and follow-ups that help you book client work."
+              : "Create an account when you want Thalovo to remember the client-work context you build."}
           </p>
           <div className="accountWorkspacePill" aria-label="Account status">
             <span>{user ? "Signed in" : "Free to browse"}</span>
@@ -154,51 +144,38 @@ export default function AccountPage() {
           </div>
         </div>
 
-        <div className="accountLaunchGrid">
-          <section className="accountLaunchPanel">
-            <span className="miniBadge">
-              {user ? "Continue work" : "What gets saved"}
-            </span>
-            <h2>
-              {user ? "Your client-work hub is ready" : "Keep the whole sales thread together"}
-            </h2>
-            <p>
-              {user
-                ? "Open the part of the workflow you need next. Your account keeps saved work connected across sessions."
-                : "Create an account when you want Thalovo to remember the messages, follow-ups, and lead context you build."}
-            </p>
+        {user ? (
+          <section className="accountHomePanel">
+            <div className="accountHomeHeader">
+              <div>
+                <span className="miniBadge">Continue</span>
+                <h2>Where do you want to go?</h2>
+              </div>
+              <Link href="/account/settings" className="button buttonUtility">
+                Account settings
+              </Link>
+            </div>
 
-            {user ? (
-              <div className="accountLaunchActions" aria-label="Workspace links">
-                <Link href="/prospects">
-                  <strong>Open pipeline</strong>
-                  <span>Move prospects through replies, calls, proposals, and handoff.</span>
-                </Link>
-                <Link href="/library">
-                  <strong>Use message library</strong>
-                  <span>Start or sharpen the next outreach message.</span>
-                </Link>
-                <Link href="/folders">
-                  <strong>Open saved client folders</strong>
-                  <span>Find sent messages, files, links, and handoff context.</span>
-                </Link>
-              </div>
-            ) : (
-              <div className="accountSavedFlow" aria-label="What your account saves">
-                <div>
-                  <strong>Messages</strong>
-                  <span>Outreach, follow-up, proposal, and win-back work.</span>
-                </div>
-                <div>
-                  <strong>Pipeline context</strong>
-                  <span>Lead stage, next action, notes, and proposal movement.</span>
-                </div>
-                <div>
-                  <strong>Client folders</strong>
-                  <span>Saved work organised around the client instead of scattered pages.</span>
-                </div>
-              </div>
-            )}
+            {visibleNotice ? <p className="notice">{visibleNotice}</p> : null}
+
+            <div className="accountHomeActions" aria-label="Workspace links">
+              <Link href="/prospects">
+                <strong>Pipeline</strong>
+                <span>Chase replies, proposals, and next actions.</span>
+              </Link>
+              <Link href="/folders">
+                <strong>Saved client folders</strong>
+                <span>Find sent messages, files, links, and handoff context.</span>
+              </Link>
+              <Link href="/library">
+                <strong>Message library</strong>
+                <span>Write the next outreach or follow-up message.</span>
+              </Link>
+              <Link href="/sequence-builder">
+                <strong>Follow-up plans</strong>
+                <span>Build simple reminder flows so leads do not slip.</span>
+              </Link>
+            </div>
 
             {syncErrorMessage ? (
               <p className="notice">
@@ -207,16 +184,25 @@ export default function AccountPage() {
               </p>
             ) : null}
           </section>
+        ) : (
+          <div className="accountSigninLayout">
+            <section className="accountSavePanel">
+              <span className="miniBadge">What gets saved</span>
+              <h2>Keep client work together</h2>
+              <div className="accountSaveList" aria-label="What your account saves">
+                <span>Messages and templates</span>
+                <span>Pipeline and follow-up context</span>
+                <span>Saved client folders</span>
+              </div>
+            </section>
 
-          <section className="accountAccessCard accountAccessPanel">
+            <section className="accountAccessCard accountAccessPanel">
             <h2 className="cardTitle">
-              {user ? "Account settings" : "Access your workspace"}
+              Access your workspace
             </h2>
 
             {visibleNotice ? <p className="notice">{visibleNotice}</p> : null}
 
-            {!user ? (
-              <>
                 <p className="muted accountAccessIntro">
                   Sign in with email and password to keep client-work context
                   saved between sessions.
@@ -364,61 +350,9 @@ export default function AccountPage() {
                     free library.
                   </p>
                 ) : null}
-              </>
-            ) : (
-              <>
-                <div className="accountSettingsTeaser">
-                  <span className="miniBadge">Settings</span>
-                  <h3>Manage account and billing</h3>
-                  <p>
-                    Change account details, reset your password, manage billing,
-                    cancel a subscription, or read the refund policy.
-                  </p>
-                  <Link className="button buttonSecondary" href="/account/settings">
-                    Open settings
-                  </Link>
-                </div>
-
-                {!isSetupGuideDismissed ? (
-                  <section className="accountSetupGuide" aria-label="Getting started">
-                    <div className="accountSetupGuideHeader">
-                      <div>
-                        <span className="miniBadge">Start in minutes</span>
-                        <h3 className="cardTitle">Get from signup to first follow-up</h3>
-                      </div>
-                      <button className="button buttonUtility" type="button" onClick={dismissSetupGuide}>
-                        Hide guide
-                      </button>
-                    </div>
-                    <div className="accountSetupSteps">
-                      <Link href="/library" className="accountSetupStep">
-                        <strong>1</strong>
-                        <span>Start the first conversation</span>
-                        <small>Use a ready message, then move the lead into your pipeline.</small>
-                      </Link>
-                      <Link href="/prospects" className="accountSetupStep">
-                        <strong>2</strong>
-                        <span>Add a lead</span>
-                        <small>Start with one real prospect, not days of pipeline setup.</small>
-                      </Link>
-                      <Link href="/sequence-builder" className="accountSetupStep">
-                        <strong>3</strong>
-                        <span>Choose reminder dates</span>
-                        <small>Save a simple follow-up plan so leads do not slip after the first touch.</small>
-                      </Link>
-                      <Link href="/pricing" className="accountSetupStep">
-                        <strong>4</strong>
-                        <span>Check your plan</span>
-                        <small>Upgrade when the pipeline becomes daily work.</small>
-                      </Link>
-                    </div>
-                  </section>
-                ) : null}
-
-              </>
-            )}
-          </section>
-        </div>
+            </section>
+          </div>
+        )}
       </section>
     </main>
   );
