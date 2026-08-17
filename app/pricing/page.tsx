@@ -125,39 +125,12 @@ export default function PricingPage() {
             ))}
           </div>
 
-          <aside className="pricingIncludedPanel">
+          <div className="pricingUnderNote">
+            <p>
+              Built around one agency workflow: templates to start conversations,
+              pipeline to track deals, and follow-ups to stop warm leads slipping.
+            </p>
             <div>
-              <span className="miniBadge">What you are paying for</span>
-              <h2>One workflow from first email to booked client</h2>
-              <p>
-                Thalovo is priced around the agency sales job itself, not a long
-                menu of generic CRM features.
-              </p>
-            </div>
-
-            <div className="pricingIncludedList">
-              <div>
-                <strong>Start conversations</strong>
-                <span>
-                  Agency-specific templates for outreach, follow-up, proposals,
-                  and win-back.
-                </span>
-              </div>
-              <div>
-                <strong>Protect warm leads</strong>
-                <span>
-                  Next actions and reminders keep prospects from sitting forgotten.
-                </span>
-              </div>
-              <div>
-                <strong>Track real client work</strong>
-                <span>
-                  See replies, calls, proposals, won deals, and where leads leak.
-                </span>
-              </div>
-            </div>
-
-            <div className="pricingFounderInline">
               <span
                 className={
                   founderEligible
@@ -173,7 +146,7 @@ export default function PricingPage() {
                   : "Founder Pro stays separate so normal pricing remains clear."}
               </p>
             </div>
-          </aside>
+          </div>
         </section>
       </section>
     </main>

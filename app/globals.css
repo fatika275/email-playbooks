@@ -5017,9 +5017,9 @@ details[open] > summary::after {
 .pricingHero {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(300px, 0.42fr);
-  gap: 34px;
+  gap: 30px;
   align-items: stretch;
-  padding: 22px 0 30px;
+  padding: 22px 0 24px;
 }
 
 .pricingHero .pageTitle {
@@ -5037,7 +5037,7 @@ details[open] > summary::after {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  margin-top: 22px;
+  margin-top: 18px;
 }
 
 .pricingHeroSignals span {
@@ -5052,8 +5052,8 @@ details[open] > summary::after {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 16px;
-  padding: 24px;
+  gap: 14px;
+  padding: 20px;
   border-left: 1px solid var(--border);
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.015) 54%),
@@ -5062,8 +5062,8 @@ details[open] > summary::after {
 
 .pricingHeroNote strong {
   display: block;
-  margin-top: 14px;
-  font-size: 24px;
+  margin-top: 12px;
+  font-size: 21px;
   line-height: 1.35;
 }
 
@@ -5081,24 +5081,20 @@ details[open] > summary::after {
 }
 
 .pricingDecision {
-  display: grid;
-  grid-template-columns: minmax(0, 1.3fr) minmax(320px, 0.7fr);
-  gap: 24px;
-  align-items: start;
-  margin-top: 6px;
+  margin-top: 4px;
 }
 
 .pricingPlanStrip {
   display: grid;
-  gap: 12px;
+  gap: 0;
 }
 
 .pricingPlanRow {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(120px, 0.28fr) minmax(160px, 0.34fr) auto;
-  gap: 16px;
+  grid-template-columns: minmax(0, 1fr) minmax(116px, 0.22fr) minmax(150px, 0.26fr) auto;
+  gap: 14px;
   align-items: center;
-  padding: 22px 0;
+  padding: 18px 0;
   border-top: 1px solid var(--border-soft);
 }
 
@@ -5108,13 +5104,13 @@ details[open] > summary::after {
 
 .pricingPlanRowFeatured {
   position: relative;
-  margin: 0 -18px;
-  padding: 24px 18px;
-  border: 1px solid rgba(255, 255, 255, 0.32);
+  margin: 0 -10px;
+  padding: 20px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
   background:
-    radial-gradient(circle at top left, rgba(255, 255, 255, 0.13), transparent 36%),
-    linear-gradient(135deg, #111111, #070707);
-  box-shadow: 0 26px 90px rgba(0, 0, 0, 0.34);
+    linear-gradient(135deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.018)),
+    #0a0a0a;
+  box-shadow: 0 18px 54px rgba(0, 0, 0, 0.26);
 }
 
 .pricingPlanRowFeatured::before {
@@ -5141,14 +5137,14 @@ details[open] > summary::after {
 
 .pricingPlanIntro h2 {
   margin: 7px 0 0;
-  font-size: 24px;
+  font-size: 22px;
 }
 
 .pricingPlanIntro p {
-  max-width: 520px;
+  max-width: 560px;
   margin: 8px 0 0;
   color: var(--muted);
-  line-height: 1.58;
+  line-height: 1.5;
 }
 
 .pricingPlanPrice {
@@ -5157,7 +5153,7 @@ details[open] > summary::after {
 
 .pricingPlanPrice strong {
   display: block;
-  font-size: 27px;
+  font-size: 25px;
   line-height: 1;
 }
 
@@ -5181,62 +5177,35 @@ details[open] > summary::after {
   justify-content: center;
 }
 
-.pricingIncludedPanel {
-  position: sticky;
-  top: 90px;
-  display: grid;
-  gap: 22px;
-  padding: 26px;
-  border: 1px solid var(--border);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.055), transparent 42%),
-    #080808;
-}
-
-.pricingIncludedPanel h2 {
-  margin: 14px 0 0;
-  font-size: 28px;
-  line-height: 1.12;
-}
-
-.pricingIncludedPanel p {
-  margin: 10px 0 0;
-  color: var(--muted);
-  line-height: 1.65;
-}
-
-.pricingIncludedList {
-  display: grid;
-  gap: 0;
+.pricingUnderNote {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: center;
+  padding: 18px 0 0;
+  margin-top: 16px;
   border-top: 1px solid var(--border-soft);
-  border-bottom: 1px solid var(--border-soft);
 }
 
-.pricingIncludedList div {
-  padding: 15px 0;
-  border-bottom: 1px solid var(--border-soft);
+.pricingUnderNote > p {
+  max-width: 680px;
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
 }
 
-.pricingIncludedList div:last-child {
-  border-bottom: 0;
+.pricingUnderNote > div {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
-.pricingIncludedList strong,
-.pricingIncludedList span {
-  display: block;
-}
-
-.pricingIncludedList span {
-  margin-top: 5px;
+.pricingUnderNote > div p {
+  margin: 0;
   color: var(--muted);
   font-size: 13px;
-  line-height: 1.55;
-}
-
-.pricingFounderInline {
-  display: grid;
-  gap: 8px;
-  padding-top: 2px;
 }
 
 .founderPageLayout {
@@ -5909,10 +5878,6 @@ details[open] > summary::after {
     grid-template-columns: 1fr;
   }
 
-  .pricingIncludedPanel {
-    position: static;
-  }
-
   .pricingPlanRow,
   .pricingPlanRowFeatured {
     grid-template-columns: 1fr;
@@ -5936,6 +5901,15 @@ details[open] > summary::after {
 
   .pricingPlanRow .button {
     width: 100%;
+  }
+
+  .pricingUnderNote {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .pricingUnderNote > div {
+    justify-content: flex-start;
   }
 
   .prospectHeader {
