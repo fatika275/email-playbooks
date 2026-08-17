@@ -144,14 +144,15 @@ export default function AccountPage() {
   return (
     <main className="main">
       <section className="container">
-        <div className="accountSupabaseHero">
+        <div className="accountLaunchHero">
           <div className="badge">Account</div>
           <h1 className="pageTitle">
-            Your workspace for saved outreach and client-work context
+            Pick up every lead where you left it
           </h1>
           <p className="muted">
-            Sign in to keep messages, follow-up plans, pipeline updates, and
-            handoff notes connected when you come back to chase leads.
+            Your account keeps the outreach, follow-up plans, pipeline notes,
+            and handoff context that help small agencies turn replies into
+            booked work.
           </p>
           <div className="accountWorkspacePill" aria-label="Account status">
             <span>{user ? "Signed in" : "Free to browse"}</span>
@@ -159,65 +160,56 @@ export default function AccountPage() {
           </div>
         </div>
 
-        <div className="accountHero accountHeroSimple accountSupabaseGrid">
-          <section className="accountStatusCard accountSupabaseCard accountSupabaseStatusCard">
-            <div className="accountStatusTop">
-              <span
-                className={
-                  user
-                    ? "statusPill statusPillSuccess"
-                    : "statusPill statusPillNeutral"
-                }
-              >
-                {user ? "Signed in" : "Not signed in"}
-              </span>
-              <span className="accountPlanChip">{planLabel}</span>
-            </div>
-
-            <h2 className="sectionTitle">
-              {user ? "Workspace ready" : "Create an account when the work matters"}
+        <div className="accountLaunchGrid">
+          <section className="accountLaunchPanel">
+            <span className="miniBadge">
+              {user ? "Continue work" : "What gets saved"}
+            </span>
+            <h2>
+              {user ? "Your client-work hub is ready" : "Keep the whole sales thread together"}
             </h2>
-
-            <p className="muted">
+            <p>
               {user
-                ? "Your saved messages, follow-up plans, and pipeline context are connected to this account."
-                : "Browse the library first. When leads become real, sign in so your outreach and client context stay together."}
+                ? "Open the part of the workflow you need next. Your account keeps saved work connected across sessions."
+                : "Create an account when you want Thalovo to remember the messages, follow-ups, and lead context you build."}
             </p>
 
-            <div className="accountSummaryGrid">
-              <div className="accountMetaItem">
-                <span className="accountMetaLabel">Plan</span>
-                <span className="accountMetaValue">{planLabel}</span>
+            {user ? (
+              <div className="accountLaunchActions" aria-label="Workspace links">
+                <Link href="/prospects">
+                  <strong>Open pipeline</strong>
+                  <span>Move prospects through replies, calls, proposals, and handoff.</span>
+                </Link>
+                <Link href="/library">
+                  <strong>Use message library</strong>
+                  <span>Start or sharpen the next outreach message.</span>
+                </Link>
+                <Link href="/folders">
+                  <strong>Open saved client folders</strong>
+                  <span>Find sent messages, files, links, and handoff context.</span>
+                </Link>
               </div>
-
-              <div className="accountMetaItem">
-                <span className="accountMetaLabel">Email</span>
-                <span className="accountMetaValue">
-                  {user?.email ?? "No email connected"}
-                </span>
-              </div>
-
-              <div className="accountMetaItem">
-                <span className="accountMetaLabel">Saved work</span>
-                <span className="accountMetaValue">
-                  {user ? "Sync available" : "Local browsing"}
-                </span>
-              </div>
-
-              {founderEligible ? (
-                <div className="accountMetaItem">
-                  <span className="accountMetaLabel">Founder price</span>
-                  <span className="accountMetaValue">
-                    {founderPriceGbp ? `GBP ${founderPriceGbp}/month` : "Active"}
-                  </span>
+            ) : (
+              <div className="accountSavedFlow" aria-label="What your account saves">
+                <div>
+                  <strong>Messages</strong>
+                  <span>Outreach, follow-up, proposal, and win-back work.</span>
                 </div>
-              ) : null}
-            </div>
+                <div>
+                  <strong>Pipeline context</strong>
+                  <span>Lead stage, next action, notes, and proposal movement.</span>
+                </div>
+                <div>
+                  <strong>Client folders</strong>
+                  <span>Saved work organised around the client instead of scattered pages.</span>
+                </div>
+              </div>
+            )}
 
             {user ? (
-              <div className="accountPrimaryActions">
+              <div className="accountUtilityRow">
                 <button
-                  className="button buttonPrimary"
+                  className="button buttonSecondary"
                   disabled={isSyncing}
                   onClick={async () => {
                     try {
@@ -230,11 +222,11 @@ export default function AccountPage() {
                     }
                   }}
                 >
-                  {isSyncing ? "Syncing..." : "Sync agency work"}
+                  {isSyncing ? "Syncing..." : "Sync work"}
                 </button>
 
                 <button
-                  className="button buttonSecondary"
+                  className="button buttonUtility"
                   onClick={() => void signOut()}
                 >
                   Sign out
@@ -250,9 +242,9 @@ export default function AccountPage() {
             ) : null}
           </section>
 
-          <section className="accountAccessCard accountSupabaseCard">
+          <section className="accountAccessCard accountAccessPanel">
             <h2 className="cardTitle">
-              {user ? "Open your workspace" : "Access your account"}
+              {user ? "Account access" : "Access your workspace"}
             </h2>
 
             {visibleNotice ? <p className="notice">{visibleNotice}</p> : null}
@@ -446,24 +438,13 @@ export default function AccountPage() {
                 ) : null}
 
                 <div className="accountQuickLinks">
-                  <Link href="/prospects" className="accountQuickLink">
-                    <strong>Open pipeline</strong>
-                    <span className="muted">Track inquiries, scoping calls, proposals, negotiation, and handoff</span>
-                  </Link>
-
-                  <Link href="/library" className="accountQuickLink">
-                    <strong>Lead capture</strong>
-                    <span className="muted">Choose a message and start conversations</span>
-                  </Link>
-
-                  <Link href="/sequence-builder" className="accountQuickLink">
-                    <strong>Build follow-up plans</strong>
-                    <span className="muted">Create reusable client-chasing flows</span>
-                  </Link>
-
                   <Link href="/pricing" className="accountQuickLink">
-                    <strong>View plan options</strong>
-                    <span className="muted">Free, Pro, Founder, and Business</span>
+                    <strong>{planLabel}</strong>
+                    <span className="muted">
+                      {founderEligible && founderPriceGbp
+                        ? `Founder pricing: GBP ${founderPriceGbp}/month`
+                        : "View Free, Pro, Founder, and Business options"}
+                    </span>
                   </Link>
                 </div>
               </>

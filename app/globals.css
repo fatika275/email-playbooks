@@ -1285,6 +1285,101 @@ details[open] > summary::after {
   background: #ffffff;
 }
 
+.accountLaunchHero {
+  max-width: 900px;
+  padding: 34px 0 38px;
+}
+
+.accountLaunchHero .pageTitle {
+  max-width: 820px;
+  margin-top: 14px;
+}
+
+.accountLaunchHero .muted {
+  max-width: 690px;
+  margin: 14px 0 0;
+  line-height: 1.7;
+}
+
+.accountLaunchGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(330px, 0.48fr);
+  gap: 16px;
+  align-items: stretch;
+}
+
+.accountLaunchPanel,
+.accountAccessPanel {
+  min-height: 100%;
+  padding: 26px;
+  border: 1px solid var(--border);
+  background: #080808;
+}
+
+.accountLaunchPanel {
+  border-color: rgba(255, 255, 255, 0.42);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.07), transparent 40%),
+    #090909;
+  box-shadow: 0 18px 56px rgba(0, 0, 0, 0.26);
+}
+
+.accountLaunchPanel h2 {
+  max-width: 640px;
+  margin: 14px 0 0;
+  font-size: 34px;
+  line-height: 1.1;
+}
+
+.accountLaunchPanel > p {
+  max-width: 680px;
+  margin: 12px 0 0;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.accountLaunchActions,
+.accountSavedFlow {
+  display: grid;
+  gap: 0;
+  margin-top: 24px;
+  border-top: 1px solid var(--border-soft);
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.accountLaunchActions a,
+.accountSavedFlow div {
+  display: grid;
+  gap: 6px;
+  padding: 16px 0;
+  color: var(--text);
+  text-decoration: none;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.accountLaunchActions a:last-child,
+.accountSavedFlow div:last-child {
+  border-bottom: 0;
+}
+
+.accountLaunchActions a:hover strong {
+  color: #ffffff;
+}
+
+.accountLaunchActions span,
+.accountSavedFlow span {
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.accountUtilityRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 22px;
+}
+
 .accountHeroSimple {
   grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
 }
@@ -5609,6 +5704,7 @@ details[open] > summary::after {
 @media (max-width: 1080px) {
   .hero,
   .accountHero,
+  .accountLaunchGrid,
   .editorLayout,
   .objectionHelperLayout,
   .builderLayout,
