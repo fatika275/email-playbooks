@@ -2,64 +2,126 @@ import Link from "next/link";
 import { CheckoutButton } from "@/components/checkout-button";
 
 const businessFeatures = [
-  "Everything in Pro",
   "Shared pipeline for inquiries, scoping calls, proposals, negotiation, and handoff",
   "Shared handoff notes so lead context survives owner changes",
   "Simple ownership rules for who is chasing each lead",
-  "One payment for the business",
-  "Full Pro access for up to 10 teammates",
   "Shared outreach messages and follow-up plans",
   "Owner-controlled invitations and removals",
   "Team visibility for scoping calls, proposals, negotiation, and handoff without duplicate chasing",
+];
+
+const businessOutcomes = [
+  {
+    metric: "10",
+    label: "Seats included",
+    copy: "Bring the people helping with outreach, follow-up, proposals, and handoff into one workspace.",
+  },
+  {
+    metric: "1",
+    label: "Shared pipeline",
+    copy: "Everyone sees the same leads, stages, owners, notes, and next actions.",
+  },
+  {
+    metric: "0",
+    label: "Duplicate chasing",
+    copy: "Keep ownership clear so two people do not follow up with the same prospect.",
+  },
+];
+
+const businessWorkflow = [
+  "Invite teammates",
+  "Assign lead owners",
+  "Share notes and handoff context",
+  "Track the next action together",
 ];
 
 export default function BusinessPage() {
   return (
     <main className="main">
       <section className="container">
-        <div className="planHero">
-          <div>
-            <div className="badge">Business Pro</div>
-            <h1 className="pageTitle" style={{ marginTop: 14 }}>
-              For small agency teams sharing pipeline, handoff notes, and lead ownership.
-            </h1>
-            <p className="muted" style={{ marginTop: 14, lineHeight: 1.75 }}>
-              For small agencies where the founder is not the only person
-              chasing replies. Give the team one shared pipeline, handoff notes,
-              and simple ownership rules so inquiries, scoping calls,
-              proposals, negotiation, and handoffs stay visible without turning
-              follow-up into extra admin.
+        <section className="businessSignupHero">
+          <div className="businessSignupCopy">
+            <span className="businessSignupBadge">Business Pro</span>
+            <h1>Keep your agency team aligned from reply to booked work.</h1>
+            <p>
+              Business Pro is for small agencies where the founder is not the
+              only person chasing leads. Share the pipeline, notes, ownership,
+              saved messages, and next actions without adding CRM bloat.
             </p>
 
-            <ul className="featureList">
-              {businessFeatures.map((feature) => (
-                <li key={feature}>{feature}</li>
-              ))}
-            </ul>
+            <div className="businessSignupActions">
+              <CheckoutButton
+                plan="business"
+                className="button buttonPrimary businessSignupButton"
+              >
+                Start Business Pro
+              </CheckoutButton>
+              <Link href="/pricing" className="button buttonSecondary businessSignupButton">
+                Compare plans
+              </Link>
+            </div>
           </div>
 
-          <aside className="glassCard planCheckoutCard">
-            <span className="statusPill statusPillSuccess">10 seats included</span>
-            <h2 className="pageTitle" style={{ marginTop: 16 }}>
-              GBP 29<span className="muted">/month</span>
-            </h2>
-            <p className="muted" style={{ marginTop: 10, lineHeight: 1.7 }}>
-              One agency workspace, one payment, and up to 10 teammates included so
-              everyone works from the same pipeline, handoff notes, lead owners, and
-              next actions.
+          <aside className="businessSignupPriceCard" aria-label="Business Pro price">
+            <span>Team workspace</span>
+            <strong>GBP 29</strong>
+            <small>/month, 10 seats included</small>
+            <div className="businessSignupDivider" />
+            <p>
+              One agency workspace, one payment, and shared access for the
+              people helping turn outreach into client work.
             </p>
-            <div style={{ marginTop: 20 }}>
-              <CheckoutButton plan="business">Start Business Pro</CheckoutButton>
-            </div>
-            <Link
-              href="/pricing"
-              className="button buttonSecondary"
-              style={{ marginTop: 10 }}
-            >
-              Back to pricing
-            </Link>
           </aside>
-        </div>
+        </section>
+
+        <section className="businessOutcomeGrid" aria-label="Business Pro outcomes">
+          {businessOutcomes.map((outcome) => (
+            <article key={outcome.label}>
+              <strong>{outcome.metric}</strong>
+              <h2>{outcome.label}</h2>
+              <p>{outcome.copy}</p>
+            </article>
+          ))}
+        </section>
+
+        <section className="businessSignupBody">
+          <div className="businessIncludedPanel">
+            <h2>What Business Pro includes</h2>
+            <div className="businessIncludedList">
+              <span>Everything in Pro for each active teammate</span>
+              {businessFeatures.map((feature) => (
+                <span key={feature}>{feature}</span>
+              ))}
+              <span>One payment for the business</span>
+            </div>
+          </div>
+
+          <div className="businessWorkflowPanel">
+            <span className="statusPill statusPillSuccess">Shared workflow</span>
+            <h2>Built for handoff</h2>
+            <p>
+              When one person starts the conversation and another continues it,
+              the context stays with the lead: owner, notes, stage, files, and
+              the next action.
+            </p>
+
+            <div className="businessWorkflowSteps">
+              {businessWorkflow.map((step, index) => (
+                <div key={step}>
+                  <strong>{index + 1}</strong>
+                  <span>{step}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="businessSignupActions businessSignupActionsCompact">
+              <CheckoutButton plan="business">Start Business Pro</CheckoutButton>
+              <Link href="/team" className="button buttonSecondary">
+                View team area
+              </Link>
+            </div>
+          </div>
+        </section>
       </section>
     </main>
   );
