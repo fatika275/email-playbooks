@@ -6,6 +6,7 @@ import {
   createAdminBusinessWorkspace,
   listFounderWaitlistForAdmin,
   listUserProfilesForAdmin,
+  sendFounderApprovedEmailForAdmin,
   updateFounderWaitlistStatusForAdmin,
   updateFounderAccessForAdmin,
   type CloudAdminProfile,
@@ -79,8 +80,21 @@ export default function AdminPage() {
         nextEligible,
         nextPrice
       );
+      if (nextEligible && profile.email) {
+        try {
+          await sendFounderApprovedEmailForAdmin(profile.email, nextPrice);
+          setNotice("Founder access enabled and the approval email was sent.");
+        } catch (emailError) {
+          setNotice(
+            emailError instanceof Error
+              ? `Founder access enabled, but the email was not sent: ${emailError.message}`
+              : "Founder access enabled, but the email was not sent."
+          );
+        }
+      } else {
+        setNotice("Founder access updated.");
+      }
       await refreshAdminData();
-      setNotice("Founder access updated.");
     } catch (error) {
       setNotice(
         error instanceof Error ? error.message : "Could not update founder access."
@@ -122,14 +136,24 @@ export default function AdminPage() {
     }
 
     try {
+      const founderPriceGbp = matchingProfile.founder_price_gbp ?? 12;
       await updateFounderAccessForAdmin(
         matchingProfile.user_id,
         true,
-        matchingProfile.founder_price_gbp ?? 12
+        founderPriceGbp
       );
       await updateFounderWaitlistStatusForAdmin(entry.id, "approved");
+      try {
+        await sendFounderApprovedEmailForAdmin(entry.email, founderPriceGbp);
+        setNotice("Founder access approved and the approval email was sent.");
+      } catch (emailError) {
+        setNotice(
+          emailError instanceof Error
+            ? `Founder access approved, but the email was not sent: ${emailError.message}`
+            : "Founder access approved, but the email was not sent."
+        );
+      }
       await refreshAdminData();
-      setNotice("Founder access approved. They now appear in the access list.");
     } catch (error) {
       setNotice(
         error instanceof Error ? error.message : "Could not approve waitlist entry."

@@ -523,6 +523,38 @@ export async function updateFounderAccessForAdmin(
   if (error) throw normalizeCloudError(error);
 }
 
+export async function sendFounderApprovedEmailForAdmin(
+  email: string,
+  founderPriceGbp: number | null
+) {
+  const client = getSupabaseBrowserClient();
+  const session = await client?.auth.getSession();
+  const accessToken = session?.data.session?.access_token;
+
+  if (!accessToken) {
+    throw new Error("Sign in again before sending Founder approval emails.");
+  }
+
+  const response = await fetch("/api/admin/founder-approved-email", {
+    method: "POST",
+    headers: {
+      authorization: `Bearer ${accessToken}`,
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({
+      email,
+      founderPriceGbp,
+    }),
+  });
+  const payload = (await response.json().catch(() => ({}))) as {
+    error?: string;
+  };
+
+  if (!response.ok) {
+    throw new Error(payload.error || "Founder approval email could not be sent.");
+  }
+}
+
 async function fetchCloudEmails(userId: string) {
   const client = getSupabaseBrowserClient();
   if (!client) return [];

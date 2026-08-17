@@ -7,6 +7,7 @@ export async function GET() {
     stripeProPriceId: Boolean(process.env.STRIPE_PRO_PRICE_ID),
     stripeFounderPriceId: Boolean(process.env.STRIPE_FOUNDER_PRICE_ID),
     stripeBusinessPriceId: Boolean(process.env.STRIPE_BUSINESS_PRICE_ID),
+    resendApiKey: Boolean(process.env.RESEND_API_KEY),
     supabaseServiceRoleKey: Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY),
     siteUrl: Boolean(process.env.NEXT_PUBLIC_SITE_URL),
   };
