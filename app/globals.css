@@ -6854,7 +6854,7 @@ details[open] > summary::after {
 }
 
 .footerInner {
-  padding: 28px 0 34px;
+  padding: 26px 0 30px;
   display: flex;
   justify-content: space-between;
   gap: 24px;
@@ -6877,13 +6877,13 @@ details[open] > summary::after {
 
 .footerLinks {
   display: flex;
-  gap: 36px;
+  gap: 30px;
   flex-wrap: wrap;
 }
 
 .footerColumn {
   display: grid;
-  gap: 10px;
+  gap: 8px;
   min-width: 120px;
 }
 

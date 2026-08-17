@@ -25,9 +25,6 @@ export default function SiteFooter() {
             <Link href="/library" className="footerLink">
               Templates
             </Link>
-            <Link href="/reply-helper" className="footerLink">
-              Objections
-            </Link>
             <Link href="/sequence-builder" className="footerLink">
               Follow-ups
             </Link>
@@ -36,12 +33,6 @@ export default function SiteFooter() {
             </Link>
             <Link href="/pricing" className="footerLink">
               Pricing
-            </Link>
-            <Link href="/founder" className="footerLink">
-              Founder Pro
-            </Link>
-            <Link href="/account" className="footerLink">
-              Account
             </Link>
           </div>
 
