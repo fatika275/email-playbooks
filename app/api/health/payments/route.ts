@@ -20,6 +20,9 @@ export async function GET() {
     emailRuntime: {
       RESEND_API_KEY: resendApiKey,
       RESEND_KEY: resendKey,
+      availableResendKeys: Object.keys(process.env)
+        .filter((key) => key.toUpperCase().includes("RESEND"))
+        .sort(),
     },
   });
 }
