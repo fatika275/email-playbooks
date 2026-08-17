@@ -96,7 +96,7 @@ export default function FounderPage() {
                 </CheckoutButton>
               ) : user ? (
                 <a href="#founder-request" className="button buttonPrimary founderHeroButton">
-                  Request Founder access
+                  Continue with this account
                 </a>
               ) : (
                 <Link href="/account" className="button buttonPrimary founderHeroButton">
@@ -129,7 +129,7 @@ export default function FounderPage() {
 
         {!founderEligible ? (
           <section className="founderRequestPanel" id="founder-request">
-            <h2>Use your signed-in email</h2>
+            <h2>Confirm your email</h2>
             <p>
               {user
                 ? "Send the request from your signed-in account. If approved, the Founder checkout unlocks for this email."
