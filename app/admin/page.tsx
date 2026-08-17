@@ -19,6 +19,12 @@ export default function AdminPage() {
   const [isLoadingProfiles, setIsLoadingProfiles] = useState(false);
   const [notice, setNotice] = useState("");
   const [isGrantingBusiness, setIsGrantingBusiness] = useState(false);
+  const pendingFounderRequests = waitlist.filter(
+    (entry) => entry.status !== "approved" && entry.status !== "declined"
+  );
+  const founderAccessProfiles = profiles.filter(
+    (profile) => profile.founder_eligible
+  );
 
   async function handleGrantBusinessWorkspace() {
     setIsGrantingBusiness(true);
@@ -123,7 +129,7 @@ export default function AdminPage() {
       );
       await updateFounderWaitlistStatusForAdmin(entry.id, "approved");
       await refreshAdminData();
-      setNotice("Founder access approved from waitlist.");
+      setNotice("Founder access approved. They now appear in the access list.");
     } catch (error) {
       setNotice(
         error instanceof Error ? error.message : "Could not approve waitlist entry."
@@ -131,19 +137,19 @@ export default function AdminPage() {
     }
   }
 
-  async function handleWaitlistStatus(entry: FounderWaitlistEntry, status: string) {
+  async function handleDeclineWaitlistEntry(entry: FounderWaitlistEntry) {
     try {
-      await updateFounderWaitlistStatusForAdmin(entry.id, status);
+      await updateFounderWaitlistStatusForAdmin(entry.id, "declined");
       await refreshAdminData();
-      setNotice("Waitlist status updated.");
+      setNotice("Founder request declined and removed from the approval queue.");
     } catch (error) {
       setNotice(
-        error instanceof Error ? error.message : "Could not update waitlist status."
+        error instanceof Error ? error.message : "Could not decline waitlist entry."
       );
     }
   }
 
-  function getFounderApprovalEmailHref(entry: FounderWaitlistEntry) {
+  function getFounderApprovalEmailHref(email: string) {
     const subject = "Your Thalovo Founder access is approved";
     const body = [
       "Hi,",
@@ -158,7 +164,7 @@ export default function AdminPage() {
       "Thalovo",
     ].join("\n");
 
-    return `mailto:${encodeURIComponent(entry.email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    return `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   }
 
   if (!isConfigured) {
@@ -240,10 +246,10 @@ export default function AdminPage() {
             }}
           >
             <div>
-              <h2 className="cardTitle">Signed-up users</h2>
+              <h2 className="cardTitle">Founder access list</h2>
               <p className="muted" style={{ marginTop: 8 }}>
-                Enable Founder access, then set the monthly locked price for
-                that user.
+                Approved accounts stay here so you can see exactly who has
+                Founder pricing unlocked.
               </p>
             </div>
 
@@ -258,14 +264,14 @@ export default function AdminPage() {
 
           <div style={{ display: "grid", gap: 16 }}>
             {isLoadingProfiles ? (
-              <p className="muted">Loading profiles...</p>
-            ) : profiles.length === 0 ? (
+              <p className="muted">Loading founder access...</p>
+            ) : founderAccessProfiles.length === 0 ? (
               <p className="muted">
-                No user profiles yet. Ask someone to sign in first so their
-                profile row gets created automatically.
+                No approved Founder accounts yet. Approve a pending request
+                below and it will move into this list.
               </p>
             ) : (
-              profiles.map((profile) => (
+              founderAccessProfiles.map((profile) => (
                 <div
                   key={profile.user_id}
                   className="glassCard"
@@ -282,7 +288,7 @@ export default function AdminPage() {
                     </div>
 
                     <span className="miniBadge">
-                      {profile.founder_eligible ? "Founder Enabled" : "Standard"}
+                      Founder Enabled
                     </span>
                   </div>
 
@@ -315,14 +321,23 @@ export default function AdminPage() {
                     </div>
 
                     <button
-                      className="button buttonPrimary"
+                      className="button buttonSecondary"
                       onClick={() => void handleFounderToggle(profile)}
                     >
-                      {profile.founder_eligible
-                        ? "Disable Founder"
-                        : "Enable Founder"}
+                      Remove Founder access
                     </button>
                   </div>
+
+                  {profile.email ? (
+                    <div className="toolbar" style={{ marginTop: 14 }}>
+                      <a
+                        className="button buttonUtility"
+                        href={getFounderApprovalEmailHref(profile.email)}
+                      >
+                        Email approval
+                      </a>
+                    </div>
+                  ) : null}
                 </div>
               ))
             )}
@@ -343,8 +358,9 @@ export default function AdminPage() {
             <div>
               <h2 className="cardTitle">Founder waitlist</h2>
               <p className="muted" style={{ marginTop: 8 }}>
-                Every founder interest form submission is recorded here, even
-                before the user finishes signing in.
+                Only requests still needing a decision show here. Approved
+                users move into the Founder access list; declined requests
+                leave this queue.
               </p>
             </div>
           </div>
@@ -352,10 +368,10 @@ export default function AdminPage() {
           <div style={{ display: "grid", gap: 16 }}>
             {isLoadingProfiles ? (
               <p className="muted">Loading waitlist...</p>
-            ) : waitlist.length === 0 ? (
-              <p className="muted">No founder interest records yet.</p>
+            ) : pendingFounderRequests.length === 0 ? (
+              <p className="muted">No Founder requests waiting for a decision.</p>
             ) : (
-              waitlist.map((entry) => {
+              pendingFounderRequests.map((entry) => {
                 const matchingProfile = profiles.find(
                   (profile) =>
                     profile.email?.toLowerCase() === entry.email.toLowerCase() ||
@@ -397,23 +413,84 @@ export default function AdminPage() {
 
                       <button
                         className="button buttonSecondary"
-                        onClick={() => void handleWaitlistStatus(entry, "reviewed")}
+                        onClick={() => void handleDeclineWaitlistEntry(entry)}
                       >
-                        Mark reviewed
+                        Decline request
                       </button>
-
-                      {entry.status === "approved" ? (
-                        <a
-                          className="button buttonUtility"
-                          href={getFounderApprovalEmailHref(entry)}
-                        >
-                          Email approval
-                        </a>
-                      ) : null}
                     </div>
                   </div>
                 );
               })
+            )}
+          </div>
+        </div>
+
+        <div className="glassCard" style={{ padding: 28, marginTop: 22 }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              gap: 16,
+              alignItems: "center",
+              marginBottom: 18,
+              flexWrap: "wrap",
+            }}
+          >
+            <div>
+              <h2 className="cardTitle">All signed-up accounts</h2>
+              <p className="muted" style={{ marginTop: 8 }}>
+                Use this only if you need to manually enable Founder access for
+                someone who did not join through the request form.
+              </p>
+            </div>
+          </div>
+
+          <div style={{ display: "grid", gap: 12 }}>
+            {isLoadingProfiles ? (
+              <p className="muted">Loading accounts...</p>
+            ) : profiles.length === 0 ? (
+              <p className="muted">
+                No user profiles yet. Ask someone to sign in first so their
+                profile row gets created automatically.
+              </p>
+            ) : (
+              profiles.map((profile) => (
+                <div
+                  key={profile.user_id}
+                  className="glassCard"
+                  style={{
+                    alignItems: "center",
+                    display: "grid",
+                    gap: 14,
+                    gridTemplateColumns: "minmax(0, 1fr) auto",
+                    padding: 16,
+                  }}
+                >
+                  <div>
+                    <h3 className="cardTitle" style={{ fontSize: 17 }}>
+                      {profile.email || profile.user_id}
+                    </h3>
+                    <p className="small" style={{ marginTop: 6 }}>
+                      {profile.founder_eligible
+                        ? `Founder GBP ${profile.founder_price_gbp ?? 12}/month`
+                        : "Standard account"}
+                    </p>
+                  </div>
+
+                  <button
+                    className={
+                      profile.founder_eligible
+                        ? "button buttonSecondary"
+                        : "button buttonPrimary"
+                    }
+                    onClick={() => void handleFounderToggle(profile)}
+                  >
+                    {profile.founder_eligible
+                      ? "Remove Founder"
+                      : "Enable Founder"}
+                  </button>
+                </div>
+              ))
             )}
           </div>
         </div>
