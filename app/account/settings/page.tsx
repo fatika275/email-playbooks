@@ -116,8 +116,8 @@ export default function AccountSettingsPage() {
           <div className="badge">Settings</div>
           <h1 className="pageTitle">Account settings</h1>
           <p className="muted">
-            Manage billing, cancellation, password, refunds, and account help
-            in one focused place.
+            Manage billing, subscription cancellation, password, refunds, and
+            account help in one focused place.
           </p>
         </div>
 
