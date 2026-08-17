@@ -144,26 +144,23 @@ export default function AccountPage() {
   return (
     <main className="main">
       <section className="container">
-        <div className="accountPageHero">
-          <div>
-            <div className="badge">Account</div>
-            <h1 className="pageTitle">
-              Keep your outreach, follow-ups, and client work in one place
-            </h1>
-            <p className="muted">
-              Sign in to save messages, follow-up plans, pipeline updates, and
-              handoff context so leads do not slip when you come back.
-            </p>
-          </div>
-          <div className="accountHeroSignal">
-            <span className="miniBadge">{user ? "Workspace ready" : "Free to start"}</span>
-            <strong>{user ? "Jump back into active leads." : "Browse first, save when ready."}</strong>
-            <p>{user ? "Your account keeps your agency work connected across sessions." : "Create an account when you want saved work and pipeline context kept together."}</p>
+        <div className="accountSupabaseHero">
+          <div className="badge">Account</div>
+          <h1 className="pageTitle">
+            Your workspace for saved outreach and client-work context
+          </h1>
+          <p className="muted">
+            Sign in to keep messages, follow-up plans, pipeline updates, and
+            handoff notes connected when you come back to chase leads.
+          </p>
+          <div className="accountWorkspacePill" aria-label="Account status">
+            <span>{user ? "Signed in" : "Free to browse"}</span>
+            <strong>{user ? planLabel : "Save when ready"}</strong>
           </div>
         </div>
 
-        <div className="accountHero accountHeroSimple">
-          <section className="accountStatusCard">
+        <div className="accountHero accountHeroSimple accountSupabaseGrid">
+          <section className="accountStatusCard accountSupabaseCard accountSupabaseStatusCard">
             <div className="accountStatusTop">
               <span
                 className={
@@ -178,13 +175,13 @@ export default function AccountPage() {
             </div>
 
             <h2 className="sectionTitle">
-              {user ? "Ready to move leads forward" : "Save the work that wins clients"}
+              {user ? "Workspace ready" : "Create an account when the work matters"}
             </h2>
 
             <p className="muted">
               {user
                 ? "Your saved messages, follow-up plans, and pipeline context are connected to this account."
-                : "You can browse the library without an account. Sign in when you want your outreach and lead context kept in one place."}
+                : "Browse the library first. When leads become real, sign in so your outreach and client context stay together."}
             </p>
 
             <div className="accountSummaryGrid">
@@ -253,9 +250,9 @@ export default function AccountPage() {
             ) : null}
           </section>
 
-          <section className="accountAccessCard">
+          <section className="accountAccessCard accountSupabaseCard">
             <h2 className="cardTitle">
-              {user ? "Quick links" : "Access your account"}
+              {user ? "Open your workspace" : "Access your account"}
             </h2>
 
             {visibleNotice ? <p className="notice">{visibleNotice}</p> : null}
@@ -449,22 +446,22 @@ export default function AccountPage() {
                 ) : null}
 
                 <div className="accountQuickLinks">
-                  <Link href="/prospects" className="glassCard clickable accountQuickLink">
+                  <Link href="/prospects" className="accountQuickLink">
                     <strong>Open pipeline</strong>
                     <span className="muted">Track inquiries, scoping calls, proposals, negotiation, and handoff</span>
                   </Link>
 
-                  <Link href="/library" className="glassCard clickable accountQuickLink">
+                  <Link href="/library" className="accountQuickLink">
                     <strong>Lead capture</strong>
                     <span className="muted">Choose a message and start conversations</span>
                   </Link>
 
-                  <Link href="/sequence-builder" className="glassCard clickable accountQuickLink">
+                  <Link href="/sequence-builder" className="accountQuickLink">
                     <strong>Build follow-up plans</strong>
                     <span className="muted">Create reusable client-chasing flows</span>
                   </Link>
 
-                  <Link href="/pricing" className="glassCard clickable accountQuickLink">
+                  <Link href="/pricing" className="accountQuickLink">
                     <strong>View plan options</strong>
                     <span className="muted">Free, Pro, Founder, and Business</span>
                   </Link>
