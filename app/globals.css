@@ -1380,6 +1380,53 @@ details[open] > summary::after {
   margin-top: 22px;
 }
 
+.accountSettingsList {
+  display: grid;
+  gap: 0;
+  margin-top: 18px;
+  border-top: 1px solid var(--border-soft);
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.accountSettingsItem {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  padding: 15px 0;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.accountSettingsItem:last-child {
+  border-bottom: 0;
+}
+
+.accountSettingsItem div {
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+}
+
+.accountSettingsItem strong {
+  color: var(--text);
+}
+
+.accountSettingsItem span {
+  color: var(--muted);
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.accountSettingsItem .button {
+  min-width: 82px;
+  justify-content: center;
+}
+
+.accountAccessPanel > .accountUtilityRow {
+  padding-top: 18px;
+  border-top: 1px solid var(--border-soft);
+}
+
 .accountHeroSimple {
   grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
 }
@@ -6037,6 +6084,15 @@ details[open] > summary::after {
   .accountAuthActions .button {
     width: 100%;
     justify-content: center;
+  }
+
+  .accountSettingsItem {
+    grid-template-columns: 1fr;
+    align-items: flex-start;
+  }
+
+  .accountSettingsItem .button {
+    width: 100%;
   }
 
   .workspaceHero {

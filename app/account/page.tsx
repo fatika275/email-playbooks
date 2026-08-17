@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { useAccount } from "@/components/account-provider";
 import { trackEvent } from "@/lib/analytics";
+import { siteConfig } from "@/lib/site-config";
 
 export default function AccountPage() {
   const {
@@ -50,6 +51,12 @@ export default function AccountPage() {
           : !/[0-9]/.test(password)
             ? "Add at least one number to your password."
             : "Password looks good.";
+  const supportEmailHref = `mailto:${encodeURIComponent(
+    siteConfig.supportEmail
+  )}?subject=${encodeURIComponent("Thalovo account help")}`;
+  const refundEmailHref = `mailto:${encodeURIComponent(
+    siteConfig.supportEmail
+  )}?subject=${encodeURIComponent("Thalovo refund request")}`;
 
   function dismissSetupGuide() {
     window.localStorage.setItem("thalovo_setup_guide_dismissed", "1");
@@ -141,6 +148,25 @@ export default function AccountPage() {
     }
   }
 
+  async function handleSignedInPasswordResetRequest() {
+    if (!user?.email) {
+      setNotice("We could not find an email address for this account.");
+      return;
+    }
+
+    try {
+      await requestPasswordReset(user.email);
+      trackEvent("account_password_reset_requested");
+      setNotice("Password reset email sent to your account email.");
+    } catch (error) {
+      setNotice(
+        error instanceof Error
+          ? error.message
+          : "Password reset could not be requested right now."
+      );
+    }
+  }
+
   return (
     <main className="main">
       <section className="container">
@@ -156,7 +182,7 @@ export default function AccountPage() {
           </p>
           <div className="accountWorkspacePill" aria-label="Account status">
             <span>{user ? "Signed in" : "Free to browse"}</span>
-            <strong>{user ? planLabel : "Save when ready"}</strong>
+            <strong>{user ? "Workspace ready" : "Save when ready"}</strong>
           </div>
         </div>
 
@@ -206,34 +232,6 @@ export default function AccountPage() {
               </div>
             )}
 
-            {user ? (
-              <div className="accountUtilityRow">
-                <button
-                  className="button buttonSecondary"
-                  disabled={isSyncing}
-                  onClick={async () => {
-                    try {
-                      await syncNow();
-                      trackEvent("account_sync_success");
-                      setNotice("Your saved work is up to date.");
-                    } catch {
-                      trackEvent("account_sync_failed");
-                      setNotice("Sync could not finish right now. Please try again.");
-                    }
-                  }}
-                >
-                  {isSyncing ? "Syncing..." : "Sync work"}
-                </button>
-
-                <button
-                  className="button buttonUtility"
-                  onClick={() => void signOut()}
-                >
-                  Sign out
-                </button>
-              </div>
-            ) : null}
-
             {syncErrorMessage ? (
               <p className="notice">
                 We could not sync your agency work right now. Your local work is
@@ -244,7 +242,7 @@ export default function AccountPage() {
 
           <section className="accountAccessCard accountAccessPanel">
             <h2 className="cardTitle">
-              {user ? "Account access" : "Access your workspace"}
+              {user ? "Account settings" : "Access your workspace"}
             </h2>
 
             {visibleNotice ? <p className="notice">{visibleNotice}</p> : null}
@@ -401,6 +399,66 @@ export default function AccountPage() {
               </>
             ) : (
               <>
+                <div className="accountSettingsList" aria-label="Account settings">
+                  <div className="accountSettingsItem">
+                    <div>
+                      <strong>Email</strong>
+                      <span>{user.email ?? "No email connected"}</span>
+                    </div>
+                    <a className="button buttonUtility" href={supportEmailHref}>
+                      Change
+                    </a>
+                  </div>
+
+                  <div className="accountSettingsItem">
+                    <div>
+                      <strong>Plan</strong>
+                      <span>
+                        {founderEligible && founderPriceGbp
+                          ? `${planLabel} - Founder GBP ${founderPriceGbp}/month`
+                          : planLabel}
+                      </span>
+                    </div>
+                    <Link className="button buttonSecondary" href="/pricing">
+                      Manage
+                    </Link>
+                  </div>
+
+                  <div className="accountSettingsItem">
+                    <div>
+                      <strong>Password</strong>
+                      <span>Send a secure reset email to your account address.</span>
+                    </div>
+                    <button
+                      className="button buttonUtility"
+                      type="button"
+                      onClick={() => void handleSignedInPasswordResetRequest()}
+                    >
+                      Reset
+                    </button>
+                  </div>
+
+                  <div className="accountSettingsItem">
+                    <div>
+                      <strong>Refunds</strong>
+                      <span>Read the policy or contact support about a charge.</span>
+                    </div>
+                    <Link className="button buttonUtility" href="/refunds">
+                      Policy
+                    </Link>
+                  </div>
+
+                  <div className="accountSettingsItem">
+                    <div>
+                      <strong>Support</strong>
+                      <span>Ask about billing, refunds, or account changes.</span>
+                    </div>
+                    <a className="button buttonUtility" href={refundEmailHref}>
+                      Email
+                    </a>
+                  </div>
+                </div>
+
                 {!isSetupGuideDismissed ? (
                   <section className="accountSetupGuide" aria-label="Getting started">
                     <div className="accountSetupGuideHeader">
@@ -437,15 +495,30 @@ export default function AccountPage() {
                   </section>
                 ) : null}
 
-                <div className="accountQuickLinks">
-                  <Link href="/pricing" className="accountQuickLink">
-                    <strong>{planLabel}</strong>
-                    <span className="muted">
-                      {founderEligible && founderPriceGbp
-                        ? `Founder pricing: GBP ${founderPriceGbp}/month`
-                        : "View Free, Pro, Founder, and Business options"}
-                    </span>
-                  </Link>
+                <div className="accountUtilityRow">
+                  <button
+                    className="button buttonSecondary"
+                    disabled={isSyncing}
+                    onClick={async () => {
+                      try {
+                        await syncNow();
+                        trackEvent("account_sync_success");
+                        setNotice("Your saved work is up to date.");
+                      } catch {
+                        trackEvent("account_sync_failed");
+                        setNotice("Sync could not finish right now. Please try again.");
+                      }
+                    }}
+                  >
+                    {isSyncing ? "Syncing..." : "Sync work"}
+                  </button>
+
+                  <button
+                    className="button buttonUtility"
+                    onClick={() => void signOut()}
+                  >
+                    Sign out
+                  </button>
                 </div>
               </>
             )}
