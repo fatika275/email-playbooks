@@ -128,230 +128,245 @@ export default function AccountPage() {
   return (
     <main className="main">
       <section className="container">
-        <div className="accountCleanHero">
-          <div className="badge">Account</div>
-          <h1 className="pageTitle">
-            {user ? "Pick up your agency work" : "Save your outreach workspace"}
-          </h1>
-          <p className="muted">
-            {user
-              ? "Jump straight back into the messages, leads, folders, and follow-ups that help you book client work."
-              : "Create an account when you want Thalovo to remember the client-work context you build."}
-          </p>
-          <div className="accountWorkspacePill" aria-label="Account status">
-            <span>{user ? "Signed in" : "Free to browse"}</span>
-            <strong>{user ? "Workspace ready" : "Save when ready"}</strong>
-          </div>
-        </div>
-
         {user ? (
-          <section className="accountHomePanel">
-            <div className="accountHomeHeader">
+          <section className="accountCommandCenter">
+            <aside className="accountCommandRail">
               <div>
-                <span className="miniBadge">Continue</span>
-                <h2>Where do you want to go?</h2>
+                <div className="badge">Account</div>
+                <h1>Your Thalovo workspace</h1>
+                <p>
+                  Signed in and ready to keep outreach, follow-ups, and client
+                  context connected.
+                </p>
               </div>
-              <Link href="/account/settings" className="button buttonUtility">
+
+              <div className="accountIdentityBlock">
+                <span>Email</span>
+                <strong>{user.email ?? "Signed in"}</strong>
+              </div>
+
+              <Link href="/account/settings" className="button buttonSecondary">
                 Account settings
               </Link>
+            </aside>
+
+            <div className="accountCommandMain">
+              <div className="accountCommandBanner">
+                <span className="miniBadge">Next</span>
+                <h2>Choose the part of the client chase you need now.</h2>
+                <p>
+                  Keep moving leads through the agency workflow without digging
+                  through account details.
+                </p>
+              </div>
+
+              {visibleNotice ? <p className="notice">{visibleNotice}</p> : null}
+
+              <div className="accountCommandActions" aria-label="Workspace actions">
+                <Link href="/prospects" className="accountCommandActionPrimary">
+                  <span>Pipeline</span>
+                  <strong>Chase active leads</strong>
+                  <small>Replies, calls, proposals, next actions, and handoff.</small>
+                </Link>
+                <Link href="/folders">
+                  <span>Saved</span>
+                  <strong>Open client folders</strong>
+                  <small>Sent messages, files, links, and context by client.</small>
+                </Link>
+                <Link href="/library">
+                  <span>Outreach</span>
+                  <strong>Write a message</strong>
+                  <small>Use agency templates to start or continue conversations.</small>
+                </Link>
+                <Link href="/sequence-builder">
+                  <span>Follow-ups</span>
+                  <strong>Build a chase plan</strong>
+                  <small>Plan reminder dates so warm leads do not disappear.</small>
+                </Link>
+              </div>
+
+              {syncErrorMessage ? (
+                <p className="notice">
+                  We could not sync your agency work right now. Your local work
+                  is still available on this device.
+                </p>
+              ) : null}
             </div>
-
-            {visibleNotice ? <p className="notice">{visibleNotice}</p> : null}
-
-            <div className="accountHomeActions" aria-label="Workspace links">
-              <Link href="/prospects">
-                <strong>Pipeline</strong>
-                <span>Chase replies, proposals, and next actions.</span>
-              </Link>
-              <Link href="/folders">
-                <strong>Saved client folders</strong>
-                <span>Find sent messages, files, links, and handoff context.</span>
-              </Link>
-              <Link href="/library">
-                <strong>Message library</strong>
-                <span>Write the next outreach or follow-up message.</span>
-              </Link>
-              <Link href="/sequence-builder">
-                <strong>Follow-up plans</strong>
-                <span>Build simple reminder flows so leads do not slip.</span>
-              </Link>
-            </div>
-
-            {syncErrorMessage ? (
-              <p className="notice">
-                We could not sync your agency work right now. Your local work is
-                still available on this device.
-              </p>
-            ) : null}
           </section>
         ) : (
-          <div className="accountSigninLayout">
-            <section className="accountSavePanel">
-              <span className="miniBadge">What gets saved</span>
-              <h2>Keep client work together</h2>
-              <div className="accountSaveList" aria-label="What your account saves">
-                <span>Messages and templates</span>
-                <span>Pipeline and follow-up context</span>
-                <span>Saved client folders</span>
+          <section className="accountEntryPage">
+            <div className="accountEntryStory">
+              <div className="badge">Account</div>
+              <h1>Save the work that helps you book clients</h1>
+              <p>
+                Sign in when you want Thalovo to remember outreach, lead context,
+                follow-up plans, and client folders between sessions.
+              </p>
+
+              <div className="accountEntryFlow" aria-label="What your account saves">
+                <span>Messages</span>
+                <span>Pipeline context</span>
+                <span>Client folders</span>
               </div>
-            </section>
+            </div>
 
-            <section className="accountAccessCard accountAccessPanel">
-            <h2 className="cardTitle">
-              Access your workspace
-            </h2>
-
-            {visibleNotice ? <p className="notice">{visibleNotice}</p> : null}
-
-                <p className="muted accountAccessIntro">
-                  Sign in with email and password to keep client-work context
-                  saved between sessions.
+            <section className="accountAuthSurface">
+              <div>
+                <span className="miniBadge">Access</span>
+                <h2>{authMode === "signup" ? "Create your account" : "Log in"}</h2>
+                <p>
+                  {authMode === "signup"
+                    ? "Start saving the outreach and follow-up work you build."
+                    : "Open your saved client-work context."}
                 </p>
+              </div>
 
-                <div className="authModeTabs" role="tablist" aria-label="Account mode">
-                  <button
-                    type="button"
-                    className={authMode === "login" ? "authModeTab active" : "authModeTab"}
-                    onClick={() => {
-                      setAuthMode("login");
-                      setNeedsVerification(false);
-                      setNotice("");
-                    }}
-                  >
-                    Log in
-                  </button>
-                  <button
-                    type="button"
-                    className={authMode === "signup" ? "authModeTab active" : "authModeTab"}
-                    onClick={() => {
-                      setAuthMode("signup");
-                      setNotice("");
-                    }}
-                  >
-                    Sign up
-                  </button>
+              {visibleNotice ? <p className="notice">{visibleNotice}</p> : null}
+
+              <div className="authModeTabs" role="tablist" aria-label="Account mode">
+                <button
+                  type="button"
+                  className={authMode === "login" ? "authModeTab active" : "authModeTab"}
+                  onClick={() => {
+                    setAuthMode("login");
+                    setNeedsVerification(false);
+                    setNotice("");
+                  }}
+                >
+                  Log in
+                </button>
+                <button
+                  type="button"
+                  className={authMode === "signup" ? "authModeTab active" : "authModeTab"}
+                  onClick={() => {
+                    setAuthMode("signup");
+                    setNotice("");
+                  }}
+                >
+                  Sign up
+                </button>
+              </div>
+
+              <form onSubmit={handleSubmit} className="accountAuthForm">
+                <div className="formGroup">
+                  <label htmlFor="email" className="label">
+                    Email
+                  </label>
+                  <input
+                    id="email"
+                    type="email"
+                    autoComplete="email"
+                    className="input"
+                    placeholder="you@example.com"
+                    value={email}
+                    onChange={(event) => setEmail(event.target.value)}
+                    required
+                  />
                 </div>
 
-                <form onSubmit={handleSubmit} style={{ marginTop: 20 }}>
-                  <div className="formGroup">
-                    <label htmlFor="email" className="label">
-                      Email
-                    </label>
-                    <input
-                      id="email"
-                      type="email"
-                      autoComplete="email"
-                      className="input"
-                      placeholder="you@example.com"
-                      value={email}
-                      onChange={(event) => setEmail(event.target.value)}
-                      required
-                    />
-                  </div>
+                <div className="formGroup">
+                  <label htmlFor="password" className="label">
+                    Password
+                  </label>
+                  <input
+                    id="password"
+                    type="password"
+                    autoComplete={
+                      authMode === "signup" ? "new-password" : "current-password"
+                    }
+                    className="input"
+                    placeholder={
+                      authMode === "signup"
+                        ? "Create a secure password"
+                        : "Enter your password"
+                    }
+                    value={password}
+                    onChange={(event) => setPassword(event.target.value)}
+                    minLength={authMode === "signup" ? 8 : 6}
+                    required
+                  />
+                  {authMode === "signup" ? (
+                    <p className="small" style={{ marginTop: 8 }}>
+                      {signupPasswordHint}
+                    </p>
+                  ) : null}
+                </div>
 
-                  <div className="formGroup">
-                    <label htmlFor="password" className="label">
-                      Password
-                    </label>
-                    <input
-                      id="password"
-                      type="password"
-                      autoComplete={
-                        authMode === "signup" ? "new-password" : "current-password"
-                      }
-                      className="input"
-                      placeholder={
-                        authMode === "signup"
-                          ? "Create a secure password"
-                          : "Enter your password"
-                      }
-                      value={password}
-                      onChange={(event) => setPassword(event.target.value)}
-                      minLength={authMode === "signup" ? 8 : 6}
-                      required
-                    />
-                    {authMode === "signup" ? (
-                      <p className="small" style={{ marginTop: 8 }}>
-                        {signupPasswordHint}
-                      </p>
-                    ) : null}
-                  </div>
+                <div className="accountAuthActions">
+                  <button
+                    className="button buttonPrimary"
+                    disabled={!isConfigured || isLoading || !email.trim() || !password}
+                    type="submit"
+                  >
+                    {authMode === "signup" ? "Create account" : "Log in"}
+                  </button>
 
-                  <div className="accountAuthActions">
+                  {authMode === "login" ? (
                     <button
-                      className="button buttonPrimary"
-                      disabled={!isConfigured || isLoading || !email.trim() || !password}
-                      type="submit"
-                    >
-                      {authMode === "signup" ? "Create account" : "Log in"}
-                    </button>
-
-                    {authMode === "login" ? (
-                      <button
-                        className="button buttonUtility"
-                        type="button"
-                        onClick={() => void handlePasswordResetRequest()}
-                      >
-                        Forgot password?
-                      </button>
-                    ) : null}
-                  </div>
-                </form>
-
-                {showVerification ? (
-                  <form onSubmit={handleVerifySignup} className="verificationBox">
-                    <div className="formGroup">
-                      <label htmlFor="signup-code" className="label">
-                        Email verification code
-                      </label>
-                      <input
-                        id="signup-code"
-                        type="text"
-                        inputMode="numeric"
-                        autoComplete="one-time-code"
-                        className="input"
-                        placeholder="Enter the code from your email"
-                        value={code}
-                        onChange={(event) => setCode(event.target.value)}
-                        required
-                      />
-                    </div>
-
-                    <button
-                      className="button buttonPrimary"
-                      disabled={!isConfigured || isLoading || !email.trim() || !code.trim()}
-                      type="submit"
-                    >
-                      Verify email
-                    </button>
-
-                    <button
-                      className="button buttonSecondary"
-                      disabled={!isConfigured || isLoading || !email.trim()}
+                      className="button buttonUtility"
                       type="button"
-                      onClick={() => void handleResendVerification()}
-                      style={{ marginLeft: 10 }}
+                      onClick={() => void handlePasswordResetRequest()}
                     >
-                      Resend email
+                      Forgot password?
                     </button>
-                  </form>
-                ) : null}
+                  ) : null}
+                </div>
+              </form>
 
-                {showVerification ? (
-                  <p className="small" style={{ marginTop: 12 }}>
-                    If the verification email does not arrive, check spam and
-                    your Supabase email provider settings.
-                  </p>
-                ) : null}
+              {showVerification ? (
+                <form onSubmit={handleVerifySignup} className="verificationBox">
+                  <div className="formGroup">
+                    <label htmlFor="signup-code" className="label">
+                      Email verification code
+                    </label>
+                    <input
+                      id="signup-code"
+                      type="text"
+                      inputMode="numeric"
+                      autoComplete="one-time-code"
+                      className="input"
+                      placeholder="Enter the code from your email"
+                      value={code}
+                      onChange={(event) => setCode(event.target.value)}
+                      required
+                    />
+                  </div>
 
-                {!isConfigured ? (
-                  <p className="notice">
-                    Sign-in is temporarily unavailable. You can still browse the
-                    free library.
-                  </p>
-                ) : null}
+                  <button
+                    className="button buttonPrimary"
+                    disabled={!isConfigured || isLoading || !email.trim() || !code.trim()}
+                    type="submit"
+                  >
+                    Verify email
+                  </button>
+
+                  <button
+                    className="button buttonSecondary"
+                    disabled={!isConfigured || isLoading || !email.trim()}
+                    type="button"
+                    onClick={() => void handleResendVerification()}
+                    style={{ marginLeft: 10 }}
+                  >
+                    Resend email
+                  </button>
+                </form>
+              ) : null}
+
+              {showVerification ? (
+                <p className="small" style={{ marginTop: 12 }}>
+                  If the verification email does not arrive, check spam and
+                  your Supabase email provider settings.
+                </p>
+              ) : null}
+
+              {!isConfigured ? (
+                <p className="notice">
+                  Sign-in is temporarily unavailable. You can still browse the
+                  free library.
+                </p>
+              ) : null}
             </section>
-          </div>
+          </section>
         )}
       </section>
     </main>
