@@ -127,37 +127,16 @@ export default function FounderPage() {
           ))}
         </section>
 
-        <section className="founderDecisionWrap" id="founder-request">
-          <div className="founderIncludedPanel">
-            <h2>What Founder Pro includes</h2>
-            <div className="founderIncludedList">
-              <span>Outreach, follow-up, proposal, and win-back templates</span>
-              <span>Agency pipeline for prospects, calls, proposals, and won work</span>
-              <span>Saved client work, folders, and follow-up plans</span>
-              <span>Simple reporting for replies, booked calls, and closed deals</span>
-            </div>
-          </div>
-
-          <div className="founderSignupPanel">
-            <span
-              className={
-                founderEligible
-                  ? "statusPill statusPillSuccess"
-                  : "statusPill statusPillWarning"
-              }
-            >
-              {founderEligible ? "Unlocked on this account" : "Approval required"}
-            </span>
-            <h2>{founderEligible ? "Start your Founder plan" : "Request Founder access"}</h2>
+        {!founderEligible ? (
+          <section className="founderRequestPanel" id="founder-request">
+            <h2>Request Founder access</h2>
             <p>
-              {founderEligible
-                ? "Your account is approved. Complete checkout to activate the locked Founder Pro price."
-                : user
-                  ? "Send your request from this signed-in account. If approved, Founder Pro unlocks on pricing and this page."
-                  : "Create or sign into your account first so your Founder request can be linked to the right email."}
+              {user
+                ? "Send the request from your signed-in account. If approved, the Founder checkout unlocks for this email."
+                : "Create or sign into your account first so the request is linked to the right email."}
             </p>
 
-            {!founderEligible && !user ? (
+            {!user ? (
               <div className="founderSignupActions">
                 <Link href="/account" className="button buttonPrimary">
                   Sign in first
@@ -166,7 +145,7 @@ export default function FounderPage() {
                   Back to pricing
                 </Link>
               </div>
-            ) : !founderEligible ? (
+            ) : (
               <form onSubmit={handleSubmit} className="founderRequestForm">
                 <label className="label" htmlFor="founder-email">
                   Signed-in email
@@ -195,17 +174,11 @@ export default function FounderPage() {
                   </Link>
                 </div>
               </form>
-            ) : (
-              <div className="founderSignupActions">
-                <Link href="/workspace" className="button buttonSecondary">
-                  Open saved work
-                </Link>
-              </div>
             )}
 
             {notice ? <p className="notice">{notice}</p> : null}
-          </div>
-        </section>
+          </section>
+        ) : null}
       </section>
     </main>
   );

@@ -6092,6 +6092,35 @@ details[open] > summary::after {
   display: contents;
 }
 
+.founderRequestPanel {
+  max-width: 640px;
+  margin: 22px auto 0;
+  padding: 28px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.012)),
+    var(--panel);
+  box-shadow: var(--shadow-lg);
+}
+
+.founderRequestPanel h2 {
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.1;
+  letter-spacing: 0;
+}
+
+.founderRequestPanel > p {
+  margin: 12px 0 0;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.founderRequestPanel .founderRequestForm {
+  margin-top: 18px;
+}
+
 .proSignupHero {
   min-height: 500px;
   display: grid;
