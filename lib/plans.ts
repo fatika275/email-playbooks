@@ -26,5 +26,5 @@ export function getStripePriceIdForPlan(plan: Exclude<PlanId, "free">) {
     business: process.env.STRIPE_BUSINESS_PRICE_ID,
   };
 
-  return prices[plan] || "";
+  return prices[plan]?.trim() || "";
 }
