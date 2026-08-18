@@ -6854,43 +6854,44 @@ details[open] > summary::after {
 }
 
 .footerInner {
-  padding: 26px 0 30px;
+  padding: 18px 0 20px;
   display: flex;
   justify-content: space-between;
-  gap: 24px;
+  gap: 20px;
   align-items: flex-start;
 }
 
 .footerBrandBlock {
-  max-width: 520px;
+  max-width: 440px;
 }
 
 .footerCopy {
-  margin: 12px 0 0;
-  line-height: 1.75;
+  margin: 8px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
 }
 
 .footerMeta {
-  margin-top: 12px;
+  margin-top: 8px;
   color: var(--muted-soft);
 }
 
 .footerLinks {
   display: flex;
-  gap: 30px;
+  gap: 24px;
   flex-wrap: wrap;
 }
 
 .footerColumn {
   display: grid;
-  gap: 8px;
-  min-width: 120px;
+  gap: 6px;
+  min-width: 104px;
 }
 
 .footerHeading {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #e4e4e7;
 }
@@ -6898,6 +6899,8 @@ details[open] > summary::after {
 .footerLink {
   text-decoration: none;
   color: var(--muted);
+  font-size: 13px;
+  line-height: 1.35;
   transition: color 0.16s ease;
 }
 
@@ -7659,11 +7662,12 @@ details[open] > summary::after {
   }
 
   .footerInner {
-    padding: 24px 0 28px;
+    padding: 18px 0 20px;
     flex-direction: column;
+    gap: 16px;
   }
 
   .footerLinks {
-    gap: 20px;
+    gap: 18px;
   }
 }
