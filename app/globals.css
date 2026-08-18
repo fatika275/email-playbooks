@@ -6884,14 +6884,23 @@ details[open] > summary::after {
 
 .footerColumn {
   display: grid;
-  gap: 6px;
+  gap: 8px;
   min-width: 104px;
 }
 
+.footerColumnProduct {
+  grid-template-columns: repeat(2, max-content);
+  column-gap: 22px;
+}
+
+.footerColumnProduct .footerHeading {
+  grid-column: 1 / -1;
+}
+
 .footerHeading {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: #e4e4e7;
 }
@@ -6899,8 +6908,6 @@ details[open] > summary::after {
 .footerLink {
   text-decoration: none;
   color: var(--muted);
-  font-size: 13px;
-  line-height: 1.35;
   transition: color 0.16s ease;
 }
 
@@ -7669,5 +7676,9 @@ details[open] > summary::after {
 
   .footerLinks {
     gap: 18px;
+  }
+
+  .footerColumnProduct {
+    grid-template-columns: repeat(2, minmax(96px, max-content));
   }
 }

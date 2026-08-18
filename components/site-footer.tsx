@@ -14,7 +14,7 @@ export default function SiteFooter() {
         </div>
 
         <div className="footerLinks">
-          <div className="footerColumn">
+          <div className="footerColumn footerColumnProduct">
             <div className="footerHeading">Product</div>
             <Link href="/prospects" className="footerLink">
               Pipeline
