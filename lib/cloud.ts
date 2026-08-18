@@ -547,12 +547,15 @@ export async function sendFounderApprovedEmailForAdmin(
     }),
   });
   const payload = (await response.json().catch(() => ({}))) as {
+    id?: string | null;
     error?: string;
   };
 
   if (!response.ok) {
     throw new Error(payload.error || "Founder approval email could not be sent.");
   }
+
+  return payload.id ?? null;
 }
 
 async function fetchCloudEmails(userId: string) {

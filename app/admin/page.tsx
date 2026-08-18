@@ -20,6 +20,7 @@ export default function AdminPage() {
   const [isLoadingProfiles, setIsLoadingProfiles] = useState(false);
   const [notice, setNotice] = useState("");
   const [isGrantingBusiness, setIsGrantingBusiness] = useState(false);
+  const [sendingFounderEmailTo, setSendingFounderEmailTo] = useState("");
   const pendingFounderRequests = waitlist.filter(
     (entry) => entry.status !== "approved" && entry.status !== "declined"
   );
@@ -82,8 +83,15 @@ export default function AdminPage() {
       );
       if (nextEligible && profile.email) {
         try {
-          await sendFounderApprovedEmailForAdmin(profile.email, nextPrice);
-          setNotice("Founder access enabled and the approval email was sent.");
+          const emailId = await sendFounderApprovedEmailForAdmin(
+            profile.email,
+            nextPrice
+          );
+          setNotice(
+            emailId
+              ? `Founder access enabled and the approval email was sent. Resend ID: ${emailId}`
+              : "Founder access enabled and the approval email was sent."
+          );
         } catch (emailError) {
           setNotice(
             emailError instanceof Error
@@ -144,8 +152,15 @@ export default function AdminPage() {
       );
       await updateFounderWaitlistStatusForAdmin(entry.id, "approved");
       try {
-        await sendFounderApprovedEmailForAdmin(entry.email, founderPriceGbp);
-        setNotice("Founder access approved and the approval email was sent.");
+        const emailId = await sendFounderApprovedEmailForAdmin(
+          entry.email,
+          founderPriceGbp
+        );
+        setNotice(
+          emailId
+            ? `Founder access approved and the approval email was sent. Resend ID: ${emailId}`
+            : "Founder access approved and the approval email was sent."
+        );
       } catch (emailError) {
         setNotice(
           emailError instanceof Error
@@ -161,6 +176,34 @@ export default function AdminPage() {
     }
   }
 
+  async function handleSendFounderApprovalEmail(profile: CloudAdminProfile) {
+    if (!profile.email) {
+      setNotice("This approved account does not have an email address.");
+      return;
+    }
+
+    setSendingFounderEmailTo(profile.user_id);
+    try {
+      const emailId = await sendFounderApprovedEmailForAdmin(
+        profile.email,
+        profile.founder_price_gbp ?? 12
+      );
+      setNotice(
+        emailId
+          ? `Approval email sent to ${profile.email}. Resend ID: ${emailId}`
+          : `Approval email sent to ${profile.email}.`
+      );
+    } catch (error) {
+      setNotice(
+        error instanceof Error
+          ? `Approval email was not sent: ${error.message}`
+          : "Approval email was not sent."
+      );
+    } finally {
+      setSendingFounderEmailTo("");
+    }
+  }
+
   async function handleDeclineWaitlistEntry(entry: FounderWaitlistEntry) {
     try {
       await updateFounderWaitlistStatusForAdmin(entry.id, "declined");
@@ -171,24 +214,6 @@ export default function AdminPage() {
         error instanceof Error ? error.message : "Could not decline waitlist entry."
       );
     }
-  }
-
-  function getFounderApprovalEmailHref(email: string) {
-    const subject = "Your Thalovo Founder access is approved";
-    const body = [
-      "Hi,",
-      "",
-      "Your Thalovo Founder access has been approved.",
-      "",
-      "Sign in with this email address and open the pricing page to complete Founder checkout:",
-      `${window.location.origin}/pricing`,
-      "",
-      "Your Founder price will stay locked while your subscription remains active.",
-      "",
-      "Thalovo",
-    ].join("\n");
-
-    return `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   }
 
   if (!isConfigured) {
@@ -354,12 +379,15 @@ export default function AdminPage() {
 
                   {profile.email ? (
                     <div className="toolbar" style={{ marginTop: 14 }}>
-                      <a
+                      <button
                         className="button buttonUtility"
-                        href={getFounderApprovalEmailHref(profile.email)}
+                        disabled={sendingFounderEmailTo === profile.user_id}
+                        onClick={() => void handleSendFounderApprovalEmail(profile)}
                       >
-                        Email approval
-                      </a>
+                        {sendingFounderEmailTo === profile.user_id
+                          ? "Sending email..."
+                          : "Send approval email"}
+                      </button>
                     </div>
                   ) : null}
                 </div>
