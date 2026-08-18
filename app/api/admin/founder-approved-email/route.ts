@@ -68,7 +68,7 @@ function getFounderApprovedHtml(options: {
       <tr>
         <td style="padding:18px 24px 42px;">
           <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:680px;margin:0 auto;">
-            <tr><td style="color:#71717a;font-size:12px;line-height:1.7;">Sent by Thalovo. If you were not expecting this, you can ignore it.</td></tr>
+            <tr><td style="color:#71717a;font-size:12px;line-height:1.7;">You are receiving this because you requested Founder access for Thalovo. Sent by Thalovo.</td></tr>
           </table>
         </td>
       </tr>

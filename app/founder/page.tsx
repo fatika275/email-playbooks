@@ -58,7 +58,7 @@ export default function FounderPage() {
 
     trackEvent("founder_interest_registered");
     setNotice(
-      "Founder interest registered. If your account is selected, Founder Pro will unlock on pricing."
+      "Founder interest registered. If approved, you will get an email from Thalovo; check spam or promotions if it does not show up."
     );
   }
 
