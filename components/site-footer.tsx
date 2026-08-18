@@ -14,22 +14,26 @@ export default function SiteFooter() {
         </div>
 
         <div className="footerLinks">
-          <div className="footerColumn footerColumnProduct">
+          <div className="footerColumn">
             <div className="footerHeading">Product</div>
             <Link href="/prospects" className="footerLink">
               Pipeline
             </Link>
-            <Link href="/library" className="footerLink">
-              Templates
-            </Link>
             <Link href="/sequence-builder" className="footerLink">
               Follow-ups
             </Link>
-            <Link href="/workspace" className="footerLink">
-              Saved
-            </Link>
             <Link href="/pricing" className="footerLink">
               Pricing
+            </Link>
+          </div>
+
+          <div className="footerColumn">
+            <div className="footerHeading">Workspace</div>
+            <Link href="/library" className="footerLink">
+              Templates
+            </Link>
+            <Link href="/workspace" className="footerLink">
+              Saved
             </Link>
           </div>
 

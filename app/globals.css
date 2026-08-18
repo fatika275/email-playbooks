@@ -6888,15 +6888,6 @@ details[open] > summary::after {
   min-width: 104px;
 }
 
-.footerColumnProduct {
-  grid-template-columns: repeat(2, max-content);
-  column-gap: 22px;
-}
-
-.footerColumnProduct .footerHeading {
-  grid-column: 1 / -1;
-}
-
 .footerHeading {
   font-size: 12px;
   font-weight: 700;
@@ -7678,7 +7669,4 @@ details[open] > summary::after {
     gap: 18px;
   }
 
-  .footerColumnProduct {
-    grid-template-columns: repeat(2, minmax(96px, max-content));
-  }
 }
