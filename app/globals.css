@@ -6878,24 +6878,22 @@ details[open] > summary::after {
 
 .footerLinks {
   display: flex;
-  gap: 12px;
+  gap: 24px;
   flex-wrap: wrap;
 }
 
 .footerColumn {
   display: grid;
-  gap: 7px;
-  min-width: 128px;
-  padding: 12px 14px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.018)),
-    #070707;
+  gap: 8px;
+  min-width: 104px;
 }
 
 .footerColumnTight {
-  min-width: 126px;
+  gap: 5px;
+}
+
+.footerColumnTight .footerHeading {
+  margin-bottom: 1px;
 }
 
 .footerHeading {
@@ -7676,12 +7674,7 @@ details[open] > summary::after {
   }
 
   .footerLinks {
-    gap: 10px;
-    width: 100%;
-  }
-
-  .footerColumn {
-    flex: 1 1 132px;
+    gap: 18px;
   }
 
 }
