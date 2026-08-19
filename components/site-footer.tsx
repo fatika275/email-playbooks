@@ -27,7 +27,7 @@ export default function SiteFooter() {
             </Link>
           </div>
 
-          <div className="footerColumn">
+          <div className="footerColumn footerColumnTight">
             <div className="footerHeading">Workspace</div>
             <Link href="/library" className="footerLink">
               Templates

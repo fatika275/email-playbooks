@@ -6888,6 +6888,14 @@ details[open] > summary::after {
   min-width: 104px;
 }
 
+.footerColumnTight {
+  gap: 5px;
+}
+
+.footerColumnTight .footerHeading {
+  margin-bottom: 1px;
+}
+
 .footerHeading {
   font-size: 12px;
   font-weight: 700;
