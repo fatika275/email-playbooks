@@ -143,10 +143,10 @@ export default function AccountSettingsPage() {
 
               <div className="accountSettingsItem accountSettingsItemImportant">
                 <div>
-                  <strong>Cancel subscription</strong>
+                  <strong>Manage subscription</strong>
                   <span>
-                    Open Stripe billing to cancel future renewals or manage your
-                    payment method.
+                    Open Stripe billing to manage your payment method, invoices,
+                    or future renewals.
                   </span>
                   {billingMessage ? (
                     <p className="accountSettingsInlineNotice">{billingMessage}</p>
@@ -158,7 +158,7 @@ export default function AccountSettingsPage() {
                   disabled={isOpeningBilling}
                   onClick={() => void handleOpenBillingPortal()}
                 >
-                  {isOpeningBilling ? "Opening..." : "Cancel"}
+                  {isOpeningBilling ? "Opening..." : "Manage"}
                 </button>
               </div>
 
