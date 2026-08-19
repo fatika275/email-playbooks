@@ -86,6 +86,7 @@ export function AccountProvider({ children }: { children: ReactNode }) {
     }
 
     let isMounted = true;
+    let lastAccountRefreshAt = 0;
 
     async function refreshAccountState(currentUser: User) {
       await hydrateLocalDataFromCloud(currentUser);
@@ -134,7 +135,41 @@ export function AccountProvider({ children }: { children: ReactNode }) {
       }
     }
 
+    async function refreshSignedInAccountState() {
+      const now = Date.now();
+      if (now - lastAccountRefreshAt < 10000) return;
+      lastAccountRefreshAt = now;
+
+      const currentUser = await getSignedInUser();
+      if (!isMounted || !currentUser) return;
+
+      setUser(currentUser);
+      setIsSyncing(true);
+      try {
+        await refreshAccountState(currentUser);
+      } catch {
+        if (!isMounted) return;
+        setSyncErrorMessage("We could not finish syncing this account yet.");
+        setStatusMessage("You are signed in, but syncing needs attention.");
+      } finally {
+        if (isMounted) setIsSyncing(false);
+      }
+    }
+
     void boot();
+
+    function handleWindowFocus() {
+      void refreshSignedInAccountState();
+    }
+
+    function handleVisibilityChange() {
+      if (document.visibilityState === "visible") {
+        void refreshSignedInAccountState();
+      }
+    }
+
+    window.addEventListener("focus", handleWindowFocus);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     const {
       data: { subscription },
@@ -175,6 +210,8 @@ export function AccountProvider({ children }: { children: ReactNode }) {
 
     return () => {
       isMounted = false;
+      window.removeEventListener("focus", handleWindowFocus);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
       subscription.unsubscribe();
     };
   }, []);
