@@ -6883,8 +6883,10 @@ details[open] > summary::after {
 }
 
 .footerColumn {
+  align-content: start;
   display: grid;
   gap: 8px;
+  grid-auto-rows: max-content;
   min-width: 104px;
 }
 
