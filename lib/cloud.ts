@@ -558,6 +558,39 @@ export async function sendFounderApprovedEmailForAdmin(
   return payload.id ?? null;
 }
 
+export async function sendBusinessInviteEmail(options: {
+  workspaceId: string;
+  recipientEmail: string;
+  role: "admin" | "member";
+}) {
+  const client = getSupabaseBrowserClient();
+  const session = await client?.auth.getSession();
+  const accessToken = session?.data.session?.access_token;
+
+  if (!accessToken) {
+    throw new Error("Sign in again before sending teammate invites.");
+  }
+
+  const response = await fetch("/api/business/invite-email", {
+    method: "POST",
+    headers: {
+      authorization: `Bearer ${accessToken}`,
+      "content-type": "application/json",
+    },
+    body: JSON.stringify(options),
+  });
+  const payload = (await response.json().catch(() => ({}))) as {
+    id?: string | null;
+    error?: string;
+  };
+
+  if (!response.ok) {
+    throw new Error(payload.error || "Team invite email could not be sent.");
+  }
+
+  return payload.id ?? null;
+}
+
 async function fetchCloudEmails(userId: string) {
   const client = getSupabaseBrowserClient();
   if (!client) return [];

@@ -16,6 +16,7 @@ import {
   removeTeamShare,
   saveCustomTemplateRecord,
   saveEmailRecord,
+  sendBusinessInviteEmail,
   updateBusinessMember,
   transferBusinessWorkspace,
   type BusinessMember,
@@ -248,18 +249,25 @@ export default function TeamLibraryPage() {
       return;
     }
 
+    const email = inviteEmail.trim().toLowerCase();
+
     try {
-      await inviteBusinessMember(workspace.id, inviteEmail);
+      await inviteBusinessMember(workspace.id, email);
       const refreshed = await listBusinessMembers(workspace.id);
       const invited = refreshed.find(
-        (member) => member.email === inviteEmail.trim().toLowerCase()
+        (member) => member.email === email
       );
       if (invited && inviteRole !== "member") {
         await updateBusinessMember(invited.id, { role: inviteRole });
       }
+      await sendBusinessInviteEmail({
+        workspaceId: workspace.id,
+        recipientEmail: email,
+        role: inviteRole,
+      });
       await refreshBusinessTeam();
       setNotice(
-        `Invitation created for ${inviteEmail.trim().toLowerCase()}. Send them the sign-in instructions.`
+        `Invite email sent to ${email}. They should sign up or sign in with that email.`
       );
       setInviteEmail("");
       setShowInvite(false);
@@ -283,12 +291,19 @@ export default function TeamLibraryPage() {
     }
   }
 
-  function handleResendInvite(member: BusinessMember) {
-    const subject = encodeURIComponent(`You have been invited to ${workspace?.name ?? "Thalovo"}`);
-    const body = encodeURIComponent(
-      `You have been invited to our Thalovo team pipeline. Sign up or sign in using ${member.email}, then open the Team page to access the shared leads.\n\nhttps://thalovo.com/account`
-    );
-    window.location.href = `mailto:${encodeURIComponent(member.email)}?subject=${subject}&body=${body}`;
+  async function handleResendInvite(member: BusinessMember) {
+    if (!workspace) return;
+
+    try {
+      await sendBusinessInviteEmail({
+        workspaceId: workspace.id,
+        recipientEmail: member.email,
+        role: member.role,
+      });
+      setNotice(`Invite email resent to ${member.email}.`);
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Invite email could not be resent.");
+    }
   }
 
   async function handleExportWorkspace() {
@@ -499,7 +514,7 @@ export default function TeamLibraryPage() {
                     <summary>Edit</summary>
                     <div className="teamMemberMenu">
                       <label className="label">Access<select className="input" value={member.role} aria-label={`Access for ${member.email}`} onChange={(event) => void handleMemberUpdate(member, { role: event.target.value as "admin" | "member" })}><option value="member">Teammate</option><option value="admin">Team lead</option></select></label>
-                      <div className="toolbar">{member.status === "invited" ? <button className="button buttonSecondary" onClick={() => handleResendInvite(member)}>Resend invite</button> : null}<button className="button buttonSecondary" onClick={() => void handleMemberUpdate(member, { access_active: !member.access_active })}>{member.access_active ? "Pause access" : "Restore access"}</button><button className="button buttonUtility" onClick={() => void handleRemoveMember(member.id)}>Remove</button></div>
+                      <div className="toolbar">{member.status === "invited" ? <button className="button buttonSecondary" onClick={() => void handleResendInvite(member)}>Resend invite</button> : null}<button className="button buttonSecondary" onClick={() => void handleMemberUpdate(member, { access_active: !member.access_active })}>{member.access_active ? "Pause access" : "Restore access"}</button><button className="button buttonUtility" onClick={() => void handleRemoveMember(member.id)}>Remove</button></div>
                     </div>
                   </details> : null}
                 </div>
