@@ -145,8 +145,8 @@ export default function AccountSettingsPage() {
                 <div>
                   <strong>Manage subscription</strong>
                   <span>
-                    Open Stripe billing to manage your payment method, invoices,
-                    or future renewals.
+                    Open Stripe billing to update payment details, view invoices,
+                    or cancel future renewals.
                   </span>
                   {billingMessage ? (
                     <p className="accountSettingsInlineNotice">{billingMessage}</p>
