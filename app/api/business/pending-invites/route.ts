@@ -5,6 +5,7 @@ type BusinessMemberRow = {
   id: string;
   workspace_id: string;
   email: string;
+  user_id: string | null;
   role: "admin" | "member";
   status: "invited" | "active";
   access_active: boolean;
@@ -54,7 +55,7 @@ export async function GET(request: NextRequest) {
     };
 
     const memberResponse = await fetch(
-      `${url}/rest/v1/business_members?select=id,workspace_id,email,role,status,access_active,created_at&email=ilike.${encodeURIComponent(email)}&status=eq.invited&access_active=eq.true&order=created_at.desc`,
+      `${url}/rest/v1/business_members?select=id,workspace_id,email,user_id,role,status,access_active,created_at&email=ilike.${encodeURIComponent(email)}&access_active=eq.true&order=created_at.desc`,
       { headers, cache: "no-store" }
     );
 
@@ -62,7 +63,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Pending team invites could not be checked." }, { status: 500 });
     }
 
-    const invites = (await memberResponse.json()) as BusinessMemberRow[];
+    const invites = ((await memberResponse.json()) as BusinessMemberRow[]).filter(
+      (invite) =>
+        invite.status === "invited" ||
+        (invite.status === "active" && invite.user_id !== user.id)
+    );
     const workspaceIds = Array.from(new Set(invites.map((invite) => invite.workspace_id)));
     let workspaces: BusinessWorkspaceRow[] = [];
 

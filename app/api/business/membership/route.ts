@@ -42,13 +42,15 @@ export async function GET(request: NextRequest) {
     }
 
     const user = await getUserFromAccessToken(accessToken);
+    const email = user.email?.trim().toLowerCase();
     const { url, serviceRoleKey } = getSupabaseServerConfig();
     const headers = {
       apikey: serviceRoleKey,
       authorization: `Bearer ${serviceRoleKey}`,
+      "content-type": "application/json",
     };
 
-    const memberResponse = await fetch(
+    let memberResponse = await fetch(
       `${url}/rest/v1/business_members?select=id,workspace_id,email,user_id,role,custom_role_id,status,access_active,created_at&user_id=eq.${encodeURIComponent(user.id)}&status=eq.active&access_active=eq.true`,
       { headers, cache: "no-store" }
     );
@@ -57,7 +59,44 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Workspace membership could not be checked." }, { status: 500 });
     }
 
-    const members = (await memberResponse.json()) as BusinessMemberRow[];
+    let members = (await memberResponse.json()) as BusinessMemberRow[];
+
+    if (!members.length && email) {
+      memberResponse = await fetch(
+        `${url}/rest/v1/business_members?select=id,workspace_id,email,user_id,role,custom_role_id,status,access_active,created_at&email=ilike.${encodeURIComponent(email)}&status=eq.active&access_active=eq.true`,
+        { headers, cache: "no-store" }
+      );
+
+      if (!memberResponse.ok) {
+        return NextResponse.json({ error: "Workspace membership could not be checked." }, { status: 500 });
+      }
+
+      const emailMatches = (await memberResponse.json()) as BusinessMemberRow[];
+      const matchingMember = emailMatches[0];
+
+      if (matchingMember) {
+        const updateResponse = await fetch(
+          `${url}/rest/v1/business_members?id=eq.${encodeURIComponent(matchingMember.id)}`,
+          {
+            method: "PATCH",
+            headers: {
+              ...headers,
+              prefer: "return=representation",
+            },
+            body: JSON.stringify({
+              user_id: user.id,
+              updated_at: new Date().toISOString(),
+            }),
+          }
+        );
+
+        if (!updateResponse.ok) {
+          return NextResponse.json({ error: "Workspace membership could not be linked." }, { status: 500 });
+        }
+
+        members = (await updateResponse.json()) as BusinessMemberRow[];
+      }
+    }
 
     for (const member of members) {
       const workspaceResponse = await fetch(
