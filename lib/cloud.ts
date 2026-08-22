@@ -1041,35 +1041,26 @@ export async function listAccessibleBusinessWorkspaces() {
   const user = await getSignedInUser();
   if (!client || !user) return [];
 
-  const [{ data: workspaces, error: workspaceError }, { data: memberships, error: memberError }] =
-    await Promise.all([
-      client
-        .from("business_workspaces")
-        .select("id, owner_id, name, status, seat_limit, created_at")
-        .eq("status", "active")
-        .order("created_at", { ascending: true }),
-      client
-        .from("business_members")
-        .select("workspace_id, role")
-        .eq("user_id", user.id)
-        .eq("status", "active")
-        .eq("access_active", true),
-    ]);
+  const session = await client.auth.getSession();
+  const accessToken = session.data.session?.access_token;
+  if (!accessToken) return [];
 
-  if (isMissingBusinessSchema(workspaceError) || isMissingBusinessSchema(memberError)) return [];
-  if (workspaceError) throw normalizeCloudError(workspaceError);
-  if (memberError) throw normalizeCloudError(memberError);
+  const response = await fetch("/api/business/workspaces", {
+    headers: {
+      authorization: `Bearer ${accessToken}`,
+    },
+    cache: "no-store",
+  });
+  const payload = (await response.json().catch(() => ({}))) as {
+    workspaces?: BusinessWorkspaceAccess[];
+    error?: string;
+  };
 
-  const roleByWorkspace = new Map(
-    (memberships ?? []).map((membership) => [membership.workspace_id, membership.role])
-  );
-  return (workspaces ?? []).map((workspace) => ({
-    ...(workspace as BusinessWorkspace),
-    access_role:
-      workspace.owner_id === user.id
-        ? "owner"
-        : (roleByWorkspace.get(workspace.id) as "admin" | "member") ?? "member",
-  })) as BusinessWorkspaceAccess[];
+  if (!response.ok) {
+    throw new Error(payload.error || "Team workspaces could not be loaded.");
+  }
+
+  return payload.workspaces ?? [];
 }
 
 export async function listBusinessMembers(workspaceId: string) {
