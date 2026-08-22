@@ -89,7 +89,17 @@ export function AccountProvider({ children }: { children: ReactNode }) {
     let lastAccountRefreshAt = 0;
 
     async function refreshAccountState(currentUser: User) {
-      await hydrateLocalDataFromCloud(currentUser);
+      let syncWarning = "";
+
+      try {
+        await hydrateLocalDataFromCloud(currentUser);
+      } catch (error) {
+        syncWarning =
+          error instanceof Error
+            ? error.message
+            : "We could not finish syncing saved work yet.";
+      }
+
       const [currentProfile, adminStatus, currentBusinessMembership] = await Promise.all([
         getCloudProfile(currentUser.id),
         getIsCurrentUserAdmin(),
@@ -101,8 +111,12 @@ export function AccountProvider({ children }: { children: ReactNode }) {
       setIsAdmin(adminStatus);
       setBusinessMembership(currentBusinessMembership);
       setSyncVersion((value) => value + 1);
-      setSyncErrorMessage("");
-      setStatusMessage("You are signed in and cloud sync is active.");
+      setSyncErrorMessage(syncWarning);
+      setStatusMessage(
+        syncWarning
+          ? "You are signed in, but saved work sync needs attention."
+          : "You are signed in and cloud sync is active."
+      );
     }
 
     async function boot() {

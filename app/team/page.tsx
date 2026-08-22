@@ -277,7 +277,7 @@ export default function TeamLibraryPage() {
 
     try {
       await acceptBusinessInvite(inviteId);
-      await syncNow();
+      await syncNow().catch(() => undefined);
       setPendingInvites((current) => current.filter((invite) => invite.id !== inviteId));
       await refreshPendingInvites();
       await refreshShares();
