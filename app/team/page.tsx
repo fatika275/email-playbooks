@@ -71,6 +71,8 @@ export default function TeamLibraryPage() {
   const [sharePage, setSharePage] = useState(1);
   const [isLoadingShares, setIsLoadingShares] = useState(false);
   const [pendingInvites, setPendingInvites] = useState<PendingBusinessInvite[]>([]);
+  const [hasCheckedPendingInvites, setHasCheckedPendingInvites] = useState(false);
+  const [isCheckingPendingInvites, setIsCheckingPendingInvites] = useState(false);
   const [isAcceptingInvite, setIsAcceptingInvite] = useState(false);
   const [notice, setNotice] = useState("");
 
@@ -112,12 +114,28 @@ export default function TeamLibraryPage() {
     setOverdueTasks(nextOverdueTasks);
   }, [user]);
 
+  const refreshPendingInvites = useCallback(async () => {
+    if (!user) return;
+    setIsCheckingPendingInvites(true);
+    try {
+      const invites = await listPendingBusinessInvites();
+      setPendingInvites(invites);
+    } catch (error) {
+      setPendingInvites([]);
+      setNotice(
+        error instanceof Error
+          ? error.message
+          : "Pending team invites could not be checked."
+      );
+    } finally {
+      setHasCheckedPendingInvites(true);
+      setIsCheckingPendingInvites(false);
+    }
+  }, [user]);
+
   useEffect(() => {
     if (!user) return;
-    void listPendingBusinessInvites()
-      .then((invites) => setPendingInvites(invites))
-      .catch(() => setPendingInvites([]));
-
+    void refreshPendingInvites();
     if (!hasProAccess) return;
     void refreshShares();
     void refreshBusinessTeam().catch((error) => {
@@ -125,7 +143,7 @@ export default function TeamLibraryPage() {
         error instanceof Error ? error.message : "Business team could not load."
       );
     });
-  }, [hasProAccess, refreshBusinessTeam, user]);
+  }, [hasProAccess, refreshBusinessTeam, refreshPendingInvites, user]);
 
   const incoming = useMemo(
     () => shares.filter((share) => share.owner_id !== user?.id),
@@ -261,6 +279,7 @@ export default function TeamLibraryPage() {
       await acceptBusinessInvite(inviteId);
       await syncNow();
       setPendingInvites((current) => current.filter((invite) => invite.id !== inviteId));
+      await refreshPendingInvites();
       await refreshShares();
       await refreshBusinessTeam();
       setNotice("Team invite accepted. Your Business Pro workspace is ready.");
@@ -440,14 +459,30 @@ export default function TeamLibraryPage() {
       <main className="main">
         <section className="container">
           <div className="glassCard emptyState">
-            <h1 className="pageTitle">Team sharing is a Pro feature</h1>
+            <h1 className="pageTitle">
+              {isCheckingPendingInvites || !hasCheckedPendingInvites
+                ? "Checking team invites"
+                : "Team sharing is a Pro feature"}
+            </h1>
             <p className="muted">
-              Upgrade when more than one person needs a shared pipeline, shared
-              notes, and simple ownership for lead follow-up.
+              {isCheckingPendingInvites || !hasCheckedPendingInvites
+                ? `Checking whether ${user.email ?? "this account"} has a Business Pro invite.`
+                : `No pending Business Pro invite was found for ${user.email ?? "this account"}. If someone invited you, ask them to check the exact email address or resend the invite.`}
             </p>
-            <Link href="/pricing" className="button buttonPrimary">
-              View Pro
-            </Link>
+            {notice ? <p className="notice">{notice}</p> : null}
+            <div className="toolbar" style={{ justifyContent: "center" }}>
+              <button
+                className="button buttonSecondary"
+                type="button"
+                disabled={isCheckingPendingInvites}
+                onClick={() => void refreshPendingInvites()}
+              >
+                {isCheckingPendingInvites ? "Checking..." : "Check invites again"}
+              </button>
+              <Link href="/pricing" className="button buttonPrimary">
+                View Pro
+              </Link>
+            </div>
           </div>
         </section>
       </main>
