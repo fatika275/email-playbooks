@@ -981,20 +981,26 @@ export async function getBusinessMembership() {
   const user = await getSignedInUser();
   if (!client || !user?.email) return null;
 
-  const { data, error } = await client
-    .from("business_members")
-    .select(
-      "id, workspace_id, email, user_id, role, custom_role_id, status, access_active, created_at"
-    )
-    .eq("user_id", user.id)
-    .eq("status", "active")
-    .eq("access_active", true)
-    .limit(1);
+  const session = await client.auth.getSession();
+  const accessToken = session.data.session?.access_token;
+  if (!accessToken) return null;
 
-  if (isMissingBusinessSchema(error)) return null;
-  if (error) throw normalizeCloudError(error);
-  const membership = Array.isArray(data) ? data[0] : null;
-  return (membership as BusinessMember | undefined) ?? null;
+  const response = await fetch("/api/business/membership", {
+    headers: {
+      authorization: `Bearer ${accessToken}`,
+    },
+    cache: "no-store",
+  });
+  const payload = (await response.json().catch(() => ({}))) as {
+    membership?: BusinessMember | null;
+    error?: string;
+  };
+
+  if (!response.ok) {
+    throw new Error(payload.error || "Workspace membership could not be checked.");
+  }
+
+  return payload.membership ?? null;
 }
 
 export async function getOwnedBusinessWorkspace() {
