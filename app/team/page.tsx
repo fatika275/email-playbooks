@@ -5,10 +5,12 @@ import Link from "next/link";
 import { useAccount } from "@/components/account-provider";
 import PageLoadingState from "@/components/page-loading-state";
 import {
+  acceptBusinessInvite,
   deleteBusinessWorkspace,
   inviteBusinessMember,
   listAccessibleBusinessWorkspaces,
   listBusinessMembers,
+  listPendingBusinessInvites,
   listWorkspaceNotifications,
   markWorkspaceNotificationRead,
   listTeamShares,
@@ -22,6 +24,7 @@ import {
   type BusinessMember,
   type BusinessWorkspace,
   type BusinessWorkspaceAccess,
+  type PendingBusinessInvite,
   type WorkspaceNotification,
   type TeamShare,
 } from "@/lib/cloud";
@@ -47,7 +50,7 @@ function getActivitySeenKey(workspaceId: string) {
 }
 
 export default function TeamLibraryPage() {
-  const { user, hasProAccess, isLoading, businessMembership } = useAccount();
+  const { user, hasProAccess, isLoading, businessMembership, syncNow } = useAccount();
   const [shares, setShares] = useState<TeamShare[]>([]);
   const [workspace, setWorkspace] = useState<BusinessWorkspace | null>(null);
   const [workspaces, setWorkspaces] = useState<BusinessWorkspaceAccess[]>([]);
@@ -67,6 +70,8 @@ export default function TeamLibraryPage() {
   const [shareType, setShareType] = useState<"all" | "email" | "sequence">("all");
   const [sharePage, setSharePage] = useState(1);
   const [isLoadingShares, setIsLoadingShares] = useState(false);
+  const [pendingInvites, setPendingInvites] = useState<PendingBusinessInvite[]>([]);
+  const [isAcceptingInvite, setIsAcceptingInvite] = useState(false);
   const [notice, setNotice] = useState("");
 
   async function refreshShares() {
@@ -108,7 +113,12 @@ export default function TeamLibraryPage() {
   }, [user]);
 
   useEffect(() => {
-    if (!user || !hasProAccess) return;
+    if (!user) return;
+    void listPendingBusinessInvites()
+      .then((invites) => setPendingInvites(invites))
+      .catch(() => setPendingInvites([]));
+
+    if (!hasProAccess) return;
     void refreshShares();
     void refreshBusinessTeam().catch((error) => {
       setNotice(
@@ -243,6 +253,24 @@ export default function TeamLibraryPage() {
     }
   }
 
+  async function handleAcceptPendingInvite(inviteId: string) {
+    setIsAcceptingInvite(true);
+    setNotice("Accepting team invite...");
+
+    try {
+      await acceptBusinessInvite(inviteId);
+      await syncNow();
+      setPendingInvites((current) => current.filter((invite) => invite.id !== inviteId));
+      await refreshShares();
+      await refreshBusinessTeam();
+      setNotice("Team invite accepted. Your Business Pro workspace is ready.");
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Team invite could not be accepted.");
+    } finally {
+      setIsAcceptingInvite(false);
+    }
+  }
+
   async function handleInviteMember() {
     if (!workspace) {
       setNotice("Your Business Pro agency workspace is not ready yet. Refresh after payment.");
@@ -370,6 +398,37 @@ export default function TeamLibraryPage() {
             <Link href="/account" className="button buttonPrimary">
               Sign in
             </Link>
+          </div>
+        </section>
+      </main>
+    );
+  }
+
+  if (!hasProAccess && pendingInvites.length > 0) {
+    return (
+      <main className="main">
+        <section className="container">
+          <div className="glassCard emptyState">
+            <div className="badge">Team invite</div>
+            <h1 className="pageTitle">Accept your Business Pro workspace invite</h1>
+            <p className="muted">
+              This account has a pending team invite. Accept it here to activate
+              shared pipeline, notes, follow-ups, and saved agency work.
+            </p>
+            {notice ? <p className="notice">{notice}</p> : null}
+            {pendingInvites.map((invite) => (
+              <button
+                key={invite.id}
+                className="button buttonPrimary"
+                type="button"
+                disabled={isAcceptingInvite}
+                onClick={() => void handleAcceptPendingInvite(invite.id)}
+              >
+                {isAcceptingInvite
+                  ? "Accepting..."
+                  : `Accept invite to ${invite.workspace_name}`}
+              </button>
+            ))}
           </div>
         </section>
       </main>

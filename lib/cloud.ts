@@ -113,6 +113,10 @@ export type BusinessMember = {
   created_at: string;
 };
 
+export type PendingBusinessInvite = BusinessMember & {
+  workspace_name: string;
+};
+
 export type WorkspaceRole = {
   id: string;
   workspace_id: string;
@@ -619,6 +623,31 @@ export async function acceptBusinessInvite(inviteId: string) {
   }
 
   return payload.membership ?? null;
+}
+
+export async function listPendingBusinessInvites() {
+  const client = getSupabaseBrowserClient();
+  const session = await client?.auth.getSession();
+  const accessToken = session?.data.session?.access_token;
+
+  if (!accessToken) return [];
+
+  const response = await fetch("/api/business/pending-invites", {
+    headers: {
+      authorization: `Bearer ${accessToken}`,
+    },
+    cache: "no-store",
+  });
+  const payload = (await response.json().catch(() => ({}))) as {
+    invites?: PendingBusinessInvite[];
+    error?: string;
+  };
+
+  if (!response.ok) {
+    throw new Error(payload.error || "Pending team invites could not be checked.");
+  }
+
+  return payload.invites ?? [];
 }
 
 async function fetchCloudEmails(userId: string) {
