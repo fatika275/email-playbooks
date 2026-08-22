@@ -97,16 +97,14 @@ language sql
 security definer
 set search_path = public
 as $$
-  update public.business_members as member
-  set user_id = auth.uid(),
-      status = 'active',
-      updated_at = now()
-  from public.business_workspaces as workspace
-  where member.workspace_id = workspace.id
-    and workspace.status = 'active'
+  select member.*
+  from public.business_members as member
+  join public.business_workspaces as workspace
+    on workspace.id = member.workspace_id
+  where workspace.status = 'active'
     and member.access_active = true
-    and lower(member.email) = lower(coalesce(auth.jwt() ->> 'email', ''))
-  returning member.*;
+    and member.status = 'active'
+    and member.user_id = auth.uid();
 $$;
 
 revoke all on function public.claim_business_membership() from public;

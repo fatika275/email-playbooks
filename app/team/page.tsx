@@ -260,8 +260,12 @@ export default function TeamLibraryPage() {
       if (invited && inviteRole !== "member") {
         await updateBusinessMember(invited.id, { role: inviteRole });
       }
+      if (!invited) {
+        throw new Error("Invite was created, but the invite link could not be prepared.");
+      }
       await sendBusinessInviteEmail({
         workspaceId: workspace.id,
+        inviteId: invited.id,
         recipientEmail: email,
         role: inviteRole,
       });
@@ -297,6 +301,7 @@ export default function TeamLibraryPage() {
     try {
       await sendBusinessInviteEmail({
         workspaceId: workspace.id,
+        inviteId: member.id,
         recipientEmail: member.email,
         role: member.role,
       });

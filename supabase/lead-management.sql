@@ -19,10 +19,8 @@ as $$
           from public.business_members as member
           where member.workspace_id = workspace.id
             and member.access_active = true
-            and (
-              member.user_id = auth.uid()
-              or lower(member.email) = lower(coalesce(auth.jwt() ->> 'email', ''))
-            )
+            and member.status = 'active'
+            and member.user_id = auth.uid()
         )
       )
   );

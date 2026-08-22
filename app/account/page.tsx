@@ -1,9 +1,10 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import { useAccount } from "@/components/account-provider";
 import { trackEvent } from "@/lib/analytics";
+import { acceptBusinessInvite } from "@/lib/cloud";
 
 export default function AccountPage() {
   const {
@@ -26,6 +27,7 @@ export default function AccountPage() {
   const [authMode, setAuthMode] = useState<"login" | "signup">("login");
   const [needsVerification, setNeedsVerification] = useState(false);
   const [notice, setNotice] = useState("");
+  const [acceptedInviteId, setAcceptedInviteId] = useState("");
 
   const showVerification = !user && needsVerification;
   const visibleNotice =
@@ -42,6 +44,42 @@ export default function AccountPage() {
           : !/[0-9]/.test(password)
             ? "Add at least one number to your password."
             : "Password looks good.";
+
+  useEffect(() => {
+    if (!user && typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("teamInvite") && !notice) {
+        setNotice("Log in or sign up with the invited email to accept the team invite.");
+      }
+    }
+  }, [notice, user]);
+
+  useEffect(() => {
+    if (!user || acceptedInviteId || typeof window === "undefined") return;
+
+    const params = new URLSearchParams(window.location.search);
+    const teamInvite = params.get("teamInvite");
+    if (!teamInvite) return;
+
+    setAcceptedInviteId(teamInvite);
+    setNotice("Checking your team invite...");
+
+    void acceptBusinessInvite(teamInvite)
+      .then(async () => {
+        await syncNow();
+        trackEvent("business_invite_accepted");
+        setNotice("Team invite accepted. Your Business Pro workspace is ready.");
+        window.history.replaceState(null, "", "/account");
+      })
+      .catch((error) => {
+        setAcceptedInviteId("");
+        setNotice(
+          error instanceof Error
+            ? error.message
+            : "Team invite could not be accepted."
+        );
+      });
+  }, [acceptedInviteId, syncNow, user]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();

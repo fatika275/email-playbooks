@@ -125,8 +125,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Sign in before sending invites." }, { status: 401 });
     }
 
-    const { workspaceId, recipientEmail, role } = (await request.json()) as {
+    const { workspaceId, inviteId, recipientEmail, role } = (await request.json()) as {
       workspaceId?: string;
+      inviteId?: string;
       recipientEmail?: string;
       role?: "admin" | "member";
     };
@@ -134,6 +135,10 @@ export async function POST(request: NextRequest) {
 
     if (!workspaceId) {
       return NextResponse.json({ error: "Workspace is missing." }, { status: 400 });
+    }
+
+    if (!inviteId) {
+      return NextResponse.json({ error: "Invite is missing." }, { status: 400 });
     }
 
     if (!normalizedEmail || !normalizedEmail.includes("@")) {
@@ -200,7 +205,7 @@ export async function POST(request: NextRequest) {
     }
 
     const siteUrl = getSiteUrl(request);
-    const inviteUrl = `${siteUrl}/account`;
+    const inviteUrl = `${siteUrl}/account?teamInvite=${encodeURIComponent(inviteId)}`;
     const roleLabel =
       role === "admin"
         ? "Team lead - can invite teammates and help manage shared lead access."

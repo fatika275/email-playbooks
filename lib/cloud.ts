@@ -560,6 +560,7 @@ export async function sendFounderApprovedEmailForAdmin(
 
 export async function sendBusinessInviteEmail(options: {
   workspaceId: string;
+  inviteId: string;
   recipientEmail: string;
   role: "admin" | "member";
 }) {
@@ -589,6 +590,35 @@ export async function sendBusinessInviteEmail(options: {
   }
 
   return payload.id ?? null;
+}
+
+export async function acceptBusinessInvite(inviteId: string) {
+  const client = getSupabaseBrowserClient();
+  const session = await client?.auth.getSession();
+  const accessToken = session?.data.session?.access_token;
+
+  if (!accessToken) {
+    throw new Error("Sign in before accepting the team invite.");
+  }
+
+  const response = await fetch("/api/business/accept-invite", {
+    method: "POST",
+    headers: {
+      authorization: `Bearer ${accessToken}`,
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({ inviteId }),
+  });
+  const payload = (await response.json().catch(() => ({}))) as {
+    membership?: BusinessMember | null;
+    error?: string;
+  };
+
+  if (!response.ok) {
+    throw new Error(payload.error || "Team invite could not be accepted.");
+  }
+
+  return payload.membership ?? null;
 }
 
 async function fetchCloudEmails(userId: string) {
@@ -951,11 +981,19 @@ export async function getBusinessMembership() {
   const user = await getSignedInUser();
   if (!client || !user?.email) return null;
 
-  const { data, error } = await client.rpc("claim_business_membership");
+  const { data, error } = await client
+    .from("business_members")
+    .select(
+      "id, workspace_id, email, user_id, role, custom_role_id, status, access_active, created_at"
+    )
+    .eq("user_id", user.id)
+    .eq("status", "active")
+    .eq("access_active", true)
+    .limit(1);
 
   if (isMissingBusinessSchema(error)) return null;
   if (error) throw normalizeCloudError(error);
-  const membership = Array.isArray(data) ? data[0] : data;
+  const membership = Array.isArray(data) ? data[0] : null;
   return (membership as BusinessMember | undefined) ?? null;
 }
 
