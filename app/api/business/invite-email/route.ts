@@ -75,12 +75,12 @@ function getInviteHtml(options: {
               <td style="padding:42px 42px 26px;">
                 <div style="color:#71717a;font-size:12px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;">Business Pro workspace</div>
                 <h1 style="margin:16px 0 0;color:#09090b;font-size:34px;line-height:1.12;font-weight:800;">You have been invited to ${workspaceName}</h1>
-                <p style="margin:18px 0 0;color:#52525b;font-size:16px;line-height:1.75;max-width:560px;">Click the invite link to activate your access, then sign up or sign in with the invited email. Until you accept it, the workspace will stay locked to protect the team's client work.</p>
+                <p style="margin:18px 0 0;color:#52525b;font-size:16px;line-height:1.75;max-width:560px;">You have been invited to join this Business Pro workspace. Sign up or log in with the invited email, then accept the invite on the Team page to activate access.</p>
               </td>
             </tr>
             <tr>
               <td style="padding:0 42px 30px;">
-                <a href="${options.inviteUrl}" style="display:inline-block;background:#050505;color:#ffffff;text-decoration:none;font-weight:700;border-radius:10px;padding:14px 20px;">Join workspace</a>
+                <a href="${options.inviteUrl}" style="display:inline-block;background:#050505;color:#ffffff;text-decoration:none;font-weight:700;border-radius:10px;padding:14px 20px;">Open Team page</a>
               </td>
             </tr>
             <tr>
@@ -95,7 +95,7 @@ function getInviteHtml(options: {
                   <tr>
                     <td style="padding:20px 0;border-bottom:1px solid #e4e4e7;">
                       <div style="font-size:15px;font-weight:800;color:#09090b;">How access activates</div>
-                      <div style="margin-top:6px;font-size:14px;line-height:1.7;color:#52525b;">Open this invite link from your email, then log in or create an account. Thalovo activates the team workspace only when the account email matches this invite.</div>
+                      <div style="margin-top:6px;font-size:14px;line-height:1.7;color:#52525b;">After you log in or create an account, open Team and accept the invite. Thalovo only shows the invite when your account email matches this address.</div>
                     </td>
                   </tr>
                   <tr>
@@ -211,7 +211,7 @@ export async function POST(request: NextRequest) {
     }
 
     const siteUrl = getSiteUrl(request);
-    const inviteUrl = `${siteUrl}/account?teamInvite=${encodeURIComponent(inviteId)}`;
+    const inviteUrl = `${siteUrl}/team`;
     const roleLabel =
       role === "admin"
         ? "Team lead - can invite teammates and help manage shared lead access."

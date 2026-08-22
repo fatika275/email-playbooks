@@ -431,8 +431,8 @@ export default function TeamLibraryPage() {
             <div className="badge">Team invite</div>
             <h1 className="pageTitle">Accept your Business Pro workspace invite</h1>
             <p className="muted">
-              This account has a pending team invite. Accept it here to activate
-              shared pipeline, notes, follow-ups, and saved agency work.
+              This signed-in email matches a team invite. Accept it here to
+              activate shared pipeline, notes, follow-ups, and saved agency work.
             </p>
             {notice ? <p className="notice">{notice}</p> : null}
             {pendingInvites.map((invite) => (
@@ -445,7 +445,9 @@ export default function TeamLibraryPage() {
               >
                 {isAcceptingInvite
                   ? "Accepting..."
-                  : `Accept invite to ${invite.workspace_name}`}
+                  : invite.status === "active"
+                    ? `Connect access to ${invite.workspace_name}`
+                    : `Accept invite to ${invite.workspace_name}`}
               </button>
             ))}
           </div>
@@ -467,7 +469,7 @@ export default function TeamLibraryPage() {
             <p className="muted">
               {isCheckingPendingInvites || !hasCheckedPendingInvites
                 ? `Checking whether ${user.email ?? "this account"} has a Business Pro invite.`
-                : `No pending Business Pro invite was found for ${user.email ?? "this account"}. If someone invited you, ask them to check the exact email address or resend the invite.`}
+                : `No Business Pro invite was found for ${user.email ?? "this account"}. If someone invited you, ask them to check the exact email address or resend the invite.`}
             </p>
             {notice ? <p className="notice">{notice}</p> : null}
             <div className="toolbar" style={{ justifyContent: "center" }}>

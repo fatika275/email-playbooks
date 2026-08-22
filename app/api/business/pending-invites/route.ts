@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
     };
 
     const memberResponse = await fetch(
-      `${url}/rest/v1/business_members?select=id,workspace_id,email,user_id,role,status,access_active,created_at&email=ilike.${encodeURIComponent(email)}&access_active=eq.true&order=created_at.desc`,
+      `${url}/rest/v1/business_members?select=id,workspace_id,email,user_id,role,status,access_active,created_at&access_active=eq.true&order=created_at.desc&limit=500`,
       { headers, cache: "no-store" }
     );
 
@@ -65,8 +65,8 @@ export async function GET(request: NextRequest) {
 
     const invites = ((await memberResponse.json()) as BusinessMemberRow[]).filter(
       (invite) =>
-        invite.status === "invited" ||
-        (invite.status === "active" && invite.user_id !== user.id)
+        invite.email.trim().toLowerCase() === email &&
+        (invite.status === "invited" || invite.status === "active")
     );
     const workspaceIds = Array.from(new Set(invites.map((invite) => invite.workspace_id)));
     let workspaces: BusinessWorkspaceRow[] = [];
