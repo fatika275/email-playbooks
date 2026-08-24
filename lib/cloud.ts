@@ -221,6 +221,18 @@ function normalizeCloudError(error: unknown) {
   return error;
 }
 
+function getErrorMessage(error: unknown) {
+  return error instanceof Error ? error.message : "Please try again later.";
+}
+
+async function withSyncStep<T>(label: string, action: () => Promise<T>) {
+  try {
+    return await action();
+  } catch (error) {
+    throw new Error(`${label}: ${getErrorMessage(error)}`);
+  }
+}
+
 function isMissingSequenceStepsColumn(error: { code?: string; message?: string } | null) {
   return Boolean(
     error &&
@@ -763,24 +775,32 @@ async function upsertTemplates(userId: string, templates: CustomTemplate[]) {
 }
 
 export async function hydrateLocalDataFromCloud(user: User) {
-  await ensureCloudProfile(user);
+  await withSyncStep("Account profile could not sync", () =>
+    ensureCloudProfile(user)
+  );
 
   const [cloudEmails, cloudTemplates] = await Promise.all([
-    fetchCloudEmails(user.id),
-    fetchCloudTemplates(user.id),
+    withSyncStep("Saved messages could not sync", () => fetchCloudEmails(user.id)),
+    withSyncStep("Follow-up plans could not sync", () =>
+      fetchCloudTemplates(user.id)
+    ),
   ]);
 
   const localEmails = getEmails();
   const localTemplates = getCustomTemplates();
 
   if (cloudEmails.length === 0 && localEmails.length > 0) {
-    await upsertEmails(user.id, localEmails);
+    await withSyncStep("Saved messages could not upload", () =>
+      upsertEmails(user.id, localEmails)
+    );
   } else {
     replaceEmails(cloudEmails);
   }
 
   if (cloudTemplates.length === 0 && localTemplates.length > 0) {
-    await upsertTemplates(user.id, localTemplates);
+    await withSyncStep("Follow-up plans could not upload", () =>
+      upsertTemplates(user.id, localTemplates)
+    );
   } else {
     replaceCustomTemplates(cloudTemplates);
   }
@@ -798,19 +818,29 @@ export async function hydrateLocalDataFromCloud(user: User) {
 }
 
 export async function syncLocalDataToCloud(user: User) {
-  await ensureCloudProfile(user);
+  await withSyncStep("Account profile could not sync", () =>
+    ensureCloudProfile(user)
+  );
 
   const localEmails = getEmails();
   const localTemplates = getCustomTemplates();
 
   await Promise.all([
-    upsertEmails(user.id, localEmails),
-    upsertTemplates(user.id, localTemplates),
+    withSyncStep("Saved messages could not upload", () =>
+      upsertEmails(user.id, localEmails)
+    ),
+    withSyncStep("Follow-up plans could not upload", () =>
+      upsertTemplates(user.id, localTemplates)
+    ),
   ]);
 
   const [cloudEmails, cloudTemplates] = await Promise.all([
-    fetchCloudEmails(user.id),
-    fetchCloudTemplates(user.id),
+    withSyncStep("Saved messages could not refresh", () =>
+      fetchCloudEmails(user.id)
+    ),
+    withSyncStep("Follow-up plans could not refresh", () =>
+      fetchCloudTemplates(user.id)
+    ),
   ]);
 
   replaceEmails(cloudEmails);

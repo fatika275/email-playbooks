@@ -257,11 +257,22 @@ export default function AccountPage() {
               </div>
 
               {syncErrorMessage ? (
-                <p className="notice">
-                  Saved work sync needs attention. Your account, billing, and
-                  team access can still load, and anything already on this
-                  device is still available here.
-                </p>
+                <div className="notice syncNotice">
+                  <strong>Saved work sync needs attention.</strong>
+                  <span>
+                    {syncErrorMessage} Your account, billing, and team access
+                    can still load, and anything already on this device is still
+                    available here.
+                  </span>
+                  <button
+                    className="button buttonSecondary"
+                    type="button"
+                    disabled={isSyncing}
+                    onClick={() => void handleSyncNow()}
+                  >
+                    {isSyncing ? "Checking..." : "Try sync again"}
+                  </button>
+                </div>
               ) : null}
             </div>
           </section>

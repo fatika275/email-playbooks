@@ -698,6 +698,17 @@ textarea {
   font-size: 14px;
 }
 
+.syncNotice {
+  align-items: flex-start;
+  display: grid;
+  gap: 10px;
+  line-height: 1.55;
+}
+
+.syncNotice .button {
+  justify-self: start;
+}
+
 .featureList {
   margin: 22px 0 0;
   padding-left: 20px;
