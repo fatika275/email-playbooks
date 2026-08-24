@@ -13,6 +13,7 @@ export default function AccountPage() {
     isLoading,
     isSyncing,
     syncErrorMessage,
+    statusMessage,
     signInWithPassword: signIn,
     signUpWithPassword: signUp,
     resendSignupVerification,
@@ -172,10 +173,8 @@ export default function AccountPage() {
     try {
       await syncNow();
       trackEvent("account_sync_success");
-      setNotice("Your saved work is up to date.");
     } catch {
       trackEvent("account_sync_failed");
-      setNotice("Sync could not finish right now. Please try again.");
     }
   }
 
@@ -256,14 +255,29 @@ export default function AccountPage() {
                 </Link>
               </div>
 
-              {syncErrorMessage ? (
-                <div className="notice syncNotice">
-                  <strong>Saved work sync needs attention.</strong>
-                  <span>
-                    {syncErrorMessage} Your account, billing, and team access
-                    can still load, and anything already on this device is still
-                    available here.
-                  </span>
+              <div
+                className={
+                  syncErrorMessage
+                    ? "notice syncNotice syncNoticeWarning"
+                    : "notice syncNotice syncNoticeSuccess"
+                }
+                role="status"
+              >
+                <strong>
+                  {syncErrorMessage
+                    ? "Saved work did not sync."
+                    : isSyncing
+                      ? "Checking saved work..."
+                      : "Saved work is synced."}
+                </strong>
+                <span>
+                  {syncErrorMessage
+                    ? "Try again so your latest messages, plans, and folders are available everywhere."
+                    : statusMessage === "Your account is up to date."
+                      ? "Your latest updates are available on your devices."
+                      : "Your messages, plans, and folders are ready on this account."}
+                </span>
+                {syncErrorMessage ? (
                   <button
                     className="button buttonSecondary"
                     type="button"
@@ -272,8 +286,8 @@ export default function AccountPage() {
                   >
                     {isSyncing ? "Checking..." : "Try sync again"}
                   </button>
-                </div>
-              ) : null}
+                ) : null}
+              </div>
             </div>
           </section>
         ) : (

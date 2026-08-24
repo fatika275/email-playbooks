@@ -703,10 +703,24 @@ textarea {
   display: grid;
   gap: 10px;
   line-height: 1.55;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: #0b0b0b;
 }
 
 .syncNotice .button {
   justify-self: start;
+}
+
+.syncNoticeSuccess {
+  border-color: rgba(71, 198, 124, 0.32);
+  background: rgba(12, 31, 23, 0.72);
+}
+
+.syncNoticeWarning {
+  border-color: rgba(255, 255, 255, 0.16);
+  background: #111111;
 }
 
 .featureList {
