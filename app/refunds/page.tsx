@@ -23,6 +23,11 @@ export default function RefundsPage() {
               billing cycle. Cancellation stops future renewals, but does not
               automatically refund charges that have already been paid.
             </p>
+            <p className="muted">
+              For Business Pro, cancellation pauses team access when the paid
+              period ends. Shared workspace data is kept unless the workspace
+              owner separately deletes the team pipeline.
+            </p>
           </div>
 
           <div className="legalBlock">

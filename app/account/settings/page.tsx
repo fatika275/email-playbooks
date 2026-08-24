@@ -148,6 +148,11 @@ export default function AccountSettingsPage() {
                     Open Stripe billing to update payment details, view invoices,
                     or cancel future renewals.
                   </span>
+                  <span>
+                    If Business Pro is cancelled, team access pauses at the end
+                    of the paid period. Shared workspace data is kept unless the
+                    team pipeline is deleted.
+                  </span>
                   {billingMessage ? (
                     <p className="accountSettingsInlineNotice">{billingMessage}</p>
                   ) : null}
