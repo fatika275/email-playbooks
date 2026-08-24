@@ -225,6 +225,23 @@ function getErrorMessage(error: unknown) {
   return error instanceof Error ? error.message : "Please try again later.";
 }
 
+function getRawCloudErrorMessage(error: unknown) {
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "message" in error &&
+    typeof (error as { message?: unknown }).message === "string"
+  ) {
+    return (error as { message: string }).message.toLowerCase();
+  }
+
+  return error instanceof Error ? error.message.toLowerCase() : "";
+}
+
+function isRowLevelSecurityError(error: unknown) {
+  return getRawCloudErrorMessage(error).includes("row-level security");
+}
+
 async function withSyncStep<T>(label: string, action: () => Promise<T>) {
   try {
     return await action();
@@ -776,9 +793,8 @@ async function upsertTemplates(userId: string, templates: CustomTemplate[]) {
 
   if (!error) return templates;
 
-  const normalizedError = normalizeCloudError(error);
-  if (!normalizedError.message.toLowerCase().includes("row-level security")) {
-    throw normalizedError;
+  if (!isRowLevelSecurityError(error)) {
+    throw normalizeCloudError(error);
   }
 
   const repairedTemplates: CustomTemplate[] = [];
@@ -793,8 +809,7 @@ async function upsertTemplates(userId: string, templates: CustomTemplate[]) {
       continue;
     }
 
-    const itemMessage = normalizeCloudError(itemError).message.toLowerCase();
-    if (!itemMessage.includes("row-level security")) {
+    if (!isRowLevelSecurityError(itemError)) {
       throw normalizeCloudError(itemError);
     }
 
@@ -820,6 +835,12 @@ async function upsertTemplates(userId: string, templates: CustomTemplate[]) {
     }
 
     repairedTemplates.push(repairedTemplate);
+  }
+
+  if (repairedTemplates.length === 0) {
+    throw new Error(
+      "Follow-up plans could not upload because saved plan ownership could not be repaired."
+    );
   }
 
   return repairedTemplates;
