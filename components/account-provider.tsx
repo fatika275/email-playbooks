@@ -131,8 +131,8 @@ export function AccountProvider({ children }: { children: ReactNode }) {
           await refreshAccountState(currentUser);
         } catch {
           if (!isMounted) return;
-          setSyncErrorMessage("We could not finish syncing this account yet.");
-          setStatusMessage("You are signed in, but syncing needs attention.");
+          setSyncErrorMessage("Saved work sync could not finish yet.");
+          setStatusMessage("You are signed in, but saved work sync needs attention.");
         } finally {
           if (isMounted) {
             setIsSyncing(false);
@@ -163,8 +163,8 @@ export function AccountProvider({ children }: { children: ReactNode }) {
         await refreshAccountState(currentUser);
       } catch {
         if (!isMounted) return;
-        setSyncErrorMessage("We could not finish syncing this account yet.");
-        setStatusMessage("You are signed in, but syncing needs attention.");
+        setSyncErrorMessage("Saved work sync could not finish yet.");
+        setStatusMessage("You are signed in, but saved work sync needs attention.");
       } finally {
         if (isMounted) setIsSyncing(false);
       }
@@ -207,8 +207,8 @@ export function AccountProvider({ children }: { children: ReactNode }) {
         void refreshAccountState(nextUser)
           .catch(() => {
             if (!isMounted) return;
-            setSyncErrorMessage("We could not finish syncing this account yet.");
-            setStatusMessage("You are signed in, but syncing needs attention.");
+            setSyncErrorMessage("Saved work sync could not finish yet.");
+            setStatusMessage("You are signed in, but saved work sync needs attention.");
           })
           .finally(() => {
             if (isMounted) setIsSyncing(false);

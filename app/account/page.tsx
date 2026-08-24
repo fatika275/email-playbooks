@@ -258,8 +258,9 @@ export default function AccountPage() {
 
               {syncErrorMessage ? (
                 <p className="notice">
-                  We could not sync your agency work right now. Your local work
-                  is still available on this device.
+                  Saved work sync needs attention. Your account, billing, and
+                  team access can still load, and anything already on this
+                  device is still available here.
                 </p>
               ) : null}
             </div>
