@@ -731,7 +731,7 @@ async function upsertEmails(userId: string, emails: SavedEmail[]) {
 
 async function upsertTemplates(userId: string, templates: CustomTemplate[]) {
   const client = getSupabaseBrowserClient();
-  if (!client || templates.length === 0) return;
+  if (!client || templates.length === 0) return templates;
 
   const payload: CloudCustomTemplateRow[] = templates.map((template) => ({
     id: template.id,
@@ -748,7 +748,10 @@ async function upsertTemplates(userId: string, templates: CustomTemplate[]) {
     created_at: template.createdAt,
   }));
 
-  const { error } = await client.from("custom_templates").upsert(payload);
+  const upsertRows = async (rows: CloudCustomTemplateRow[]) =>
+    client.from("custom_templates").upsert(rows);
+
+  const { error } = await upsertRows(payload);
   if (isMissingSequenceStepsColumn(error)) {
     const fallbackPayload = payload.map((template) => ({
       id: template.id,
@@ -768,10 +771,58 @@ async function upsertTemplates(userId: string, templates: CustomTemplate[]) {
       .upsert(fallbackPayload);
 
     if (fallbackError) throw normalizeCloudError(fallbackError);
-    return;
+    return templates;
   }
 
-  if (error) throw normalizeCloudError(error);
+  if (!error) return templates;
+
+  const normalizedError = normalizeCloudError(error);
+  if (!normalizedError.message.toLowerCase().includes("row-level security")) {
+    throw normalizedError;
+  }
+
+  const repairedTemplates: CustomTemplate[] = [];
+
+  for (const template of templates) {
+    const row = payload.find((item) => item.id === template.id);
+    if (!row) continue;
+
+    const { error: itemError } = await upsertRows([row]);
+    if (!itemError) {
+      repairedTemplates.push(template);
+      continue;
+    }
+
+    const itemMessage = normalizeCloudError(itemError).message.toLowerCase();
+    if (!itemMessage.includes("row-level security")) {
+      throw normalizeCloudError(itemError);
+    }
+
+    const repairedId = `template-${userId.slice(0, 8)}-${Date.now()}-${Math.random()
+      .toString(16)
+      .slice(2)}`;
+    const repairedTemplate = { ...template, id: repairedId };
+    const repairedRow = {
+      ...row,
+      id: repairedId,
+      user_id: userId,
+    };
+
+    const { error: repairError } = await upsertRows([repairedRow]);
+    if (isMissingSequenceStepsColumn(repairError)) {
+      const { sequence_steps: _sequenceSteps, ...fallbackRow } = repairedRow;
+      const { error: fallbackRepairError } = await client
+        .from("custom_templates")
+        .upsert([fallbackRow]);
+      if (fallbackRepairError) throw normalizeCloudError(fallbackRepairError);
+    } else if (repairError) {
+      throw normalizeCloudError(repairError);
+    }
+
+    repairedTemplates.push(repairedTemplate);
+  }
+
+  return repairedTemplates;
 }
 
 export async function hydrateLocalDataFromCloud(user: User) {
@@ -798,9 +849,10 @@ export async function hydrateLocalDataFromCloud(user: User) {
   }
 
   if (cloudTemplates.length === 0 && localTemplates.length > 0) {
-    await withSyncStep("Follow-up plans could not upload", () =>
+    const uploadedTemplates = await withSyncStep("Follow-up plans could not upload", () =>
       upsertTemplates(user.id, localTemplates)
     );
+    replaceCustomTemplates(uploadedTemplates);
   } else {
     replaceCustomTemplates(cloudTemplates);
   }
@@ -862,7 +914,13 @@ export async function saveCustomTemplateRecord(template: CustomTemplate) {
   const user = await getSignedInUser();
   if (!user) return;
 
-  await upsertTemplates(user.id, [template]);
+  const uploadedTemplates = await upsertTemplates(user.id, [template]);
+  const uploadedTemplate = uploadedTemplates[0];
+
+  if (uploadedTemplate && uploadedTemplate.id !== template.id) {
+    deleteCustomTemplate(template.id);
+    saveCustomTemplate(uploadedTemplate);
+  }
 }
 
 export async function deleteEmailRecord(id: string) {
