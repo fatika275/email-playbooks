@@ -25,6 +25,14 @@ type StripeSubscription = {
   };
 };
 
+const activeSubscriptionStatuses = new Set(["active", "trialing"]);
+const endedSubscriptionStatuses = new Set([
+  "canceled",
+  "incomplete_expired",
+  "paused",
+  "unpaid",
+]);
+
 function verifyStripeSignature(payload: string, signatureHeader: string) {
   const secret = process.env.STRIPE_WEBHOOK_SECRET;
 
@@ -91,6 +99,31 @@ export async function POST(request: NextRequest) {
       const userId = subscription.metadata?.user_id;
 
       if (userId) {
+        await updateUserPlan({
+          userId,
+          plan: "free",
+          stripeCustomerId: subscription.customer ?? null,
+          stripeSubscriptionId: subscription.id,
+        });
+      }
+    }
+
+    if (event.type === "customer.subscription.updated") {
+      const subscription = event.data.object as StripeSubscription;
+      const userId = subscription.metadata?.user_id;
+      const plan = normalizePlan(subscription.metadata?.plan);
+      const status = subscription.status || "";
+
+      if (userId && plan !== "free" && activeSubscriptionStatuses.has(status)) {
+        await updateUserPlan({
+          userId,
+          plan,
+          stripeCustomerId: subscription.customer ?? null,
+          stripeSubscriptionId: subscription.id,
+        });
+      }
+
+      if (userId && endedSubscriptionStatuses.has(status)) {
         await updateUserPlan({
           userId,
           plan: "free",
