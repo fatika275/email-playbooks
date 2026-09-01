@@ -50,7 +50,7 @@ function getActivitySeenKey(workspaceId: string) {
 }
 
 export default function TeamLibraryPage() {
-  const { user, hasProAccess, isLoading, businessMembership, syncNow } = useAccount();
+  const { user, plan, isLoading, businessMembership, syncNow } = useAccount();
   const [shares, setShares] = useState<TeamShare[]>([]);
   const [workspace, setWorkspace] = useState<BusinessWorkspace | null>(null);
   const [workspaces, setWorkspaces] = useState<BusinessWorkspaceAccess[]>([]);
@@ -75,6 +75,8 @@ export default function TeamLibraryPage() {
   const [isCheckingPendingInvites, setIsCheckingPendingInvites] = useState(false);
   const [isAcceptingInvite, setIsAcceptingInvite] = useState(false);
   const [notice, setNotice] = useState("");
+  const hasBusinessTeamAccess =
+    plan === "business" || Boolean(businessMembership?.access_active);
 
   async function refreshShares() {
     setIsLoadingShares(true);
@@ -136,14 +138,14 @@ export default function TeamLibraryPage() {
   useEffect(() => {
     if (!user) return;
     void refreshPendingInvites();
-    if (!hasProAccess) return;
+    if (!hasBusinessTeamAccess) return;
     void refreshShares();
     void refreshBusinessTeam().catch((error) => {
       setNotice(
         error instanceof Error ? error.message : "Business team could not load."
       );
     });
-  }, [hasProAccess, refreshBusinessTeam, refreshPendingInvites, user]);
+  }, [hasBusinessTeamAccess, refreshBusinessTeam, refreshPendingInvites, user]);
 
   const incoming = useMemo(
     () => shares.filter((share) => share.owner_id !== user?.id),
@@ -423,7 +425,7 @@ export default function TeamLibraryPage() {
     );
   }
 
-  if (!hasProAccess && pendingInvites.length > 0) {
+  if (!hasBusinessTeamAccess && pendingInvites.length > 0) {
     return (
       <main className="main">
         <section className="container">
@@ -456,7 +458,7 @@ export default function TeamLibraryPage() {
     );
   }
 
-  if (!hasProAccess) {
+  if (!hasBusinessTeamAccess) {
     return (
       <main className="main">
         <section className="container">
@@ -464,7 +466,7 @@ export default function TeamLibraryPage() {
             <h1 className="pageTitle">
               {isCheckingPendingInvites || !hasCheckedPendingInvites
                 ? "Checking team invites"
-                : "Team sharing is a Pro feature"}
+                : "Team sharing is a Business Pro feature"}
             </h1>
             <p className="muted">
               {isCheckingPendingInvites || !hasCheckedPendingInvites
@@ -481,8 +483,8 @@ export default function TeamLibraryPage() {
               >
                 {isCheckingPendingInvites ? "Checking..." : "Check invites again"}
               </button>
-              <Link href="/pricing" className="button buttonPrimary">
-                View Pro
+              <Link href="/business" className="button buttonPrimary">
+                View Business Pro
               </Link>
             </div>
           </div>
