@@ -16,9 +16,11 @@ export function CheckoutButton({
   children,
   className = "button buttonPrimary",
 }: CheckoutButtonProps) {
-  const { user } = useAccount();
+  const { user, plan: currentPlan } = useAccount();
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  const hasPaidPlan = currentPlan !== "free";
 
   async function handleCheckout() {
     setMessage("");
@@ -37,16 +39,16 @@ export function CheckoutButton({
       return;
     }
 
-    setIsLoading(true);
-
     try {
-      const response = await fetch("/api/checkout", {
+      setIsLoading(true);
+      const endpoint = hasPaidPlan ? "/api/billing/portal" : "/api/checkout";
+      const response = await fetch(endpoint, {
         method: "POST",
         headers: {
           "content-type": "application/json",
           authorization: `Bearer ${accessToken}`,
         },
-        body: JSON.stringify({ plan }),
+        body: hasPaidPlan ? undefined : JSON.stringify({ plan }),
       });
 
       const payload = (await response.json()) as {
@@ -55,7 +57,12 @@ export function CheckoutButton({
       };
 
       if (!response.ok || !payload.url) {
-        throw new Error(payload.error || "Checkout could not be started.");
+        throw new Error(
+          payload.error ||
+            (hasPaidPlan
+              ? "Subscription management could not be opened."
+              : "Checkout could not be started.")
+        );
       }
 
       window.location.href = payload.url;
@@ -63,7 +70,9 @@ export function CheckoutButton({
       setMessage(
         error instanceof Error
           ? error.message
-          : "Checkout could not be started."
+          : hasPaidPlan
+            ? "Subscription management could not be opened."
+            : "Checkout could not be started."
       );
     } finally {
       setIsLoading(false);
@@ -73,8 +82,18 @@ export function CheckoutButton({
   return (
     <div>
       <button className={className} disabled={isLoading} onClick={handleCheckout}>
-        {isLoading ? "Opening checkout..." : children}
+        {isLoading
+          ? hasPaidPlan
+            ? "Opening subscription..."
+            : "Opening checkout..."
+          : children}
       </button>
+      {hasPaidPlan ? (
+        <p className="notice">
+          You already have a paid plan. Manage your subscription to change,
+          cancel, or update billing.
+        </p>
+      ) : null}
       {message ? <p className="notice">{message}</p> : null}
     </div>
   );

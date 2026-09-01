@@ -1,8 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getStripePriceIdForPlan, type PlanId } from "@/lib/plans";
+import { getStripePriceIdForPlan, normalizePlan, type PlanId } from "@/lib/plans";
 import { getUserFromAccessToken } from "@/lib/server-auth";
 
 const checkoutPlans = new Set<PlanId>(["pro", "founder", "business"]);
+
+function getSupabaseServerConfig() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!url || !serviceRoleKey) {
+    throw new Error("Supabase server environment variables are missing.");
+  }
+
+  return {
+    url: url.replace(/\/rest\/v1\/?$/, "").replace(/\/$/, ""),
+    serviceRoleKey,
+  };
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -43,6 +57,40 @@ export async function POST(request: NextRequest) {
     }
 
     const user = await getUserFromAccessToken(accessToken);
+    const { url, serviceRoleKey } = getSupabaseServerConfig();
+    const profileResponse = await fetch(
+      `${url}/rest/v1/user_profiles?select=plan&user_id=eq.${encodeURIComponent(user.id)}&limit=1`,
+      {
+        headers: {
+          apikey: serviceRoleKey,
+          authorization: `Bearer ${serviceRoleKey}`,
+        },
+        cache: "no-store",
+      }
+    );
+
+    if (!profileResponse.ok) {
+      return NextResponse.json(
+        { error: "Your billing profile could not be checked." },
+        { status: 500 }
+      );
+    }
+
+    const profiles = (await profileResponse.json()) as Array<{
+      plan?: string | null;
+    }>;
+    const currentPlan = normalizePlan(profiles[0]?.plan);
+
+    if (currentPlan !== "free") {
+      return NextResponse.json(
+        {
+          error:
+            "You already have a paid plan. Manage your subscription to change plans.",
+        },
+        { status: 409 }
+      );
+    }
+
     const form = new URLSearchParams();
     form.set("mode", "subscription");
     form.set("line_items[0][price]", priceId);
