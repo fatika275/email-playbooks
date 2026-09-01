@@ -76,42 +76,78 @@ export default function CheckoutSuccessPage() {
   return (
     <main className="main">
       <section className="container">
-        <div className="glassCard emptyState">
-          <span
-            className={
-              state === "confirmed"
-                ? "statusPill statusPillSuccess"
+        <div className="checkoutSuccessShell">
+          <div className="checkoutSuccessPanel">
+            <span
+              className={
+                state === "confirmed"
+                  ? "statusPill statusPillSuccess"
+                  : state === "error"
+                    ? "statusPill statusPillWarning"
+                    : "statusPill statusPillNeutral"
+              }
+            >
+              {state === "confirmed"
+                ? "Payment confirmed"
                 : state === "error"
-                  ? "statusPill statusPillWarning"
-                  : "statusPill statusPillNeutral"
-            }
-          >
-            {state === "confirmed"
-              ? "Payment confirmed"
-              : state === "error"
-                ? "Activation needs attention"
-                : "Checking payment"}
-          </span>
+                  ? "Activation needs attention"
+                  : "Checking payment"}
+            </span>
 
-          <h1 className="pageTitle" style={{ marginTop: 18 }}>
-            {state === "confirmed"
-              ? `Welcome to ${planLabel}`
-              : "Finishing your account setup"}
-          </h1>
-          <p className="muted" style={{ maxWidth: 620, lineHeight: 1.75 }}>
-            {message}
-          </p>
+            <div className="checkoutSuccessHeader">
+              <h1 className="pageTitle">
+                {state === "confirmed"
+                  ? `${planLabel} is ready`
+                  : "Finishing your plan setup"}
+              </h1>
+              <p className="muted">{message}</p>
+            </div>
 
-          <div className="toolbar" style={{ marginTop: 22 }}>
-            {state === "confirmed" ? (
-              <Link href="/workspace" className="button buttonPrimary">
-                Open saved work
+            <div className="checkoutSuccessStatus" role="status">
+              <strong>
+                {state === "confirmed"
+                  ? "Your account has been updated."
+                  : state === "error"
+                    ? "We could not finish activation automatically."
+                    : "This usually takes a few seconds."}
+              </strong>
+              <span>
+                {state === "confirmed"
+                  ? "You can now use the paid workflow across your saved work, pipeline, and follow-ups."
+                  : state === "error"
+                    ? "Open your account page and try syncing again, or check the payment in Stripe."
+                    : "Keep this page open while Thalovo confirms the checkout session."}
+              </span>
+            </div>
+
+            <div className="checkoutSuccessActions">
+              {state === "confirmed" ? (
+                <>
+                  <Link href="/prospects" className="button buttonPrimary">
+                    Open pipeline
+                  </Link>
+                  <Link href="/workspace" className="button buttonSecondary">
+                    Open saved work
+                  </Link>
+                </>
+              ) : null}
+              <Link href="/account" className="button buttonUtility">
+                View account
               </Link>
-            ) : null}
-            <Link href="/account" className="button buttonSecondary">
-              View account
-            </Link>
+            </div>
           </div>
+
+          {state === "confirmed" ? (
+            <div className="checkoutSuccessNext">
+              <span className="miniBadge">Next</span>
+              <h2>Put the plan to work</h2>
+              <div>
+                <Link href="/library">Write or reuse an outreach message</Link>
+                <Link href="/prospects">Move a lead through the pipeline</Link>
+                <Link href="/sequence-builder">Build a follow-up plan</Link>
+              </div>
+            </div>
+          ) : null}
         </div>
       </section>
     </main>
