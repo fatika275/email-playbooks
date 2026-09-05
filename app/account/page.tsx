@@ -28,6 +28,7 @@ export default function AccountPage() {
   const [authMode, setAuthMode] = useState<"login" | "signup">("login");
   const [needsVerification, setNeedsVerification] = useState(false);
   const [notice, setNotice] = useState("");
+  const [verificationNotice, setVerificationNotice] = useState("");
   const [acceptedInviteId, setAcceptedInviteId] = useState("");
 
   const showVerification = !user && needsVerification;
@@ -94,6 +95,7 @@ export default function AccountPage() {
         const result = await signUp(email, password);
         trackEvent("account_signup_requested");
         setNeedsVerification(result.needsVerification);
+        setVerificationNotice("");
         setNotice(
           result.needsVerification
             ? "Account created. Check your email for the verification code."
@@ -121,10 +123,11 @@ export default function AccountPage() {
       await verifySignupCode(email, code);
       trackEvent("account_signup_verified");
       setNeedsVerification(false);
+      setVerificationNotice("");
       setNotice("Email verified. You are signed in.");
       setCode("");
     } catch (error) {
-      setNotice(
+      setVerificationNotice(
         error instanceof Error
           ? error.message
           : "That verification code could not be checked. Please try again."
@@ -136,9 +139,11 @@ export default function AccountPage() {
     try {
       await resendSignupVerification(email);
       trackEvent("account_signup_verification_resent");
-      setNotice("Verification email sent again. Check your inbox and spam folder.");
+      setVerificationNotice(
+        "Verification email sent again. Check your inbox and spam folder."
+      );
     } catch (error) {
-      setNotice(
+      setVerificationNotice(
         error instanceof Error
           ? error.message
           : "Could not resend the verification email right now."
@@ -328,6 +333,7 @@ export default function AccountPage() {
                     setAuthMode("login");
                     setNeedsVerification(false);
                     setNotice("");
+                    setVerificationNotice("");
                   }}
                 >
                   Log in
@@ -338,6 +344,7 @@ export default function AccountPage() {
                   onClick={() => {
                     setAuthMode("signup");
                     setNotice("");
+                    setVerificationNotice("");
                   }}
                 >
                   Sign up
@@ -424,9 +431,23 @@ export default function AccountPage() {
                       className="input"
                       placeholder="Enter the code from your email"
                       value={code}
-                      onChange={(event) => setCode(event.target.value)}
+                      onChange={(event) => {
+                        setCode(event.target.value);
+                        setVerificationNotice("");
+                      }}
+                      aria-describedby={
+                        verificationNotice ? "signup-code-message" : undefined
+                      }
                       required
                     />
+                    {verificationNotice ? (
+                      <p
+                        id="signup-code-message"
+                        className="verificationInlineNotice"
+                      >
+                        {verificationNotice}
+                      </p>
+                    ) : null}
                   </div>
 
                   <button
