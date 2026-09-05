@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useAccount } from "@/components/account-provider";
 import { trackEvent } from "@/lib/analytics";
@@ -30,6 +30,8 @@ export default function AccountPage() {
   const [notice, setNotice] = useState("");
   const [verificationNotice, setVerificationNotice] = useState("");
   const [acceptedInviteId, setAcceptedInviteId] = useState("");
+  const verificationBoxRef = useRef<HTMLFormElement | null>(null);
+  const verificationCodeRef = useRef<HTMLInputElement | null>(null);
 
   const showVerification = !user && needsVerification;
   const visibleNotice =
@@ -82,6 +84,20 @@ export default function AccountPage() {
         );
       });
   }, [acceptedInviteId, syncNow, user]);
+
+  useEffect(() => {
+    if (!showVerification) return;
+
+    const timer = window.setTimeout(() => {
+      verificationBoxRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+      verificationCodeRef.current?.focus({ preventScroll: true });
+    }, 80);
+
+    return () => window.clearTimeout(timer);
+  }, [showVerification]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -418,12 +434,17 @@ export default function AccountPage() {
               </form>
 
               {showVerification ? (
-                <form onSubmit={handleVerifySignup} className="verificationBox">
+                <form
+                  ref={verificationBoxRef}
+                  onSubmit={handleVerifySignup}
+                  className="verificationBox"
+                >
                   <div className="formGroup">
                     <label htmlFor="signup-code" className="label">
                       Email verification code
                     </label>
                     <input
+                      ref={verificationCodeRef}
                       id="signup-code"
                       type="text"
                       inputMode="numeric"
