@@ -726,13 +726,10 @@ textarea {
 .checkoutSuccessShell {
   min-height: 560px;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.38fr);
-  gap: 16px;
-  align-items: stretch;
+  align-items: center;
 }
 
-.checkoutSuccessPanel,
-.checkoutSuccessNext {
+.checkoutSuccessPanel {
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
   background:
@@ -783,36 +780,6 @@ textarea {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
-}
-
-.checkoutSuccessNext {
-  padding: 24px;
-  align-self: center;
-  display: grid;
-  gap: 18px;
-}
-
-.checkoutSuccessNext h2 {
-  margin: 0;
-  font-size: 28px;
-  line-height: 1.08;
-}
-
-.checkoutSuccessNext div {
-  display: grid;
-  border-top: 1px solid var(--border-soft);
-}
-
-.checkoutSuccessNext a {
-  padding: 14px 0;
-  color: var(--text);
-  text-decoration: none;
-  border-bottom: 1px solid var(--border-soft);
-  line-height: 1.35;
-}
-
-.checkoutSuccessNext a:hover {
-  color: #ffffff;
 }
 
 .featureList {
@@ -7754,11 +7721,9 @@ details[open] > summary::after {
 
   .checkoutSuccessShell {
     min-height: 0;
-    grid-template-columns: 1fr;
   }
 
-  .checkoutSuccessPanel,
-  .checkoutSuccessNext {
+  .checkoutSuccessPanel {
     padding: 22px;
   }
 

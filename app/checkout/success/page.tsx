@@ -129,6 +129,9 @@ export default function CheckoutSuccessPage() {
                   <Link href="/workspace" className="button buttonSecondary">
                     Open saved work
                   </Link>
+                  <Link href="/library" className="button buttonSecondary">
+                    Write a message
+                  </Link>
                 </>
               ) : null}
               <Link href="/account" className="button buttonUtility">
@@ -136,18 +139,6 @@ export default function CheckoutSuccessPage() {
               </Link>
             </div>
           </div>
-
-          {state === "confirmed" ? (
-            <div className="checkoutSuccessNext">
-              <span className="miniBadge">Next</span>
-              <h2>Put the plan to work</h2>
-              <div>
-                <Link href="/library">Write or reuse an outreach message</Link>
-                <Link href="/prospects">Move a lead through the pipeline</Link>
-                <Link href="/sequence-builder">Build a follow-up plan</Link>
-              </div>
-            </div>
-          ) : null}
         </div>
       </section>
     </main>
