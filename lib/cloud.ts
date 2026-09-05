@@ -726,7 +726,7 @@ async function fetchCloudTemplates(userId: string) {
 
 async function upsertEmails(userId: string, emails: SavedEmail[]) {
   const client = getSupabaseBrowserClient();
-  if (!client || emails.length === 0) return;
+  if (!client || emails.length === 0) return emails;
 
   const payload: CloudSavedEmailRow[] = emails.map((email) => ({
     id: email.id,
@@ -742,8 +742,55 @@ async function upsertEmails(userId: string, emails: SavedEmail[]) {
     created_at: email.createdAt,
   }));
 
-  const { error } = await client.from("saved_emails").upsert(payload);
-  if (error) throw normalizeCloudError(error);
+  const upsertRows = async (rows: CloudSavedEmailRow[]) =>
+    client.from("saved_emails").upsert(rows);
+
+  const { error } = await upsertRows(payload);
+  if (!error) return emails;
+
+  if (!isRowLevelSecurityError(error)) {
+    throw normalizeCloudError(error);
+  }
+
+  const repairedEmails: SavedEmail[] = [];
+
+  for (const email of emails) {
+    const row = payload.find((item) => item.id === email.id);
+    if (!row) continue;
+
+    const { error: itemError } = await upsertRows([row]);
+    if (!itemError) {
+      repairedEmails.push(email);
+      continue;
+    }
+
+    if (!isRowLevelSecurityError(itemError)) {
+      throw normalizeCloudError(itemError);
+    }
+
+    const repairedId = `email-${userId.slice(0, 8)}-${Date.now()}-${Math.random()
+      .toString(16)
+      .slice(2)}`;
+    const repairedEmail = { ...email, id: repairedId };
+    const repairedRow = {
+      ...row,
+      id: repairedId,
+      user_id: userId,
+    };
+
+    const { error: repairError } = await upsertRows([repairedRow]);
+    if (repairError) throw normalizeCloudError(repairError);
+
+    repairedEmails.push(repairedEmail);
+  }
+
+  if (repairedEmails.length === 0) {
+    throw new Error(
+      "Saved messages could not upload because saved message ownership could not be repaired."
+    );
+  }
+
+  return repairedEmails;
 }
 
 async function upsertTemplates(userId: string, templates: CustomTemplate[]) {
@@ -862,9 +909,10 @@ export async function hydrateLocalDataFromCloud(user: User) {
   const localTemplates = getCustomTemplates();
 
   if (cloudEmails.length === 0 && localEmails.length > 0) {
-    await withSyncStep("Saved messages could not upload", () =>
+    const uploadedEmails = await withSyncStep("Saved messages could not upload", () =>
       upsertEmails(user.id, localEmails)
     );
+    replaceEmails(uploadedEmails);
   } else {
     replaceEmails(cloudEmails);
   }
@@ -926,7 +974,13 @@ export async function saveEmailRecord(email: SavedEmail) {
   const user = await getSignedInUser();
   if (!user) return;
 
-  await upsertEmails(user.id, [email]);
+  const uploadedEmails = await upsertEmails(user.id, [email]);
+  const uploadedEmail = uploadedEmails[0];
+
+  if (uploadedEmail && uploadedEmail.id !== email.id) {
+    deleteEmail(email.id);
+    saveEmail(uploadedEmail);
+  }
 }
 
 export async function saveCustomTemplateRecord(template: CustomTemplate) {
