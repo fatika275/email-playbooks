@@ -69,7 +69,8 @@ export default function TermsPage() {
               Founder pricing is invite-only and may be limited to selected
               accounts. If founder pricing is offered as a locked rate, that
               rate stays in place while the subscription remains active. If the
-              subscription is cancelled and later restarted, a different price
+              subscription is cancelled, switched away from, or later restarted,
+              Founder pricing may no longer be available and a different price
               may apply.
             </p>
           </div>

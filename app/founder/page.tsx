@@ -24,7 +24,7 @@ export default function FounderPage() {
     },
     {
       label: "Locked early price",
-      copy: "Keep your approved Founder monthly rate while your subscription stays active.",
+      copy: "Keep your approved Founder monthly rate while the subscription stays active. If you cancel or switch away, the Founder rate may not be available again.",
     },
     {
       label: "Built for agencies",
@@ -80,7 +80,8 @@ export default function FounderPage() {
             <p>
               Founder Pro is for selected early users who want Thalovo to help
               turn outreach into booked client work without paying the standard
-              Pro price.
+              Pro price. Founder is approval-only, so users can switch away from
+              it later but cannot switch into it from the billing portal.
             </p>
 
             <div className="founderHeroActions">
@@ -115,7 +116,10 @@ export default function FounderPage() {
             <strong>{founderPriceLabel}</strong>
             <small>/month locked while active</small>
             <div className="founderPriceLine" />
-            <p>One individual account. Choose Business Pro when teammates need shared access.</p>
+            <p>
+              Limited early-user rate. Keep it active to keep the price; choose
+              Business Pro when teammates need shared access.
+            </p>
           </aside>
         </section>
 

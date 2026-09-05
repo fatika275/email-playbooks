@@ -90,8 +90,8 @@ export default function PricingPage() {
             </h2>
             <p>
               {founderEligible
-                ? "Your early supporter price is unlocked. Use it to run the full outreach-to-booked-work workflow for less."
-                : "Invite-only early supporter pricing for agencies that want the full Pro workflow at a lower monthly price."}
+                ? "Your early supporter price is unlocked. Keep it active to keep this rate; if you cancel or switch away, Founder may not be available again."
+                : "Invite-only early supporter pricing for selected early users. Founder cannot be chosen from the billing portal later."}
             </p>
           </div>
 
