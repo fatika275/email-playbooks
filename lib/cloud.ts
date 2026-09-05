@@ -8,6 +8,8 @@ import {
   replaceEmails,
   saveCustomTemplate,
   saveEmail,
+  getStorageOwnerId,
+  setStorageOwnerId,
   type CustomTemplate,
   type SavedEmail,
 } from "@/lib/storage";
@@ -897,6 +899,8 @@ export async function hydrateLocalDataFromCloud(user: User) {
   await withSyncStep("Account profile could not sync", () =>
     ensureCloudProfile(user)
   );
+  const storedOwnerId = getStorageOwnerId();
+  const canUploadLocalWork = storedOwnerId === user.id;
 
   const [cloudEmails, cloudTemplates] = await Promise.all([
     withSyncStep("Saved messages could not sync", () => fetchCloudEmails(user.id)),
@@ -907,34 +911,37 @@ export async function hydrateLocalDataFromCloud(user: User) {
 
   const localEmails = getEmails();
   const localTemplates = getCustomTemplates();
+  let syncedEmails = cloudEmails;
+  let syncedTemplates = cloudTemplates;
 
-  if (cloudEmails.length === 0 && localEmails.length > 0) {
+  if (cloudEmails.length === 0 && localEmails.length > 0 && canUploadLocalWork) {
     const uploadedEmails = await withSyncStep("Saved messages could not upload", () =>
       upsertEmails(user.id, localEmails)
     );
     replaceEmails(uploadedEmails);
+    syncedEmails = uploadedEmails;
   } else {
     replaceEmails(cloudEmails);
   }
 
-  if (cloudTemplates.length === 0 && localTemplates.length > 0) {
+  if (
+    cloudTemplates.length === 0 &&
+    localTemplates.length > 0 &&
+    canUploadLocalWork
+  ) {
     const uploadedTemplates = await withSyncStep("Follow-up plans could not upload", () =>
       upsertTemplates(user.id, localTemplates)
     );
     replaceCustomTemplates(uploadedTemplates);
+    syncedTemplates = uploadedTemplates;
   } else {
     replaceCustomTemplates(cloudTemplates);
   }
+  setStorageOwnerId(user.id);
 
   return {
-    emails:
-      cloudEmails.length === 0 && localEmails.length > 0
-        ? localEmails
-        : cloudEmails,
-    templates:
-      cloudTemplates.length === 0 && localTemplates.length > 0
-        ? localTemplates
-        : cloudTemplates,
+    emails: syncedEmails,
+    templates: syncedTemplates,
   };
 }
 
@@ -945,6 +952,23 @@ export async function syncLocalDataToCloud(user: User) {
 
   const localEmails = getEmails();
   const localTemplates = getCustomTemplates();
+  const canUploadLocalWork = getStorageOwnerId() === user.id;
+
+  if (!canUploadLocalWork) {
+    const [cloudEmails, cloudTemplates] = await Promise.all([
+      withSyncStep("Saved messages could not refresh", () =>
+        fetchCloudEmails(user.id)
+      ),
+      withSyncStep("Follow-up plans could not refresh", () =>
+        fetchCloudTemplates(user.id)
+      ),
+    ]);
+
+    replaceEmails(cloudEmails);
+    replaceCustomTemplates(cloudTemplates);
+    setStorageOwnerId(user.id);
+    return;
+  }
 
   await Promise.all([
     withSyncStep("Saved messages could not upload", () =>
@@ -966,6 +990,7 @@ export async function syncLocalDataToCloud(user: User) {
 
   replaceEmails(cloudEmails);
   replaceCustomTemplates(cloudTemplates);
+  setStorageOwnerId(user.id);
 }
 
 export async function saveEmailRecord(email: SavedEmail) {
@@ -973,6 +998,7 @@ export async function saveEmailRecord(email: SavedEmail) {
 
   const user = await getSignedInUser();
   if (!user) return;
+  setStorageOwnerId(user.id);
 
   const uploadedEmails = await upsertEmails(user.id, [email]);
   const uploadedEmail = uploadedEmails[0];
@@ -988,6 +1014,7 @@ export async function saveCustomTemplateRecord(template: CustomTemplate) {
 
   const user = await getSignedInUser();
   if (!user) return;
+  setStorageOwnerId(user.id);
 
   const uploadedTemplates = await upsertTemplates(user.id, [template]);
   const uploadedTemplate = uploadedTemplates[0];

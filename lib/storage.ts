@@ -39,6 +39,7 @@ const EMAILS_KEY = "thalovo_emails";
 const LEGACY_EMAILS_KEY = "arcmail_emails";
 const TEMPLATES_KEY = "thalovo_templates";
 const LEGACY_TEMPLATES_KEY = "arcmail_templates";
+const STORAGE_OWNER_KEY = "thalovo_storage_owner";
 const STORAGE_CHANGE_EVENT = "thalovo_storage_change";
 const EMPTY_EMAILS: SavedEmail[] = [];
 const EMPTY_TEMPLATES: CustomTemplate[] = [];
@@ -50,6 +51,16 @@ let cachedTemplatesSnapshot: CustomTemplate[] = EMPTY_TEMPLATES;
 function notifyStorageChange() {
   if (typeof window === "undefined") return;
   window.dispatchEvent(new Event(STORAGE_CHANGE_EVENT));
+}
+
+export function getStorageOwnerId() {
+  if (typeof window === "undefined") return "";
+  return localStorage.getItem(STORAGE_OWNER_KEY) || "";
+}
+
+export function setStorageOwnerId(userId: string) {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(STORAGE_OWNER_KEY, userId);
 }
 
 function subscribeToStorageChange(onStoreChange: () => void) {
