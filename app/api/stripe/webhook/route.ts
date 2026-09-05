@@ -1,7 +1,10 @@
 import { createHmac, timingSafeEqual } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { normalizePlan } from "@/lib/plans";
-import { updateUserPlan } from "@/lib/server-auth";
+import {
+  getUserBillingProfileByStripeCustomerId,
+  updateUserPlan,
+} from "@/lib/server-auth";
 
 type StripeCheckoutSession = {
   id: string;
@@ -23,6 +26,14 @@ type StripeSubscription = {
     user_id?: string;
     plan?: string;
   };
+};
+
+type StripeCharge = {
+  id: string;
+  customer?: string;
+  amount?: number;
+  amount_refunded?: number;
+  refunded?: boolean;
 };
 
 const activeSubscriptionStatuses = new Set(["active", "trialing"]);
@@ -64,6 +75,54 @@ function verifyStripeSignature(payload: string, signatureHeader: string) {
   }
 }
 
+async function cancelStripeSubscriptionImmediately(subscriptionId: string) {
+  const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+  if (!stripeSecretKey) {
+    throw new Error("Stripe is not configured yet.");
+  }
+
+  const response = await fetch(
+    `https://api.stripe.com/v1/subscriptions/${encodeURIComponent(subscriptionId)}`,
+    {
+      method: "DELETE",
+      headers: {
+        authorization: `Bearer ${stripeSecretKey}`,
+      },
+    }
+  );
+
+  if (response.ok || response.status === 404) return;
+
+  const payload = (await response.json().catch(() => ({}))) as {
+    error?: { message?: string };
+  };
+  throw new Error(payload.error?.message || "Stripe subscription could not be cancelled.");
+}
+
+async function removeAccessForRefundedCharge(charge: StripeCharge) {
+  const customerId = charge.customer;
+  const amount = charge.amount ?? 0;
+  const refundedAmount = charge.amount_refunded ?? 0;
+  const isFullRefund = Boolean(charge.refunded) && amount > 0 && refundedAmount >= amount;
+
+  if (!customerId || !isFullRefund) return;
+
+  const profile = await getUserBillingProfileByStripeCustomerId(customerId);
+  if (!profile) return;
+
+  if (profile.stripe_subscription_id) {
+    await cancelStripeSubscriptionImmediately(profile.stripe_subscription_id);
+  }
+
+  await updateUserPlan({
+    userId: profile.user_id,
+    email: profile.email,
+    plan: "free",
+    stripeCustomerId: profile.stripe_customer_id ?? customerId,
+    stripeSubscriptionId: profile.stripe_subscription_id ?? null,
+  });
+}
+
 export async function POST(request: NextRequest) {
   const payload = await request.text();
   const signature = request.headers.get("stripe-signature") || "";
@@ -72,7 +131,7 @@ export async function POST(request: NextRequest) {
     verifyStripeSignature(payload, signature);
     const event = JSON.parse(payload) as {
       type: string;
-      data: { object: StripeCheckoutSession | StripeSubscription };
+      data: { object: StripeCheckoutSession | StripeSubscription | StripeCharge };
     };
 
     if (event.type === "checkout.session.completed") {
@@ -131,6 +190,10 @@ export async function POST(request: NextRequest) {
           stripeSubscriptionId: subscription.id,
         });
       }
+    }
+
+    if (event.type === "charge.refunded") {
+      await removeAccessForRefundedCharge(event.data.object as StripeCharge);
     }
 
     return NextResponse.json({ received: true });

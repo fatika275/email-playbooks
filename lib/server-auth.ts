@@ -113,11 +113,11 @@ export async function updateUserPlan(options: {
   const { url, serviceRoleKey } = getSupabaseServerConfig();
   const body = {
     user_id: options.userId,
-    email: options.email ?? null,
     plan: normalizePlan(options.plan),
     stripe_customer_id: options.stripeCustomerId ?? null,
     stripe_subscription_id: options.stripeSubscriptionId ?? null,
     updated_at: new Date().toISOString(),
+    ...(options.email ? { email: options.email } : {}),
   };
 
   const response = await fetch(
@@ -153,6 +153,42 @@ export async function updateUserPlan(options: {
       stripeSubscriptionId: options.stripeSubscriptionId ?? null,
     });
   }
+}
+
+export async function getUserBillingProfileByStripeCustomerId(
+  stripeCustomerId: string
+) {
+  const { url, serviceRoleKey } = getSupabaseServerConfig();
+  const response = await fetch(
+    `${url}/rest/v1/user_profiles?select=user_id,email,plan,stripe_customer_id,stripe_subscription_id&stripe_customer_id=eq.${encodeURIComponent(stripeCustomerId)}&limit=1`,
+    {
+      headers: {
+        apikey: serviceRoleKey,
+        authorization: `Bearer ${serviceRoleKey}`,
+      },
+      cache: "no-store",
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(await response.text());
+  }
+
+  const profiles = (await response.json()) as Array<{
+    user_id: string;
+    email?: string | null;
+    plan?: string | null;
+    stripe_customer_id?: string | null;
+    stripe_subscription_id?: string | null;
+  }>;
+  const profile = profiles[0];
+
+  return profile
+    ? {
+        ...profile,
+        plan: normalizePlan(profile.plan),
+      }
+    : null;
 }
 
 async function setBusinessWorkspaceAccess(options: {
