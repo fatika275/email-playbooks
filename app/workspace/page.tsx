@@ -21,6 +21,10 @@ import {
   type ClientFolderShareAccess,
 } from "@/lib/cloud";
 import {
+  listClientFolderFiles,
+  type ProspectFileRecord,
+} from "@/lib/client-folder-files";
+import {
   PROSPECT_STAGE_LABELS,
   getProspect,
   listProspectActivitiesForProspects,
@@ -29,21 +33,8 @@ import {
   type ProspectActivity,
 } from "@/lib/prospects";
 
-const PROSPECT_FILES_KEY = "thalovo_prospect_files_v1";
-
 type SavedView = "clients" | "followups";
 type FollowUpKind = "email" | "sequence";
-
-type ProspectFileRecord = {
-  id: string;
-  prospectId: string;
-  title: string;
-  kind: string;
-  url: string;
-  folder: string;
-  note: string;
-  createdAt: string;
-};
 
 type FollowUpItem =
   | {
@@ -77,18 +68,6 @@ function getPreview(text: string, maxLength = 120) {
   return `${clean.slice(0, maxLength).trim()}...`;
 }
 
-function readProspectFiles() {
-  if (typeof window === "undefined") return [];
-  try {
-    const parsed = JSON.parse(
-      window.localStorage.getItem(PROSPECT_FILES_KEY) || "[]"
-    );
-    return Array.isArray(parsed) ? (parsed as ProspectFileRecord[]) : [];
-  } catch {
-    return [];
-  }
-}
-
 export default function WorkspacePage() {
   const { user, businessMembership, syncVersion } = useAccount();
   const emails = useEmails();
@@ -101,7 +80,7 @@ export default function WorkspacePage() {
   const [renameValue, setRenameValue] = useState("");
   const [prospects, setProspects] = useState<Prospect[]>([]);
   const [activities, setActivities] = useState<ProspectActivity[]>([]);
-  const [files] = useState<ProspectFileRecord[]>(() => readProspectFiles());
+  const [files, setFiles] = useState<ProspectFileRecord[]>([]);
   const [shares, setShares] = useState<ClientFolderShare[]>([]);
   const [shareProspectId, setShareProspectId] = useState("");
   const [shareEmail, setShareEmail] = useState("");
@@ -245,11 +224,15 @@ export default function WorkspacePage() {
         if (!isMounted) return;
         setShares(nextShares);
         setProspects(nextProspects);
-        const nextActivities = await listProspectActivitiesForProspects(
-          nextProspects.map((prospect) => prospect.id)
-        );
+        const [nextActivities, nextFiles] = await Promise.all([
+          listProspectActivitiesForProspects(
+            nextProspects.map((prospect) => prospect.id)
+          ),
+          listClientFolderFiles(),
+        ]);
         if (!isMounted) return;
         setActivities(nextActivities);
+        setFiles(nextFiles);
       } catch (error) {
         if (!isMounted) return;
         setNotice(

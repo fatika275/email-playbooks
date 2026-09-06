@@ -5,24 +5,12 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAccount } from "@/components/account-provider";
 import PageLoadingState from "@/components/page-loading-state";
+import { saveClientFolderFile } from "@/lib/client-folder-files";
 import {
   getProspect,
   PROSPECT_STAGE_LABELS,
   type Prospect,
 } from "@/lib/prospects";
-
-const PROSPECT_FILES_KEY = "thalovo_prospect_files_v1";
-
-type ProspectFileRecord = {
-  id: string;
-  prospectId: string;
-  title: string;
-  kind: string;
-  url: string;
-  folder: string;
-  note: string;
-  createdAt: string;
-};
 
 const fileKindLabels: Record<string, string> = {
   proposal: "Proposal",
@@ -36,29 +24,6 @@ function makeLocalFileId() {
   return typeof crypto !== "undefined" && "randomUUID" in crypto
     ? crypto.randomUUID()
     : `client-file-${Date.now()}-${Math.random().toString(16).slice(2)}`;
-}
-
-function readAllProspectFiles() {
-  if (typeof window === "undefined") return [];
-  try {
-    const parsed = JSON.parse(
-      window.localStorage.getItem(PROSPECT_FILES_KEY) || "[]"
-    );
-    return Array.isArray(parsed) ? (parsed as ProspectFileRecord[]) : [];
-  } catch {
-    return [];
-  }
-}
-
-function writeProspectFiles(prospectId: string, files: ProspectFileRecord[]) {
-  if (typeof window === "undefined") return;
-  const otherFiles = readAllProspectFiles().filter(
-    (file) => file.prospectId !== prospectId
-  );
-  window.localStorage.setItem(
-    PROSPECT_FILES_KEY,
-    JSON.stringify([...otherFiles, ...files])
-  );
 }
 
 function normalizeFileUrl(value: string) {
@@ -110,7 +75,7 @@ export default function AddClientFolderFilePage() {
     };
   }, [id, user]);
 
-  function handleSaveFile(event: FormEvent<HTMLFormElement>) {
+  async function handleSaveFile(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!id || !fileTitle.trim()) {
       setNotice("Add a name for the file or link first.");
@@ -118,11 +83,10 @@ export default function AddClientFolderFilePage() {
     }
 
     setIsSaving(true);
-    const currentFiles = readAllProspectFiles()
-      .filter((file) => file.prospectId === id)
-      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-    const nextFiles = [
-      {
+    setNotice("");
+
+    try {
+      await saveClientFolderFile({
         id: makeLocalFileId(),
         prospectId: id,
         title: fileTitle.trim(),
@@ -131,12 +95,14 @@ export default function AddClientFolderFilePage() {
         folder: fileFolder.trim() || "Client files",
         note: fileNote.trim(),
         createdAt: new Date().toISOString(),
-      },
-      ...currentFiles,
-    ];
-
-    writeProspectFiles(id, nextFiles);
-    router.push(`/client-folders/${id}`);
+      });
+      router.push(`/client-folders/${id}`);
+    } catch (error) {
+      setNotice(
+        error instanceof Error ? error.message : "Could not save this file or link."
+      );
+      setIsSaving(false);
+    }
   }
 
   if (isLoading || (user && isFolderLoading)) {

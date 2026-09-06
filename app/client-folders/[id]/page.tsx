@@ -6,25 +6,17 @@ import { useParams } from "next/navigation";
 import { useAccount } from "@/components/account-provider";
 import PageLoadingState from "@/components/page-loading-state";
 import {
+  deleteClientFolderFile,
+  listClientFolderFiles,
+  type ProspectFileRecord,
+} from "@/lib/client-folder-files";
+import {
   getProspect,
   listProspectActivities,
   PROSPECT_STAGE_LABELS,
   type Prospect,
   type ProspectActivity,
 } from "@/lib/prospects";
-
-const PROSPECT_FILES_KEY = "thalovo_prospect_files_v1";
-
-type ProspectFileRecord = {
-  id: string;
-  prospectId: string;
-  title: string;
-  kind: string;
-  url: string;
-  folder: string;
-  note: string;
-  createdAt: string;
-};
 
 const fileKindLabels: Record<string, string> = {
   "sent-message": "Sent message",
@@ -38,45 +30,6 @@ const fileKindLabels: Record<string, string> = {
 const fileKindFilterOptions = Object.entries(fileKindLabels).filter(
   ([value]) => value !== "sent-message"
 );
-
-function readProspectFiles(prospectId: string) {
-  if (typeof window === "undefined") return [];
-  try {
-    const parsed = JSON.parse(
-      window.localStorage.getItem(PROSPECT_FILES_KEY) || "[]"
-    );
-    return Array.isArray(parsed)
-      ? (parsed as ProspectFileRecord[])
-          .filter((file) => file.prospectId === prospectId)
-          .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
-      : [];
-  } catch {
-    return [];
-  }
-}
-
-function readAllProspectFiles() {
-  if (typeof window === "undefined") return [];
-  try {
-    const parsed = JSON.parse(
-      window.localStorage.getItem(PROSPECT_FILES_KEY) || "[]"
-    );
-    return Array.isArray(parsed) ? (parsed as ProspectFileRecord[]) : [];
-  } catch {
-    return [];
-  }
-}
-
-function writeProspectFiles(prospectId: string, files: ProspectFileRecord[]) {
-  if (typeof window === "undefined") return;
-  const otherFiles = readAllProspectFiles().filter(
-    (file) => file.prospectId !== prospectId
-  );
-  window.localStorage.setItem(
-    PROSPECT_FILES_KEY,
-    JSON.stringify([...otherFiles, ...files])
-  );
-}
 
 function isSentMessageActivity(activity: ProspectActivity) {
   const summary = activity.summary.toLowerCase();
@@ -131,12 +84,20 @@ export default function ClientFolderPage() {
     );
   }, [files, fileSearch, fileTypeFilter]);
 
-  function handleRemoveFile(fileId: string) {
-    if (!id) return;
-    const nextFiles = files.filter((file) => file.id !== fileId);
-    setFiles(nextFiles);
-    writeProspectFiles(id, nextFiles);
-    setNotice("Removed from this client folder.");
+  async function handleRemoveFile(fileId: string) {
+    const existingFiles = files;
+    setFiles((current) => current.filter((file) => file.id !== fileId));
+    setNotice("");
+
+    try {
+      await deleteClientFolderFile(fileId);
+      setNotice("Removed from this client folder.");
+    } catch (error) {
+      setFiles(existingFiles);
+      setNotice(
+        error instanceof Error ? error.message : "Could not remove this file."
+      );
+    }
   }
 
   useEffect(() => {
@@ -145,14 +106,15 @@ export default function ClientFolderPage() {
 
     async function loadFolder() {
       try {
-        const [nextProspect, nextActivities] = await Promise.all([
+        const [nextProspect, nextActivities, nextFiles] = await Promise.all([
           getProspect(id!),
           listProspectActivities(id!),
+          listClientFolderFiles(id!),
         ]);
         if (!isMounted) return;
         setProspect(nextProspect);
         setActivities(nextActivities);
-        setFiles(readProspectFiles(id!));
+        setFiles(nextFiles);
       } catch (error) {
         if (!isMounted) return;
         setNotice(
@@ -302,7 +264,7 @@ export default function ClientFolderPage() {
                     <button
                       type="button"
                       className="button buttonUtility"
-                      onClick={() => handleRemoveFile(file.id)}
+                      onClick={() => void handleRemoveFile(file.id)}
                     >
                       Remove
                     </button>

@@ -40,6 +40,11 @@ const LEGACY_EMAILS_KEY = "arcmail_emails";
 const TEMPLATES_KEY = "thalovo_templates";
 const LEGACY_TEMPLATES_KEY = "arcmail_templates";
 const STORAGE_OWNER_KEY = "thalovo_storage_owner";
+const LOCAL_CLIENT_FILES_KEY = "thalovo_prospect_files_v1";
+const REUSE_EMAIL_KEY = "thalovo_reuse_email";
+const LEGACY_REUSE_EMAIL_KEY = "arcmail_reuse_email";
+const PROSPECT_CONTEXT_KEY = "thalovo_prospect_context";
+const ACTIVE_WORKSPACE_KEY = "thalovo_active_workspace_id";
 const STORAGE_CHANGE_EVENT = "thalovo_storage_change";
 const EMPTY_EMAILS: SavedEmail[] = [];
 const EMPTY_TEMPLATES: CustomTemplate[] = [];
@@ -69,7 +74,22 @@ export function clearStoredSavedWork() {
   localStorage.removeItem(TEMPLATES_KEY);
   localStorage.removeItem(LEGACY_EMAILS_KEY);
   localStorage.removeItem(LEGACY_TEMPLATES_KEY);
+  localStorage.removeItem(LOCAL_CLIENT_FILES_KEY);
+  localStorage.removeItem(REUSE_EMAIL_KEY);
+  localStorage.removeItem(LEGACY_REUSE_EMAIL_KEY);
+  localStorage.removeItem(PROSPECT_CONTEXT_KEY);
+  localStorage.removeItem(ACTIVE_WORKSPACE_KEY);
   localStorage.removeItem(STORAGE_OWNER_KEY);
+  for (let index = localStorage.length - 1; index >= 0; index -= 1) {
+    const key = localStorage.key(index);
+    if (
+      key?.startsWith("thalovo_team_activity_seen_") ||
+      key?.startsWith("thalovo_prospect_note_read_") ||
+      key?.startsWith("thalovo_prospect_activity_read_")
+    ) {
+      localStorage.removeItem(key);
+    }
+  }
   cachedEmailsRaw = null;
   cachedEmailsSnapshot = EMPTY_EMAILS;
   cachedTemplatesRaw = null;
