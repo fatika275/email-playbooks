@@ -1,7 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { Suspense, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { useAccount } from "@/components/account-provider";
 import PageLoadingState from "@/components/page-loading-state";
 import {
   buildObjectionReply,
@@ -26,6 +28,7 @@ const OFFER_CONTEXT_CATEGORIES: ObjectionCategory[] = [
 
 function ReplyHelperContent() {
   const searchParams = useSearchParams();
+  const { user, hasProAccess, isLoading } = useAccount();
   const [leadName, setLeadName] = useState(searchParams.get("name") ?? "");
   const [offer, setOffer] = useState(searchParams.get("offer") ?? "");
   const [senderName, setSenderName] = useState("");
@@ -69,6 +72,44 @@ function ReplyHelperContent() {
       shouldShowOfferField,
     ]
   );
+
+  if (isLoading) {
+    return (
+      <PageLoadingState
+        eyebrow="Objections"
+        title="Loading objection helper"
+        detail="Checking your account before opening the reply workspace."
+      />
+    );
+  }
+
+  if (!hasProAccess) {
+    return (
+      <main className="main">
+        <section className="container">
+          <div className="glassCard emptyState">
+            <div className="badge">Pro Workflow</div>
+            <h1 className="pageTitle" style={{ marginTop: 14 }}>
+              Objection replies are a Pro feature
+            </h1>
+            <p className="muted" style={{ maxWidth: 700, marginInline: "auto" }}>
+              Free access gives you the core outreach templates. Pro unlocks the
+              objection workspace for turning price, timing, trust, and fit
+              concerns into clearer next steps toward booked client work.
+            </p>
+            <div className="toolbar" style={{ justifyContent: "center", marginTop: 20 }}>
+              <Link href={user ? "/pricing" : "/account"} className="button buttonPrimary">
+                {user ? "View Pro" : "Sign in"}
+              </Link>
+              <Link href="/library" className="button buttonSecondary">
+                Use Free Templates
+              </Link>
+            </div>
+          </div>
+        </section>
+      </main>
+    );
+  }
 
   async function handleCopyReply() {
     await navigator.clipboard.writeText(`Subject: ${reply.subject}\n\n${reply.body}`);
