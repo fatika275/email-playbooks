@@ -63,6 +63,20 @@ export function setStorageOwnerId(userId: string) {
   localStorage.setItem(STORAGE_OWNER_KEY, userId);
 }
 
+export function clearStoredSavedWork() {
+  if (typeof window === "undefined") return;
+  localStorage.removeItem(EMAILS_KEY);
+  localStorage.removeItem(TEMPLATES_KEY);
+  localStorage.removeItem(LEGACY_EMAILS_KEY);
+  localStorage.removeItem(LEGACY_TEMPLATES_KEY);
+  localStorage.removeItem(STORAGE_OWNER_KEY);
+  cachedEmailsRaw = null;
+  cachedEmailsSnapshot = EMPTY_EMAILS;
+  cachedTemplatesRaw = null;
+  cachedTemplatesSnapshot = EMPTY_TEMPLATES;
+  notifyStorageChange();
+}
+
 function subscribeToStorageChange(onStoreChange: () => void) {
   if (typeof window === "undefined") return () => {};
 

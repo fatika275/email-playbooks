@@ -4,6 +4,7 @@ import {
   getEmails,
   deleteCustomTemplate,
   deleteEmail,
+  clearStoredSavedWork,
   replaceCustomTemplates,
   replaceEmails,
   saveCustomTemplate,
@@ -395,6 +396,7 @@ export async function signOutFromCloud() {
 
   const { error } = await client.auth.signOut();
   if (error) throw normalizeCloudError(error);
+  clearStoredSavedWork();
 }
 
 export async function getSignedInUser() {
@@ -900,6 +902,9 @@ export async function hydrateLocalDataFromCloud(user: User) {
     ensureCloudProfile(user)
   );
   const storedOwnerId = getStorageOwnerId();
+  if (storedOwnerId !== user.id) {
+    clearStoredSavedWork();
+  }
   const canUploadLocalWork = storedOwnerId === user.id;
 
   const [cloudEmails, cloudTemplates] = await Promise.all([
