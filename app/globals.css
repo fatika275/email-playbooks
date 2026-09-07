@@ -3924,12 +3924,6 @@ details[open] > summary::after {
   margin-bottom: 18px;
 }
 
-.prospectAddToggleRow {
-  display: flex;
-  justify-content: flex-end;
-  margin: -8px 0 18px;
-}
-
 .prospectFormHint {
   margin: 0 0 14px;
 }
