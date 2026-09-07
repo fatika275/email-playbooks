@@ -797,13 +797,13 @@ export default function ProspectsPage() {
               </p>
             </div>
             <div className="prospectOnboardingSteps">
-              <div><strong>1</strong><span>Add first lead</span></div>
+              <div><strong>1</strong><span>Create prospect card</span></div>
               <div><strong>2</strong><span>Choose a follow-up plan</span></div>
               <div><strong>3</strong><span>Send first message</span></div>
               <div><strong>4</strong><span>Set first follow-up</span></div>
             </div>
             <button className="button buttonPrimary" type="button" onClick={() => setShowAdd(true)}>
-              Add first lead
+              Start setup
             </button>
           </section>
         ) : null}
@@ -825,7 +825,7 @@ export default function ProspectsPage() {
               <div className="formGroup"><label className="label">Next follow-up <span>Optional</span></label><input className="input" type="date" value={nextFollowUp} onChange={(event) => setNextFollowUp(event.target.value)} /></div>
               <div className="formGroup"><label className="label">Deliverables <span>Optional</span></label><input className="input" value={deliverables} onChange={(event) => setDeliverables(event.target.value)} placeholder="Landing page, 3-email sequence, monthly reporting..." /></div>
             </div>
-            <button className="button buttonPrimary" disabled={isWorking} onClick={() => void handleCreate()}>{isWorking ? "Adding..." : "Add lead"}</button>
+            <button className="button buttonPrimary" disabled={isWorking} onClick={() => void handleCreate()}>{isWorking ? "Saving..." : "Save prospect"}</button>
           </section>
         ) : null}
 
