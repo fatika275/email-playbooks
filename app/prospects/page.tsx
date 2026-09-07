@@ -781,9 +781,6 @@ export default function ProspectsPage() {
                 }}
               />
             </label>
-            <button className="button buttonPrimary" onClick={() => setShowAdd((open) => !open)}>
-              {showAdd ? "Close" : "Add lead"}
-            </button>
           </div>
         </div>
 
@@ -802,11 +799,21 @@ export default function ProspectsPage() {
               <div><strong>3</strong><span>Send first message</span></div>
               <div><strong>4</strong><span>Set first follow-up</span></div>
             </div>
-            <button className="button buttonPrimary" type="button" onClick={() => setShowAdd(true)}>
-              Start setup
+            <button className="button buttonPrimary" type="button" onClick={() => setShowAdd((open) => !open)}>
+              {showAdd ? "Close" : "Add first lead"}
             </button>
           </section>
-        ) : null}
+        ) : (
+          <div className="prospectAddToggleRow">
+            <button
+              className={showAdd ? "button buttonSecondary" : "button buttonPrimary"}
+              type="button"
+              onClick={() => setShowAdd((open) => !open)}
+            >
+              {showAdd ? "Close" : "Add lead"}
+            </button>
+          </div>
+        )}
 
         {showAdd ? (
           <section className="prospectAddPanel">
