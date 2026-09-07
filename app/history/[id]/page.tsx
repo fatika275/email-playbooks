@@ -28,6 +28,7 @@ export default function SavedEmailViewPage() {
   );
   const email =
     optimisticEmail?.id === storedEmail?.id ? optimisticEmail : storedEmail;
+  const [titleDraft, setTitleDraft] = useState<string | null>(null);
   const [tagsInput, setTagsInput] = useState(
     () => storedEmail?.tags.join(", ") ?? ""
   );
@@ -35,6 +36,7 @@ export default function SavedEmailViewPage() {
     () => storedEmail?.folder ?? ""
   );
   const [savedNotice, setSavedNotice] = useState("");
+  const savedTitle = titleDraft ?? email?.templateLabel ?? "";
 
   async function handleCopy() {
     if (!email) return;
@@ -62,6 +64,12 @@ export default function SavedEmailViewPage() {
 
   async function handleSaveMetadata() {
     if (!email) return;
+    const nextTitle = savedTitle.trim();
+
+    if (!nextTitle) {
+      setSavedNotice("Give this saved message a clear name first.");
+      return;
+    }
 
     const tags = tagsInput
       .split(",")
@@ -70,6 +78,7 @@ export default function SavedEmailViewPage() {
 
     const updatedEmail = {
       ...email,
+      templateLabel: nextTitle,
       tags,
       folder: folderInput.trim() || null,
     };
@@ -96,7 +105,7 @@ export default function SavedEmailViewPage() {
     if (!email) return;
     if (
       !window.confirm(
-        `Delete "${email.templateLabel}" from your saved messages? This cannot be undone.`
+        `Delete "${savedTitle}" from your saved messages? This cannot be undone.`
       )
     ) {
       return;
@@ -133,7 +142,7 @@ export default function SavedEmailViewPage() {
           <div className="badge">Saved Email</div>
 
           <h1 className="pageTitle" style={{ marginTop: 14 }}>
-            {email.templateLabel}
+            {savedTitle}
           </h1>
 
           <p className="muted">
@@ -175,7 +184,7 @@ export default function SavedEmailViewPage() {
                   >
                     Template
                   </p>
-                  <p style={{ margin: "6px 0 0" }}>{email.templateLabel}</p>
+                  <p style={{ margin: "6px 0 0" }}>{savedTitle}</p>
                 </div>
 
                 <div>
@@ -243,6 +252,16 @@ export default function SavedEmailViewPage() {
               <h4 style={{ margin: 0 }}>Organize this saved agency message</h4>
               <div style={{ display: "grid", gap: 14, marginTop: 14 }}>
                 <div className="formGroup" style={{ marginBottom: 0 }}>
+                  <label className="label">Saved message name</label>
+                  <input
+                    className="input"
+                    value={savedTitle}
+                    onChange={(event) => setTitleDraft(event.target.value)}
+                    placeholder="Example: Post-proposal price reply"
+                  />
+                </div>
+
+                <div className="formGroup" style={{ marginBottom: 0 }}>
                   <label className="label">Folder</label>
                   <input
                     className="input"
@@ -285,7 +304,7 @@ export default function SavedEmailViewPage() {
             <ShareWithTeam
               assetType="email"
               sourceId={email.id}
-              title={email.templateLabel}
+              title={savedTitle}
               subject={email.subject}
               body={email.body}
             />

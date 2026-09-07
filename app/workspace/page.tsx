@@ -14,8 +14,6 @@ import {
   deleteCustomTemplateRecord,
   deleteEmailRecord,
   removeClientFolderShare,
-  saveCustomTemplateRecord,
-  saveEmailRecord,
   shareClientFolderWithTeammate,
   type ClientFolderShare,
   type ClientFolderShareAccess,
@@ -76,8 +74,6 @@ export default function WorkspacePage() {
   const [clientQuery, setClientQuery] = useState("");
   const [followUpQuery, setFollowUpQuery] = useState("");
   const [followUpKind, setFollowUpKind] = useState<"all" | FollowUpKind>("all");
-  const [renameItemKey, setRenameItemKey] = useState("");
-  const [renameValue, setRenameValue] = useState("");
   const [prospects, setProspects] = useState<Prospect[]>([]);
   const [activities, setActivities] = useState<ProspectActivity[]>([]);
   const [files, setFiles] = useState<ProspectFileRecord[]>([]);
@@ -274,33 +270,6 @@ export default function WorkspacePage() {
     } catch (error) {
       setNotice(
         error instanceof Error ? error.message : "Could not delete this item."
-      );
-    }
-  }
-
-  async function handleRenameFollowUp() {
-    const item = followUpItems.find(
-      (candidate) => `${candidate.kind}:${candidate.id}` === renameItemKey
-    );
-    const nextName = renameValue.trim();
-
-    if (!item || !nextName) {
-      setNotice("Choose a follow-up item and give it a clear name.");
-      return;
-    }
-
-    try {
-      if (item.kind === "email") {
-        await saveEmailRecord({ ...item.item, templateLabel: nextName });
-      } else {
-        await saveCustomTemplateRecord({ ...item.item, title: nextName });
-      }
-      setRenameItemKey("");
-      setRenameValue("");
-      setNotice(`Renamed to "${nextName}".`);
-    } catch (error) {
-      setNotice(
-        error instanceof Error ? error.message : "Could not rename this item."
       );
     }
   }
@@ -547,45 +516,6 @@ export default function WorkspacePage() {
                 <option value="sequence">Plans</option>
               </select>
             </div>
-
-            {followUpItems.length > 0 ? (
-              <div className="savedMoveBar">
-                <select
-                  className="input"
-                  value={renameItemKey}
-                  onChange={(event) => {
-                    const key = event.target.value;
-                    const item = followUpItems.find(
-                      (candidate) => `${candidate.kind}:${candidate.id}` === key
-                    );
-                    setRenameItemKey(key);
-                    setRenameValue(item?.title ?? "");
-                  }}
-                  aria-label="Follow-up item to rename"
-                >
-                  <option value="">Rename saved follow-up...</option>
-                  {followUpItems.map((item) => (
-                    <option key={`${item.kind}:${item.id}`} value={`${item.kind}:${item.id}`}>
-                      {item.kind === "email" ? "Email" : "Plan"}: {item.title}
-                    </option>
-                  ))}
-                </select>
-                <input
-                  className="input"
-                  value={renameValue}
-                  onChange={(event) => setRenameValue(event.target.value)}
-                  placeholder="Clear searchable name"
-                  aria-label="New follow-up name"
-                />
-                <button
-                  type="button"
-                  className="button buttonSecondary"
-                  onClick={() => void handleRenameFollowUp()}
-                >
-                  Rename
-                </button>
-              </div>
-            ) : null}
 
             {filteredFollowUps.length === 0 ? (
               <div className="glassCard emptyState">

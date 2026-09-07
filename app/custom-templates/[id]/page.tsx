@@ -157,6 +157,12 @@ export default function SequenceAssetPage() {
 
   async function handleSaveMetadata() {
     if (!template) return;
+    const nextTitle = title.trim();
+
+    if (!nextTitle) {
+      setSavedMessage("Give this follow-up plan a clear name first.");
+      return;
+    }
 
     const tags = tagsInput
       .split(",")
@@ -165,6 +171,7 @@ export default function SequenceAssetPage() {
 
     const updatedTemplate = {
       ...template,
+      title: nextTitle,
       tags,
       folder: folderInput.trim() || null,
     };
@@ -389,8 +396,18 @@ export default function SequenceAssetPage() {
             </details>
 
             <details className="savedPlanDisclosure">
-              <summary><strong>Organize this plan</strong><span>Folder, tags, favorite</span></summary>
+              <summary><strong>Organize this plan</strong><span>Name, folder, tags</span></summary>
               <div className="savedPlanDisclosureBody">
+                <div className="formGroup" style={{ marginBottom: 0 }}>
+                  <label className="label">Plan name</label>
+                  <input
+                    className="input"
+                    value={title}
+                    onChange={(event) => setTitleDraft(event.target.value)}
+                    placeholder="Example: Proposal chase for design leads"
+                  />
+                </div>
+
                 <div className="formGroup" style={{ marginBottom: 0 }}>
                   <label className="label">Folder</label>
                   <input
@@ -436,16 +453,6 @@ export default function SequenceAssetPage() {
               subject={subject}
               body={body}
             />
-
-            <div className="formGroup">
-              <label className="label">Asset Name</label>
-              <input
-                className="input"
-                value={title}
-                onChange={(event) => setTitleDraft(event.target.value)}
-                placeholder="Enter asset name"
-              />
-            </div>
 
             <div className="formGroup">
               <label className="label">Subject</label>
