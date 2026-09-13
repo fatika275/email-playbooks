@@ -34,6 +34,22 @@ type StripeSubscription = {
   };
 };
 
+type StripeInvoicePreview = {
+  amount_due?: number;
+  total?: number;
+  currency?: string;
+  error?: {
+    message?: string;
+  };
+};
+
+function formatMinorCurrency(amount: number, currency: string) {
+  return new Intl.NumberFormat("en-GB", {
+    style: "currency",
+    currency: currency.toUpperCase(),
+  }).format(amount / 100);
+}
+
 function getSupabaseServerConfig() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -94,6 +110,7 @@ async function updateStripeSubscriptionPlan(options: {
   priceId: string;
   plan: Exclude<PlanId, "free" | "founder">;
   userId: string;
+  prorationDate: number;
   stripeSecretKey: string;
 }) {
   const form = new URLSearchParams();
@@ -101,7 +118,8 @@ async function updateStripeSubscriptionPlan(options: {
   form.set("items[0][price]", options.priceId);
   form.set("metadata[user_id]", options.userId);
   form.set("metadata[plan]", options.plan);
-  form.set("proration_behavior", "create_prorations");
+  form.set("proration_behavior", "always_invoice");
+  form.set("proration_date", String(options.prorationDate));
   form.set("payment_behavior", "error_if_incomplete");
 
   const response = await fetch(
@@ -124,6 +142,48 @@ async function updateStripeSubscriptionPlan(options: {
   return payload;
 }
 
+async function previewStripeSubscriptionChange(options: {
+  subscriptionId: string;
+  subscriptionItemId: string;
+  priceId: string;
+  prorationDate: number;
+  stripeSecretKey: string;
+}) {
+  const form = new URLSearchParams();
+  form.set("subscription", options.subscriptionId);
+  form.set("subscription_details[items][0][id]", options.subscriptionItemId);
+  form.set("subscription_details[items][0][price]", options.priceId);
+  form.set("subscription_details[proration_behavior]", "always_invoice");
+  form.set("subscription_details[proration_date]", String(options.prorationDate));
+
+  const response = await fetch("https://api.stripe.com/v1/invoices/create_preview", {
+    method: "POST",
+    headers: {
+      authorization: `Bearer ${options.stripeSecretKey}`,
+      "content-type": "application/x-www-form-urlencoded",
+    },
+    body: form,
+  });
+  const payload = (await response.json()) as StripeInvoicePreview;
+
+  if (!response.ok) {
+    throw new Error(payload.error?.message || "Stripe could not preview this plan change.");
+  }
+
+  const amountDue = payload.amount_due ?? 0;
+  const total = payload.total ?? amountDue;
+  const currency = payload.currency ?? "gbp";
+
+  return {
+    amountDue,
+    total,
+    currency,
+    amountDueLabel: formatMinorCurrency(amountDue, currency),
+    totalLabel: formatMinorCurrency(total, currency),
+    prorationDate: options.prorationDate,
+  };
+}
+
 export async function POST(request: NextRequest) {
   try {
     const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
@@ -143,7 +203,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { plan } = (await request.json()) as { plan?: PlanId };
+    const { plan, previewOnly, prorationDate } = (await request.json()) as {
+      plan?: PlanId;
+      previewOnly?: boolean;
+      prorationDate?: number;
+    };
     const targetPlan = normalizePlan(plan);
 
     if (!changeablePlans.has(targetPlan)) {
@@ -199,12 +263,35 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const safeProrationDate =
+      Number.isFinite(prorationDate) && Number(prorationDate) > 0
+        ? Math.floor(Number(prorationDate))
+        : Math.floor(Date.now() / 1000);
+
+    const preview = await previewStripeSubscriptionChange({
+      subscriptionId,
+      subscriptionItemId: subscriptionItem.id,
+      priceId,
+      prorationDate: safeProrationDate,
+      stripeSecretKey,
+    });
+
+    if (previewOnly) {
+      return NextResponse.json({
+        changed: false,
+        plan: targetPlan,
+        planLabel: PLAN_LABELS[targetPlan],
+        preview,
+      });
+    }
+
     const updatedSubscription = await updateStripeSubscriptionPlan({
       subscriptionId,
       subscriptionItemId: subscriptionItem.id,
       priceId,
       plan: targetPlan as Exclude<PlanId, "free" | "founder">,
       userId: user.id,
+      prorationDate: preview.prorationDate,
       stripeSecretKey,
     });
 
@@ -228,6 +315,7 @@ export async function POST(request: NextRequest) {
       changed: true,
       plan: targetPlan,
       planLabel: PLAN_LABELS[targetPlan],
+      preview,
     });
   } catch (error) {
     return NextResponse.json(

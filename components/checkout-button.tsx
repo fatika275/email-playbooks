@@ -17,6 +17,15 @@ const planLabels: Record<Exclude<PlanId, "free">, string> = {
   business: "Business Pro",
 };
 
+type PlanChangePreview = {
+  amountDue: number;
+  total: number;
+  currency: string;
+  amountDueLabel: string;
+  totalLabel: string;
+  prorationDate: number;
+};
+
 export function CheckoutButton({
   plan,
   children,
@@ -26,6 +35,8 @@ export function CheckoutButton({
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isConfirmingPlanChange, setIsConfirmingPlanChange] = useState(false);
+  const [planChangePreview, setPlanChangePreview] =
+    useState<PlanChangePreview | null>(null);
 
   const hasPaidPlan = currentPlan !== "free";
   const canChangePlanInApp =
@@ -38,14 +49,6 @@ export function CheckoutButton({
 
     if (!user) {
       setMessage("Create or sign into your account first, then choose a plan.");
-      return;
-    }
-
-    if (canChangePlanInApp && !isConfirmingPlanChange) {
-      setIsConfirmingPlanChange(true);
-      setMessage(
-        `You're about to switch from ${planLabels[currentPlan as Exclude<PlanId, "free">] || "your current plan"} to ${planLabels[plan]}. Stripe may prorate the billing difference.`
-      );
       return;
     }
 
@@ -72,7 +75,13 @@ export function CheckoutButton({
           authorization: `Bearer ${accessToken}`,
         },
         body:
-          canChangePlanInApp || !hasPaidPlan
+          canChangePlanInApp
+            ? JSON.stringify({
+                plan,
+                previewOnly: !isConfirmingPlanChange,
+                prorationDate: planChangePreview?.prorationDate,
+              })
+            : !hasPaidPlan
             ? JSON.stringify({ plan })
             : undefined,
       });
@@ -81,6 +90,7 @@ export function CheckoutButton({
         url?: string;
         error?: string;
         planLabel?: string;
+        preview?: PlanChangePreview;
       };
 
       if (canChangePlanInApp) {
@@ -88,8 +98,27 @@ export function CheckoutButton({
           throw new Error(payload.error || "Plan could not be changed.");
         }
 
+        if (!isConfirmingPlanChange) {
+          const preview = payload.preview;
+          if (!preview) {
+            throw new Error("Stripe could not calculate this plan change.");
+          }
+
+          setPlanChangePreview(preview);
+          setIsConfirmingPlanChange(true);
+          setMessage(
+            preview.amountDue > 0
+              ? `Stripe will charge ${preview.amountDueLabel} now to switch from ${planLabels[currentPlan as Exclude<PlanId, "free">] || "your current plan"} to ${planLabels[plan]}.`
+              : preview.total < 0
+                ? `Stripe shows ${preview.totalLabel} as credit from this switch. No extra payment is due now.`
+                : `Stripe shows no extra payment due now for this switch.`
+          );
+          return;
+        }
+
         await syncNow().catch(() => undefined);
         setIsConfirmingPlanChange(false);
+        setPlanChangePreview(null);
         setMessage(
           `${payload.planLabel || "Your new plan"} is active on this account.`
         );
@@ -139,6 +168,7 @@ export function CheckoutButton({
           style={{ marginTop: 10 }}
           onClick={() => {
             setIsConfirmingPlanChange(false);
+            setPlanChangePreview(null);
             setMessage("");
           }}
         >
