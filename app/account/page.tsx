@@ -354,8 +354,6 @@ export default function AccountPage() {
                 </p>
               </div>
 
-              {visibleNotice ? <p className="notice">{visibleNotice}</p> : null}
-
               <div className="authModeTabs" role="tablist" aria-label="Account mode">
                 <button
                   type="button"
@@ -423,6 +421,15 @@ export default function AccountPage() {
                   {authMode === "signup" ? (
                     <p className="small" style={{ marginTop: 8 }}>
                       {signupPasswordHint}
+                    </p>
+                  ) : null}
+                  {visibleNotice ? (
+                    <p
+                      className="verificationInlineNotice"
+                      role="status"
+                      aria-live="polite"
+                    >
+                      {visibleNotice}
                     </p>
                   ) : null}
                 </div>
