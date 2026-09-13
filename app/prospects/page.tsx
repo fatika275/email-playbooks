@@ -268,6 +268,23 @@ export default function ProspectsPage() {
       const days = daysSince(prospect.last_contacted_at ?? prospect.updated_at);
       return days !== null && days >= 14;
     });
+    const proposalStageProspects = prospects.filter((prospect) =>
+      ["qualified", "meeting"].includes(prospect.stage)
+    );
+    const highValueNoNextStep = prospects.filter(
+      (prospect) =>
+        ACTIVE_STAGES.includes(prospect.stage) &&
+        !prospect.next_follow_up &&
+        prospect.estimated_value_gbp >= 1000
+    );
+    const stuckProspects = prospects.filter((prospect) => {
+      if (!["researching", "contacted", "qualified", "meeting"].includes(prospect.stage)) {
+        return false;
+      }
+      if (isDue(prospect.next_follow_up)) return false;
+      const days = daysSince(prospect.updated_at);
+      return days !== null && days >= 10;
+    });
     const nextMessageQueue = [
       ...scheduledFollowUps.map(({ task, prospect }) => ({
         id: `message-task-${task.id}`,
@@ -298,28 +315,20 @@ export default function ProspectsPage() {
     ].slice(0, 5);
 
     const priorityItems = [
-      ...scheduledFollowUps.slice(0, 4).map(({ task, prospect }) => ({
-        id: `followup-task-${task.id}`,
-        prospectId: prospect?.id,
-        label: "Reminder",
-        title: getProspectTaskDisplayTitle(task.title),
-        meta: prospect ? `${prospect.full_name} - ${prospect.company}` : "Prospect",
-        href: prospect ? `/prospects/${prospect.id}` : "/prospects",
-      })),
-      ...dueFollowUps.slice(0, 4).map(({ prospect }) => ({
-        id: `followup-prospect-${prospect.id}`,
-        prospectId: prospect.id,
-        label: "Due today",
-        title: prospect.full_name,
-        meta: `${prospect.company} - ${PROSPECT_STAGE_LABELS[prospect.stage]}`,
-        href: `/prospects/${prospect.id}`,
-      })),
       ...replyNeeded.slice(0, 3).map((prospect) => ({
         id: `reply-${prospect.id}`,
         prospectId: prospect.id,
         label: "Needs reply",
         title: prospect.full_name,
         meta: prospect.company,
+        href: `/prospects/${prospect.id}`,
+      })),
+      ...proposalStageProspects.slice(0, 3).map((prospect) => ({
+        id: `proposal-stage-${prospect.id}`,
+        prospectId: prospect.id,
+        label: "Close step",
+        title: prospect.full_name,
+        meta: `${prospect.company} - ${PROSPECT_STAGE_LABELS[prospect.stage]}`,
         href: `/prospects/${prospect.id}`,
       })),
       ...coldProspects.slice(0, 3).map((prospect) => ({
@@ -330,13 +339,21 @@ export default function ProspectsPage() {
         meta: `${prospect.company} - last touched ${daysSince(prospect.last_contacted_at ?? prospect.updated_at)} days ago`,
         href: `/prospects/${prospect.id}`,
       })),
-      ...manualDueTasks.slice(0, 3).map(({ task, prospect }) => ({
-        id: `task-${task.id}`,
-        prospectId: prospect?.id,
-        label: "Task due",
-        title: getProspectTaskDisplayTitle(task.title),
-        meta: prospect ? `${prospect.full_name} - ${prospect.company}` : "Prospect",
-        href: prospect ? `/prospects/${prospect.id}` : "/prospects",
+      ...highValueNoNextStep.slice(0, 3).map((prospect) => ({
+        id: `no-next-step-${prospect.id}`,
+        prospectId: prospect.id,
+        label: "No next step",
+        title: prospect.full_name,
+        meta: `${prospect.company} - ${formatMoney(prospect.estimated_value_gbp)} potential work`,
+        href: `/prospects/${prospect.id}`,
+      })),
+      ...stuckProspects.slice(0, 3).map((prospect) => ({
+        id: `stuck-${prospect.id}`,
+        prospectId: prospect.id,
+        label: "Stuck stage",
+        title: prospect.full_name,
+        meta: `${prospect.company} - ${PROSPECT_STAGE_LABELS[prospect.stage]} for ${daysSince(prospect.updated_at)} days`,
+        href: `/prospects/${prospect.id}`,
       })),
     ].slice(0, 8);
     const primaryMessage = nextMessageQueue[0];
@@ -350,6 +367,8 @@ export default function ProspectsPage() {
       proposalsToChase,
       coldProspects,
       manualDueTasks,
+      highValueNoNextStep,
+      stuckProspects,
       priorityItems,
       supportingItems,
       nextMessageQueue,
@@ -1091,7 +1110,7 @@ export default function ProspectsPage() {
 
             <div className="prospectDailyLayout">
               <section className="prospectDailyPanel">
-                <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">Action queue</h3><p className="muted">Handle these in order. Each item opens the lead with the context you need for the next move.</p></div>
+                <div className="prospectDashboardSectionHeading"><h3 className="sectionTitle">Opportunity queue</h3><p className="muted">Leads that need judgement, a close step, or a next action before they quietly slip.</p></div>
                 <div className="prospectDailyActionList">
                   {dailyDashboard.supportingItems.slice(0, 6).map((item) => (
                     <Link key={item.id} href={item.href} className="prospectDailyAction">
@@ -1104,8 +1123,8 @@ export default function ProspectsPage() {
                   ))}
                   {dailyDashboard.supportingItems.length === 0 ? (
                     <div className="prospectDailyEmpty">
-                      <strong>No extra work queued</strong>
-                      <p className="muted">Handle the main move above, or add a lead and set the next follow-up.</p>
+                      <strong>No extra opportunities flagged</strong>
+                      <p className="muted">Use the Chase list for due reminders, or add a next step to any lead that needs attention.</p>
                     </div>
                   ) : null}
                 </div>
