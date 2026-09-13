@@ -16,11 +16,15 @@ export function CheckoutButton({
   children,
   className = "button buttonPrimary",
 }: CheckoutButtonProps) {
-  const { user, plan: currentPlan } = useAccount();
+  const { user, plan: currentPlan, syncNow } = useAccount();
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const hasPaidPlan = currentPlan !== "free";
+  const canChangePlanInApp =
+    hasPaidPlan &&
+    currentPlan !== plan &&
+    (plan === "pro" || plan === "business");
 
   async function handleCheckout() {
     setMessage("");
@@ -41,20 +45,40 @@ export function CheckoutButton({
 
     try {
       setIsLoading(true);
-      const endpoint = hasPaidPlan ? "/api/billing/portal" : "/api/checkout";
+      const endpoint = canChangePlanInApp
+        ? "/api/billing/change-plan"
+        : hasPaidPlan
+          ? "/api/billing/portal"
+          : "/api/checkout";
       const response = await fetch(endpoint, {
         method: "POST",
         headers: {
           "content-type": "application/json",
           authorization: `Bearer ${accessToken}`,
         },
-        body: hasPaidPlan ? undefined : JSON.stringify({ plan }),
+        body:
+          canChangePlanInApp || !hasPaidPlan
+            ? JSON.stringify({ plan })
+            : undefined,
       });
 
       const payload = (await response.json()) as {
         url?: string;
         error?: string;
+        planLabel?: string;
       };
+
+      if (canChangePlanInApp) {
+        if (!response.ok) {
+          throw new Error(payload.error || "Plan could not be changed.");
+        }
+
+        await syncNow().catch(() => undefined);
+        setMessage(
+          `${payload.planLabel || "Your new plan"} is active on this account.`
+        );
+        return;
+      }
 
       if (!response.ok || !payload.url) {
         throw new Error(
@@ -83,12 +107,14 @@ export function CheckoutButton({
     <div>
       <button className={className} disabled={isLoading} onClick={handleCheckout}>
         {isLoading
-          ? hasPaidPlan
+          ? canChangePlanInApp
+            ? "Switching plan..."
+            : hasPaidPlan
             ? "Opening subscription..."
             : "Opening checkout..."
           : children}
       </button>
-      {hasPaidPlan ? (
+      {hasPaidPlan && !canChangePlanInApp ? (
         <p className="notice">
           You already have a paid plan. Manage your subscription to change,
           cancel, or update billing.
