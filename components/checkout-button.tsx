@@ -11,6 +11,12 @@ type CheckoutButtonProps = {
   className?: string;
 };
 
+const planLabels: Record<Exclude<PlanId, "free">, string> = {
+  pro: "Pro",
+  founder: "Founder Pro",
+  business: "Business Pro",
+};
+
 export function CheckoutButton({
   plan,
   children,
@@ -19,6 +25,7 @@ export function CheckoutButton({
   const { user, plan: currentPlan, syncNow } = useAccount();
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isConfirmingPlanChange, setIsConfirmingPlanChange] = useState(false);
 
   const hasPaidPlan = currentPlan !== "free";
   const canChangePlanInApp =
@@ -31,6 +38,14 @@ export function CheckoutButton({
 
     if (!user) {
       setMessage("Create or sign into your account first, then choose a plan.");
+      return;
+    }
+
+    if (canChangePlanInApp && !isConfirmingPlanChange) {
+      setIsConfirmingPlanChange(true);
+      setMessage(
+        `You're about to switch from ${planLabels[currentPlan as Exclude<PlanId, "free">] || "your current plan"} to ${planLabels[plan]}. Stripe may prorate the billing difference.`
+      );
       return;
     }
 
@@ -74,6 +89,7 @@ export function CheckoutButton({
         }
 
         await syncNow().catch(() => undefined);
+        setIsConfirmingPlanChange(false);
         setMessage(
           `${payload.planLabel || "Your new plan"} is active on this account.`
         );
@@ -112,8 +128,23 @@ export function CheckoutButton({
             : hasPaidPlan
             ? "Opening subscription..."
             : "Opening checkout..."
+          : canChangePlanInApp && isConfirmingPlanChange
+            ? `Confirm switch to ${planLabels[plan]}`
           : children}
       </button>
+      {canChangePlanInApp && isConfirmingPlanChange ? (
+        <button
+          type="button"
+          className="button buttonUtility"
+          style={{ marginTop: 10 }}
+          onClick={() => {
+            setIsConfirmingPlanChange(false);
+            setMessage("");
+          }}
+        >
+          Cancel
+        </button>
+      ) : null}
       {hasPaidPlan && !canChangePlanInApp ? (
         <p className="notice">
           You already have a paid plan. Manage your subscription to change,
