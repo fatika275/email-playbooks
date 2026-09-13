@@ -6,6 +6,7 @@ import { useAccount } from "@/components/account-provider";
 
 const plans = [
   {
+    id: "free",
     name: "Free",
     description: "For testing the message library before tracking live client work.",
     price: "GBP 0",
@@ -20,6 +21,7 @@ const plans = [
     ],
   },
   {
+    id: "pro",
     name: "Pro",
     description: "For small agencies turning replies into booked calls and proposals.",
     price: "GBP 19",
@@ -35,6 +37,7 @@ const plans = [
     ],
   },
   {
+    id: "business",
     name: "Business Pro",
     description: "For small teams sharing leads, notes, ownership, and handoff context.",
     price: "GBP 29",
@@ -58,7 +61,14 @@ const comparisons = [
 ];
 
 export default function PricingPage() {
-  const { founderEligible, founderPriceGbp } = useAccount();
+  const {
+    founderEligible,
+    founderPriceGbp,
+    hasBusinessAccess,
+    plan: currentPlan,
+    planLabel,
+  } = useAccount();
+  const effectivePlan = hasBusinessAccess ? "business" : currentPlan;
   const founderPriceLabel =
     founderPriceGbp !== null ? `GBP ${founderPriceGbp}` : "GBP 12";
 
@@ -76,8 +86,8 @@ export default function PricingPage() {
           </p>
 
           <div className="pricingBillingPill" aria-label="Billing">
-            <span>Monthly</span>
-            <strong>No setup fees</strong>
+            <span>Your plan</span>
+            <strong>{planLabel}</strong>
           </div>
         </div>
 
@@ -98,12 +108,18 @@ export default function PricingPage() {
           <div className="pricingFounderSpotlightActions">
             <span
               className={
-                founderEligible
+                effectivePlan === "founder"
+                  ? "statusPill statusPillSuccess"
+                  : founderEligible
                   ? "statusPill statusPillSuccess"
                   : "statusPill statusPillWarning"
               }
             >
-              {founderEligible ? "Unlocked on this account" : "Invite-only"}
+              {effectivePlan === "founder"
+                ? "Current plan"
+                : founderEligible
+                  ? "Unlocked on this account"
+                  : "Invite-only"}
             </span>
             {founderEligible ? (
               <CheckoutButton
@@ -121,7 +137,9 @@ export default function PricingPage() {
         </div>
 
         <div className="pricingSupabaseGrid">
-          {plans.map((plan) => (
+          {plans.map((plan) => {
+            const isCurrentPlan = effectivePlan === plan.id;
+            return (
             <article
               key={plan.name}
               className={
@@ -136,6 +154,7 @@ export default function PricingPage() {
                   <p>{plan.description}</p>
                 </div>
                 {plan.popular ? <span>Most popular</span> : null}
+                {isCurrentPlan ? <span>Current plan</span> : null}
               </div>
 
               <div className="pricingSupabasePrice">
@@ -145,7 +164,11 @@ export default function PricingPage() {
 
               {plan.note ? <p className="pricingSupabaseNote">{plan.note}</p> : null}
 
-              {plan.name === "Pro" ? (
+              {isCurrentPlan ? (
+                <div className="button buttonSecondary pricingCurrentPlanButton">
+                  Current plan
+                </div>
+              ) : plan.name === "Pro" ? (
                 <CheckoutButton
                   plan="pro"
                   className="button buttonPrimary"
@@ -174,7 +197,8 @@ export default function PricingPage() {
                 ))}
               </ul>
             </article>
-          ))}
+          );
+          })}
         </div>
 
         <section className="pricingCompare" id="compare-plans" aria-label="Plan comparison">

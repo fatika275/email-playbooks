@@ -12,6 +12,9 @@ export default function AccountPage() {
     isConfigured,
     isLoading,
     isSyncing,
+    founderPriceGbp,
+    plan,
+    planLabel,
     syncErrorMessage,
     statusMessage,
     signInWithPassword: signIn,
@@ -217,6 +220,18 @@ export default function AccountPage() {
               <div className="accountIdentityBlock">
                 <span>Email</span>
                 <strong>{user.email ?? "Signed in"}</strong>
+              </div>
+
+              <div className="accountIdentityBlock accountPlanBlock">
+                <span>Current plan</span>
+                <strong>
+                  {plan === "founder" && founderPriceGbp
+                    ? `${planLabel} - GBP ${founderPriceGbp}/month`
+                    : planLabel}
+                </strong>
+                <Link href="/pricing" className="small">
+                  View plans
+                </Link>
               </div>
 
               <div className="accountRailActions">
