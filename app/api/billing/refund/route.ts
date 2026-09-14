@@ -236,7 +236,7 @@ export async function POST(request: NextRequest) {
     if (!isInsideRefundWindow) {
       return NextResponse.json(
         {
-          error: `Automatic refunds are available within ${refundWindowDays} days of payment. Please contact support if you still need help with this charge.`,
+          error: `Refund not submitted. Automatic refunds are only available within ${refundWindowDays} days of payment. Please contact support if you still need help with this charge.`,
         },
         { status: 409 }
       );

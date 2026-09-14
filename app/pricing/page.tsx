@@ -82,9 +82,12 @@ export default function PricingPage() {
             then add team sharing when more people help chase and close work.
           </p>
 
-          <div className="pricingBillingPill" aria-label="Billing">
-            <span>Your plan</span>
-            <strong>{planLabel}</strong>
+          <div className="pricingCurrentPlanBanner" aria-label="Current plan">
+            <div>
+              <span>Current plan</span>
+              <strong>{planLabel}</strong>
+            </div>
+            <Link href="/account/settings">Manage billing</Link>
           </div>
         </div>
 

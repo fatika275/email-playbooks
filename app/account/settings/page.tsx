@@ -18,6 +18,7 @@ export default function AccountSettingsPage() {
   const [billingMessage, setBillingMessage] = useState("");
   const [passwordMessage, setPasswordMessage] = useState("");
   const [refundMessage, setRefundMessage] = useState("");
+  const [refundStatus, setRefundStatus] = useState<"success" | "error" | "">("");
   const [isOpeningBilling, setIsOpeningBilling] = useState(false);
   const [isRequestingRefund, setIsRequestingRefund] = useState(false);
 
@@ -93,6 +94,7 @@ export default function AccountSettingsPage() {
 
   async function handleRefundRequest() {
     setRefundMessage("");
+    setRefundStatus("");
 
     const client = getSupabaseBrowserClient();
     const refreshed = await client?.auth.refreshSession();
@@ -100,6 +102,7 @@ export default function AccountSettingsPage() {
 
     if (refreshed?.error || !accessToken) {
       setRefundMessage("Please sign in again before requesting a refund.");
+      setRefundStatus("error");
       return;
     }
 
@@ -126,10 +129,12 @@ export default function AccountSettingsPage() {
         payload.message ||
           "Refund submitted. Paid access has been removed from this account."
       );
+      setRefundStatus("success");
     } catch (error) {
       setRefundMessage(
         error instanceof Error ? error.message : "Refund could not be requested."
       );
+      setRefundStatus("error");
     } finally {
       setIsRequestingRefund(false);
     }
@@ -239,7 +244,15 @@ export default function AccountSettingsPage() {
                     is submitted.
                   </span>
                   {refundMessage ? (
-                    <p className="accountSettingsInlineNotice">{refundMessage}</p>
+                    <p
+                      className={`accountSettingsInlineNotice ${
+                        refundStatus === "success"
+                          ? "accountSettingsInlineNoticeSuccess"
+                          : "accountSettingsInlineNoticeError"
+                      }`}
+                    >
+                      {refundMessage}
+                    </p>
                   ) : null}
                 </div>
                 <div className="accountSettingsActions">
