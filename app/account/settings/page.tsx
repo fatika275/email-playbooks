@@ -17,7 +17,9 @@ export default function AccountSettingsPage() {
   } = useAccount();
   const [billingMessage, setBillingMessage] = useState("");
   const [passwordMessage, setPasswordMessage] = useState("");
+  const [refundMessage, setRefundMessage] = useState("");
   const [isOpeningBilling, setIsOpeningBilling] = useState(false);
+  const [isRequestingRefund, setIsRequestingRefund] = useState(false);
 
   const supportEmailHref = `mailto:${encodeURIComponent(
     siteConfig.supportEmail
@@ -86,6 +88,50 @@ export default function AccountSettingsPage() {
       );
     } finally {
       setIsOpeningBilling(false);
+    }
+  }
+
+  async function handleRefundRequest() {
+    setRefundMessage("");
+
+    const client = getSupabaseBrowserClient();
+    const refreshed = await client?.auth.refreshSession();
+    const accessToken = refreshed?.data.session?.access_token;
+
+    if (refreshed?.error || !accessToken) {
+      setRefundMessage("Please sign in again before requesting a refund.");
+      return;
+    }
+
+    setIsRequestingRefund(true);
+
+    try {
+      const response = await fetch("/api/billing/refund", {
+        method: "POST",
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+      });
+      const payload = (await response.json()) as {
+        message?: string;
+        error?: string;
+      };
+
+      if (!response.ok) {
+        throw new Error(payload.error || "Refund could not be requested.");
+      }
+
+      trackEvent("account_refund_requested");
+      setRefundMessage(
+        payload.message ||
+          "Refund submitted. Paid access has been removed from this account."
+      );
+    } catch (error) {
+      setRefundMessage(
+        error instanceof Error ? error.message : "Refund could not be requested."
+      );
+    } finally {
+      setIsRequestingRefund(false);
     }
   }
 
@@ -187,11 +233,28 @@ export default function AccountSettingsPage() {
               <div className="accountSettingsItem">
                 <div>
                   <strong>Refunds</strong>
-                  <span>Read the policy or contact support about a charge.</span>
+                  <span>
+                    Request an automatic refund for the latest eligible payment
+                    within 7 days. Paid access is removed as soon as the refund
+                    is submitted.
+                  </span>
+                  {refundMessage ? (
+                    <p className="accountSettingsInlineNotice">{refundMessage}</p>
+                  ) : null}
                 </div>
-                <Link className="button buttonUtility" href="/refunds">
-                  Policy
-                </Link>
+                <div className="accountSettingsActions">
+                  <button
+                    className="button buttonSecondary"
+                    type="button"
+                    disabled={isRequestingRefund}
+                    onClick={() => void handleRefundRequest()}
+                  >
+                    {isRequestingRefund ? "Requesting..." : "Request refund"}
+                  </button>
+                  <Link className="button buttonUtility" href="/refunds">
+                    Policy
+                  </Link>
+                </div>
               </div>
 
               <div className="accountSettingsItem">

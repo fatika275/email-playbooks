@@ -1892,6 +1892,17 @@ details[open] > summary::after {
   justify-content: center;
 }
 
+.accountSettingsItem .accountSettingsActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.accountSettingsItem .accountSettingsActions .button {
+  white-space: nowrap;
+}
+
 .accountSettingsItemImportant {
   margin: 0 -12px;
   padding: 15px 12px;
@@ -7414,6 +7425,10 @@ details[open] > summary::after {
   }
 
   .accountSettingsItem .button {
+    width: 100%;
+  }
+
+  .accountSettingsItem .accountSettingsActions {
     width: 100%;
   }
 
