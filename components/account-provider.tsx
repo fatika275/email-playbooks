@@ -58,6 +58,7 @@ type AccountContextValue = {
   verifySignupCode: (email: string, code: string) => Promise<void>;
   signOut: () => Promise<void>;
   syncNow: () => Promise<void>;
+  refreshAccount: () => Promise<void>;
 };
 
 const AccountContext = createContext<AccountContextValue | null>(null);
@@ -327,6 +328,21 @@ export function AccountProvider({ children }: { children: ReactNode }) {
         } finally {
           setIsSyncing(false);
         }
+      },
+      async refreshAccount() {
+        if (!user) return;
+        const [refreshedProfile, adminStatus, refreshedBusinessMembership] =
+          await Promise.all([
+            getCloudProfile(user.id),
+            getIsCurrentUserAdmin(),
+            getBusinessMembership(),
+          ]);
+        setProfile(refreshedProfile);
+        setIsAdmin(adminStatus);
+        setBusinessMembership(refreshedBusinessMembership);
+        setSyncVersion((value) => value + 1);
+        setSyncErrorMessage("");
+        setStatusMessage("Your account is up to date.");
       },
     }),
     [

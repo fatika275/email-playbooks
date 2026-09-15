@@ -13,6 +13,7 @@ export default function AccountSettingsPage() {
     founderEligible,
     founderPriceGbp,
     planLabel,
+    refreshAccount,
     requestPasswordReset,
   } = useAccount();
   const [billingMessage, setBillingMessage] = useState("");
@@ -125,6 +126,7 @@ export default function AccountSettingsPage() {
       }
 
       trackEvent("account_refund_requested");
+      await refreshAccount();
       setRefundMessage(
         payload.message ||
           "Refund submitted. Paid access has been removed from this account."
