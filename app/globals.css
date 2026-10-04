@@ -1814,8 +1814,12 @@ details[open] > summary::after {
   padding: 30px 0 28px;
 }
 
+.accountSettingsHero > .button {
+  margin-bottom: 32px;
+}
+
 .accountSettingsHero .badge {
-  margin-top: 22px;
+  margin-top: 0;
 }
 
 .accountSettingsHero .pageTitle {
