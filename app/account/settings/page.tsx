@@ -145,10 +145,13 @@ export default function AccountSettingsPage() {
   return (
     <main className="main">
       <section className="container">
-        <div className="accountSettingsHero">
+        <div className="accountSettingsBackRow">
           <Link href="/account" className="button buttonUtility">
             Back to account
           </Link>
+        </div>
+
+        <div className="accountSettingsHero">
           <div className="badge">Settings</div>
           <h1 className="pageTitle">Account settings</h1>
           <p className="muted">

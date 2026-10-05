@@ -1809,17 +1809,14 @@ details[open] > summary::after {
   justify-content: center;
 }
 
+.accountSettingsBackRow {
+  max-width: 820px;
+  padding: 30px 0 0;
+}
+
 .accountSettingsHero {
   max-width: 820px;
-  padding: 30px 0 28px;
-}
-
-.accountSettingsHero > .button {
-  margin-bottom: 32px;
-}
-
-.accountSettingsHero .badge {
-  margin-top: 0;
+  padding: 28px 0 28px;
 }
 
 .accountSettingsHero .pageTitle {
